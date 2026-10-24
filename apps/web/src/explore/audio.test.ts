@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { EXPLORE } from "../shared/config";
-import { AudioEngine, type AudioDeps, type SpeechLike, type UtteranceLike } from "./audio";
+import { AudioEngine, type AudioDeps, NO_LOCAL_VOICE, type SpeechLike, type UtteranceLike, pickVoice } from "./audio";
 
 class FakeBuffer {
   constructor(
@@ -57,6 +57,14 @@ class FakeSpeech implements SpeechLike {
     { name: "Samantha", lang: "en-US", localService: true, default: false },
   ];
   current: UtteranceLike | null = null;
+  listeners: (() => void)[] = [];
+  addEventListener(_type: "voiceschanged", listener: () => void) {
+    this.listeners.push(listener);
+  }
+  setVoices(voices: FakeSpeech["voices"]) {
+    this.voices = voices;
+    for (const l of this.listeners) l();
+  }
   speak(u: UtteranceLike) {
     this.said.push(u.text);
     this.speaking = true;
@@ -78,9 +86,15 @@ class FakeSpeech implements SpeechLike {
   }
 }
 
-function setup(mode: "app" | "screen_reader" = "app") {
+const NETWORK_ONLY = [
+  { name: "Google US English", lang: "en-US", localService: false, default: true },
+  { name: "Google UK English", lang: "en-GB", localService: false, default: false },
+];
+
+function setup(mode: "app" | "screen_reader" = "app", voices?: FakeSpeech["voices"]) {
   const ctx = new FakeContext();
   const speech = new FakeSpeech();
+  if (voices) speech.voices = voices;
   const mirror = document.createElement("div");
   const deps: AudioDeps = {
     context: () => ctx as unknown as AudioContext,
@@ -190,5 +204,81 @@ describe("audio engine", () => {
     await engine.start(pitches);
     engine.say("Stem");
     expect(engine.lastSaid).toBe("Stem");
+  });
+});
+
+const voice = (v: Partial<SpeechSynthesisVoice>) => ({ name: "v", lang: "en-US", localService: false, default: false, ...v }) as SpeechSynthesisVoice;
+
+describe("the app voice works offline or steps aside", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("picks a local voice over the default network voice, English first", () => {
+    expect(pickVoice([voice({ name: "Net", default: true }), voice({ name: "Local", localService: true })])?.name).toBe("Local");
+    expect(pickVoice([voice({ name: "Fr", lang: "fr-FR", localService: true }), voice({ name: "En", localService: true })])?.name).toBe("En");
+    expect(pickVoice([voice({ name: "A", localService: true }), voice({ name: "B", localService: true, default: true })])?.name).toBe("B");
+    expect(pickVoice([voice({ name: "Net", default: true })])).toBeNull();
+    expect(pickVoice([])).toBeNull();
+  });
+
+  it("with only network voices, never speaks, makes the mirror polite and flags it for the notice", async () => {
+    const { speech, mirror, engine } = setup("app", NETWORK_ONLY);
+    let changes = 0;
+    engine.onVoiceChange = () => { changes++; };
+    expect(engine.noLocalVoice).toBe(false); // not known before start
+    await engine.start(pitches);
+    expect(engine.noLocalVoice).toBe(true);
+    expect(changes).toBe(1);
+    engine.say("Left lobe");
+    expect(speech.said).toEqual([]);
+    expect(mirror.getAttribute("aria-live")).toBe("polite");
+    expect(mirror.textContent).toContain("Left lobe");
+    expect(NO_LOCAL_VOICE).toMatch(/no voice that works offline/);
+  });
+
+  it("choosing the screen reader clears the notice, and choosing the app voice again brings it back", async () => {
+    const { engine, mirror } = setup("app", NETWORK_ONLY);
+    let changes = 0;
+    engine.onVoiceChange = () => { changes++; };
+    await engine.start(pitches);
+    engine.setMode("screen_reader");
+    expect([engine.noLocalVoice, changes]).toEqual([false, 2]);
+    engine.setMode("app");
+    expect([engine.noLocalVoice, changes, mirror.getAttribute("aria-live")]).toEqual([true, 3, "polite"]);
+  });
+
+  it("waits for voices that load a moment late, then uses the local one", async () => {
+    const { speech, engine } = setup("app", []);
+    const started = engine.start(pitches);
+    speech.setVoices([...NETWORK_ONLY, { name: "Samantha", lang: "en-US", localService: true, default: false }]);
+    await started;
+    expect(engine.noLocalVoice).toBe(false);
+    engine.say("Stem");
+    expect(speech.said).toEqual(["Stem"]);
+  });
+
+  it("gives up waiting after a second, then leaves the fallback when a local voice arrives", async () => {
+    vi.useFakeTimers();
+    const { speech, mirror, engine } = setup("app", []);
+    const started = engine.start(pitches);
+    await vi.advanceTimersByTimeAsync(1000);
+    await started;
+    expect(engine.noLocalVoice).toBe(true);
+    let changes = 0;
+    engine.onVoiceChange = () => { changes++; };
+    speech.setVoices([{ name: "Samantha", lang: "en-US", localService: true, default: false }]);
+    expect([engine.noLocalVoice, changes, mirror.getAttribute("aria-live")]).toEqual([false, 1, "off"]);
+    engine.say("Stem");
+    expect(speech.said).toEqual(["Stem"]);
+  });
+
+  it("losing the local voice stops speech and falls back", async () => {
+    const { speech, engine } = setup();
+    await engine.start(pitches);
+    engine.say("A long sentence");
+    speech.setVoices(NETWORK_ONLY);
+    expect(speech.speaking).toBe(false);
+    expect(engine.noLocalVoice).toBe(true);
   });
 });

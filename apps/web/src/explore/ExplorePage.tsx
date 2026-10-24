@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EXPLORE } from "../shared/config";
 import type { RegionsFile } from "../shared/regions";
 import type { WorkerHand } from "../workers/protocol";
-import { AudioEngine, type AudioPort, type VoiceMode, browserAudioDeps } from "./audio";
+import { AudioEngine, type AudioPort, NO_LOCAL_VOICE, type VoiceMode, browserAudioDeps } from "./audio";
 import { CameraLoop, type HandsFrame, askApi } from "./camera";
 import { CornerClicks, loadCorners, parseQuad, saveCorners } from "./corners";
 import { FingertipTracker } from "./fingertip";
@@ -127,6 +127,7 @@ export function ExplorePage() {
   const [started, setStarted] = useState(false);
   const [settings, setSettings] = useState<Settings>(loadSettings);
   const [question, setQuestion] = useState("");
+  const [noLocalVoice, setNoLocalVoice] = useState(false);
 
   const mirror = useRef<HTMLDivElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
@@ -228,6 +229,7 @@ export function ExplorePage() {
     if (!m) return;
     const eng = new AudioEngine(EXPLORE, browserAudioDeps(m), settings.voice);
     engine.current = eng;
+    eng.onVoiceChange = () => { setNoLocalVoice(eng.noLocalVoice); };
     const port = new TracingAudio(eng, trace.current.log);
     audio.current = port;
     const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi });
@@ -380,6 +382,7 @@ export function ExplorePage() {
           Start exploring
         </button>
       )}
+      {started && noLocalVoice && <p role="alert">{NO_LOCAL_VOICE}</p>}
       {started && (
         <>
           <form onSubmit={onAsk}>
