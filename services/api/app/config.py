@@ -294,6 +294,8 @@ class Intents(_Section):
 
 class Health(_Section):
     no_hand_warn_ms: PosInt
+    dark_frame_below: Annotated[StrictFloat, Field(gt=0, lt=1)]
+    dark_warn_ms: PosInt
     off_page_points_before_recal: PosInt
 
 

@@ -63,6 +63,8 @@ describe("explore config", () => {
     ["guidance.chime_hz", []],
     ["intents.min_label_similarity", 1.2],
     ["intents", DELETE],
+    ["health.dark_frame_below", 1.5],
+    ["health.dark_warn_ms", 0],
   ])("refuses %s = %s and names the field", (path, value) => {
     const field = path.split(".").pop() ?? path;
     expect(() => loadExploreConfig(edit(path, value))).toThrow(ConfigError);

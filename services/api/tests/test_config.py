@@ -183,6 +183,8 @@ EXPLORE_BAD = [
     ("guidance.chime_hz", [], "chime_hz"),
     ("intents.min_label_similarity", 1.2, "min_label_similarity"),
     ("intents", DELETE, "intents"),
+    ("health.dark_frame_below", 1.5, "dark_frame_below"),
+    ("health.dark_warn_ms", 0, "dark_warn_ms"),
 ]
 
 

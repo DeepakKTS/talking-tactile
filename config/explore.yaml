@@ -40,6 +40,8 @@ intents:
   min_label_similarity: 0.75 # fuzzy match of a spoken name to a label, 0 to 1
 health:
   no_hand_warn_ms: 2000
+  dark_frame_below: 0.06     # mean frame brightness, 0 to 1: below this the camera is covered or sees nothing
+  dark_warn_ms: 1800         # dark this long: say so. Under 2 s with a frame or two of camera delay
   off_page_points_before_recal: 15
 registration:
   mark_inset_mm: 12.7        # corner marks on every printed sheet, this far in from each page edge.

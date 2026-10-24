@@ -15,15 +15,20 @@ function yamlConfig(): Plugin {
   };
 }
 
+// TT_API lets the headless Explore run use its own API port.
+const API_PROXY = { "/api": process.env.TT_API ?? "http://127.0.0.1:8000" };
+
 export default defineConfig({
   plugins: [react(), yamlConfig()],
   server: {
     port: 5173,
     strictPort: true,
-    proxy: { "/api": "http://127.0.0.1:8000" },
+    proxy: API_PROXY,
     // The contract and shared fixtures live at the repo root, outside apps/web.
     fs: { allow: [fileURLToPath(new URL("../..", import.meta.url))] },
   },
+  preview: { proxy: API_PROXY },
+  worker: { format: "es" },
   test: {
     include: ["src/**/*.test.ts", "src/**/*.test.tsx", "scripts/**/*.test.ts"],
     environment: "node",

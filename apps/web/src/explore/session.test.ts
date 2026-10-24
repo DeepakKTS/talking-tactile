@@ -68,10 +68,10 @@ function setup(ask?: (r: AskRequest) => Promise<string>) {
 }
 
 describe("explore session", () => {
-  it("opens with the title and the summary", () => {
+  it("opens with the title, the summary and how to get help", () => {
     const { audio, session } = setup();
     session.intro();
-    expect(audio.said()).toEqual([`${SYNTHETIC.title}. ${SYNTHETIC.summary}`]);
+    expect(audio.said()).toEqual([`${SYNTHETIC.title}. ${SYNTHETIC.summary} Press H for help.`]);
   });
 
   it("plays the part's earcon on entry and says its label on dwell", () => {
@@ -178,6 +178,34 @@ describe("explore session", () => {
     expect(audio.said()).toEqual(["Your finger is off the sheet. Press R to set the corners again."]);
     hold([-40, 500], 3000);
     expect(audio.said()).toHaveLength(1);
+  });
+});
+
+describe("camera sight", () => {
+  const dark = EXPLORE.health.dark_frame_below / 2;
+  const light = 0.5;
+  const feed = (session: ExploreSession, b: number, from: number, ms: number) => {
+    for (let t = from; t < from + ms; t += FRAME) session.sight(b, t);
+  };
+
+  it("says the camera cannot see the sheet dark_warn_ms after it goes dark, once", () => {
+    const { audio, session } = setup();
+    expect(EXPLORE.health.dark_warn_ms).toBeLessThan(2000 - 2 * FRAME); // the a11y pass asks for 2 s
+    feed(session, light, 0, 1000);
+    feed(session, dark, 1000, EXPLORE.health.dark_warn_ms - FRAME);
+    expect(audio.said()).toEqual([]);
+    feed(session, dark, 1000 + EXPLORE.health.dark_warn_ms - FRAME, 3000);
+    expect(audio.said()).toEqual(["The camera cannot see the sheet."]);
+  });
+
+  it("says when it can see again, and a short dip says nothing", () => {
+    const { audio, session } = setup();
+    feed(session, dark, 0, 2500);
+    feed(session, light, 2500, 500);
+    expect(audio.said()).toEqual(["The camera cannot see the sheet.", "The camera can see the sheet again."]);
+    feed(session, dark, 3000, 1000);
+    feed(session, light, 4000, 1000);
+    expect(audio.said()).toHaveLength(2);
   });
 });
 

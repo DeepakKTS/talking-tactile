@@ -1,9 +1,10 @@
+import { ExplorePage } from "./explore/ExplorePage";
 import { routeFromPath } from "./route";
 
 export function App() {
   const route = routeFromPath(window.location.pathname);
   if (route === "author") return <main><h1>Author</h1></main>;
-  if (route === "explore") return <main><h1>Explore</h1></main>;
+  if (route === "explore") return <ExplorePage />;
   return (
     <main>
       <h1>Talking Tactile</h1>

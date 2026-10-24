@@ -19,10 +19,19 @@ export interface AskRequest {
   recent_region_ids: string[];
 }
 
+/** A failed question, with the sentence to say instead of an answer. */
+export class AskError extends Error {
+  override name = "AskError";
+  constructor(readonly spoken: string) {
+    super(spoken);
+  }
+}
+
 export interface SessionDeps {
   audio: AudioPort;
   metrics: Metrics;
-  /** The answer text, or a throw when the network or the service is not there. */
+  /** The answer text. Throws AskError with a sentence to say when the service fails, or
+   * anything else when the network is not there. */
   ask: (req: AskRequest) => Promise<string>;
 }
 
@@ -61,6 +70,8 @@ export const HELP =
   "Escape stops speech. R sets the corners again. Type a question and press Enter.";
 export const OFFLINE_ANSWER = "Questions need the network. Labels still work.";
 const OFF_SHEET = "Your finger is off the sheet. Press R to set the corners again.";
+const CANNOT_SEE = "The camera cannot see the sheet.";
+const SEES_AGAIN = "The camera can see the sheet again.";
 const RECENT = 2;
 
 const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -80,6 +91,8 @@ export class ExploreSession {
   private recent: IndexedRegion[] = [];
   private offSheet = 0;
   private warnedOffSheet = false;
+  private darkSince: number | null = null;
+  private warnedDark = false;
 
   constructor(
     readonly file: RegionsFile,
@@ -101,7 +114,7 @@ export class ExploreSession {
   }
 
   intro(): void {
-    this.deps.audio.say(`${this.file.title}. ${this.file.summary}`);
+    this.deps.audio.say(`${this.file.title}. ${this.file.summary} Press H for help.`);
   }
 
   help(): void {
@@ -147,6 +160,23 @@ export class ExploreSession {
         audio.chime();
         audio.say(capital(g.region.label));
       }
+    }
+  }
+
+  /** Each frame's brightness (0 to 1): a camera that stays dark for dark_warn_ms is
+   * covered or sees nothing, and the student hears so, once, and again when it clears. */
+  sight(brightness: number, t: number): void {
+    const { dark_frame_below, dark_warn_ms } = this.cfg.health;
+    if (brightness >= dark_frame_below) {
+      this.darkSince = null;
+      if (this.warnedDark) this.deps.audio.say(SEES_AGAIN);
+      this.warnedDark = false;
+      return;
+    }
+    this.darkSince ??= t;
+    if (!this.warnedDark && t - this.darkSince >= dark_warn_ms) {
+      this.warnedDark = true;
+      this.deps.audio.say(CANNOT_SEE);
     }
   }
 
@@ -236,8 +266,8 @@ export class ExploreSession {
     let answer: string;
     try {
       answer = await this.deps.ask(req);
-    } catch {
-      answer = OFFLINE_ANSWER;
+    } catch (err) {
+      answer = err instanceof AskError ? err.spoken : OFFLINE_ANSWER;
     }
     this.deps.audio.say(answer);
   }

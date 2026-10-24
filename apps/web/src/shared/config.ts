@@ -65,7 +65,12 @@ const ExploreSchema = z.strictObject({
       path: ["beeps_per_s_near"],
     }),
   intents: z.strictObject({ min_label_similarity: z.number().positive().max(1) }),
-  health: z.strictObject({ no_hand_warn_ms: posInt, off_page_points_before_recal: posInt }),
+  health: z.strictObject({
+    no_hand_warn_ms: posInt,
+    dark_frame_below: z.number().positive().lt(1),
+    dark_warn_ms: posInt,
+    off_page_points_before_recal: posInt,
+  }),
   registration: z.strictObject({ mark_inset_mm: posNum }),
 });
 
