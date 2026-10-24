@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 34,
- "updated_at": "2026-10-24T16:24:59.090Z",
+ "rev": 39,
+ "updated_at": "2026-10-24T16:28:18.621Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -707,13 +707,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "apps/web, services/api, Makefile, CI with lint and tests. Copy the kit and this file into the root.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "Pin Python 3.11 for services/api with uv (uv python pin 3.11, then uv venv); system python3 is 3.13. Check that the liblouis Python bindings (louis) install on macOS. Fallback: call lou_translate through subprocess.",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 3c3c1d4 on early-start. apps/web: Vite 8.3.5, React 19.3, TypeScript 6.0.3 strict (noUncheckedIndexedAccess, exactOptionalPropertyTypes), vitest 5, eslint strictTypeChecked, 2 tests. services/api: FastAPI 0.162 on Python 3.11.14 via uv, pytest with warnings as errors, ruff incl. PLR2004 magic-value check on app/, mypy strict, 1 test. make dev/test/lint/typecheck/eval/check. Hook runs make check; probe with a failing staged pytest and a passing unstaged copy: blocked, exit 1, unstaged copy restored.",
+   "done_at": "2026-10-24T16:28:18.587Z",
    "tags": [
     "setup"
    ],
-   "changed_at": "2026-10-24T06:07:11.361Z"
+   "changed_at": "2026-10-24T16:28:18.587Z"
   },
   {
    "id": "d1-5",
@@ -790,6 +790,36 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "tags": [
     "gate"
    ]
+  },
+  {
+   "id": "d1-10",
+   "day": 1,
+   "title": "Regions contract in code",
+   "detail": "Pydantic models and TypeScript types for regions.json. fixtures/regions/golden.json validated against docs/regions.schema.json from Python and TypeScript, so the two sides cannot drift.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "doing",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "contract"
+   ],
+   "changed_at": "2026-10-24T16:28:18.621Z"
+  },
+  {
+   "id": "d1-11",
+   "day": 1,
+   "title": "Config loaders",
+   "detail": "Load and validate config/tactile_rules.yaml and config/explore.yaml at startup in Python and TypeScript. Tests for missing and invalid values. No magic numbers elsewhere.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "config"
+   ],
+   "changed_at": "2026-10-24T16:25:17.358Z"
   },
   {
    "id": "d2-1",
@@ -1753,6 +1783,31 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:28:18.621Z",
+   "kind": "claude",
+   "text": "Task d1-10 \"Regions contract in code\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T16:28:18.587Z",
+   "kind": "claude",
+   "text": "Task d1-4 \"Repo skeleton and kit\" is now done. Note: Commit 3c3c1d4 on early-start. apps/web: Vite 8.3.5, React 19.3, TypeScript 6.0.3 strict (noUncheckedIndexedAccess, exactOptionalPropertyTypes), vitest 5, eslint strictTypeChecked, 2 tests. services/api: FastAPI 0.162 on Python 3.11.14 via uv, pytest with warnings as errors, ruff incl. PLR2004 magic-value check on app/, mypy strict, 1 test. make dev/test/lint/typecheck/eval/check. Hook runs make check; probe with a failing staged pytest and a passing unstaged copy: blocked, exit 1, unstaged copy restored."
+  },
+  {
+   "ts": "2026-10-24T16:25:17.389Z",
+   "kind": "claude",
+   "text": "Task d1-4 \"Repo skeleton and kit\" is now doing. Note: On branch early-start (worktree .worktrees/early-start): Vite React TS strict app, FastAPI uv Python 3.11 service, Makefile dev/test/lint/typecheck/eval, pre-commit hook extended to run pytest, vitest, ruff, mypy, eslint and tsc. CI is the pre-commit hook for now."
+  },
+  {
+   "ts": "2026-10-24T16:25:17.358Z",
+   "kind": "claude",
+   "text": "Task d1-11 \"Config loaders\" added to day 1."
+  },
+  {
+   "ts": "2026-10-24T16:25:17.325Z",
+   "kind": "claude",
+   "text": "Task d1-10 \"Regions contract in code\" added to day 1."
+  },
   {
    "ts": "2026-10-24T16:24:59.090Z",
    "kind": "claude",

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 34, updated 2026-10-24T16:24:59.090Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 39, updated 2026-10-24T16:28:18.621Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -37,9 +37,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Read dev.meta.ai/docs/models and pricing-rate-limits. Wonder is muse-wonder-1.0, preview, 1M context, same request shape as Spark, 4.00/20.00 per 1M tokens. Decision: no job in the product; optional S1 comparison only if Spark recall misses 80 percent. Also noted: rate limit table says sam-3.1, models table says sam-3-1; SAM spike will confirm.
 - [ ] d1-3 Get the API key and credits, set BUDGET_USD (20 min)
   - Key goes only in services/api/.env.
-- [ ] d1-4 Repo skeleton and kit (1.5 h)
+- [x] d1-4 Repo skeleton and kit (1.5 h)
   - apps/web, services/api, Makefile, CI with lint and tests. Copy the kit and this file into the root.
-  - Note: Pin Python 3.11 for services/api with uv (uv python pin 3.11, then uv venv); system python3 is 3.13. Check that the liblouis Python bindings (louis) install on macOS. Fallback: call lou_translate through subprocess.
+  - Note: Commit 3c3c1d4 on early-start. apps/web: Vite 8.3.5, React 19.3, TypeScript 6.0.3 strict (noUncheckedIndexedAccess, exactOptionalPropertyTypes), vitest 5, eslint strictTypeChecked, 2 tests. services/api: FastAPI 0.162 on Python 3.11.14 via uv, pytest with warnings as errors, ruff incl. PLR2004 magic-value check on app/, mypy strict, 1 test. make dev/test/lint/typecheck/eval/check. Hook runs make check; probe with a failing staged pytest and a passing unstaged copy: blocked, exit 1, unstaged copy restored.
 - [ ] d1-5 Spike Muse Spark (1 h) [blocked]
   - One figure in, structured parts list out. Use the meta-api-spike skill.
   - Note: Script and notes written from the docs: spikes/spark_spike.py (understand case with heart.png and S1 schema, answer case streamed with TTFT and cache check), spikes/muse-spark.md. Dry run passes on Python 3.11 via uv. Blocked on the API key in services/api/.env.
@@ -55,6 +55,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.
 - [ ] d1-9 Gate A check (15 min)
   - All three models answer and latencies are written in spikes/.
+- [ ] d1-10 Regions contract in code (1.5 h) [doing]
+  - Pydantic models and TypeScript types for regions.json. fixtures/regions/golden.json validated against docs/regions.schema.json from Python and TypeScript, so the two sides cannot drift.
+- [ ] d1-11 Config loaders (1 h)
+  - Load and validate config/tactile_rules.yaml and config/explore.yaml at startup in Python and TypeScript. Tests for missing and invalid values. No magic numbers elsewhere.
 - [ ] Gate A: Models answer [Pending]
   - Pass when: Muse Spark, SAM 3.1 and Muse Voice all return real results. p50 and p95 latency written in spikes/.
   - Fallback: Weak SAM on line art: local SAM 3.1 checkpoint with point prompts, same day.
