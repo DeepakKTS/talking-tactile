@@ -42,6 +42,9 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
     if video:
         args.append(f"--use-file-for-fake-video-capture={Path(video).resolve()}")
     query = "?stub=100" if mode == "loop" else (f"?delegate={delegate}" if delegate else "")
+    if mode == "hands":
+        # Whole 640x480 frame as the sheet, so the fingertip lands at a known place in mm.
+        query += ("&" if query else "?") + "corners=0,0,640,0,640,480,0,480"
     logs: list[str] = []
     try:
         with sync_playwright() as p:
@@ -63,11 +66,15 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
                 """() => { const s = window.__tt; return { backend: s.backend, videoSize: s.videoSize,
                     camFps: s.camFps, procFps: s.procFps, pump: s.pump, maxInFlight: s.maxInFlight,
                     results: s.results, handsNow: s.hands.length, framesWithHands: s.framesWithHands ?? null,
-                    loadMs: s.loadMs, backendErrors: s.backendErrors, firstHand: s.hands[0] ? JSON.parse(JSON.stringify(s.hands[0])) : null,
+                    loadMs: s.loadMs, backendErrors: s.backendErrors, tip: s.tip, calibrated: !!(s.calib && s.calib.toMm), firstHand: s.hands[0] ? JSON.parse(JSON.stringify(s.hands[0])) : null,
                     inferP50: [...s.inferMs].sort((a,b)=>a-b)[Math.floor(s.inferMs.length/2)],
                     loopP95: [...s.loopMs].sort((a,b)=>a-b)[Math.ceil(0.95*s.loopMs.length)-1] }; }"""
             )
             stats["status"] = page.inner_text("#status")
+            shot = HERE.parent / "out" / f"tracking_e2e_{mode}.png"
+            shot.parent.mkdir(parents=True, exist_ok=True)
+            page.screenshot(path=str(shot), full_page=True)
+            stats["screenshot"] = str(shot)
             browser.close()
     finally:
         srv.shutdown()
@@ -91,8 +98,14 @@ def main() -> None:
             failures.append("processed fps should be at most about 10 with a 100 ms worker")
         if stats["loopP95"] > 160:
             failures.append("frame to result p95 above 160 ms; frames may be queuing")
-    if mode == "hands" and not stats.get("framesWithHands"):
-        failures.append("no hands found in the clip")
+    if mode == "hands":
+        if not stats.get("framesWithHands"):
+            failures.append("no hands found in the clip")
+        if not stats.get("calibrated"):
+            failures.append("calibration from ?corners= did not apply")
+        tip = stats.get("tip") or {}
+        if not tip.get("mm") or not all(0 <= v <= 300 for v in tip["mm"]):
+            failures.append(f"fingertip not mapped onto the sheet: {tip}")
     if failures:
         print("FAIL:", "; ".join(failures))
         sys.exit(1)

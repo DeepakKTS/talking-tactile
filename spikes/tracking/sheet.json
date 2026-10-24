@@ -1,0 +1,15 @@
+{
+  "note": "Test sheet geometry in mm, origin at the top left of a US Letter page, portrait. Used by make_sheet.py and the page.",
+  "page_mm": [215.9, 279.4],
+  "corner_order": ["A top left", "B top right", "C bottom right", "D bottom left"],
+  "corners_mm": [[15, 15], [200.9, 15], [200.9, 264.4], [15, 264.4]],
+  "corner_mark": { "ring_radius_mm": 5, "cross_half_mm": 7 },
+  "targets_mm": [
+    [45, 60], [107.95, 60], [170.9, 60],
+    [45, 130], [107.95, 130], [170.9, 130],
+    [45, 200], [107.95, 200], [170.9, 200]
+  ],
+  "target_mark": { "ring_radius_mm": 4, "dot_radius_mm": 0.8 },
+  "calibration_bar": { "start_mm": [57.95, 240], "length_mm": 100, "tick_every_mm": 10 },
+  "touches_per_target": 5
+}

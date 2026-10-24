@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 24, updated 2026-10-24T06:52:36.543Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 26, updated 2026-10-24T06:55:52.869Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -67,8 +67,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d2-2 Hand worker with MediaPipe Hand Landmarker (2 h)
   - VIDEO mode, two hands, landmarks only back to the main thread.
   - Note: spikes/tracking/worker.js: MediaPipe tasks-vision 1.1.0 Hand Landmarker in a module worker, VIDEO mode, 2 hands, landmarks only back to the page. Needed forVisionTasks(base, true): module workers have no importScripts (error was 'ModuleFactory not set'). Headless Chrome, 640x480 15 fps clip of a public domain pointing hand: CPU 149 of 155 frames with a hand, infer p50 33.6 ms, keeps up; GPU infer p50 20.7 ms but 8.4 fps processed headless, recheck on real hardware. Load about 0.6 s. Product must vendor the wasm and model for offline (RULES 5.4).
-- [ ] d2-3 Homography from 4 clicked corners (1 h)
+- [x] d2-3 Homography from 4 clicked corners (1 h)
   - 3 x 3 matrix, a few lines of math. Auto registration comes on Day 5.
+  - Note: spikes/tracking: lib/homography.js (4 point DLT, convex check for click order), lib/oneeuro.js (per axis, config/explore.yaml values), lib/fingertip.js (pointing hand picker, 4 mm contact offset toward DIP), calib.js (click A to D, overlay of projected sheet and targets, saved per camera size). 18 node tests. Headless: whole frame as sheet, fingertip mapped to 62.7, 69.5 mm, matching the hand math within 0.1 mm, pointing pose recognized. Watch: MediaPipe warns NORM_RECT projection is exact only for square input; check in the touch test.
 - [ ] d2-4 Run the 9 point touch test (1 h)
   - Print the test sheet, 45 touches, record mean and p95 error in mm.
 - [ ] d2-5 Measure fps on phone browser and laptop (30 min)
