@@ -11,6 +11,7 @@ A standalone page that covers Day 2 (d2-1 to d2-4) as a prototype. The camera ke
 5. Press R and click the centers of corners A, B, C, D on the video, in that order. The magenta outline and targets should land on the printed ones. If they do not, press R again.
 6. Press T. For each number shown and spoken, put your index fingertip on that target and hold still. The touch records itself after 0.6 s at rest. Space records one at once. There are 45 touches, about 3 minutes.
 7. The page shows mean, p95, bias and per target means, plus the two tracker commands, and offers the raw JSON. Send me the numbers or the JSON.
+8. `python3 spikes/tracking/analyze_touch.py touch-test-....json` recomputes the stats from the raw records and decides Gate B (mean 4 mm or less). It also tests whether x and y differ, both as signed bias and as scale per axis in camera pixels. A frame aspect ratio bug shows only in the scale: errors on both sides of center cancel in the mean bias.
 
 Keys: R recalibrate, T start the test, Space record now, Escape stop speech. The contact offset field moves the contact point back from the fingertip, 4 mm by default from config/explore.yaml.
 
