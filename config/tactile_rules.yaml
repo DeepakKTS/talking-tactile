@@ -38,6 +38,13 @@ page:
 
 pipeline:                          # engineering values, not design rules
   normalize_max_side_px: 2048      # PLAN.md section 6, S0: longest side of the normalized image
+  max_upload_mb: 10                # PLAN.md section 5.3 upload guard
+  pdf_render_dpi: 200              # a PDF page is rendered at this resolution before normalizing
+  min_sharpness: 0.15              # p99.5 gradient over intensity range at 2048 px. Measured Oct 24 on the synthetic
+                                   # figure and heart.png: sharp 0.49-0.56, Gaussian blur 2 px 0.22-0.27, 4 px 0.09-0.13
+  deskew_min_area_fraction: 0.2    # a photographed page must fill at least this much of the photo
+  deskew_max_area_fraction: 0.98   # a four-sided outline this large is the image border, not a page
+  deskew_min_contrast: 40          # the page must be this much brighter (0-255) than what surrounds it
 
 reconcile:                         # S3 rules on raw masks. Engineering values, tuned on the eval figures
   duplicate_iou: 0.8               # PLAN.md section 6, S3: merge near duplicates above this overlap

@@ -16,6 +16,7 @@ dependencies = [
   "python-multipart>=0.0.20",
   "cairosvg>=2.9.1",
   "pypdf>=6.21.2",
+  "pypdfium2>=5.14.0",
 ]
 
 [dependency-groups]
@@ -58,5 +59,5 @@ files = ["app"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["cairosvg"]  # no type information published
+module = ["cairosvg", "pypdfium2"]  # no type information published
 ignore_missing_imports = true

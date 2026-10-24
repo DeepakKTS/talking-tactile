@@ -127,6 +127,18 @@ class PageRules(_Section):
 
 class Pipeline(_Section):
     normalize_max_side_px: PosInt
+    max_upload_mb: PosFloat
+    pdf_render_dpi: PosInt
+    min_sharpness: NonNegFloat
+    deskew_min_area_fraction: Annotated[StrictFloat, Field(gt=0, lt=1)]
+    deskew_max_area_fraction: Annotated[StrictFloat, Field(gt=0, le=1)]
+    deskew_min_contrast: NonNegFloat
+
+    @model_validator(mode="after")
+    def _deskew_range(self) -> Self:
+        if self.deskew_min_area_fraction >= self.deskew_max_area_fraction:
+            raise ValueError("deskew_min_area_fraction must be below deskew_max_area_fraction")
+        return self
 
 
 Fraction = Annotated[StrictFloat, Field(gt=0, le=1)]
