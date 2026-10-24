@@ -1,6 +1,14 @@
 // Pick the pointing hand and find the contact point under the index finger.
 // Landmark indices follow MediaPipe Hands: 0 wrist; index 5 MCP, 6 PIP, 7 DIP, 8 tip;
 // middle 10 PIP, 12 tip; ring 14 PIP, 16 tip; pinky 18 PIP, 20 tip.
+import { applyHomography } from "./homography.js";
+import { OneEuroFilter2D } from "./oneeuro.js";
+
+// Starting values from config/explore.yaml: fingertip.one_euro, fingertip.lost_reset_ms.
+export const TRACKING = {
+  filter: { mincutoffHz: 1.0, beta: 0.007, dcutoffHz: 1.0 },
+  lostResetMs: 300,
+};
 
 const WRIST = 0;
 const INDEX = { pip: 6, dip: 7, tip: 8 };
@@ -42,3 +50,41 @@ export function contactPoint(tipMm, dipMm, offsetMm) {
 }
 
 export const LANDMARK = { WRIST, INDEX_TIP: INDEX.tip, INDEX_DIP: INDEX.dip };
+
+// The page's path for each worker result: pick the hand, map its tip and DIP joint to sheet
+// mm, move back by the contact offset, then the 1 euro filter. test/parity.test.mjs runs
+// this against the shipped code (apps/web/src/explore/fingertip.ts).
+export class FingertipMapper {
+  constructor({ filter, lostResetMs } = TRACKING) {
+    this.filter = new OneEuroFilter2D(filter);
+    this.lostResetMs = lostResetMs;
+    this.toMm = null;
+    this.lastHandAt = 0;
+  }
+
+  setCalibration(toMm) {
+    this.toMm = toMm;
+    this.filter.reset();
+  }
+
+  // True once no hand has been seen for lostResetMs.
+  lost(nowMs) {
+    return nowMs - this.lastHandAt > this.lostResetMs;
+  }
+
+  // handsPx: arrays of 21 [x, y] points in pixels. Null with no hand or no calibration.
+  update(handsPx, nowMs, offsetMm) {
+    if (!this.toMm || !handsPx.length) {
+      if (this.lost(nowMs)) this.filter.reset();
+      return null;
+    }
+    const pick = pickPointingHand(handsPx);
+    const pts = handsPx[pick.index];
+    const tipMm = applyHomography(this.toMm, pts[LANDMARK.INDEX_TIP]);
+    const dipMm = applyHomography(this.toMm, pts[LANDMARK.INDEX_DIP]);
+    const raw = contactPoint(tipMm, dipMm, offsetMm);
+    const mm = this.filter.filter(raw, nowMs / 1000);
+    this.lastHandAt = nowMs;
+    return { mm, raw, pointing: pick.pointing, t: nowMs };
+  }
+}

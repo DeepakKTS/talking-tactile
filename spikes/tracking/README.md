@@ -18,6 +18,7 @@ Keys: R recalibrate, T start the test, Space record now, Escape stop speech. The
 ## Checks
 
 - `cd spikes/tracking && npm test`: node tests for the frame pump, homography, 1 euro filter, pointing hand picker and touch test logic. Node only, nothing to install.
+- `test/parity.test.mjs` (part of `npm test`) holds the spike to the shipped tracking code in `apps/web/src/explore` on early-start: same inputs, same contact point every frame. main has no `apps/web`, so the shipped outputs are stored in `test/parity/port_outputs.json`. After a change to the shipped code, remake them from the early-start worktree: `cd .worktrees/early-start/apps/web && npx vitest run --config ../../../../spikes/tracking/test/parity/vitest.config.mjs`.
 - `uv run spikes/tracking/e2e_check.py loop`: headless Chrome with a fake camera and a 100 ms stub worker. Frames must drop and never queue.
 - `uv run spikes/tracking/e2e_check.py hands CLIP.y4m CPU`: MediaPipe on a fake camera clip. A hand must be found and mapped onto the sheet.
 - `uv run spikes/tracking/e2e_check.py touch CLIP.y4m CPU`: the same, then T and 3 Space presses.

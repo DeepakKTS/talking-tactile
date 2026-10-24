@@ -1,18 +1,13 @@
 import { state, view, say, setHandsListener, addOverlay, clickToVideo } from "./main.js";
-import { homographyFromPoints, applyHomography, isConvexQuad } from "./lib/homography.js";
-import { OneEuroFilter2D } from "./lib/oneeuro.js";
-import { pickPointingHand, contactPoint, LANDMARK } from "./lib/fingertip.js";
+import { homographyFromPoints, isConvexQuad } from "./lib/homography.js";
+import { FingertipMapper } from "./lib/fingertip.js";
 
-// Starting values from config/explore.yaml, fingertip.one_euro.
-const FILTER = { mincutoffHz: 1.0, beta: 0.007, dcutoffHz: 1.0 };
-const LOST_RESET_MS = 300;
 const CORNER_NAMES = ["A, top left", "B, top right", "C, bottom right", "D, bottom left"];
 
 const sheet = await (await fetch("./sheet.json")).json();
 const params = new URLSearchParams(location.search);
 const calib = { clicks: [], active: false, toMm: null, toPx: null };
-const filter = new OneEuroFilter2D(FILTER);
-let lastHandAt = 0;
+const mapper = new FingertipMapper();
 
 state.sheet = sheet;
 state.calib = calib;
@@ -28,7 +23,7 @@ function setCorners(px) {
   calib.toMm = homographyFromPoints(px, sheet.corners_mm);
   calib.toPx = homographyFromPoints(sheet.corners_mm, px);
   calib.corners = px;
-  filter.reset();
+  mapper.setCalibration(calib.toMm);
   try {
     localStorage.setItem(storeKey(), JSON.stringify(px));
   } catch {}
@@ -84,23 +79,11 @@ const waitForVideo = setInterval(() => {
 
 setHandsListener((hands) => {
   const now = performance.now();
-  if (!calib.toMm || !hands.length) {
-    if (now - lastHandAt > LOST_RESET_MS) {
-      filter.reset();
-      state.tip = null;
-    }
-    return;
-  }
   const px = hands.map((h) => h.landmarks.map((p) => [p.x * view.width, p.y * view.height]));
-  const pick = pickPointingHand(px);
-  const pts = px[pick.index];
-  const tipMm = applyHomography(calib.toMm, pts[LANDMARK.INDEX_TIP]);
-  const dipMm = applyHomography(calib.toMm, pts[LANDMARK.INDEX_DIP]);
   const offset = Number(document.getElementById("offset").value) || 0;
-  const raw = contactPoint(tipMm, dipMm, offset);
-  const mm = filter.filter(raw, now / 1000);
-  lastHandAt = now;
-  state.tip = { mm, raw, pointing: pick.pointing, t: now };
+  const tip = mapper.update(px, now, offset);
+  if (tip) state.tip = tip;
+  else if (mapper.lost(now)) state.tip = null;
 });
 
 // ---------- drawing ----------
