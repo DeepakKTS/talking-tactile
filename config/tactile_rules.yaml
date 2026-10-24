@@ -48,6 +48,7 @@ layout:                            # S4 fixes. Engineering values
   gap_max_passes: 8                # gap enforcement repeats until clean or this many passes
   color_group_max_delta: 40        # RGB distance under which two fills count as the same color
   inside_point_tolerance_mm: 0.1   # precision of the point inside a region (point symbol center, centroid_mm)
+  neighbor_max_gap_mm: 20.0        # regions this close are listed as neighbors in regions.json
 
 principles:
   - represent, not interpret       # APH handout

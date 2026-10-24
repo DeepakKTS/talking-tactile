@@ -139,6 +139,7 @@ class Layout(_Section):
     gap_max_passes: PosInt
     color_group_max_delta: PosFloat
     inside_point_tolerance_mm: PosFloat
+    neighbor_max_gap_mm: PosFloat
 
 
 class TactileRules(_Section):
