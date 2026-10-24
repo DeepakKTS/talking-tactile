@@ -35,6 +35,9 @@ MEDIA_TYPES = {
     SVG_FILE: "image/svg+xml",
     PDF_FILE: "application/pdf",
 }
+SOURCE_FILE = "source.png"
+# For the teacher's review only: never copied into a published version.
+DRAFT_ONLY_TYPES = {REPORT_FILE: "application/json", SOURCE_FILE: "image/png"}
 _RETRYABLE_JOB_ERRORS = {"stage_failed"}
 _READ_ONLY = stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
 
@@ -219,8 +222,10 @@ class FigureService:
         }
 
     def draft_file(self, figure_id: str, name: str) -> Path:
-        """The newest finished output, for the teacher's review."""
+        """The newest finished output, for the teacher's review, or the source image."""
         self._known(figure_id)
+        if name == SOURCE_FILE:
+            return self.runner.source_image(figure_id)
         job = self.jobs.latest_done(figure_id)
         out = None if job is None else self.runner.output_dir(job)
         if out is None:

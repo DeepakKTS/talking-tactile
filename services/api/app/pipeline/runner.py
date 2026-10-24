@@ -180,6 +180,11 @@ class Runner:
             return None
         return FigureCache(self.figures_dir, job.figure_id).dir("s5", job.result_key)
 
+    def source_image(self, figure_id: str) -> Path:
+        """S0's normalized image of the figure, which every job of it starts from."""
+        cache = FigureCache(self.figures_dir, figure_id)
+        return cache.dir("s0", self._key0(figure_id)) / s0_ingest.IMAGE_FILE
+
     def ingest(self, data: bytes, page_index: int) -> tuple[s0_ingest.Ingested, StageRun]:
         """S0, saved to the cache. A bad upload raises IngestError."""
         t0 = time.perf_counter()

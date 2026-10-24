@@ -609,3 +609,42 @@ def test_explore_can_never_load_an_unpublished_version(tmp_path: Path) -> None:
             assert_envelope(await api.http.get(url), 404, "not_published")
 
     run(tmp_path, body)
+
+
+def test_the_teacher_gets_the_source_image_and_the_draft_rules_report(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        r = await api.http.get(f"/api/figures/{fid}/source.png")
+        assert r.status_code == 200
+        assert r.headers["content-type"] == "image/png"
+        with Image.open(io.BytesIO(r.content)) as img:
+            assert img.size == Image.open(io.BytesIO(SYNTHETIC_PNG)).size
+        r = await api.http.get(f"/api/figures/{fid}/report.json")
+        assert r.status_code == 200
+        assert r.json() == []
+
+        # Neither is part of a published version, and Explore cannot ask for them there.
+        pub = (await api.http.post(f"/api/figures/{fid}/publish")).json()
+        assert set(pub["files"]) == {"regions.json", "tactile.svg", "print.pdf"}
+        for name in ("source.png", "report.json"):
+            r = await api.http.get(f"/api/figures/{fid}/published/1/{name}")
+            assert_envelope(r, 404, "not_found")
+
+    run(tmp_path, body)
+
+
+@pytest.mark.usefixtures("planted_violation")
+def test_the_draft_report_lists_what_publish_would_refuse(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        await api.http.patch(f"/api/figures/{fid}/regions/r3",
+                             json={"op": "label", "label": PLANTED})  # fmt: skip
+        await api.wait(fid)
+        report = (await api.http.get(f"/api/figures/{fid}/report.json")).json()
+        assert [(v["rule"], v["regions"]) for v in report] == [("min_gap", ["r3"])]
+        refused = (await api.http.post(f"/api/figures/{fid}/publish")).json()["error"]
+        assert [(v["rule"], v["regions"]) for v in refused["violations"]] == [("min_gap", ["r3"])]
+
+    run(tmp_path, body)

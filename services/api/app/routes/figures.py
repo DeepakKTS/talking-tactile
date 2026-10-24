@@ -1,6 +1,7 @@
-"""Figure routes. Author: upload, status, draft outputs, edits, publish. Explore: published
-versions only. A figure id is checked to be a lowercase hex sha256 before anything else
-looks at it. Files are served with their media type and an ETag of their sha256."""
+"""Figure routes. Author: upload, status, draft outputs (plus the source image and the
+rules report), edits, publish. Explore: published versions only. A figure id is checked to
+be a lowercase hex sha256 before anything else looks at it. Files are served with their
+media type and an ETag of their sha256."""
 
 import hashlib
 from typing import Annotated, Any, Literal
@@ -9,7 +10,7 @@ from fastapi import APIRouter, Body, File, Form, Request, Response, UploadFile
 from pydantic import ValidationError
 
 from app.errors import ApiError
-from app.figures import MEDIA_TYPES, FigureService, Publication, job_json
+from app.figures import DRAFT_ONLY_TYPES, MEDIA_TYPES, FigureService, Publication, job_json
 from app.models.regions import GradeBand, PageSize
 from app.pipeline.cache import is_figure_id
 from app.pipeline.edits import EDIT, AddEdit, Edit
@@ -31,10 +32,10 @@ def _fid(figure_id: str) -> str:
     return figure_id
 
 
-def _media_type(name: str) -> str:
-    if name not in MEDIA_TYPES:
+def _media_type(name: str, types: dict[str, str] = MEDIA_TYPES) -> str:
+    if name not in types:
         raise ApiError(404, "not_found", f"There is no file called {name}.")
-    return MEDIA_TYPES[name]
+    return types[name]
 
 
 def _file(request: Request, data: bytes, media_type: str, immutable: bool) -> Response:
@@ -143,7 +144,7 @@ async def published_file(
 @router.get("/{figure_id}/{name}")
 async def draft_file(request: Request, figure_id: str, name: str) -> Response:
     fid = _fid(figure_id)
-    media_type = _media_type(name)
+    media_type = _media_type(name, {**MEDIA_TYPES, **DRAFT_ONLY_TYPES})
     path = _service(request).draft_file(fid, name)
     return _file(request, path.read_bytes(), media_type, immutable=False)
 

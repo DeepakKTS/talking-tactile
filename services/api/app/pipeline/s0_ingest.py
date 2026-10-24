@@ -186,17 +186,17 @@ def ingest(data: bytes, page_index: int, rules: Pipeline) -> Ingested:
     )
 
 
-_IMAGE_FILE = "normalized.png"
+IMAGE_FILE = "normalized.png"
 _INFO_FILE = "ingest.json"
 
 
 def save(ing: Ingested, out: Path) -> None:
-    Image.fromarray(ing.image).save(out / _IMAGE_FILE)
+    Image.fromarray(ing.image).save(out / IMAGE_FILE)
     (out / _INFO_FILE).write_text(ing.model_dump_json(exclude={"image"}, indent=1), "utf-8")
 
 
 def load(src: Path) -> Ingested:
-    with Image.open(src / _IMAGE_FILE) as img:
+    with Image.open(src / IMAGE_FILE) as img:
         image = np.ascontiguousarray(np.asarray(img.convert("RGB"), dtype=np.uint8))
     info = json.loads((src / _INFO_FILE).read_text("utf-8"))
     ing = Ingested(image=image, **info)
