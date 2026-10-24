@@ -12,6 +12,7 @@ from app.meta.mock import MockMetaClient
 from app.meta.types import Understanding
 from app.models.image import RGB
 from app.models.mask import Mask
+from app.prompts import Prompt
 
 ClientMode = Literal["mock", "live"]
 
@@ -27,11 +28,17 @@ class MetaClient(Protocol):
     @property
     def meter(self) -> CostMeter: ...
 
-    async def understand(self, image: RGB, figure_id: str) -> Understanding:
+    @property
+    def cache_tag(self) -> str:
+        """What the answers depend on besides the request, for the stage cache keys: the
+        mode, and in mock mode a hash of the fixture files."""
+        ...
+
+    async def understand(self, image: RGB, figure_id: str, prompt: Prompt) -> Understanding:
         """S1: Muse Spark reads the figure."""
         ...
 
-    async def segment(self, image: RGB, figure_id: str, phrase: str) -> list[Mask]:
+    async def segment(self, image: RGB, figure_id: str, phrase: str, prompt: Prompt) -> list[Mask]:
         """S2: SAM finds every instance of one phrase. Zero matches gives an empty list."""
         ...
 

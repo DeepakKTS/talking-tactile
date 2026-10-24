@@ -12,6 +12,7 @@ from app.geometry.compose import ComposedSheet
 from app.geometry.validate import Violation, check_svg_ids, validate_sheet
 from app.meta.types import Understanding
 from app.models.regions import RegionsFile
+from app.pipeline.edits import Annotations
 from app.render.pdf import render_pdf
 from app.render.regions_json import FigureInfo, build_regions_file
 from app.render.svg import render_key_svgs, render_sheet_svg
@@ -32,14 +33,21 @@ class Rendered(BaseModel):
 
 
 def render(
-    c: ComposedSheet, u: Understanding, figure_id: str, rules: TactileRules, explore: ExploreConfig
+    c: ComposedSheet,
+    u: Understanding,
+    figure_id: str,
+    notes: Annotations,
+    rules: TactileRules,
+    explore: ExploreConfig,
 ) -> Rendered:
     svg = render_sheet_svg(c.sheet, u.title, rules, explore)
     keys = render_key_svgs(c.sheet, c.braille, c.translations, rules)
     info = FigureInfo(
         figure_id=figure_id, title=u.title, figure_type=u.figure_type, summary=u.summary
     )
-    regions = build_regions_file(c.sheet, c.braille, info, rules)
+    regions = build_regions_file(
+        c.sheet, c.braille, info, rules, notes.descriptions, notes.verified
+    )
     report = validate_sheet(c.sheet, rules) + check_svg_ids(svg, regions)
     return Rendered(svg=svg, pdf=render_pdf([svg, *keys]), regions=regions, report=report)
 

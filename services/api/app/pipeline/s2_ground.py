@@ -4,18 +4,35 @@ print text so it can be cut out of the raised layer."""
 import asyncio
 import json
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
 from app.config import Meta
 from app.meta.client import MetaClient
 from app.meta.types import Understanding
-from app.models.mask import Mask
+from app.models.mask import Mask, MaskSource
 from app.pipeline.cache import load_mask, save_mask
 from app.pipeline.s0_ingest import Ingested
+from app.prompts import Prompt, schema_digest
 
-VERSION = 1  # part of the cache key: bump when the SAM request changes
+PROMPT = "s2_ground.v1.json"
 _FILE = "grounded.json"
+
+
+class MaskEntry(BaseModel):
+    """One mask as the cache stores it, beside its PNG."""
+
+    model_config = ConfigDict(frozen=True)
+
+    kind: Literal["part", "text"]
+    file: str
+    label: str
+    score: float
+    source: MaskSource
+
+
+SCHEMA_DIGEST = schema_digest(MaskEntry.model_json_schema())
 
 
 class Grounded(BaseModel):
@@ -25,31 +42,36 @@ class Grounded(BaseModel):
     text: list[Mask]
 
 
-async def ground(client: MetaClient, ing: Ingested, u: Understanding, rules: Meta) -> Grounded:
+async def ground(
+    client: MetaClient, ing: Ingested, u: Understanding, prompt: Prompt, rules: Meta
+) -> Grounded:
     phrases = [p for p in dict.fromkeys(p.phrase for p in u.parts) if p != rules.text_phrase]
     gate = asyncio.Semaphore(rules.sam_concurrency)
 
     async def one(phrase: str) -> list[Mask]:
         async with gate:
-            return await client.segment(ing.image, ing.figure_id, phrase)
+            return await client.segment(ing.image, ing.figure_id, phrase, prompt)
 
     found = await asyncio.gather(*(one(p) for p in [*phrases, rules.text_phrase]))
     return Grounded(parts=[m for masks in found[:-1] for m in masks], text=found[-1])
 
 
 def save(g: Grounded, out: Path) -> None:
-    entries = []
+    entries: list[MaskEntry] = []
     for kind, masks in (("part", g.parts), ("text", g.text)):
         for i, m in enumerate(masks):
             name = f"{kind}{i:03d}.png"
             save_mask(out / name, m.data)
-            entries.append({"kind": kind, "file": name, **m.model_dump(exclude={"data"})})
-    (out / _FILE).write_text(json.dumps(entries, indent=1), "utf-8")
+            entries.append(
+                MaskEntry(kind=kind, file=name, label=m.label, score=m.score, source=m.source)
+            )
+    (out / _FILE).write_text(json.dumps([e.model_dump() for e in entries], indent=1), "utf-8")
 
 
 def load(src: Path) -> Grounded:
     masks: dict[str, list[Mask]] = {"part": [], "text": []}
-    for e in json.loads((src / _FILE).read_text("utf-8")):
-        kind, name = e.pop("kind"), e.pop("file")
-        masks[kind].append(Mask(data=load_mask(src / name), **e))
+    for obj in json.loads((src / _FILE).read_text("utf-8")):
+        e = MaskEntry.model_validate(obj)
+        mask = Mask(data=load_mask(src / e.file), label=e.label, score=e.score, source=e.source)
+        masks[e.kind].append(mask)
     return Grounded(parts=masks["part"], text=masks["text"])

@@ -1,7 +1,9 @@
-"""S4 layout on S3's parts: polygons in page mm, point symbols, gaps, textures and braille.
-Polygons are cached as WKB, so a sheet read back is the sheet that was saved."""
+"""S4 layout on S3's parts with the teacher's edits applied: polygons in page mm, point
+symbols, gaps, textures and braille. Polygons are cached as WKB, so a sheet read back is the
+sheet that was saved."""
 
 import json
+from collections.abc import Sequence
 from pathlib import Path
 
 import shapely
@@ -13,7 +15,7 @@ from app.braille.place import BrailleLayout, Translations
 from app.config import Earcons, TactileRules
 from app.geometry.compose import ComposedSheet, build_sheet
 from app.geometry.layout import LayoutRegion
-from app.geometry.reconcile import Reconciled
+from app.geometry.reconcile import ReconciledPart
 from app.geometry.scale import PageFit
 from app.geometry.sheet import Sheet
 from app.meta.types import Understanding
@@ -24,7 +26,7 @@ _FILE = "sheet.json"
 
 
 def layout(
-    rec: Reconciled,
+    parts: Sequence[ReconciledPart],
     ing: Ingested,
     u: Understanding,
     fit: PageFit,
@@ -34,7 +36,7 @@ def layout(
     translator: Translator,
 ) -> ComposedSheet:
     return build_sheet(
-        parts=rec.parts,
+        parts=parts,
         image=ing.image,
         fit=fit,
         grade_band=grade_band,

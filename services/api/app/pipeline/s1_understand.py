@@ -8,15 +8,19 @@ from app.config import Meta
 from app.meta.client import MetaClient
 from app.meta.types import Understanding
 from app.pipeline.s0_ingest import Ingested
+from app.prompts import Prompt, schema_digest
 
 log = logging.getLogger(__name__)
 
-VERSION = 1  # part of the cache key: bump when the prompt or the Understanding schema changes
+PROMPT = "s1_understand.v1.json"
+SCHEMA_DIGEST = schema_digest(Understanding.model_json_schema())
 _FILE = "understanding.json"
 
 
-async def understand(client: MetaClient, ing: Ingested, rules: Meta) -> Understanding:
-    u = await client.understand(ing.image, ing.figure_id)
+async def understand(
+    client: MetaClient, ing: Ingested, prompt: Prompt, rules: Meta
+) -> Understanding:
+    u = await client.understand(ing.image, ing.figure_id, prompt)
     if len(u.parts) > rules.max_parts:
         log.warning("S1 proposed %d parts, keeping %d", len(u.parts), rules.max_parts)
         u = u.model_copy(update={"parts": u.parts[: rules.max_parts]})

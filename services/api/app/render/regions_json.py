@@ -1,5 +1,8 @@
 """regions.json from a laid-out sheet: the file Explore runs from."""
 
+from collections.abc import Mapping
+from collections.abc import Set as AbstractSet
+
 from pydantic import BaseModel, ConfigDict
 
 from app.braille.place import BrailleLayout
@@ -19,8 +22,17 @@ class FigureInfo(BaseModel):
     summary: str
 
 
-def build_regions_file(sheet: Sheet, braille: BrailleLayout, info: FigureInfo,
-                       rules: TactileRules) -> RegionsFile:  # fmt: skip
+def build_regions_file(
+    sheet: Sheet,
+    braille: BrailleLayout,
+    info: FigureInfo,
+    rules: TactileRules,
+    descriptions: Mapping[str, str] | None = None,
+    verified: AbstractSet[str] = frozenset(),
+) -> RegionsFile:
+    """descriptions and verified come from teacher edits, keyed by reconciled part id; every
+    piece of a part shares them."""
+    descriptions = descriptions or {}
     d = rules.render.coordinate_decimals
     width, height = rules.page.dimensions_mm[sheet.page]
     abbrev = {p.region_id: p.line.text for p in braille.placements if p.kind == "abbrev"}
@@ -36,7 +48,11 @@ def build_regions_file(sheet: Sheet, braille: BrailleLayout, info: FigureInfo,
         if len(pts) > 1 and pts[0] == pts[-1]:
             pts.pop()
         cx, cy = centers[r.id]
-        optional = {"abbrev": abbrev.get(r.id), "texture": r.texture}
+        optional = {
+            "abbrev": abbrev.get(r.id),
+            "texture": r.texture,
+            "description": descriptions.get(r.group_key),
+        }
         regions.append(
             Region(
                 id=r.id,
@@ -47,7 +63,7 @@ def build_regions_file(sheet: Sheet, braille: BrailleLayout, info: FigureInfo,
                 neighbors=neighbors[r.id],
                 source=region_source(r.source),
                 confidence=r.score,
-                verified_by_teacher=False,
+                verified_by_teacher=r.group_key in verified,
                 # The schema allows these to be missing but not null.
                 **{k: v for k, v in optional.items() if v is not None},
             )
@@ -57,9 +73,10 @@ def build_regions_file(sheet: Sheet, braille: BrailleLayout, info: FigureInfo,
         figure_id=info.figure_id,
         title=info.title,
         figure_type=info.figure_type,
-        grade_band=sheet.grade_band,
         page=Page(size=sheet.page, width_mm=width, height_mm=height),
         summary=info.summary,
         textures=sheet.textures,
         regions=regions,
+        # Like the region fields above: the schema allows grade_band missing, not null.
+        **({} if sheet.grade_band is None else {"grade_band": sheet.grade_band}),
     )

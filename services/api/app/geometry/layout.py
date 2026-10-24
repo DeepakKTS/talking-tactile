@@ -53,10 +53,16 @@ class LayoutRegion(BaseModel):
         return self.model_copy(update={**update, "notes": notes})
 
 
+def part_id_of(region_id: str) -> str:
+    """The reconciled part a region came from: pieces after the first are <part>_<k>."""
+    return region_id.partition("_")[0]
+
+
 def regions_from_parts(
     parts: Sequence[ReconciledPart], fit: PageFit, rules: Vectorize
 ) -> list[LayoutRegion]:
-    """One region per polygon piece. The largest piece keeps the part id."""
+    """One region per polygon piece. The largest piece keeps the part id; the others are
+    <part>_<k>."""
     out: list[LayoutRegion] = []
     for part in parts:
         for k, poly in enumerate(mask_to_polygons_mm(part.mask, fit, rules), start=1):

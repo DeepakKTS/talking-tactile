@@ -14,10 +14,14 @@ from app.meta.cost import BudgetExceededError, CostMeter
 from app.meta.mock import MockFixtureMissingError, MockMetaClient
 from app.meta.sam_adapter import to_masks
 from app.meta.types import Understanding
+from app.pipeline import s1_understand, s2_ground
 from app.pipeline.s0_ingest import figure_id
+from app.prompts import load_prompt
 from app.synthetic.load import SyntheticFigure
 
 RULES = load_tactile_rules()
+S1 = load_prompt(s1_understand.PROMPT)
+S2 = load_prompt(s2_ground.PROMPT)
 APP_DIR = Path(__file__).resolve().parents[1] / "app"
 
 
@@ -33,7 +37,7 @@ def test_the_mock_is_a_meta_client(mock: MockMetaClient) -> None:
 
 def test_understand_returns_the_synthetic_parts(mock: MockMetaClient,
                                                synthetic: SyntheticFigure) -> None:  # fmt: skip
-    u = asyncio.run(mock.understand(synthetic.image, figure_id(synthetic.image)))
+    u = asyncio.run(mock.understand(synthetic.image, figure_id(synthetic.image), S1))
     assert isinstance(u, Understanding)
     assert u.title == synthetic.truth.title
     assert u.color_carries_meaning is True
@@ -48,31 +52,31 @@ def test_understand_returns_the_synthetic_parts(mock: MockMetaClient,
 def test_segment_returns_every_instance_as_masks(mock: MockMetaClient,
                                                  synthetic: SyntheticFigure) -> None:  # fmt: skip
     fid = figure_id(synthetic.image)
-    vessel = asyncio.run(mock.segment(synthetic.image, fid, "cross vessel"))
+    vessel = asyncio.run(mock.segment(synthetic.image, fid, "cross vessel", S2))
     assert len(vessel) == 2  # the part and a sliver
     assert all(m.label == "cross vessel" and m.source == "synthetic" for m in vessel)
     assert all(m.shape == synthetic.image.shape[:2] for m in vessel)
-    text = asyncio.run(mock.segment(synthetic.image, fid, RULES.meta.text_phrase))
+    text = asyncio.run(mock.segment(synthetic.image, fid, RULES.meta.text_phrase, S2))
     assert len(text) == len(synthetic.truth.text_labels)
 
 
 def test_zero_matches_is_a_result_not_an_error(mock: MockMetaClient,
                                                synthetic: SyntheticFigure) -> None:  # fmt: skip
     fid = figure_id(synthetic.image)
-    assert asyncio.run(mock.segment(synthetic.image, fid, "mitochondria")) == []
+    assert asyncio.run(mock.segment(synthetic.image, fid, "mitochondria", S2)) == []
 
 
 def test_an_image_without_fixtures_is_refused(mock: MockMetaClient) -> None:
     other = np.full((10, 10, 3), 255, np.uint8)
     with pytest.raises(MockFixtureMissingError, match="mock mode"):
-        asyncio.run(mock.understand(other, figure_id(other)))
+        asyncio.run(mock.understand(other, figure_id(other), S1))
 
 
 def test_mock_calls_cost_nothing_and_are_logged(mock: MockMetaClient,
                                                 synthetic: SyntheticFigure) -> None:  # fmt: skip
     fid = figure_id(synthetic.image)
-    asyncio.run(mock.understand(synthetic.image, fid))
-    asyncio.run(mock.segment(synthetic.image, fid, "pore"))
+    asyncio.run(mock.understand(synthetic.image, fid, S1))
+    asyncio.run(mock.segment(synthetic.image, fid, "pore", S2))
     assert [c.call for c in mock.calls] == ["understand", "segment"]
     assert mock.meter.spent_usd == 0
 

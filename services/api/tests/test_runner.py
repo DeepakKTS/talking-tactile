@@ -1,5 +1,6 @@
 """The pipeline runner in mock mode: S0 to S5 in order, the per-stage cache, and the SQLite
-job records."""
+job records. The cache tests each change one thing a stage depends on and check that the
+stage, and everything after it, runs again instead of serving a stale hit."""
 
 import asyncio
 import json
@@ -18,9 +19,13 @@ from app.meta.types import Understanding
 from app.models.image import RGB
 from app.models.mask import Mask
 from app.paths import FIXTURES_DIR, REGIONS_SCHEMA
+from app.pipeline.cache import FigureCache
+from app.pipeline.edits import EditStore
 from app.pipeline.jobs import JobRecord, JobStore
 from app.pipeline.runner import STAGES, JobOptions, Runner
 from app.pipeline.s0_ingest import IngestError
+from app.prompts import PROMPTS_DIR, Prompt
+from app.synthetic.generate import OUT_DIR as SYNTHETIC_DIR
 
 RULES = load_tactile_rules()
 EXPLORE = load_explore()
@@ -28,14 +33,18 @@ SYNTHETIC_PNG = (FIXTURES_DIR / "synthetic" / "figure.png").read_bytes()
 OUTPUTS = ("tactile.svg", "print.pdf", "regions.json", "report.json")
 
 
-def make_runner(root: Path, client: MockMetaClient | None = None) -> Runner:
+def make_runner(
+    root: Path, client: MockMetaClient | None = None, prompts: Path = PROMPTS_DIR
+) -> Runner:
     return Runner(
         client=client or MockMetaClient(RULES.meta),
         rules=RULES,
         explore=EXPLORE,
         translator=Translator(RULES.braille),
         jobs=JobStore(root / "jobs.sqlite"),
+        edits=EditStore(root / "jobs.sqlite"),
         figures_dir=root / "figures",
+        prompts_dir=prompts,
     )
 
 
@@ -46,6 +55,19 @@ def submit_and_run(runner: Runner, options: JobOptions | None = None) -> JobReco
 
 def outcomes(job: JobRecord) -> dict[str, str]:
     return {s.stage: s.outcome for s in job.stages}
+
+
+def ran_from(stage: str | None) -> dict[str, str]:
+    """Every stage before `stage` cached, it and every later one ran. None: all cached."""
+    cut = len(STAGES) if stage is None else STAGES.index(stage)
+    return {s: "cached" if i < cut else "ran" for i, s in enumerate(STAGES)}
+
+
+def regions_of(runner: Runner, job: JobRecord) -> dict[str, object]:
+    out = runner.output_dir(job)
+    assert out is not None
+    regions: dict[str, object] = json.loads((out / "regions.json").read_text(encoding="utf-8"))
+    return regions
 
 
 @pytest.fixture(scope="module")
@@ -61,11 +83,17 @@ def warm(first: tuple[Path, JobRecord], tmp_path: Path) -> Path:
     return tmp_path
 
 
+def copy_prompts(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    prompts = tmp_path_factory.mktemp("prompts")
+    shutil.copytree(PROMPTS_DIR, prompts, dirs_exist_ok=True)
+    return prompts
+
+
 def test_a_fresh_upload_runs_every_stage(first: tuple[Path, JobRecord]) -> None:
     root, job = first
     assert job.status == "done", job.error_message
+    assert outcomes(job) == ran_from("s0")
     assert [s.stage for s in job.stages] == list(STAGES)
-    assert set(outcomes(job).values()) == {"ran"}
     assert all(s.ms > 0 for s in job.stages)
     out = make_runner(root).output_dir(job)
     assert out is not None
@@ -86,14 +114,7 @@ def test_the_same_upload_again_costs_no_meta_calls(
     job = submit_and_run(runner)
     assert job.status == "done"
     assert job.figure_id == first[1].figure_id
-    assert outcomes(job) == {
-        "s0": "cached",
-        "s1": "cached",
-        "s2": "skipped",
-        "s3": "skipped",
-        "s4": "skipped",
-        "s5": "cached",
-    }
+    assert outcomes(job) == ran_from(None)
     assert client.calls == []
     assert runner.output_dir(job) == runner.output_dir(first[1])
 
@@ -102,13 +123,18 @@ def test_new_options_reuse_the_meta_stages(warm: Path) -> None:
     client = MockMetaClient(RULES.meta)
     job = submit_and_run(make_runner(warm, client), JobOptions(grade_band="9_12"))
     assert job.status == "done"
-    assert outcomes(job)["s1"] == "cached"
-    assert outcomes(job)["s2"] == "cached"
-    assert outcomes(job)["s5"] == "ran"
+    assert outcomes(job) == ran_from("s3")
     assert client.calls == []
 
 
-def test_a_missing_render_resumes_from_the_saved_layout(
+def test_a_figure_with_no_grade_band_leaves_it_out(warm: Path) -> None:
+    runner = make_runner(warm)
+    job = submit_and_run(runner, JobOptions())
+    assert job.status == "done", job.error_message
+    assert "grade_band" not in regions_of(runner, job)
+
+
+def test_a_missing_render_runs_from_the_saved_layout(
     warm: Path, first: tuple[Path, JobRecord]
 ) -> None:
     runner = make_runner(warm)
@@ -117,15 +143,14 @@ def test_a_missing_render_resumes_from_the_saved_layout(
     before = {name: (old / name).read_bytes() for name in ("tactile.svg", "regions.json")}
     shutil.rmtree(old)
     job = submit_and_run(runner)
-    assert outcomes(job)["s4"] == "cached"
-    assert outcomes(job)["s5"] == "ran"
+    assert outcomes(job) == ran_from("s5")
     new = runner.output_dir(job)
     assert new is not None
     for name, data in before.items():
         assert (new / name).read_bytes() == data, name
 
 
-def test_a_missing_layout_resumes_from_the_saved_masks(
+def test_a_missing_layout_runs_from_the_saved_masks(
     warm: Path, first: tuple[Path, JobRecord]
 ) -> None:
     runner = make_runner(warm)
@@ -136,14 +161,7 @@ def test_a_missing_layout_resumes_from_the_saved_masks(
     for stage in ("s3", "s4", "s5"):
         shutil.rmtree(figure / stage)
     job = submit_and_run(runner)
-    assert outcomes(job) == {
-        "s0": "cached",
-        "s1": "cached",
-        "s2": "cached",
-        "s3": "ran",
-        "s4": "ran",
-        "s5": "ran",
-    }
+    assert outcomes(job) == ran_from("s3")
     new = runner.output_dir(job)
     assert new is not None
     assert (new / "regions.json").read_bytes() == regions
@@ -153,11 +171,81 @@ def test_a_damaged_cache_entry_is_rebuilt(warm: Path, first: tuple[Path, JobReco
     runner = make_runner(warm)
     old = runner.output_dir(first[1])
     assert old is not None
-    (old / "regions.json").write_text("{not json", encoding="utf-8")
+    good = (old / "regions.json").read_bytes()
+    (old / "regions.json").write_text("{}", encoding="utf-8")  # valid JSON, wrong content
     job = submit_and_run(runner)
     assert job.status == "done"
-    assert outcomes(job)["s5"] == "ran"
-    assert json.loads((old / "regions.json").read_text(encoding="utf-8"))["figure_id"]
+    assert outcomes(job) == ran_from("s5")
+    assert (old / "regions.json").read_bytes() == good
+
+
+# Each of these passes only if the key covers the thing changed; a key without it serves
+# the stale entry and the outcomes come back all cached.
+
+
+def test_editing_the_s1_prompt_runs_s1_again(
+    warm: Path, tmp_path_factory: pytest.TempPathFactory
+) -> None:
+    prompts = copy_prompts(tmp_path_factory)
+    s1 = prompts / "s1_understand.v1.json"
+    s1.write_text(s1.read_text(encoding="utf-8").replace("You read", "You  read", 1), "utf-8")
+    client = MockMetaClient(RULES.meta)
+    job = submit_and_run(make_runner(warm, client, prompts))
+    assert outcomes(job) == ran_from("s1")
+    assert client.calls[0].call == "understand"
+    again = submit_and_run(make_runner(warm, MockMetaClient(RULES.meta), prompts))
+    assert outcomes(again) == ran_from(None)
+
+
+def test_editing_the_s2_request_runs_s2_and_not_s1(
+    warm: Path, tmp_path_factory: pytest.TempPathFactory
+) -> None:
+    prompts = copy_prompts(tmp_path_factory)
+    s2 = prompts / "s2_ground.v1.json"
+    s2.write_text(s2.read_text(encoding="utf-8").replace('"true"', '"false"'), "utf-8")
+    job = submit_and_run(make_runner(warm, MockMetaClient(RULES.meta), prompts))
+    assert outcomes(job) == ran_from("s2")
+
+
+class _Retitled(MockMetaClient):
+    async def understand(self, image: RGB, figure_id: str, prompt: Prompt) -> Understanding:
+        u = await super().understand(image, figure_id, prompt)
+        return u.model_copy(update={"title": "A different title"})
+
+
+def test_a_new_s1_answer_runs_every_later_stage(warm: Path, first: tuple[Path, JobRecord]) -> None:
+    """S1 is made again under the same key (its entry is gone) and answers differently. The
+    later keys follow S1's output, so nothing downstream is served stale."""
+    shutil.rmtree(warm / "figures" / first[1].figure_id / "s1")
+    runner = make_runner(warm, _Retitled(RULES.meta))
+    job = submit_and_run(runner)
+    assert outcomes(job) == ran_from("s1")
+    assert regions_of(runner, job)["title"] == "A different title"
+
+
+def test_editing_a_mock_fixture_runs_the_meta_stages_again(tmp_path: Path) -> None:
+    fixtures = tmp_path / "fixtures"
+    shutil.copytree(SYNTHETIC_DIR, fixtures)
+    first = submit_and_run(make_runner(tmp_path, MockMetaClient(RULES.meta, fixtures)))
+    assert first.status == "done"
+    truth = fixtures / "truth.json"
+    obj = json.loads(truth.read_text(encoding="utf-8"))
+    obj["summary"] = "An edited summary."
+    truth.write_text(json.dumps(obj, indent=1), "utf-8")
+    runner = make_runner(tmp_path, MockMetaClient(RULES.meta, fixtures))
+    job = submit_and_run(runner)
+    assert outcomes(job) == ran_from("s1")
+    assert regions_of(runner, job)["summary"] == "An edited summary."
+
+
+def test_the_cache_refuses_a_figure_id_that_is_not_a_sha256(tmp_path: Path) -> None:
+    for bad in ["../" * 3 + "etc", "A" * 64, "a" * 63, "a" * 64 + "/x", "", "..", "a" * 65]:
+        with pytest.raises(ValueError, match="64 lowercase hex"):
+            FigureCache(tmp_path, bad)
+    FigureCache(tmp_path, "0" * 64)
+
+
+# Jobs
 
 
 def test_jobs_survive_a_restart(first: tuple[Path, JobRecord]) -> None:
@@ -176,6 +264,8 @@ def test_the_latest_job_for_a_figure_is_the_newest(tmp_path: Path) -> None:
     assert latest is not None
     assert latest.id == b.id != a.id
     assert latest.status == "queued"
+    assert store.find_live("f" * 64, JobOptions(), 0) == a
+    assert store.find_live("f" * 64, JobOptions(), 1) is None
 
 
 def test_a_bad_upload_makes_no_job(tmp_path: Path) -> None:
@@ -207,8 +297,8 @@ def test_an_image_with_no_recording_fails_at_s1(tmp_path: Path) -> None:
 
 
 class _DescribeOnly(MockMetaClient):
-    async def understand(self, image: RGB, figure_id: str) -> Understanding:
-        u = await super().understand(image, figure_id)
+    async def understand(self, image: RGB, figure_id: str, prompt: Prompt) -> Understanding:
+        u = await super().understand(image, figure_id, prompt)
         return u.model_copy(update={"verdict": "describe_only"})
 
 
@@ -226,12 +316,12 @@ class _Counting(MockMetaClient):
         self.in_flight = 0
         self.most = 0
 
-    async def segment(self, image: RGB, figure_id: str, phrase: str) -> list[Mask]:
+    async def segment(self, image: RGB, figure_id: str, phrase: str, prompt: Prompt) -> list[Mask]:
         self.in_flight += 1
         self.most = max(self.most, self.in_flight)
         await asyncio.sleep(0.01)
         self.in_flight -= 1
-        return await super().segment(image, figure_id, phrase)
+        return await super().segment(image, figure_id, phrase, prompt)
 
 
 def test_segmenting_keeps_to_the_sam_concurrency(tmp_path: Path) -> None:
