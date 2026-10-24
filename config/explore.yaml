@@ -7,17 +7,37 @@ hysteresis:
 dwell:
   speed_below_mm_s: 15
   hold_ms: 600
+  speed_window_ms: 200       # speed is the straight line move over this window, so jitter at rest does not add up
 earcons:
-  max_per_second: 6
+  max_per_second: 6          # texture earcons and exit ticks together
   texture_hz: { dots: 523.25, lines: 659.25, grid: 783.99, cross: 880.0, solid: 392.0 }  # C5 E5 G5 A5 G4
   default_hz: 440.0          # regions with no area texture, and point symbols
+  tone_ms: 80
+  gain: 0.3
+  exit_tick_hz: 1568.0       # G6, short and quiet: the finger left a part
+  exit_tick_ms: 20
+  exit_tick_gain: 0.12
 fingertip:
   contact_offset_mm: 4.0     # move back along the finger toward the knuckle
   filter: one_euro
   one_euro: { mincutoff_hz: 1.0, beta: 0.007, dcutoff_hz: 1.0 }   # tune per the 1 euro two step procedure
+  lost_reset_ms: 300         # no hand for this long: the filter and the touch state start over, silently
+hands:
+  max_hands: 2
+  min_curled: 3              # index extended and middle, ring and pinky curled is a pointing hand
+  require_pointing: false    # Gate B fallback: true ignores any hand that is not pointing
 guidance:
   update_ms: 300
   arrive_inside_ms: 200
+  beep_hz: 1046.5            # C6
+  beep_ms: 40
+  beeps_per_s_far: 1.5
+  beeps_per_s_near: 10.0
+  far_mm: 150                # at this distance from the part's edge or farther, the slowest rate
+  chime_hz: [1046.5, 1318.51, 1567.98]   # C6 E6 G6 on arrival
+  chime_note_ms: 90
+intents:
+  min_label_similarity: 0.75 # fuzzy match of a spoken name to a label, 0 to 1
 health:
   no_hand_warn_ms: 2000
   off_page_points_before_recal: 15

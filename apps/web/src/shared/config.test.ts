@@ -52,6 +52,17 @@ describe("explore config", () => {
     ["health.off_page_points_before_recal", 1.5],
     ["registration.mark_inset_mm", -1],
     ["extra_section", {}],
+    ["dwell.speed_window_ms", 0],
+    ["earcons.gain", 1.5],
+    ["earcons.exit_tick_hz", DELETE],
+    ["fingertip.lost_reset_ms", -1],
+    ["hands.max_hands", 3],
+    ["hands.min_curled", 0],
+    ["hands.require_pointing", "yes"],
+    ["guidance.beeps_per_s_near", 1.0],
+    ["guidance.chime_hz", []],
+    ["intents.min_label_similarity", 1.2],
+    ["intents", DELETE],
   ])("refuses %s = %s and names the field", (path, value) => {
     const field = path.split(".").pop() ?? path;
     expect(() => loadExploreConfig(edit(path, value))).toThrow(ConfigError);

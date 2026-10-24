@@ -11,6 +11,7 @@ const posNum = z.number().positive();
 const nonNegNum = z.number().nonnegative();
 const posInt = z.number().int().positive();
 const nonNegInt = z.number().int().nonnegative();
+const gain = z.number().positive().max(1);
 
 const ExploreSchema = z.strictObject({
   hysteresis: z.strictObject({
@@ -19,7 +20,7 @@ const ExploreSchema = z.strictObject({
     enter_hold_ms: nonNegInt,
     exit_hold_ms: nonNegInt,
   }),
-  dwell: z.strictObject({ speed_below_mm_s: posNum, hold_ms: posInt }),
+  dwell: z.strictObject({ speed_below_mm_s: posNum, hold_ms: posInt, speed_window_ms: posInt }),
   earcons: z.strictObject({
     max_per_second: posNum,
     texture_hz: z.strictObject({
@@ -30,13 +31,40 @@ const ExploreSchema = z.strictObject({
       solid: posNum,
     }),
     default_hz: posNum,
+    tone_ms: posInt,
+    gain,
+    exit_tick_hz: posNum,
+    exit_tick_ms: posInt,
+    exit_tick_gain: gain,
   }),
   fingertip: z.strictObject({
     contact_offset_mm: nonNegNum,
     filter: z.literal("one_euro"),
     one_euro: z.strictObject({ mincutoff_hz: posNum, beta: nonNegNum, dcutoff_hz: posNum }),
+    lost_reset_ms: posInt,
   }),
-  guidance: z.strictObject({ update_ms: posInt, arrive_inside_ms: nonNegInt }),
+  hands: z.strictObject({
+    max_hands: z.number().int().min(1).max(2),
+    min_curled: z.number().int().min(1).max(3), // of middle, ring and pinky
+    require_pointing: z.boolean(),
+  }),
+  guidance: z
+    .strictObject({
+      update_ms: posInt,
+      arrive_inside_ms: nonNegInt,
+      beep_hz: posNum,
+      beep_ms: posInt,
+      beeps_per_s_far: posNum,
+      beeps_per_s_near: posNum,
+      far_mm: posNum,
+      chime_hz: z.array(posNum).min(1),
+      chime_note_ms: posInt,
+    })
+    .refine((g) => g.beeps_per_s_near > g.beeps_per_s_far, {
+      message: "beeps_per_s_near must be above beeps_per_s_far",
+      path: ["beeps_per_s_near"],
+    }),
+  intents: z.strictObject({ min_label_similarity: z.number().positive().max(1) }),
   health: z.strictObject({ no_hand_warn_ms: posInt, off_page_points_before_recal: posInt }),
   registration: z.strictObject({ mark_inset_mm: posNum }),
 });

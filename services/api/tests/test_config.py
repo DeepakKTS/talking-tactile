@@ -172,6 +172,17 @@ EXPLORE_BAD = [
     ("guidance.update_ms", 0, "update_ms"),
     ("health.off_page_points_before_recal", 1.5, "off_page_points_before_recal"),
     ("registration.mark_inset_mm", -1, "mark_inset_mm"),
+    ("dwell.speed_window_ms", 0, "speed_window_ms"),
+    ("earcons.gain", 1.5, "gain"),
+    ("earcons.exit_tick_hz", DELETE, "exit_tick_hz"),
+    ("fingertip.lost_reset_ms", -1, "lost_reset_ms"),
+    ("hands.max_hands", 3, "max_hands"),
+    ("hands.min_curled", 0, "min_curled"),
+    ("hands.require_pointing", "yes", "require_pointing"),
+    ("guidance.beeps_per_s_near", 1.0, "beeps_per_s_near must be above"),
+    ("guidance.chime_hz", [], "chime_hz"),
+    ("intents.min_label_similarity", 1.2, "min_label_similarity"),
+    ("intents", DELETE, "intents"),
 ]
 
 

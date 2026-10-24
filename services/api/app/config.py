@@ -12,6 +12,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    StrictBool,
     StrictFloat,
     StrictInt,
     StrictStr,
@@ -31,6 +32,7 @@ PosFloat = Annotated[StrictFloat, Field(gt=0)]
 NonNegFloat = Annotated[StrictFloat, Field(ge=0)]
 PosInt = Annotated[StrictInt, Field(gt=0)]
 NonNegInt = Annotated[StrictInt, Field(ge=0)]
+Gain = Annotated[StrictFloat, Field(gt=0, le=1)]
 
 
 class _Section(BaseModel):
@@ -228,12 +230,18 @@ class Hysteresis(_Section):
 class Dwell(_Section):
     speed_below_mm_s: PosFloat
     hold_ms: PosInt
+    speed_window_ms: PosInt
 
 
 class Earcons(_Section):
     max_per_second: PosFloat
     texture_hz: dict[TextureId, PosFloat]
     default_hz: PosFloat
+    tone_ms: PosInt
+    gain: Gain
+    exit_tick_hz: PosFloat
+    exit_tick_ms: PosInt
+    exit_tick_gain: Gain
 
     @model_validator(mode="after")
     def _every_texture_has_a_pitch(self) -> Self:
@@ -253,11 +261,35 @@ class Fingertip(_Section):
     contact_offset_mm: NonNegFloat
     filter: Literal["one_euro"]
     one_euro: OneEuro
+    lost_reset_ms: PosInt
+
+
+class Hands(_Section):
+    max_hands: Annotated[StrictInt, Field(ge=1, le=2)]
+    min_curled: Annotated[StrictInt, Field(ge=1, le=3)]  # of middle, ring and pinky
+    require_pointing: StrictBool
 
 
 class Guidance(_Section):
     update_ms: PosInt
     arrive_inside_ms: NonNegInt
+    beep_hz: PosFloat
+    beep_ms: PosInt
+    beeps_per_s_far: PosFloat
+    beeps_per_s_near: PosFloat
+    far_mm: PosFloat
+    chime_hz: Annotated[list[PosFloat], Field(min_length=1)]
+    chime_note_ms: PosInt
+
+    @model_validator(mode="after")
+    def _beeps_speed_up_when_near(self) -> Self:
+        if self.beeps_per_s_near <= self.beeps_per_s_far:
+            raise ValueError("beeps_per_s_near must be above beeps_per_s_far")
+        return self
+
+
+class Intents(_Section):
+    min_label_similarity: Annotated[StrictFloat, Field(gt=0, le=1)]
 
 
 class Health(_Section):
@@ -274,7 +306,9 @@ class ExploreConfig(_Section):
     dwell: Dwell
     earcons: Earcons
     fingertip: Fingertip
+    hands: Hands
     guidance: Guidance
+    intents: Intents
     health: Health
     registration: Registration
 
