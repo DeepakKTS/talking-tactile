@@ -122,6 +122,7 @@ TACTILE_BAD = [
     ("reconcile.duplicate_iou", 0, "duplicate_iou"),
     ("reconcile.contain_fraction", DELETE, "contain_fraction"),
     ("reconcile.speck_max_area_mm2", -1, "speck_max_area_mm2"),
+    ("vectorize.simplify_tolerance_mm", 0, "simplify_tolerance_mm"),
     ("pipeline.normalize_max_side_px", 2048.5, "normalize_max_side_px"),
     ("principles", "spacing", "principles"),
 ]

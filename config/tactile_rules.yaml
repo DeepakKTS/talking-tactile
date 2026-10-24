@@ -37,6 +37,9 @@ reconcile:                         # S3 rules on raw masks. Engineering values, 
   speck_max_area_mm2: 2.0          # connected pieces smaller than this are noise
   sliver_max_width_mm: 1.0         # a mask thinner than this everywhere is dropped
 
+vectorize:                         # S4 masks to polygons. The 200 point cap comes from regions.schema.json
+  simplify_tolerance_mm: 0.1       # first Douglas-Peucker tolerance; doubled until the cap is met
+
 principles:
   - represent, not interpret       # APH handout
   - spacing is the key to avoiding clutter

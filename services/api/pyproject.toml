@@ -25,6 +25,7 @@ dev = [
   "mypy>=2.4",
   "types-pyyaml>=6.0.12",
   "httpx2>=2.16.0",
+  "types-shapely>=2.1.0.20260728",
 ]
 
 [tool.uv]
@@ -43,7 +44,7 @@ target-version = "py311"
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PL"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["PLR2004", "PLR0913", "PLR0915"]
+"tests/**" = ["PLR2004", "PLR0913", "PLR0915", "PLR0917"]
 
 [tool.mypy]
 python_version = "3.11"

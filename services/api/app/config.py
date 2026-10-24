@@ -124,6 +124,10 @@ class Reconcile(_Section):
     sliver_max_width_mm: NonNegFloat
 
 
+class Vectorize(_Section):
+    simplify_tolerance_mm: PosFloat
+
+
 class TactileRules(_Section):
     spacing: Spacing
     textures: Textures
@@ -131,6 +135,7 @@ class TactileRules(_Section):
     page: PageRules
     pipeline: Pipeline
     reconcile: Reconcile
+    vectorize: Vectorize
     principles: list[StrictStr]
 
 
