@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 29, updated 2026-10-24T07:03:30.752Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 30, updated 2026-10-24T07:04:41.104Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -174,6 +174,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Fallback: Cut the failing step from the script.
 - [ ] d9-4 README with measured numbers (1.5 h)
   - Setup, models and why, numbers from RESULTS.md, honest tester status.
+  - Note: Credit fixtures/heart.png in the README and in the demo video, using the credit line in ATTRIBUTION.md: Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. State that the tactile sheet and its files are adaptations shared under CC BY-SA 3.0.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.
