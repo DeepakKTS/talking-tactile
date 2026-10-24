@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 42,
- "updated_at": "2026-10-24T16:36:21.817Z",
+ "rev": 45,
+ "updated_at": "2026-10-24T16:44:02.386Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -999,6 +999,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "tags": [
     "tests"
    ]
+  },
+  {
+   "id": "d3-6",
+   "day": 3,
+   "title": "Synthetic test figure",
+   "detail": "Generator for fixtures/synthetic/: about 8 labeled shapes with a nested part, two neighbors inside the minimum gap, one part below the point symbol size, fill colors that carry meaning, printed labels, and SAM-like raw masks with a near duplicate, a partial overlap, a sliver, a speck and a text leak. Outputs figure.png, exact truth masks and truth.json. Every geometry test uses it.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "done",
+   "note": "Commit 0a108bd. Mask type (read-only 2-D bool, label, score, source sam/teacher/synthetic; 16 tests). Generator app/synthetic: exact shapes rasterized at pixel centers, 1479 x 2048 px on the Letter figure area (8.959 px/mm). 8 parts: nested core (clearance above 2x min gap), lobes 2.0 mm apart (only pair under 3.2 mm, checked by distance transform), 4.0 mm pore (only part under 6.4 mm), 4 color categories on a k5 sheet (limit 3). Raw masks: duplicate IoU above 0.8, 45 mm2 lobe overlap, 0.25 mm sliver, 0.8 mm2 speck, text leak equal to the label mask. 12 tests incl. regenerate-and-compare. 168 KB on disk. Totals 130 pytest, 66 vitest.",
+   "done_at": "2026-10-24T16:44:02.386Z",
+   "tags": [
+    "geometry",
+    "fixture"
+   ],
+   "changed_at": "2026-10-24T16:44:02.386Z"
   },
   {
    "id": "d4-1",
@@ -1783,6 +1799,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:44:02.386Z",
+   "kind": "claude",
+   "text": "Task d3-6 \"Synthetic test figure\" is now done. Note: Commit 0a108bd. Mask type (read-only 2-D bool, label, score, source sam/teacher/synthetic; 16 tests). Generator app/synthetic: exact shapes rasterized at pixel centers, 1479 x 2048 px on the Letter figure area (8.959 px/mm). 8 parts: nested core (clearance above 2x min gap), lobes 2.0 mm apart (only pair under 3.2 mm, checked by distance transform), 4.0 mm pore (only part under 6.4 mm), 4 color categories on a k5 sheet (limit 3). Raw masks: duplicate IoU above 0.8, 45 mm2 lobe overlap, 0.25 mm sliver, 0.8 mm2 speck, text leak equal to the label mask. 12 tests incl. regenerate-and-compare. 168 KB on disk. Totals 130 pytest, 66 vitest."
+  },
+  {
+   "ts": "2026-10-24T16:38:53.292Z",
+   "kind": "claude",
+   "text": "Task d3-6 \"Synthetic test figure\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T16:38:53.261Z",
+   "kind": "claude",
+   "text": "Task d3-6 \"Synthetic test figure\" added to day 3."
+  },
   {
    "ts": "2026-10-24T16:36:21.817Z",
    "kind": "claude",

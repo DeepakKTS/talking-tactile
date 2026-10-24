@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 42, updated 2026-10-24T16:36:21.817Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 45, updated 2026-10-24T16:44:02.386Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -103,6 +103,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Merge near duplicates, nest contained parts, drop slivers, numbered overlay mapping.
 - [ ] d3-5 Unit tests for overlap rules (1 h)
   - pytest cases for merge, contain, partial overlap.
+- [x] d3-6 Synthetic test figure (2 h)
+  - Generator for fixtures/synthetic/: about 8 labeled shapes with a nested part, two neighbors inside the minimum gap, one part below the point symbol size, fill colors that carry meaning, printed labels, and SAM-like raw masks with a near duplicate, a partial overlap, a sliver, a speck and a text leak. Outputs figure.png, exact truth masks and truth.json. Every geometry test uses it.
+  - Note: Commit 0a108bd. Mask type (read-only 2-D bool, label, score, source sam/teacher/synthetic; 16 tests). Generator app/synthetic: exact shapes rasterized at pixel centers, 1479 x 2048 px on the Letter figure area (8.959 px/mm). 8 parts: nested core (clearance above 2x min gap), lobes 2.0 mm apart (only pair under 3.2 mm, checked by distance transform), 4.0 mm pore (only part under 6.4 mm), 4 color categories on a k5 sheet (limit 3). Raw masks: duplicate IoU above 0.8, 45 mm2 lobe overlap, 0.25 mm sliver, 0.8 mm2 speck, text leak equal to the label mask. 12 tests incl. regenerate-and-compare. 168 KB on disk. Totals 130 pytest, 66 vitest.
 
 ## Day 4: Thu Oct 29
 
