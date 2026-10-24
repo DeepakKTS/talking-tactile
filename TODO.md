@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 59, updated 2026-10-24T16:57:30.871Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 60, updated 2026-10-24T16:59:38.217Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -129,8 +129,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d4-6 Centroids and neighbor directions (1 h)
   - Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.
   - Note: Commit 1625b6e. app/geometry/neighbors.py: centroid_mm at the pole of inaccessibility (inside even for a C shape), neighbors within 20 mm plus direct inside/around, direction of the shortest outline-to-outline line in 8 sectors. 19 tests incl. 3 hypothesis properties (symmetry, quarter turn of the sheet, centroid inside). Synthetic: vessel down from outer chamber, right lobe right of left lobe, stem has left lobe up.
-- [ ] d4-7 Tactile rules validator (1.5 h) [doing]
+- [x] d4-7 Tactile rules validator (1.5 h)
   - tactile-rules-check skill: gaps, texture count, point symbol size, polygon validity and page bounds, later braille and SVG ids. Must find every planted violation in the synthetic figure before the fixes and none after.
+  - Note: Commit 15d6759. app/geometry/validate.py on a Sheet: ids and parents, polygon validity and 200 point cap, figure area bounds, 3.2 mm gap between outlines and inside a parent, point symbol size, area texture count per grade band; each violation has regions, measured value and limit. Synthetic, before fixes: exactly the planted set (min_gap lobes 2.01 mm, point_symbol pore 4.04 mm, texture_count 5 over 3), from truth masks and from reconciled raw masks. After fixes: none. 16 tests. Braille clearance and SVG id checks are added in d4-2 and d4-3; the CLI from the skill comes with storage in Phase 5.
 
 ## Day 5: Fri Oct 30. Gate C
 

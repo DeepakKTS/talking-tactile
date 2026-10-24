@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 59,
- "updated_at": "2026-10-24T16:57:30.871Z",
+ "rev": 60,
+ "updated_at": "2026-10-24T16:59:38.217Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1130,13 +1130,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "tactile-rules-check skill: gaps, texture count, point symbol size, polygon validity and page bounds, later braille and SVG ids. Must find every planted violation in the synthetic figure before the fixes and none after.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 15d6759. app/geometry/validate.py on a Sheet: ids and parents, polygon validity and 200 point cap, figure area bounds, 3.2 mm gap between outlines and inside a parent, point symbol size, area texture count per grade band; each violation has regions, measured value and limit. Synthetic, before fixes: exactly the planted set (min_gap lobes 2.01 mm, point_symbol pore 4.04 mm, texture_count 5 over 3), from truth masks and from reconciled raw masks. After fixes: none. 16 tests. Braille clearance and SVG id checks are added in d4-2 and d4-3; the CLI from the skill comes with storage in Phase 5.",
+   "done_at": "2026-10-24T16:59:38.217Z",
    "tags": [
     "geometry"
    ],
-   "changed_at": "2026-10-24T16:57:30.871Z"
+   "changed_at": "2026-10-24T16:59:38.217Z"
   },
   {
    "id": "d5-1",
@@ -1847,6 +1847,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:59:38.217Z",
+   "kind": "claude",
+   "text": "Task d4-7 \"Tactile rules validator\" is now done. Note: Commit 15d6759. app/geometry/validate.py on a Sheet: ids and parents, polygon validity and 200 point cap, figure area bounds, 3.2 mm gap between outlines and inside a parent, point symbol size, area texture count per grade band; each violation has regions, measured value and limit. Synthetic, before fixes: exactly the planted set (min_gap lobes 2.01 mm, point_symbol pore 4.04 mm, texture_count 5 over 3), from truth masks and from reconciled raw masks. After fixes: none. 16 tests. Braille clearance and SVG id checks are added in d4-2 and d4-3; the CLI from the skill comes with storage in Phase 5."
+  },
   {
    "ts": "2026-10-24T16:57:30.871Z",
    "kind": "claude",
