@@ -23,6 +23,8 @@ function setCorners(px) {
   calib.toMm = homographyFromPoints(px, sheet.corners_mm);
   calib.toPx = homographyFromPoints(sheet.corners_mm, px);
   calib.corners = px;
+  // What the touch-test JSON keeps: the clicks, the video size they were made at, the marks.
+  calib.record = { cornersPx: px, videoSize: [view.width, view.height], cornersMm: sheet.corners_mm, at: new Date().toISOString() };
   mapper.setCalibration(calib.toMm);
   try {
     localStorage.setItem(storeKey(), JSON.stringify(px));
@@ -82,6 +84,7 @@ setHandsListener((hands) => {
   const px = hands.map((h) => h.landmarks.map((p) => [p.x * view.width, p.y * view.height]));
   const offset = Number(document.getElementById("offset").value) || 0;
   const tip = mapper.update(px, now, offset);
+  if (calib.toMm) state.onFrame?.(tip, now);
   if (tip) state.tip = tip;
   else if (mapper.lost(now)) state.tip = null;
 });

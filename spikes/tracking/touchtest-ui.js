@@ -1,5 +1,5 @@
 import { state, say } from "./main.js";
-import { makeSequence, DwellDetector, errorStats, record } from "./lib/touchtest.js";
+import { makeSequence, DwellDetector, TouchWindow, record, serializeSession, sessionFilename, sessionResult } from "./lib/touchtest.js";
 
 // Dwell values from config/explore.yaml; rearm distance keeps one rest from scoring twice.
 const DWELL = { speedBelowMmS: 15, holdMs: 600, rearmMm: 15 };
@@ -8,6 +8,10 @@ const $ = (id) => document.getElementById(id);
 const test = { active: false, seq: [], i: 0, records: [], seed: 0, startedAt: null };
 state.touchTest = test;
 const dwell = new DwellDetector(DWELL);
+const touchWindow = new TouchWindow();
+state.onFrame = (tip, t) => {
+  if (test.active) touchWindow.add(tip, t);
+};
 
 function speak(text) {
   say(text);
@@ -19,6 +23,7 @@ function speak(text) {
 function prompt() {
   const n = test.seq[test.i] + 1;
   $("target").textContent = String(n);
+  touchWindow.start(performance.now());
   speak(`Touch ${n}.`);
 }
 
@@ -47,8 +52,12 @@ function capture(how) {
   }
   const target = test.seq[test.i];
   const targetMm = state.sheet.targets_mm[target];
+  const dwellFromMs = how === "dwell" && dwell.slowSince !== null ? Math.round(dwell.slowSince) : null;
   test.records.push(
-    record(target, targetMm, tip.mm, { rawMm: tip.raw, pointing: tip.pointing, how, at: Math.round(performance.now()) }),
+    record(target, targetMm, tip.mm, {
+      rawMm: tip.raw, pointing: tip.pointing, how, at: Math.round(performance.now()),
+      dwellFromMs, ...touchWindow.take(),
+    }),
   );
   test.i++;
   if (test.i < test.seq.length) prompt();
@@ -58,10 +67,7 @@ function capture(how) {
 function finish() {
   test.active = false;
   $("target").textContent = "";
-  const stats = errorStats(test.records);
-  test.stats = stats;
-  const result = {
-    kind: "touch-test",
+  const result = sessionResult({
     startedAt: test.startedAt,
     finishedAt: new Date().toISOString(),
     seed: test.seed,
@@ -69,16 +75,18 @@ function finish() {
     videoSize: state.videoSize,
     contactOffsetMm: Number($("offset").value),
     corners: state.calib.corners,
-    stats,
+    calibration: state.calib.record,
     records: test.records,
-  };
+  });
+  const stats = result.stats;
+  test.stats = stats;
   try {
     localStorage.setItem("tt-last-touch-test", JSON.stringify(result));
   } catch {}
-  const blob = new Blob([JSON.stringify(result, null, 1)], { type: "application/json" });
+  const blob = new Blob([serializeSession(result)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `touch-test-${result.finishedAt.replace(/[:.]/g, "-")}.json`;
+  a.download = sessionFilename(result);
   a.textContent = "Download the raw results (JSON)";
   $("results").textContent = [
     `Touches ${stats.n}. Mean error ${stats.meanMm} mm. p95 ${stats.p95Mm} mm. Max ${stats.maxMm} mm.`,

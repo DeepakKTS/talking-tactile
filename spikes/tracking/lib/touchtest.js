@@ -81,6 +81,70 @@ export function errorStats(records) {
   };
 }
 
+// Every frame while one target is up, from its prompt to its capture, so a session can be
+// replayed: the index tip and DIP landmarks in video pixels, the contact point before the
+// filter (rawMm) and after it (mm), all in sheet mm. A frame with no hand is { t, lost }.
+// Only the newest `limit` frames are kept; framesDropped counts the rest.
+export const FRAMES_PER_TOUCH = 600; // 20 s at 30 fps
+const r3 = (p) => p.map((v) => Math.round(v * 1000) / 1000);
+
+export class TouchWindow {
+  constructor(limit = FRAMES_PER_TOUCH) {
+    this.limit = limit;
+    this.start(0);
+  }
+
+  start(tMs) {
+    this.fromMs = Math.round(tMs);
+    this.frames = [];
+    this.dropped = 0;
+  }
+
+  add(tip, tMs) {
+    const t = Math.round(tMs);
+    this.frames.push(tip
+      ? { t, tipPx: r3(tip.tipPx), dipPx: r3(tip.dipPx), rawMm: r3(tip.raw), mm: r3(tip.mm), pointing: tip.pointing }
+      : { t, lost: true });
+    if (this.frames.length > this.limit) {
+      this.frames.shift();
+      this.dropped++;
+    }
+  }
+
+  take() {
+    return { windowFromMs: this.fromMs, frames: this.frames, framesDropped: this.dropped };
+  }
+}
+
+// The JSON the page offers when a test ends. Fields only ever get added, so
+// analyze_touch.py keeps working: version 2 added calibration and each record's frames.
+export function sessionResult({ startedAt, finishedAt, seed, backend, videoSize, contactOffsetMm, corners, calibration, records }) {
+  return {
+    kind: "touch-test",
+    startedAt,
+    finishedAt,
+    seed,
+    backend,
+    videoSize,
+    contactOffsetMm,
+    corners,
+    stats: errorStats(records),
+    records,
+    version: 2,
+    calibration,
+    framesPerTouchLimit: FRAMES_PER_TOUCH,
+  };
+}
+
+export const sessionFilename = (result) => `touch-test-${result.finishedAt.replace(/[:.]/g, "-")}.json`;
+export const serializeSession = (result) => JSON.stringify(result, null, 1);
+
+export function readSession(text) {
+  const s = JSON.parse(text);
+  if (s.kind !== "touch-test" || !Array.isArray(s.records)) throw new Error("not a touch-test session");
+  return s;
+}
+
 export function record(target, targetMm, measuredMm, extra = {}) {
   return {
     target,

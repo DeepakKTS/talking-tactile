@@ -91,6 +91,7 @@ export class FingertipMapper {
     if (this.lost(nowMs)) this.filter.reset();
     const mm = this.filter.filter(raw, nowMs / 1000);
     this.lastHandAt = nowMs;
-    return { mm, raw, pointing: pick.pointing, t: nowMs };
+    const tipPx = pts[LANDMARK.INDEX_TIP], dipPx = pts[LANDMARK.INDEX_DIP];
+    return { mm, raw, pointing: pick.pointing, t: nowMs, tipPx, dipPx };
   }
 }
