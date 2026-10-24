@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 60, updated 2026-10-24T16:59:38.217Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 64, updated 2026-10-24T17:10:40.013Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -117,10 +117,12 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d4-1 S4 layout (3 h)
   - Polygons in mm, gap enforcement, textures, point symbols.
   - Note: Commit 4a8e2e3. Point symbols (32-gon at least 6.4 mm across at the pole of inaccessibility), gap enforcement by cutting back the larger outline or the child, never a point symbol, by gap + 2 x 0.05 mm, repeated to 8 passes; two point symbols too close are reported, not moved. Textures by median fill color, largest group first, grade limit, pitches from explore.yaml. 14 tests incl. a 150-example property test; a 3000 case stress run: 0 unresolved, 0 pairs under 3.2 mm. Synthetic k5: pore is the only point symbol, right lobe shrunk, 3 textures, inner core untextured. vectorize and color 90 ms, fixes 1 ms. Braille placement is d4-2.
-- [ ] d4-2 Braille with liblouis (1.5 h)
+- [x] d4-2 Braille with liblouis (1.5 h)
   - UEB grade 2, placement, key fallback with abbreviations.
-- [ ] d4-3 S5 render (2 h)
+  - Note: Commit 8518864. lou_translate subprocess (decision recorded), UEB grade 2: 'left ventricle' contracts en, capital and number signs, grade 1 indicator for lone letters. Placement: label inside, abbreviation inside, abbreviation beside within 15 mm, key only; 3.7 mm clearance to every outline, 3.2 mm between blocks; validator extended with braille_clearance, braille_gap, braille_overlap. Synthetic: cross vessel, left lobe, right lobe labels inside; oc, ic, rc inside; po, st beside; key of 5; none key only; validator clean. 27 tests incl. 2 hypothesis properties. translate 12 ms, place 200 ms. Needs brew install liblouis on a fresh machine.
+- [ ] d4-3 S5 render (2 h) [doing]
   - tactile.svg, print.pdf with 100 mm calibration bar, regions.json, validation report.
+  - Note: tactile.svg in layers, print.pdf at 1:1 with the 100 mm bar and registration marks, key page. First check that cairosvg works here.
 - [ ] d4-4 Rules check passes on the heart figure (1 h)
   - tactile-rules-check skill. Fix causes, never loosen rules.
 - [ ] d4-5 Print two copies and trace with puffy paint (1 h)

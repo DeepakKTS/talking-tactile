@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 60,
- "updated_at": "2026-10-24T16:59:38.217Z",
+ "rev": 64,
+ "updated_at": "2026-10-24T17:10:40.013Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1056,13 +1056,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "UEB grade 2, placement, key fallback with abbreviations.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 8518864. lou_translate subprocess (decision recorded), UEB grade 2: 'left ventricle' contracts en, capital and number signs, grade 1 indicator for lone letters. Placement: label inside, abbreviation inside, abbreviation beside within 15 mm, key only; 3.7 mm clearance to every outline, 3.2 mm between blocks; validator extended with braille_clearance, braille_gap, braille_overlap. Synthetic: cross vessel, left lobe, right lobe labels inside; oc, ic, rc inside; po, st beside; key of 5; none key only; validator clean. 27 tests incl. 2 hypothesis properties. translate 12 ms, place 200 ms. Needs brew install liblouis on a fresh machine.",
+   "done_at": "2026-10-24T17:10:39.977Z",
    "tags": [
     "backend",
     "author"
-   ]
+   ],
+   "changed_at": "2026-10-24T17:10:39.977Z"
   },
   {
    "id": "d4-3",
@@ -1071,13 +1072,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "tactile.svg, print.pdf with 100 mm calibration bar, regions.json, validation report.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
+   "status": "doing",
+   "note": "tactile.svg in layers, print.pdf at 1:1 with the 100 mm bar and registration marks, key page. First check that cairosvg works here.",
    "done_at": null,
    "tags": [
     "backend",
     "author"
-   ]
+   ],
+   "changed_at": "2026-10-24T17:10:40.013Z"
   },
   {
    "id": "d4-4",
@@ -1785,6 +1787,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Branch early-start created from main on Oct 24 and checked out as a git worktree at .worktrees/early-start (gitignored on main). All product code (apps/web, services/api, config changes, fixtures/regions, fixtures/synthetic, the extended pre-commit hook) is committed there. Spikes, TRACKER.html and TODO.md stay on main in the repo root; tracker.py always runs against the root TRACKER.html. The Meta client is an interface with a mock only until the spikes run.",
    "why": "Keeps the Oct 26 boundary: main holds only spikes and planning, so it can be shown as is if the Official Rules forbid earlier code. The worktree lets spikes run on main the moment the key arrives without switching branches, and the tracker never forks between branches.",
    "changed_at": "2026-10-24T16:24:59.090Z"
+  },
+  {
+   "id": "dec-mvmncaozpg73",
+   "date": "2026-10-24",
+   "title": "Braille through lou_translate, not the Python bindings",
+   "decision": "Translate labels by running lou_translate (liblouis 3.39.0 from Homebrew: brew install liblouis) as a subprocess, one call per figure with one label per line, tables from config/tactile_rules.yaml (unicode.dis, en-ueb-g2.ctb). The backend refuses to start if lou_translate is missing.",
+   "why": "Checked Oct 24 on this Mac: the liblouis bindings are not on PyPI (the PyPI package named louis is an unrelated 2013 upload, not installed), and Homebrew installs them only for its own Python 3.15. They import into our 3.11 venv only by pointing it at Homebrew's site-packages, which is fragile. lou_translate works from any Python: 'left ventricle' gives the expected UEB grade 2 cells.",
+   "changed_at": "2026-10-24T17:02:03.318Z"
   }
  ],
  "risks": [
@@ -1847,6 +1857,26 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T17:10:40.013Z",
+   "kind": "claude",
+   "text": "Task d4-3 \"S5 render\" is now doing. Note: tactile.svg in layers, print.pdf at 1:1 with the 100 mm bar and registration marks, key page. First check that cairosvg works here."
+  },
+  {
+   "ts": "2026-10-24T17:10:39.977Z",
+   "kind": "claude",
+   "text": "Task d4-2 \"Braille with liblouis\" is now done. Note: Commit 8518864. lou_translate subprocess (decision recorded), UEB grade 2: 'left ventricle' contracts en, capital and number signs, grade 1 indicator for lone letters. Placement: label inside, abbreviation inside, abbreviation beside within 15 mm, key only; 3.7 mm clearance to every outline, 3.2 mm between blocks; validator extended with braille_clearance, braille_gap, braille_overlap. Synthetic: cross vessel, left lobe, right lobe labels inside; oc, ic, rc inside; po, st beside; key of 5; none key only; validator clean. 27 tests incl. 2 hypothesis properties. translate 12 ms, place 200 ms. Needs brew install liblouis on a fresh machine."
+  },
+  {
+   "ts": "2026-10-24T17:02:03.355Z",
+   "kind": "claude",
+   "text": "Task d4-2 \"Braille with liblouis\" is now doing. Note: lou_translate via subprocess (decision recorded). UEB grade 2, block size from the braille config, placement inside the region with 3.7 mm clearance, then abbreviation inside, then abbreviation next to it, then key only; key on its own page."
+  },
+  {
+   "ts": "2026-10-24T17:02:03.318Z",
+   "kind": "claude",
+   "text": "Decision: Braille through lou_translate, not the Python bindings."
+  },
   {
    "ts": "2026-10-24T16:59:38.217Z",
    "kind": "claude",
