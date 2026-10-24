@@ -250,6 +250,29 @@ class TestMetric(TrackerTestCase):
         self.assert_fails_unchanged("metric", "touch-mean", "3", "--source", "guess")
         self.assert_fails_unchanged("metric", "touch-mean", "3")
 
+    def test_rename_with_a_value(self) -> None:
+        s = self.assert_ok_write("metric", "lat-earcon", "0.3", "--source", "mock", "--name", "Code path to earcon, p95")
+        m = self.find(s["metrics"], "lat-earcon")
+        self.assertEqual((m["name"], m["value"], m["target"]), ("Code path to earcon, p95", 0.3, 100))
+        self.assertIn('renamed to "Code path to earcon, p95"', s["log"][0]["text"])
+        self.assert_fails_unchanged("metric", "lat-earcon", "1", "--source", "mock", "--name", " ")
+
+
+class TestAddMetric(TrackerTestCase):
+    def test_added_metric_is_not_measured(self) -> None:
+        s = self.assert_ok_write("add-metric", "lat-device", "--suite", "Latency", "--name", "On device, p95", "--unit", "ms", "--report-only")
+        m = s["metrics"][-1]
+        self.assertEqual(len(s["metrics"]), len(self.initial["metrics"]) + 1)
+        self.assertEqual((m["id"], m["cmp"], m["target"], m["report_only"]), ("lat-device", "<=", 0, True))
+        self.assertEqual((m["value"], m["measured_at"], m["source"]), (None, None, ""))
+        s = self.assert_ok_write("metric", "lat-device", "180", "--source", "live")
+        self.assertEqual(self.find(s["metrics"], "lat-device")["value"], 180)
+
+    def test_bad_new_metric(self) -> None:
+        self.assert_fails_unchanged("add-metric", "lat-earcon", "--suite", "Latency", "--name", "x", "--unit", "ms")
+        self.assert_fails_unchanged("add-metric", "y", "--suite", "Latency", "--name", "x", "--unit", "ms", "--target", "soon")
+        self.assert_fails_unchanged("add-metric", "y", "--suite", "Latency", "--unit", "ms")
+
 
 class TestIssue(TrackerTestCase):
     def test_each_severity(self) -> None:
@@ -266,6 +289,22 @@ class TestIssue(TrackerTestCase):
     def test_bad_severity(self) -> None:
         self.assert_fails_unchanged("issue", "x", "--severity", "urgent")
         self.assert_fails_unchanged("issue", "x")
+
+    def test_close_with_a_note(self) -> None:
+        s = self.assert_ok_write("issue", "Earcon late", "--severity", "medium")
+        iid = s["issues"][0]["id"]
+        s = self.assert_ok_write("issue-status", iid, "closed", "--note", "Decided")
+        i = self.find(s["issues"], iid)
+        self.assertEqual((i["status"], i["note"]), ("closed", "Decided"))
+        self.assertEqual(s["log"][0]["text"], "Issue closed: Earcon late. Decided")
+        r = self.run_cli("todo", "--out", str(self.dir / "TODO.md"))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertNotIn("Earcon late", (self.dir / "TODO.md").read_text())
+
+    def test_bad_issue_status(self) -> None:
+        self.assert_fails_unchanged("issue-status", "i-nope", "closed")
+        s = self.assert_ok_write("issue", "x", "--severity", "low")
+        self.assert_fails_unchanged("issue-status", s["issues"][0]["id"], "gone")
 
 
 class TestDecision(TrackerTestCase):

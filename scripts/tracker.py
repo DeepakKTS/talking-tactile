@@ -30,6 +30,7 @@ TASK_STATUSES = ["todo", "doing", "done", "blocked", "cut"]
 GATE_STATUSES = ["pending", "pass", "fail", "fallback"]
 SEVERITIES = ["high", "medium", "low"]
 SOURCES = ["live", "mock"]
+ISSUE_STATUSES = ["open", "fixing", "closed"]  # same choices as the page
 LOG_CAP = 500  # same cap as logEvent() in the page
 DAY1 = dt.date(2026, 10, 26)
 LAST_DAY = 10
@@ -289,7 +290,35 @@ def cmd_metric(state: dict, args: argparse.Namespace) -> str | None:
     m["measured_at"] = ts
     m["source"] = args.source
     text = f'Metric "{m.get("name", m["id"])}" set to {m["value"]} {m.get("unit", "")} ({args.source}).'
+    if args.name is not None:
+        if not args.name.strip():
+            raise TrackerError("Metric name is empty.")
+        text = f'Metric "{m.get("name", m["id"])}" renamed to "{args.name}" and set to {m["value"]} {m.get("unit", "")} ({args.source}).'
+        m["name"] = args.name
     commit(state, m, text, ts)
+    return text
+
+
+def cmd_add_metric(state: dict, args: argparse.Namespace) -> str | None:
+    if any(m.get("id") == args.metric_id for m in state["metrics"]):
+        raise TrackerError(f"Metric id '{args.metric_id}' already exists.")
+    if not args.metric_id.strip() or not args.name.strip() or not args.suite.strip():
+        raise TrackerError("A metric needs an id, a suite and a name.")
+    metric = {
+        "id": args.metric_id,
+        "suite": args.suite,
+        "name": args.name,
+        "cmp": args.cmp,
+        "target": parse_number(args.target),
+        "unit": args.unit,
+        "report_only": args.report_only,
+        "value": None,
+        "measured_at": None,
+        "source": "",
+    }
+    state["metrics"].append(metric)
+    text = f'Metric added: "{args.name}", not measured yet.'
+    commit(state, metric, text)
     return text
 
 
@@ -308,6 +337,18 @@ def cmd_issue(state: dict, args: argparse.Namespace) -> str | None:
     state["issues"].insert(0, issue)
     text = f"Issue opened: {args.text}."
     commit(state, issue, text, ts)
+    return text
+
+
+def cmd_issue_status(state: dict, args: argparse.Namespace) -> str | None:
+    issue = find(state["issues"], args.issue_id, "issue")
+    issue["status"] = args.status
+    if args.note is not None:
+        issue["note"] = args.note
+    text = f"Issue {args.status}: {issue.get('title')}."
+    if args.note:
+        text += f" {args.note}"
+    commit(state, issue, text)
     return text
 
 
@@ -450,12 +491,29 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("metric_id")
     s.add_argument("value")
     s.add_argument("--source", choices=SOURCES, required=True)
+    s.add_argument("--name", help="rename the metric")
     s.set_defaults(func=cmd_metric)
+
+    s = sub.add_parser("add-metric", help="add a metric, not measured yet")
+    s.add_argument("metric_id")
+    s.add_argument("--suite", required=True)
+    s.add_argument("--name", required=True)
+    s.add_argument("--unit", required=True)
+    s.add_argument("--cmp", choices=["<=", ">="], default="<=")
+    s.add_argument("--target", default="0")
+    s.add_argument("--report-only", action="store_true")
+    s.set_defaults(func=cmd_add_metric)
 
     s = sub.add_parser("issue", help="open an issue")
     s.add_argument("text")
     s.add_argument("--severity", choices=SEVERITIES, required=True)
     s.set_defaults(func=cmd_issue)
+
+    s = sub.add_parser("issue-status", help="set an issue status, such as closed")
+    s.add_argument("issue_id")
+    s.add_argument("status", choices=ISSUE_STATUSES)
+    s.add_argument("--note")
+    s.set_defaults(func=cmd_issue_status)
 
     s = sub.add_parser("decision", help="record a decision")
     s.add_argument("title")

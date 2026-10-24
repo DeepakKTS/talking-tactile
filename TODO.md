@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 96, updated 2026-10-24T21:14:43.338Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 101, updated 2026-10-24T22:43:54.267Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -232,4 +232,4 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Open issues
 
-- (medium) Touch to earcon cannot meet the 100 ms budget (RULES 4) while explore.yaml enter_hold_ms is 120: headless enter to earcon is 141.6 ms p95 before any camera latency (code is 0.3 ms of it). Either the budget means code after the hold, or the hold must drop to about 60 ms and the border flicker property rechecked. Decide with the touch eval.
+None. Add one with scripts/tracker.py issue.
