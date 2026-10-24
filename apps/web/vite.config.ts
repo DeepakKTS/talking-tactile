@@ -1,9 +1,22 @@
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
+import type { Plugin } from "vite";
+import { parse } from "yaml";
 import { defineConfig } from "vitest/config";
 
+// Turns an import of config/*.yaml into a JSON module. ?raw imports are left to Vite.
+function yamlConfig(): Plugin {
+  return {
+    name: "yaml-config",
+    transform(code, id) {
+      if (!id.endsWith(".yaml")) return null;
+      return { code: `export default ${JSON.stringify(parse(code))};`, map: null };
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), yamlConfig()],
   server: {
     port: 5173,
     strictPort: true,
