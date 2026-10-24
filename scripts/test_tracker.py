@@ -164,6 +164,54 @@ class TestStatus(TrackerTestCase):
         self.assert_fails_unchanged("status", "d1-5", "finished")
 
 
+class TestAdd(TrackerTestCase):
+    def test_add_with_every_field(self) -> None:
+        s = self.assert_ok_write(
+            "add", "9", "Credit the heart figure", "--detail", "README and video credit.",
+            "--timebox", "15 min", "--fallback", "A slide at the end.", "--tags", "docs, license",
+        )
+        t = self.find(s["tasks"], "d9-5")
+        self.assertEqual(
+            {k: t[k] for k in ("day", "title", "detail", "timebox", "fallback", "status", "note", "done_at", "tags")},
+            {"day": 9, "title": "Credit the heart figure", "detail": "README and video credit.", "timebox": "15 min",
+             "fallback": "A slide at the end.", "status": "todo", "note": "", "done_at": None, "tags": ["docs", "license"]},
+        )
+        self.assertRegex(t["changed_at"], ISO_RE)
+        self.assertEqual(s["log"][0]["text"], 'Task d9-5 "Credit the heart figure" added to day 9.')
+        self.assertEqual(len(s["tasks"]), len(self.initial["tasks"]) + 1)
+
+    def test_new_task_sits_after_its_day(self) -> None:
+        s = self.assert_ok_write("add", "9", "X")
+        ids = [t["id"] for t in s["tasks"]]
+        self.assertEqual(ids[ids.index("d9-5") - 1], "d9-4")
+        self.assertEqual(ids[ids.index("d9-5") + 1], "d10-1")
+        s = self.assert_ok_write("add", "0", "Y")
+        ids = [t["id"] for t in s["tasks"]]
+        self.assertEqual(ids[ids.index("d0-10") - 1], "d0-9")
+        self.assertEqual(ids[ids.index("d0-10") + 1], "d1-1")
+
+    def test_ids_count_up_and_defaults_are_empty(self) -> None:
+        self.assert_ok_write("add", "3", "First")
+        s = self.assert_ok_write("add", "3", "Second")
+        a, b = self.find(s["tasks"], "d3-6"), self.find(s["tasks"], "d3-7")
+        self.assertEqual((a["title"], b["title"]), ("First", "Second"))
+        self.assertEqual((b["detail"], b["timebox"], b["fallback"], b["tags"]), ("", "", "", []))
+
+    def test_added_task_works_with_status_and_todo(self) -> None:
+        self.assert_ok_write("add", "9", "Credit the heart figure", "--timebox", "15 min")
+        s = self.assert_ok_write("status", "d9-5", "done", "--note", "Credit is in the README")
+        self.assertEqual(self.find(s["tasks"], "d9-5")["status"], "done")
+        self.assertEqual(self.run_cli("todo").returncode, 0)
+        self.assertIn("- [x] d9-5 Credit the heart figure (15 min)", (self.dir / "TODO.md").read_text(encoding="utf-8"))
+
+    def test_bad_input_writes_nothing(self) -> None:
+        self.assert_fails_unchanged("add", "11", "Too late")
+        self.assert_fails_unchanged("add", "-1", "Too early")
+        self.assert_fails_unchanged("add", "nine", "Not a number")
+        self.assert_fails_unchanged("add", "9", "   ")
+        self.assert_fails_unchanged("add", "9")
+
+
 class TestLog(TrackerTestCase):
     def test_log(self) -> None:
         s = self.assert_ok_write("log", "Spike notes written")

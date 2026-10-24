@@ -246,6 +246,35 @@ def cmd_status(state: dict, args: argparse.Namespace) -> str | None:
     return text
 
 
+def cmd_add(state: dict, args: argparse.Namespace) -> str | None:
+    if not 0 <= args.day <= LAST_DAY:
+        raise TrackerError(f"Day must be 0 to {LAST_DAY}, got {args.day}.")
+    if not args.title.strip():
+        raise TrackerError("Task title is empty.")
+    tasks = state["tasks"]
+    prefix = f"d{args.day}-"
+    numbers = [int(t["id"][len(prefix):]) for t in tasks
+               if str(t.get("id", "")).startswith(prefix) and t["id"][len(prefix):].isdigit()]
+    task = {
+        "id": f"{prefix}{max(numbers, default=0) + 1}",
+        "day": args.day,
+        "title": args.title,
+        "detail": args.detail,
+        "timebox": args.timebox,
+        "fallback": args.fallback,
+        "status": "todo",
+        "note": "",
+        "done_at": None,
+        "tags": [t.strip() for t in args.tags.split(",") if t.strip()] if args.tags else [],
+    }
+    # Keep tasks grouped by day: insert after the last task of the same or an earlier day.
+    at = max((i + 1 for i, t in enumerate(tasks) if t.get("day", 0) <= args.day), default=0)
+    tasks.insert(at, task)
+    text = f'Task {task["id"]} "{task["title"]}" added to day {args.day}.'
+    commit(state, task, text)
+    return text
+
+
 def cmd_log(state: dict, args: argparse.Namespace) -> str | None:
     if not args.text.strip():
         raise TrackerError("Log text is empty.")
@@ -403,6 +432,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("status", choices=TASK_STATUSES)
     s.add_argument("--note")
     s.set_defaults(func=cmd_status)
+
+    s = sub.add_parser("add", help="add a task")
+    s.add_argument("day", type=int)
+    s.add_argument("title")
+    s.add_argument("--detail", default="")
+    s.add_argument("--timebox", default="")
+    s.add_argument("--fallback", default="")
+    s.add_argument("--tags", default="", help="comma separated, such as docs,license")
+    s.set_defaults(func=cmd_add)
 
     s = sub.add_parser("log", help="add a log entry")
     s.add_argument("text")
