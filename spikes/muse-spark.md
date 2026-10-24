@@ -1,0 +1,32 @@
+# Muse Spark 1.3 spike
+
+Docs read 2026-10-24:
+- https://dev.meta.ai/docs/api-reference/chat-completions/create-chat-completion
+- https://dev.meta.ai/docs/structured-output
+- https://dev.meta.ai/docs/image-understanding
+- https://dev.meta.ai/docs/reasoning
+- https://dev.meta.ai/docs/prompt-caching
+- https://dev.meta.ai/docs/error-handling
+- https://dev.meta.ai/docs/pricing-rate-limits
+
+Script: `uv run spikes/spark_spike.py` (Python 3.11, httpx). `--dry-run` prints the requests with no key.
+
+## Request shape, from the docs
+
+- `POST https://api.meta.ai/v1/chat/completions`, `Authorization: Bearer <key>`. Keys start with `LLM_`.
+- Image: a content part `{"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}}`. Up to 50 images per request.
+- Structured output: `response_format: {type: "json_schema", json_schema: {name, schema}}`. Decoding is constrained, so output always matches. Recursive schemas return 400. `strict` defaults to false and only adds schema validation.
+- Reasoning: top-level `reasoning_effort`, `minimal` to `max`. Spark has no `none`.
+- Streaming: `stream: true` with `stream_options.include_usage` puts `usage` on the final chunk.
+- Caching: automatic prefix caching, no flag. Reported at `usage.prompt_tokens_details.cached_tokens`. Optional `prompt_cache_key`.
+- Errors: retry 429, 500 and 503 with backoff and jitter, and honor `Retry-After`. Do not blindly retry 504, because the same request usually times out again.
+- Price: $1.25 input, $0.15 cached input, $4.25 output per 1M tokens. Limits: 3,000 RPM and 4M TPM per team.
+
+## Cases
+
+- `understand`: heart.png at 2048 px with the S1 schema (figure type, title, summary, up to 25 parts with print labels, color meaning, verdict). `reasoning_effort: medium`. Not streamed.
+- `answer`: a text-only grounded question with static figure context first, then the question. Streamed, `reasoning_effort: low`. Measures time to first token and first sentence, and reports `cached_tokens` across repeats.
+
+## Results
+
+Not run yet. Waiting for the API key in services/api/.env.

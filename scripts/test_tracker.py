@@ -1,6 +1,6 @@
 """Tests for scripts/tracker.py. Run: python3 -m unittest -v scripts/test_tracker.py
 
-Every test works on a copy of TRACKER.html in a temp directory.
+Every test works on a temp copy of testdata/tracker_fixture.html.
 """
 
 from __future__ import annotations
@@ -16,7 +16,8 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 TRACKER = SCRIPTS / "tracker.py"
-REAL_FILE = SCRIPTS.parent / "TRACKER.html"
+# A frozen copy of the tracker as the kit shipped it, so tests never depend on live project state.
+FIXTURE_FILE = SCRIPTS / "testdata" / "tracker_fixture.html"
 BLOCK_RE = re.compile(r'(<script id="tt-state" type="application/json">)(.*?)(</script>)', re.S)
 ISO_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$")
 
@@ -35,7 +36,7 @@ class TrackerTestCase(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.dir = Path(self.tmp.name)
         self.file = self.dir / "TRACKER.html"
-        shutil.copyfile(REAL_FILE, self.file)
+        shutil.copyfile(FIXTURE_FILE, self.file)
         self.before_text = self.read_text()
         self.before = self.state()
         self.initial = self.before
