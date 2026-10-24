@@ -9,6 +9,7 @@ regions. Each connected piece becomes its own polygon, largest first.
 import cv2
 import numpy as np
 import shapely
+from shapely.affinity import affine_transform
 from shapely.geometry import Polygon
 
 from app.config import Vectorize
@@ -69,6 +70,6 @@ def mask_to_polygons_mm(mask: Mask, fit: PageFit, rules: Vectorize) -> list[Poly
     a = fit.mm_per_px
     ox, oy = fit.origin_mm
     return [
-        shapely.affinity.affine_transform(p, [a, 0, 0, a, ox, oy])
+        affine_transform(p, [a, 0, 0, a, ox, oy])
         for p in mask_to_polygons_px(mask.data, tolerance_px)
     ]

@@ -5,7 +5,7 @@ refused so a typo cannot silently fall back to a default; there are no defaults.
 """
 
 from pathlib import Path
-from typing import Annotated, Any, Literal, Self, TypeVar
+from typing import Annotated, Any, Literal, Self, TypeVar, get_args
 
 import yaml
 from pydantic import (
@@ -19,7 +19,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.models.regions import MAX_TEXTURES, GradeBand, PageSize
+from app.models.regions import MAX_TEXTURES, GradeBand, PageSize, TextureId
 from app.paths import EXPLORE_YAML, TACTILE_RULES_YAML
 
 
@@ -54,6 +54,7 @@ class Textures(_Section):
     max_area_textures: PosInt
     max_area_textures_lower_grades: PosInt
     lower_grade_bands: list[GradeBand]
+    order: Annotated[list[TextureId], Field(min_length=1)]
 
     def limit_for(self, grade_band: GradeBand | None) -> int:
         """Area textures allowed for a grade band. No band given means the general limit."""
@@ -70,6 +71,10 @@ class Textures(_Section):
             )
         if self.max_area_textures_lower_grades > self.max_area_textures:
             raise ValueError("max_area_textures_lower_grades must not exceed max_area_textures")
+        if len(set(self.order)) != len(self.order):
+            raise ValueError("order lists a texture twice")
+        if len(self.order) < self.max_area_textures:
+            raise ValueError("order must name at least max_area_textures textures")
         return self
 
 
@@ -128,6 +133,14 @@ class Vectorize(_Section):
     simplify_tolerance_mm: PosFloat
 
 
+class Layout(_Section):
+    point_symbol_vertices: Annotated[StrictInt, Field(ge=8)]
+    gap_simplify_tolerance_mm: PosFloat
+    gap_max_passes: PosInt
+    color_group_max_delta: PosFloat
+    inside_point_tolerance_mm: PosFloat
+
+
 class TactileRules(_Section):
     spacing: Spacing
     textures: Textures
@@ -136,6 +149,7 @@ class TactileRules(_Section):
     pipeline: Pipeline
     reconcile: Reconcile
     vectorize: Vectorize
+    layout: Layout
     principles: list[StrictStr]
 
 
@@ -156,6 +170,15 @@ class Dwell(_Section):
 
 class Earcons(_Section):
     max_per_second: PosFloat
+    texture_hz: dict[TextureId, PosFloat]
+    default_hz: PosFloat
+
+    @model_validator(mode="after")
+    def _every_texture_has_a_pitch(self) -> Self:
+        missing = set(get_args(TextureId)) - set(self.texture_hz)
+        if missing:
+            raise ValueError(f"texture_hz has no pitch for {sorted(missing)}")
+        return self
 
 
 class OneEuro(_Section):

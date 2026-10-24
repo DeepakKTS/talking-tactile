@@ -20,7 +20,17 @@ const ExploreSchema = z.strictObject({
     exit_hold_ms: nonNegInt,
   }),
   dwell: z.strictObject({ speed_below_mm_s: posNum, hold_ms: posInt }),
-  earcons: z.strictObject({ max_per_second: posNum }),
+  earcons: z.strictObject({
+    max_per_second: posNum,
+    texture_hz: z.strictObject({
+      dots: posNum,
+      lines: posNum,
+      grid: posNum,
+      cross: posNum,
+      solid: posNum,
+    }),
+    default_hz: posNum,
+  }),
   fingertip: z.strictObject({
     contact_offset_mm: nonNegNum,
     filter: z.literal("one_euro"),

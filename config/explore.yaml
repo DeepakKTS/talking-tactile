@@ -9,6 +9,8 @@ dwell:
   hold_ms: 600
 earcons:
   max_per_second: 6
+  texture_hz: { dots: 523.25, lines: 659.25, grid: 783.99, cross: 880.0, solid: 392.0 }  # C5 E5 G5 A5 G4
+  default_hz: 440.0          # regions with no area texture, and point symbols
 fingertip:
   contact_offset_mm: 4.0     # move back along the finger toward the knuckle
   filter: one_euro

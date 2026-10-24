@@ -10,6 +10,8 @@ textures:
   max_area_textures: 5           # APH handout, "limit of 5"
   max_area_textures_lower_grades: 3  # APH handout, "limit of 3 for lower grades"
   lower_grade_bands: [k5]            # APH gives no cut-off for "lower grades"; we take K to 5
+  order: [dots, lines, grid, cross, solid]  # handed out in this order, largest group first. Solid last:
+                                            # large solid raised areas are hard to read. Engineering choice
 
 braille:                     # BANA signage guideline values. Paper braille may differ.
   dot_base_diameter_mm: [1.5, 1.6]
@@ -39,6 +41,13 @@ reconcile:                         # S3 rules on raw masks. Engineering values, 
 
 vectorize:                         # S4 masks to polygons. The 200 point cap comes from regions.schema.json
   simplify_tolerance_mm: 0.1       # first Douglas-Peucker tolerance; doubled until the cap is met
+
+layout:                            # S4 fixes. Engineering values
+  point_symbol_vertices: 32        # a point symbol is a regular polygon this fine, at least point_symbol_min_mm wide
+  gap_simplify_tolerance_mm: 0.05  # outlines cut back for a gap are simplified this much, and cut twice this deeper
+  gap_max_passes: 8                # gap enforcement repeats until clean or this many passes
+  color_group_max_delta: 40        # RGB distance under which two fills count as the same color
+  inside_point_tolerance_mm: 0.1   # precision of the point inside a region (point symbol center, centroid_mm)
 
 principles:
   - represent, not interpret       # APH handout
