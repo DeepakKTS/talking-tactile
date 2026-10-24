@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 64, updated 2026-10-24T17:10:40.013Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 65, updated 2026-10-24T17:23:13.322Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -120,9 +120,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d4-2 Braille with liblouis (1.5 h)
   - UEB grade 2, placement, key fallback with abbreviations.
   - Note: Commit 8518864. lou_translate subprocess (decision recorded), UEB grade 2: 'left ventricle' contracts en, capital and number signs, grade 1 indicator for lone letters. Placement: label inside, abbreviation inside, abbreviation beside within 15 mm, key only; 3.7 mm clearance to every outline, 3.2 mm between blocks; validator extended with braille_clearance, braille_gap, braille_overlap. Synthetic: cross vessel, left lobe, right lobe labels inside; oc, ic, rc inside; po, st beside; key of 5; none key only; validator clean. 27 tests incl. 2 hypothesis properties. translate 12 ms, place 200 ms. Needs brew install liblouis on a fresh machine.
-- [ ] d4-3 S5 render (2 h) [doing]
+- [x] d4-3 S5 render (2 h)
   - tactile.svg, print.pdf with 100 mm calibration bar, regions.json, validation report.
-  - Note: tactile.svg in layers, print.pdf at 1:1 with the 100 mm bar and registration marks, key page. First check that cairosvg works here.
+  - Note: Commits a2ca503 and 88fe8fe. tactile.svg layers guides, textures, outlines, braille; L marks 12.7 mm in (explore.yaml, shared with Explore); 1 mm outlines inside each edge (gaps, nested clearance and braille clearance now count it); textures 3.2 mm inside, off children, 3.7 mm off braille, pieces under 4 mm dropped; key pages with abbreviations and texture samples; print.pdf via cairosvg 2.9.1 (works with Homebrew cairo 1.18.4) and pypdf; regions.json valid against the schema; SVG ids match. Print scale at 300 dpi with pdftoppm: 2550 x 3300 px, bar 1182 px = 100.08 mm, lobe edge and mark corner within 0.2 mm. make synthetic-sheet writes data/synthetic/print.pdf, 2 pages, 0 violations. Render 23 ms, PDF 162 ms. 12 render tests.
 - [ ] d4-4 Rules check passes on the heart figure (1 h)
   - tactile-rules-check skill. Fix causes, never loosen rules.
 - [ ] d4-5 Print two copies and trace with puffy paint (1 h)

@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 64,
- "updated_at": "2026-10-24T17:10:40.013Z",
+ "rev": 65,
+ "updated_at": "2026-10-24T17:23:13.322Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1072,14 +1072,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "tactile.svg, print.pdf with 100 mm calibration bar, regions.json, validation report.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "doing",
-   "note": "tactile.svg in layers, print.pdf at 1:1 with the 100 mm bar and registration marks, key page. First check that cairosvg works here.",
-   "done_at": null,
+   "status": "done",
+   "note": "Commits a2ca503 and 88fe8fe. tactile.svg layers guides, textures, outlines, braille; L marks 12.7 mm in (explore.yaml, shared with Explore); 1 mm outlines inside each edge (gaps, nested clearance and braille clearance now count it); textures 3.2 mm inside, off children, 3.7 mm off braille, pieces under 4 mm dropped; key pages with abbreviations and texture samples; print.pdf via cairosvg 2.9.1 (works with Homebrew cairo 1.18.4) and pypdf; regions.json valid against the schema; SVG ids match. Print scale at 300 dpi with pdftoppm: 2550 x 3300 px, bar 1182 px = 100.08 mm, lobe edge and mark corner within 0.2 mm. make synthetic-sheet writes data/synthetic/print.pdf, 2 pages, 0 violations. Render 23 ms, PDF 162 ms. 12 render tests.",
+   "done_at": "2026-10-24T17:23:13.322Z",
    "tags": [
     "backend",
     "author"
    ],
-   "changed_at": "2026-10-24T17:10:40.013Z"
+   "changed_at": "2026-10-24T17:23:13.322Z"
   },
   {
    "id": "d4-4",
@@ -1857,6 +1857,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T17:23:13.322Z",
+   "kind": "claude",
+   "text": "Task d4-3 \"S5 render\" is now done. Note: Commits a2ca503 and 88fe8fe. tactile.svg layers guides, textures, outlines, braille; L marks 12.7 mm in (explore.yaml, shared with Explore); 1 mm outlines inside each edge (gaps, nested clearance and braille clearance now count it); textures 3.2 mm inside, off children, 3.7 mm off braille, pieces under 4 mm dropped; key pages with abbreviations and texture samples; print.pdf via cairosvg 2.9.1 (works with Homebrew cairo 1.18.4) and pypdf; regions.json valid against the schema; SVG ids match. Print scale at 300 dpi with pdftoppm: 2550 x 3300 px, bar 1182 px = 100.08 mm, lobe edge and mark corner within 0.2 mm. make synthetic-sheet writes data/synthetic/print.pdf, 2 pages, 0 violations. Render 23 ms, PDF 162 ms. 12 render tests."
+  },
   {
    "ts": "2026-10-24T17:10:40.013Z",
    "kind": "claude",
