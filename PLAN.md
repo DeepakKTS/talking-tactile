@@ -63,7 +63,7 @@ Routes
 - `GET /api/figures/{id}` status and stage timings
 - `GET /api/figures/{id}/regions.json`, `/tactile.svg`, `/print.pdf`
 - `PATCH /api/figures/{id}/regions/{rid}` teacher edits
-- `POST /api/figures/{id}/publish` locks a reviewed version
+- `POST /api/figures/{id}/publish` locks a reviewed version. Refused with 409 `rules_violated` and each violation (regions, rule, measured, limit) when that version's rules report is not empty; no override
 - `POST /api/register` one frame in, sheet corners, orientation and confidence out
 - `POST /api/ask` question plus context in, answer streamed out as server-sent events
 - `WS /api/voice` audio in, transcripts out, proxied to Muse Voice Transcribe

@@ -17,12 +17,15 @@ import httpx
 import pytest
 from PIL import Image
 
-from app.config import load_tactile_rules
+from app.config import TactileRules, load_tactile_rules
 from app.figures import FigureService
+from app.geometry.sheet import Sheet
+from app.geometry.validate import Violation
 from app.logs import JsonFormatter, request_id
 from app.main import create_app
 from app.meta.mock import MockMetaClient
 from app.paths import FIXTURES_DIR
+from app.pipeline import s5_render
 
 RULES = load_tactile_rules()
 SYNTHETIC_PNG = (FIXTURES_DIR / "synthetic" / "figure.png").read_bytes()
@@ -460,5 +463,149 @@ def test_concurrent_publishes_and_edits_take_distinct_versions(tmp_path: Path) -
         labels = {x["id"]: x["label"] for x in
                   (await api.http.get(f"{base}/regions.json")).json()["regions"]}  # fmt: skip
         assert (labels["r1"], labels["r2"]) == ("shell", "kernel")
+
+    run(tmp_path, body)
+
+
+PLANTED = "too close"
+
+
+@pytest.fixture
+def planted_violation(monkeypatch: pytest.MonkeyPatch) -> None:
+    """S5's rules check also reports a gap violation on any part labelled PLANTED, the way it
+    would if layout had missed one. A teacher fixes it by relabelling the part."""
+    real = s5_render.validate_sheet
+
+    def check(sheet: Sheet, rules: TactileRules) -> list[Violation]:
+        planted = [
+            Violation(
+                rule="min_gap",
+                regions=[r.id],
+                measured=2.01,
+                limit=rules.spacing.min_gap_mm,
+                message=f"{r.id} is 2.01 mm from its neighbor",
+            )
+            for r in sheet.regions
+            if r.label == PLANTED
+        ]
+        return real(sheet, rules) + planted
+
+    monkeypatch.setattr(s5_render, "validate_sheet", check)
+
+
+@pytest.mark.usefixtures("planted_violation")
+def test_publish_refuses_a_version_that_breaks_a_rule(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        r = await api.http.patch(f"/api/figures/{fid}/regions/r3",
+                                 json={"op": "label", "label": PLANTED})  # fmt: skip
+        assert r.status_code == 202
+        await api.wait(fid)
+        draft = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
+        assert {x["id"]: x["label"] for x in draft["regions"]}["r3"] == PLANTED
+
+        for attempt in ({}, {"force": True}, {"override": True}):  # there is no override
+            r = await api.http.post(f"/api/figures/{fid}/publish", json=attempt)
+            assert_envelope(r, 409, "rules_violated")
+            err = r.json()["error"]
+            assert err["retryable"] is False
+            assert err["edit_version"] == 1
+            assert err["violations"] == [{"regions": ["r3"], "rule": "min_gap", "measured": 2.01,
+                                          "limit": RULES.spacing.min_gap_mm}]  # fmt: skip
+        status = (await api.http.get(f"/api/figures/{fid}")).json()
+        assert status["published"] == []
+        assert not (tmp_path / "published" / fid).exists()
+
+        # The fixing edit makes a new version, and that version publishes.
+        r = await api.http.patch(f"/api/figures/{fid}/regions/r3",
+                                 json={"op": "label", "label": "left lobe"})  # fmt: skip
+        assert r.status_code == 202
+        await api.wait(fid)
+        r = await api.http.post(f"/api/figures/{fid}/publish")
+        assert r.status_code == 201, r.text
+        assert r.json()["version"] == 1
+        assert r.json()["edit_version"] == 2
+        pub = (await api.http.get(f"/api/figures/{fid}/published/1/regions.json")).json()
+        assert {x["id"]: x["label"] for x in pub["regions"]}["r3"] == "left lobe"
+
+    run(tmp_path, body)
+
+
+@pytest.mark.usefixtures("planted_violation")
+def test_publish_checks_the_report_of_the_exact_version(tmp_path: Path) -> None:
+    """A clean version 1 is published; an edit that breaks a rule cannot replace it, and
+    Explore keeps getting version 1."""
+
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
+        await api.http.patch(f"/api/figures/{fid}/regions/r3",
+                                 json={"op": "label", "label": PLANTED})  # fmt: skip
+        await api.wait(fid)
+        assert_envelope(await api.http.post(f"/api/figures/{fid}/publish"), 409, "rules_violated")
+        index = (await api.http.get(f"/api/figures/{fid}/published")).json()
+        assert index["latest"] == 1
+        latest = (await api.http.get(f"/api/figures/{fid}/published/latest/regions.json")).json()
+        assert PLANTED not in {x["label"] for x in latest["regions"]}
+
+    run(tmp_path, body)
+
+
+def test_a_version_with_no_report_is_never_published(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        job = api.service.jobs.latest_done(fid)
+        assert job is not None
+        out = api.service.runner.output_dir(job)
+        assert out is not None
+        (out / s5_render.REPORT_FILE).unlink()
+        assert_envelope(await api.http.post(f"/api/figures/{fid}/publish"), 409, "rules_unchecked")
+        assert (await api.http.get(f"/api/figures/{fid}")).json()["published"] == []
+
+    run(tmp_path, body)
+
+
+@pytest.mark.usefixtures("planted_violation")
+def test_explore_can_never_load_an_unpublished_version(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        names = ("regions.json", "tactile.svg", "print.pdf")
+
+        def explore_urls(versions: tuple[str, ...]) -> list[str]:
+            return [f"/api/figures/{fid}/published/{v}/{n}" for v in versions for n in names]
+
+        # Nothing published: every Explore path is a 404, even though a draft exists.
+        assert (await api.http.get(f"/api/figures/{fid}/regions.json")).status_code == 200
+        assert_envelope(await api.http.get(f"/api/figures/{fid}/published"), 404, "not_published")
+        for url in explore_urls(("latest", "0", "1", "2", "-1")):
+            assert_envelope(await api.http.get(url), 404, "not_published")
+
+        # A refused version stays invisible to Explore.
+        await api.http.patch(f"/api/figures/{fid}/regions/r3",
+                             json={"op": "label", "label": PLANTED})  # fmt: skip
+        await api.wait(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 409
+        for url in explore_urls(("latest", "1")):
+            assert_envelope(await api.http.get(url), 404, "not_published")
+
+        # After a fix and a publish, Explore sees version 1 only, and newer drafts never leak.
+        await api.http.patch(f"/api/figures/{fid}/regions/r3",
+                             json={"op": "label", "label": "left lobe"})  # fmt: skip
+        await api.wait(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
+        await api.http.patch(f"/api/figures/{fid}/regions/r1",
+                             json={"op": "label", "label": "draft only"})  # fmt: skip
+        await api.wait(fid)
+        draft = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
+        assert "draft only" in {x["label"] for x in draft["regions"]}
+        for v in ("latest", "1"):
+            r = await api.http.get(f"/api/figures/{fid}/published/{v}/regions.json")
+            assert "draft only" not in {x["label"] for x in r.json()["regions"]}
+        for url in explore_urls(("2",)):
+            assert_envelope(await api.http.get(url), 404, "not_published")
 
     run(tmp_path, body)

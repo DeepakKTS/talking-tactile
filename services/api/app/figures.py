@@ -7,7 +7,9 @@ version number. Runs of one figure also queue behind each other on a second lock
 admission never waits on, so a request is not held up by a running pipeline.
 
 Publishing copies regions.json, tactile.svg and print.pdf into
-data/published/<figure_id>/<n>/, read-only and never overwritten. Explore loads these."""
+data/published/<figure_id>/<n>/, read-only and never overwritten. Explore loads these. A
+version is published only when the tactile rules report written with those exact files has
+no violation; there is no override."""
 
 import asyncio
 import hashlib
@@ -21,11 +23,12 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict
 
 from app.errors import ApiError
+from app.geometry.validate import Violation
 from app.pipeline import db
 from app.pipeline.edits import Edit, EditError, EditStore
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore
 from app.pipeline.runner import NotReadyError, Runner
-from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, SVG_FILE
+from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, REPORT_FILE, SVG_FILE
 
 MEDIA_TYPES = {
     REGIONS_FILE: "application/json",
@@ -135,6 +138,35 @@ def job_json(job: JobRecord) -> dict[str, object]:
     }
 
 
+def check_report(out: Path, edit_version: int) -> None:
+    """Raises a 409 unless the rules report next to these outputs is present and empty."""
+    try:
+        raw = json.loads((out / REPORT_FILE).read_text("utf-8"))
+        report = [Violation.model_validate(v) for v in raw]
+    except (OSError, ValueError) as exc:
+        raise ApiError(
+            409,
+            "rules_unchecked",
+            "This version has no tactile rules report, so it cannot be published.",
+        ) from exc
+    if not report:
+        return
+    n = len(report)
+    raise ApiError(
+        409,
+        "rules_violated",
+        f"This version breaks {n} tactile rule{'s' if n > 1 else ''}. Fix "
+        f"{'them' if n > 1 else 'it'} with an edit, then publish again.",
+        extra={
+            "edit_version": edit_version,
+            "violations": [
+                {"regions": v.regions, "rule": v.rule, "measured": v.measured, "limit": v.limit}
+                for v in report
+            ],
+        },
+    )
+
+
 class FigureService:
     def __init__(self, runner: Runner, publications: PublishStore) -> None:
         self.runner = runner
@@ -221,7 +253,8 @@ class FigureService:
 
     async def publish(self, figure_id: str) -> tuple[Publication, bool]:
         """A locked version of the output that has every edit so far, and whether it is
-        new. Publishing the same output again returns the version it already has."""
+        new. Publishing the same output again returns the version it already has. Refused
+        with each violation when that output breaks a tactile rule."""
         self._known(figure_id)
         async with self._admit[figure_id]:
             job = self.jobs.latest_done(figure_id, self.edits.version(figure_id))
@@ -231,6 +264,7 @@ class FigureService:
             latest = self.publications.get(figure_id, None)
             if latest is not None and latest.job_id == job.id:
                 return latest, False
+            check_report(out, job.edit_version)
             return await asyncio.to_thread(self.publications.publish, job, out), True
 
     def published(self, figure_id: str, version: int | None) -> Publication:

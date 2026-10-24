@@ -1,6 +1,8 @@
-"""One error envelope for every failure: {"error": {"code", "message", "retryable"}}."""
+"""One error envelope for every failure: {"error": {"code", "message", "retryable"}}, plus
+any fields an error adds, such as the violations that stop a publish."""
 
 import logging
+from collections.abc import Mapping
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -18,23 +20,37 @@ _STATUS_INTERNAL = 500
 
 
 class ApiError(Exception):
-    def __init__(self, status: int, code: str, message: str, retryable: bool = False) -> None:
+    def __init__(
+        self,
+        status: int,
+        code: str,
+        message: str,
+        retryable: bool = False,
+        extra: Mapping[str, object] | None = None,
+    ) -> None:
         super().__init__(message)
         self.status = status
         self.code = code
         self.message = message
         self.retryable = retryable
+        self.extra = dict(extra or {})
 
 
-def envelope(status: int, code: str, message: str, retryable: bool = False) -> JSONResponse:
-    body = {"error": {"code": code, "message": message, "retryable": retryable}}
+def envelope(
+    status: int,
+    code: str,
+    message: str,
+    retryable: bool = False,
+    extra: Mapping[str, object] | None = None,
+) -> JSONResponse:
+    body = {"error": {**(extra or {}), "code": code, "message": message, "retryable": retryable}}
     return JSONResponse(body, status_code=status)
 
 
 def install(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def api_error(_: Request, exc: ApiError) -> JSONResponse:
-        return envelope(exc.status, exc.code, exc.message, exc.retryable)
+        return envelope(exc.status, exc.code, exc.message, exc.retryable, exc.extra)
 
     @app.exception_handler(IngestError)
     async def ingest_error(_: Request, exc: IngestError) -> JSONResponse:
