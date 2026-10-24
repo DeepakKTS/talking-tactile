@@ -1,6 +1,6 @@
 """Analyze a touch test JSON from the tracking page. Standard library only.
 
-  python3 spikes/tracking/analyze_touch.py touch-test-....json
+  python3 spikes/tracking/analyze_touch.py eval/gate-b/touch-test-....json
 
 Recomputes the error stats from the raw records (it does not trust the page's
 summary), decides Gate B (mean error 4 mm or less), and tests whether x and y
