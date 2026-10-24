@@ -76,3 +76,11 @@ MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
 - Block the main thread with hand tracking. It runs in a Web Worker.
 - Add infrastructure we do not need (see "Not building" in PLAN.md).
 - Use em dashes or filler words in any text a user will hear or read.
+
+## Tracker
+TRACKER.html is the project memory. Update it only with scripts/tracker.py, never by hand.
+- Start of every session: python scripts/tracker.py show
+- Starting a task: python scripts/tracker.py status <id> doing
+- Finishing: python scripts/tracker.py status <id> done --note "what was done and measured"
+- Blocked or cut: the same command, with the reason in --note
+- Numbers: tracker.py metric. Bugs: tracker.py issue. Choices: tracker.py decision. Gates: tracker.py gate.
