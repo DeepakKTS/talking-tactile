@@ -114,12 +114,23 @@ class Pipeline(_Section):
     normalize_max_side_px: PosInt
 
 
+Fraction = Annotated[StrictFloat, Field(gt=0, le=1)]
+
+
+class Reconcile(_Section):
+    duplicate_iou: Fraction
+    contain_fraction: Fraction
+    speck_max_area_mm2: NonNegFloat
+    sliver_max_width_mm: NonNegFloat
+
+
 class TactileRules(_Section):
     spacing: Spacing
     textures: Textures
     braille: Braille
     page: PageRules
     pipeline: Pipeline
+    reconcile: Reconcile
     principles: list[StrictStr]
 
 

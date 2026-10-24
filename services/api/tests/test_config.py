@@ -118,6 +118,10 @@ TACTILE_BAD = [
     ("page.margin_mm", 105, "no figure area"),
     ("page.margin_mm", 0, "margin_mm"),
     ("pipeline", DELETE, "pipeline"),
+    ("reconcile.duplicate_iou", 1.2, "duplicate_iou"),
+    ("reconcile.duplicate_iou", 0, "duplicate_iou"),
+    ("reconcile.contain_fraction", DELETE, "contain_fraction"),
+    ("reconcile.speck_max_area_mm2", -1, "speck_max_area_mm2"),
     ("pipeline.normalize_max_side_px", 2048.5, "normalize_max_side_px"),
     ("principles", "spacing", "principles"),
 ]

@@ -31,6 +31,12 @@ page:
 pipeline:                          # engineering values, not design rules
   normalize_max_side_px: 2048      # PLAN.md section 6, S0: longest side of the normalized image
 
+reconcile:                         # S3 rules on raw masks. Engineering values, tuned on the eval figures
+  duplicate_iou: 0.8               # PLAN.md section 6, S3: merge near duplicates above this overlap
+  contain_fraction: 0.95           # share of the smaller mask inside the larger one to nest it
+  speck_max_area_mm2: 2.0          # connected pieces smaller than this are noise
+  sliver_max_width_mm: 1.0         # a mask thinner than this everywhere is dropped
+
 principles:
   - represent, not interpret       # APH handout
   - spacing is the key to avoiding clutter
