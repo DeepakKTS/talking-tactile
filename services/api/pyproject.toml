@@ -1,0 +1,52 @@
+[project]
+name = "talking-tactile-api"
+version = "0.1.0"
+description = "Talking Tactile backend: authoring pipeline and Explore API"
+requires-python = "==3.11.*"
+dependencies = [
+  "fastapi>=0.162",
+  "uvicorn>=0.54",
+  "pydantic>=2.14",
+  "pyyaml>=6.0.3",
+  "numpy>=2.2",
+  "opencv-python-headless>=4.12",
+  "shapely>=2.1",
+  "httpx>=0.28",
+  "pillow>=11",
+  "python-multipart>=0.0.20",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=9",
+  "hypothesis>=6.170",
+  "jsonschema>=4.26",
+  "ruff>=0.17",
+  "mypy>=2.4",
+  "types-pyyaml>=6.0.12",
+  "httpx2>=2.16.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PL"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR2004", "PLR0913", "PLR0915"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["app"]
+plugins = ["pydantic.mypy"]

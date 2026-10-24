@@ -5,3 +5,9 @@ __pycache__/
 data/
 .DS_Store
 spikes/out/
+dist/
+*.tsbuildinfo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/

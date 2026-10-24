@@ -53,9 +53,12 @@ fixtures/            recorded Meta responses for MOCK_META=1
 ```
 make dev          # api on :8000, web on :5173
 make test         # pytest + vitest
+make lint         # ruff + eslint
+make typecheck    # mypy strict on app/ + tsc
+make check        # test + lint + typecheck, what the pre-commit hook runs
 make eval         # runs eval/ and writes eval/RESULTS.md
 MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
-sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests on the staged content
+sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests and make check on the staged content
 ```
 
 ## The contract
