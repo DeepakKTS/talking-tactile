@@ -1,5 +1,5 @@
 import { state, view, say, setHandsListener, addOverlay, clickToVideo } from "./main.js";
-import { homographyFromPoints, isConvexQuad } from "./lib/homography.js";
+import { homographyFromPoints, applyHomography, isConvexQuad } from "./lib/homography.js";
 import { FingertipMapper } from "./lib/fingertip.js";
 
 const CORNER_NAMES = ["A, top left", "B, top right", "C, bottom right", "D, bottom left"];
