@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 73,
- "updated_at": "2026-10-24T17:28:35.152Z",
+ "rev": 75,
+ "updated_at": "2026-10-24T17:32:39.324Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -828,14 +828,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "MetaClient protocol (understand, segment), MockMetaClient serving the synthetic figure's truth, cost meter with budget warnings, app/meta/sam_adapter.py as a documented stub. The real client is d1-8 and waits for the spikes.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 9eab058. MetaClient protocol, MockMetaClient (synthetic S1 answer with 9 phrases incl. a duplicate proposal, every SAM instance per phrase incl. the sliver, zero matches as [], unknown image refused), CostMeter (Spark with cached input, SAM per image, voice per hour; warns at 0.7 and 0.9; refuses calls past the budget), sam_adapter stub with the documented format, boundary test that no other app module mentions the SAM encoding. Live mode refuses with a pointer to MOCK_META=1. 13 tests.",
+   "done_at": "2026-10-24T17:32:39.136Z",
    "tags": [
     "meta",
     "mock"
    ],
-   "changed_at": "2026-10-24T17:28:35.152Z"
+   "changed_at": "2026-10-24T17:32:39.136Z"
   },
   {
    "id": "d2-1",
@@ -1057,13 +1057,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "S0 to S5 in order, content-hash cache per stage under data/figures/\u003csha256>/, job records in SQLite with stage timings, mock S1 and S2.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "todo",
+   "status": "doing",
    "note": "",
    "done_at": null,
    "tags": [
     "pipeline"
    ],
-   "changed_at": "2026-10-24T17:24:14.382Z"
+   "changed_at": "2026-10-24T17:32:39.324Z"
   },
   {
    "id": "d3-9",
@@ -1920,6 +1920,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T17:32:39.324Z",
+   "kind": "claude",
+   "text": "Task d3-8 \"Pipeline runner with stage cache and SQLite jobs\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T17:32:39.136Z",
+   "kind": "claude",
+   "text": "Task d1-12 \"Meta client interface, mock and SAM adapter stub\" is now done. Note: Commit 9eab058. MetaClient protocol, MockMetaClient (synthetic S1 answer with 9 phrases incl. a duplicate proposal, every SAM instance per phrase incl. the sliver, zero matches as [], unknown image refused), CostMeter (Spark with cached input, SAM per image, voice per hour; warns at 0.7 and 0.9; refuses calls past the budget), sam_adapter stub with the documented format, boundary test that no other app module mentions the SAM encoding. Live mode refuses with a pointer to MOCK_META=1. 13 tests."
+  },
   {
    "ts": "2026-10-24T17:28:35.152Z",
    "kind": "claude",
