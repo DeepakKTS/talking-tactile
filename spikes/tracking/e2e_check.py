@@ -5,7 +5,7 @@
 """Headless browser check for the tracking spike, using the installed Google Chrome and a fake camera.
 
   uv run spikes/tracking/e2e_check.py loop          stub worker with a 100 ms delay: frames must drop, never queue
-  uv run spikes/tracking/e2e_check.py hands VIDEO   MediaPipe on a y4m clip: hands must be found
+  uv run spikes/tracking/e2e_check.py hands VIDEO [CPU|GPU]   MediaPipe on a y4m clip: hands must be found
 
 Prints the page's stats as JSON. Exits non-zero if a check fails.
 """
@@ -36,12 +36,12 @@ def serve() -> tuple[http.server.ThreadingHTTPServer, int]:
     return srv, srv.server_address[1]
 
 
-def run(mode: str, video: str | None, seconds: float) -> dict:
+def run(mode: str, video: str | None, seconds: float, delegate: str | None = None) -> dict:
     srv, port = serve()
     args = ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"]
     if video:
         args.append(f"--use-file-for-fake-video-capture={Path(video).resolve()}")
-    query = "?stub=100" if mode == "loop" else ""
+    query = "?stub=100" if mode == "loop" else (f"?delegate={delegate}" if delegate else "")
     logs: list[str] = []
     try:
         with sync_playwright() as p:
@@ -52,12 +52,18 @@ def run(mode: str, video: str | None, seconds: float) -> dict:
             page.goto(f"http://127.0.0.1:{port}/index.html{query}")
             page.click("#start")
             if mode == "hands":
-                page.wait_for_function("window.__tt.backend && !window.__tt.backend.startsWith('stub')", timeout=60000)
+                try:
+                    page.wait_for_function("window.__tt.backend && !window.__tt.backend.startsWith('stub')", timeout=60000)
+                except Exception:
+                    print("model did not load. status:", page.inner_text("#status"))
+                    print("\n".join(logs[-20:]))
+                    raise
             page.wait_for_timeout(seconds * 1000)
             stats = page.evaluate(
                 """() => { const s = window.__tt; return { backend: s.backend, videoSize: s.videoSize,
                     camFps: s.camFps, procFps: s.procFps, pump: s.pump, maxInFlight: s.maxInFlight,
                     results: s.results, handsNow: s.hands.length, framesWithHands: s.framesWithHands ?? null,
+                    loadMs: s.loadMs, backendErrors: s.backendErrors, firstHand: s.hands[0] ? JSON.parse(JSON.stringify(s.hands[0])) : null,
                     inferP50: [...s.inferMs].sort((a,b)=>a-b)[Math.floor(s.inferMs.length/2)],
                     loopP95: [...s.loopMs].sort((a,b)=>a-b)[Math.ceil(0.95*s.loopMs.length)-1] }; }"""
             )
@@ -72,7 +78,8 @@ def run(mode: str, video: str | None, seconds: float) -> dict:
 def main() -> None:
     mode = sys.argv[1] if len(sys.argv) > 1 else "loop"
     video = sys.argv[2] if len(sys.argv) > 2 else None
-    stats = run(mode, video, seconds=6 if mode == "loop" else 10)
+    delegate = sys.argv[3] if len(sys.argv) > 3 else None
+    stats = run(mode, video, seconds=6 if mode == "loop" else 10, delegate=delegate)
     print(json.dumps(stats, indent=1))
     failures = []
     if mode == "loop":

@@ -17,6 +17,8 @@ const state = {
   hands: [],
   frameId: 0,
   maxInFlight: 0,
+  framesWithHands: 0,
+  loadMs: null,
 };
 // Read by e2e_check.py.
 window.__tt = state;
@@ -53,7 +55,11 @@ worker.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === "ready") {
     state.backend = msg.backend;
+    state.loadMs = msg.loadMs ?? null;
+    state.backendErrors = msg.errors ?? [];
     say(`Hand tracker ready: ${msg.backend}.`);
+  } else if (msg.type === "log") {
+    console.log(`worker: ${msg.text}`);
   } else if (msg.type === "error") {
     say(`Hand tracker error: ${msg.message}`);
   } else if (msg.type === "result") {
@@ -65,10 +71,11 @@ worker.onmessage = (e) => {
     sentAt.delete(msg.id);
     if (t !== undefined) push(state.loopMs, performance.now() - t);
     state.hands = msg.hands;
+    if (msg.hands.length) state.framesWithHands++;
     onHands(msg.hands);
   }
 };
-worker.postMessage({ type: "init", stubMs: Number(params.get("stub") || 0) });
+worker.postMessage({ type: "init", stubMs: Number(params.get("stub") || 0), delegate: params.get("delegate") || undefined });
 
 // Filled in by later steps: calibration, filtering and the touch test.
 let onHands = () => {};
@@ -145,11 +152,11 @@ function drawStats() {
   state.camFps = state.camFrames / secs;
   state.procFps = state.results / secs;
   $("stats").textContent = [
-    `backend ${state.backend ?? "loading"}  video ${view.width}x${view.height}`,
+    `backend ${state.backend ?? "loading"}${state.loadMs ? ` (loaded in ${Math.round(state.loadMs)} ms)` : ""}  video ${view.width}x${view.height}`,
     `camera ${state.camFps.toFixed(1)} fps  processed ${state.procFps.toFixed(1)} fps  dropped ${s.dropped} of ${s.offered}  max in flight ${state.maxInFlight}`,
     `worker p50 ${pct(state.inferMs, 50).toFixed(1)} ms  p95 ${pct(state.inferMs, 95).toFixed(1)} ms`,
     `frame to result p50 ${pct(state.loopMs, 50).toFixed(1)} ms  p95 ${pct(state.loopMs, 95).toFixed(1)} ms`,
-    `hands ${state.hands.length}`,
+    `hands ${state.hands.length}  frames with hands ${state.framesWithHands} of ${state.results}`,
   ].join("\n");
 }
 
