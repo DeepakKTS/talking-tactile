@@ -71,12 +71,17 @@ function twoHands(rnd, a, b) {
 }
 
 const OPEN = { curled: [false, false, false] };
+const TWO_CURLED = { curled: [false, true, true] };
 
 export const PATH_CASES = {
   "one hand": (rnd) => oneHand(rnd, "none"),
   "one hand, frames stall for 400 ms": (rnd) => oneHand(rnd, "skip"),
   "one hand, lost for 400 ms": (rnd) => oneHand(rnd, "empty"),
   "a pointing hand and an open hand": (rnd) => twoHands(rnd, {}, OPEN),
+  // Index and middle out, ring and pinky curled: not pointing with min_curled 3.
+  "one hand, exactly 2 curled": (rnd) => oneHand(rnd, "none", TWO_CURLED),
+  // The 2 curled hand reaches farther, so it wins on extension if it counts as pointing.
+  "a pointing hand and a farther hand with exactly 2 curled": (rnd) => twoHands(rnd, {}, { ...TWO_CURLED, indexLen: 380 }),
 };
 
 export function makeInputs(cornersMm) {

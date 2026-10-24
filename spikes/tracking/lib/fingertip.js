@@ -4,10 +4,12 @@
 import { applyHomography } from "./homography.js";
 import { OneEuroFilter2D } from "./oneeuro.js";
 
-// Starting values from config/explore.yaml: fingertip.one_euro, fingertip.lost_reset_ms.
+// Starting values from config/explore.yaml: fingertip.one_euro, fingertip.lost_reset_ms,
+// hands.min_curled.
 export const TRACKING = {
   filter: { mincutoffHz: 1.0, beta: 0.007, dcutoffHz: 1.0 },
   lostResetMs: 300,
+  minCurled: 3,
 };
 
 const WRIST = 0;
@@ -27,13 +29,14 @@ function extension(pts, finger) {
 
 // hands: arrays of 21 [x, y] points in pixels (not normalized, so aspect ratio is right).
 // Returns { index, pointing } for the best hand, or null when there are no hands.
-// pointing is true when the index finger is extended and at least 2 other fingers are curled.
-export function pickPointingHand(hands) {
+// pointing is true when the index finger is extended and at least minCurled of the middle,
+// ring and pinky fingers are curled.
+export function pickPointingHand(hands, minCurled = TRACKING.minCurled) {
   let best = null;
   hands.forEach((pts, index) => {
     const indexExt = extension(pts, INDEX);
     const curled = OTHERS.filter((f) => extension(pts, f) < 1).length;
-    const pointing = indexExt > 1 && curled >= 2;
+    const pointing = indexExt > 1 && curled >= minCurled;
     const score = (pointing ? 10 : 0) + indexExt - OTHERS.reduce((s, f) => s + extension(pts, f), 0) / 3;
     if (!best || score > best.score) best = { index, pointing, score };
   });

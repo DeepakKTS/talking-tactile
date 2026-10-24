@@ -27,6 +27,7 @@ test("the spike's constants match the shipped explore.yaml", () => {
   const c = port.config;
   assert.deepEqual(TRACKING.filter, euroParams(c.one_euro));
   assert.equal(TRACKING.lostResetMs, c.lost_reset_ms);
+  assert.equal(TRACKING.minCurled, c.min_curled);
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   assert.equal(Number(/id="offset"[^>]*value="([\d.]+)"/.exec(html)?.[1]), c.contact_offset_mm);
 });
