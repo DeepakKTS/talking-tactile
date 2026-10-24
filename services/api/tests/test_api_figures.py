@@ -16,6 +16,7 @@ from typing import Any
 import httpx
 import pytest
 from PIL import Image
+from shapely.geometry import Point
 
 from app.config import TactileRules, load_tactile_rules
 from app.figures import FigureService
@@ -29,6 +30,10 @@ from app.pipeline import s5_render
 
 RULES = load_tactile_rules()
 SYNTHETIC_PNG = (FIXTURES_DIR / "synthetic" / "figure.png").read_bytes()
+SYNTHETIC_REGIONS = {
+    r["id"]: r
+    for r in json.loads((FIXTURES_DIR / "synthetic" / "regions.json").read_text())["regions"]
+}
 MB = 1024 * 1024
 FINISHED = {"done", "failed", "describe_only"}
 WEB = "http://localhost:5173"
@@ -646,5 +651,146 @@ def test_the_draft_report_lists_what_publish_would_refuse(tmp_path: Path) -> Non
         assert [(v["rule"], v["regions"]) for v in report] == [("min_gap", ["r3"])]
         refused = (await api.http.post(f"/api/figures/{fid}/publish")).json()["error"]
         assert [(v["rule"], v["regions"]) for v in refused["violations"]] == [("min_gap", ["r3"])]
+
+    run(tmp_path, body)
+
+
+@pytest.fixture
+def merge_violation(monkeypatch: pytest.MonkeyPatch) -> None:
+    """S5's rules check also reports a gap violation on any part other than the right lobe
+    that reaches over the right lobe's spot, as merging the right lobe into its neighbor
+    does. Layout repairs every real gap a merge makes on the synthetic figure, so the
+    violation is planted, but it follows the merged geometry, not a label."""
+    real = s5_render.validate_sheet
+    spot = Point(SYNTHETIC_REGIONS["r8"]["centroid_mm"])
+
+    def check(sheet: Sheet, rules: TactileRules) -> list[Violation]:
+        planted = [
+            Violation(
+                rule="min_gap",
+                regions=[r.id],
+                measured=1.5,
+                limit=rules.spacing.min_gap_mm,
+                message=f"{r.id} is 1.5 mm from its neighbor",
+            )
+            for r in sheet.regions
+            if r.id != "r8" and r.polygon.contains(spot)
+        ]
+        return real(sheet, rules) + planted
+
+    monkeypatch.setattr(s5_render, "validate_sheet", check)
+
+
+@pytest.mark.usefixtures("merge_violation")
+def test_a_merge_that_breaks_a_rule_is_refused_naming_the_merged_part(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        assert (await api.http.get(f"/api/figures/{fid}/report.json")).json() == []
+
+        r = await api.http.patch(
+            f"/api/figures/{fid}/regions/r8", json={"op": "merge", "into": "r7"}
+        )
+        assert r.status_code == 202
+        status = await api.wait(fid)
+        assert status["edit_version"] == 1
+        draft = {
+            x["id"]: x
+            for x in (await api.http.get(f"/api/figures/{fid}/regions.json")).json()["regions"]
+        }
+        assert "r8" not in draft
+        assert (draft["r7"]["label"], draft["r7"]["verified_by_teacher"]) == ("left lobe", True)
+
+        r = await api.http.post(f"/api/figures/{fid}/publish")
+        assert_envelope(r, 409, "rules_violated")
+        err = r.json()["error"]
+        assert err["edit_version"] == 1
+        assert err["violations"] == [{"regions": ["r7"], "rule": "min_gap", "measured": 1.5,
+                                      "limit": RULES.spacing.min_gap_mm}]  # fmt: skip
+        assert (await api.http.get(f"/api/figures/{fid}")).json()["published"] == []
+        assert_envelope(await api.http.get(f"/api/figures/{fid}/published/latest/regions.json"),
+                        404, "not_published")  # fmt: skip
+
+    run(tmp_path, body)
+
+
+@pytest.mark.usefixtures("planted_violation")
+def test_deleting_a_part_recomputes_the_report_for_the_new_version(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        await api.http.patch(
+            f"/api/figures/{fid}/regions/r3", json={"op": "label", "label": PLANTED}
+        )
+        await api.wait(fid)
+        job1 = api.service.jobs.latest_done(fid)
+        assert job1 is not None and job1.edit_version == 1
+        report1 = api.service.runner.output_dir(job1)
+        assert report1 is not None
+        assert [
+            v["regions"] for v in (await api.http.get(f"/api/figures/{fid}/report.json")).json()
+        ] == [["r3"]]
+        assert_envelope(await api.http.post(f"/api/figures/{fid}/publish"), 409, "rules_violated")
+
+        r = await api.http.patch(f"/api/figures/{fid}/regions/r3", json={"op": "delete"})
+        assert r.status_code == 202
+        status = await api.wait(fid)
+        assert status["edit_version"] == 2
+        job2 = api.service.jobs.latest_done(fid)
+        assert job2 is not None and job2.edit_version == 2
+        report2 = api.service.runner.output_dir(job2)
+        assert report2 is not None and report2 != report1
+
+        # Version 2 has its own report, made by its own S5 run; version 1's still lists r3.
+        assert outcomes(status)["s5"] == "ran"
+        assert json.loads((report2 / s5_render.REPORT_FILE).read_text()) == []
+        assert [
+            v["regions"] for v in json.loads((report1 / s5_render.REPORT_FILE).read_text())
+        ] == [["r3"]]
+        assert (await api.http.get(f"/api/figures/{fid}/report.json")).json() == []
+        draft = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
+        assert "r3" not in {x["id"] for x in draft["regions"]}
+
+        r = await api.http.post(f"/api/figures/{fid}/publish")
+        assert r.status_code == 201, r.text
+        assert (r.json()["version"], r.json()["edit_version"]) == (1, 2)
+
+    run(tmp_path, body)
+
+
+def test_draft_only_files_never_reach_a_published_version(tmp_path: Path) -> None:
+    """The source image and the rules report are for the teacher's review. No published
+    version serves them, holds them on disk, or points at them from regions.json."""
+
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        source = (await api.http.get(f"/api/figures/{fid}/source.png")).content
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
+        await api.http.patch(
+            f"/api/figures/{fid}/regions/r1", json={"op": "label", "label": "chamber"}
+        )
+        await api.wait(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
+
+        for v in ("1", "2", "latest", "3", "0"):
+            for name in ("source.png", "report.json"):
+                r = await api.http.get(f"/api/figures/{fid}/published/{v}/{name}")
+                assert r.status_code in (403, 404), (v, name, r.status_code)
+                assert r.headers["content-type"].startswith("application/json")
+                assert source not in r.content
+
+        index = (await api.http.get(f"/api/figures/{fid}/published")).json()
+        assert [set(p["files"]) for p in index["versions"]] == [
+            {"regions.json", "tactile.svg", "print.pdf"}
+        ] * 2
+        on_disk = [p for p in (tmp_path / "published" / fid).rglob("*") if p.is_file()]
+        assert on_disk
+        assert not {p.name for p in on_disk} & {"source.png", "report.json"}
+        assert all(p.read_bytes() != source for p in on_disk)
+        for v in ("1", "2"):
+            text = (await api.http.get(f"/api/figures/{fid}/published/{v}/regions.json")).text
+            assert "source.png" not in text and "report.json" not in text
+            assert "rules" not in json.loads(text) and "violations" not in text
 
     run(tmp_path, body)
