@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 33,
- "updated_at": "2026-10-24T07:30:29.109Z",
+ "rev": 34,
+ "updated_at": "2026-10-24T16:24:59.090Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1683,6 +1683,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Use model id sam-3.1 on POST /v1/responses, streamed, one noun phrase per call, one_bit masks with include_confidence, parsed with meta-sam-parser 0.1.0. Masks are box-local. PLAN.md 5.4 and 17, CLAUDE.md and .env.example updated. The live spike confirms the id against sam-3-1.",
    "why": "The API docs (dev.meta.ai/docs/sam/*, read Oct 24) use sam-3.1 and the Responses API with special-token text output, while the kit and the product page said sam-3-1 and assumed an OpenAI style call. The meta-api-spike skill says to update PLAN.md when the shape differs.",
    "changed_at": "2026-10-24T06:37:11.186Z"
+  },
+  {
+   "id": "dec-mvmm0mh9zmgx",
+   "date": "2026-10-24",
+   "title": "Product code on branch early-start in a worktree",
+   "decision": "Branch early-start created from main on Oct 24 and checked out as a git worktree at .worktrees/early-start (gitignored on main). All product code (apps/web, services/api, config changes, fixtures/regions, fixtures/synthetic, the extended pre-commit hook) is committed there. Spikes, TRACKER.html and TODO.md stay on main in the repo root; tracker.py always runs against the root TRACKER.html. The Meta client is an interface with a mock only until the spikes run.",
+   "why": "Keeps the Oct 26 boundary: main holds only spikes and planning, so it can be shown as is if the Official Rules forbid earlier code. The worktree lets spikes run on main the moment the key arrives without switching branches, and the tracker never forks between branches.",
+   "changed_at": "2026-10-24T16:24:59.090Z"
   }
  ],
  "risks": [
@@ -1745,6 +1753,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:24:59.090Z",
+   "kind": "claude",
+   "text": "Decision: Product code on branch early-start in a worktree."
+  },
   {
    "ts": "2026-10-24T07:30:29.109Z",
    "kind": "claude",
