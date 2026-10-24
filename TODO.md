@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 39, updated 2026-10-24T16:28:18.621Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 41, updated 2026-10-24T16:34:07.474Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -55,9 +55,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.
 - [ ] d1-9 Gate A check (15 min)
   - All three models answer and latencies are written in spikes/.
-- [ ] d1-10 Regions contract in code (1.5 h) [doing]
+- [x] d1-10 Regions contract in code (1.5 h)
   - Pydantic models and TypeScript types for regions.json. fixtures/regions/golden.json validated against docs/regions.schema.json from Python and TypeScript, so the two sides cannot drift.
-- [ ] d1-11 Config loaders (1 h)
+  - Note: Commit f435df1. Python: app/models/regions.py, 52 pytest tests incl. 41 shared cases from fixtures/regions/cases.json and a 600-example hypothesis mutation test (schema vs pydantic agree; it found Literal[1] accepting True). TypeScript: regions.gen.ts generated from the schema, staleness test, ajv 2020 parseRegions, 45 vitest tests on the same golden and cases. Probe: adding an enum value to the schema fails both sides (2 pytest, 2 vitest).
+- [ ] d1-11 Config loaders (1 h) [doing]
   - Load and validate config/tactile_rules.yaml and config/explore.yaml at startup in Python and TypeScript. Tests for missing and invalid values. No magic numbers elsewhere.
 - [ ] Gate A: Models answer [Pending]
   - Pass when: Muse Spark, SAM 3.1 and Muse Voice all return real results. p50 and p95 latency written in spikes/.

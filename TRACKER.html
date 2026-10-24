@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 39,
- "updated_at": "2026-10-24T16:28:18.621Z",
+ "rev": 41,
+ "updated_at": "2026-10-24T16:34:07.474Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -798,13 +798,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Pydantic models and TypeScript types for regions.json. fixtures/regions/golden.json validated against docs/regions.schema.json from Python and TypeScript, so the two sides cannot drift.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit f435df1. Python: app/models/regions.py, 52 pytest tests incl. 41 shared cases from fixtures/regions/cases.json and a 600-example hypothesis mutation test (schema vs pydantic agree; it found Literal[1] accepting True). TypeScript: regions.gen.ts generated from the schema, staleness test, ajv 2020 parseRegions, 45 vitest tests on the same golden and cases. Probe: adding an enum value to the schema fails both sides (2 pytest, 2 vitest).",
+   "done_at": "2026-10-24T16:34:07.443Z",
    "tags": [
     "contract"
    ],
-   "changed_at": "2026-10-24T16:28:18.621Z"
+   "changed_at": "2026-10-24T16:34:07.443Z"
   },
   {
    "id": "d1-11",
@@ -813,13 +813,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Load and validate config/tactile_rules.yaml and config/explore.yaml at startup in Python and TypeScript. Tests for missing and invalid values. No magic numbers elsewhere.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
+   "status": "doing",
    "note": "",
    "done_at": null,
    "tags": [
     "config"
    ],
-   "changed_at": "2026-10-24T16:25:17.358Z"
+   "changed_at": "2026-10-24T16:34:07.474Z"
   },
   {
    "id": "d2-1",
@@ -1783,6 +1783,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:34:07.474Z",
+   "kind": "claude",
+   "text": "Task d1-11 \"Config loaders\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T16:34:07.443Z",
+   "kind": "claude",
+   "text": "Task d1-10 \"Regions contract in code\" is now done. Note: Commit f435df1. Python: app/models/regions.py, 52 pytest tests incl. 41 shared cases from fixtures/regions/cases.json and a 600-example hypothesis mutation test (schema vs pydantic agree; it found Literal[1] accepting True). TypeScript: regions.gen.ts generated from the schema, staleness test, ajv 2020 parseRegions, 45 vitest tests on the same golden and cases. Probe: adding an enum value to the schema fails both sides (2 pytest, 2 vitest)."
+  },
   {
    "ts": "2026-10-24T16:28:18.621Z",
    "kind": "claude",
