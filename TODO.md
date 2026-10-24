@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 67, updated 2026-10-24T17:23:32.917Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 73, updated 2026-10-24T17:28:35.152Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -61,6 +61,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d1-11 Config loaders (1 h)
   - Load and validate config/tactile_rules.yaml and config/explore.yaml at startup in Python and TypeScript. Tests for missing and invalid values. No magic numbers elsewhere.
   - Note: Commit 2e0ec29. Python app/config.py: pydantic, strict types, extra keys forbidden, no defaults; create_app refuses to start on a bad value; max_area_textures checked against the schema limit. 40 config tests (missing file, YAML syntax, non-mapping, 19 tactile and 14 explore bad values, file named in the error). TypeScript src/shared/config.ts: explore.yaml bundled by a Vite transform, zod strictObject, validated on import in main.tsx; 19 vitest tests. Totals: 92 pytest, 66 vitest.
+- [ ] d1-12 Meta client interface, mock and SAM adapter stub (1.5 h) [doing]
+  - MetaClient protocol (understand, segment), MockMetaClient serving the synthetic figure's truth, cost meter with budget warnings, app/meta/sam_adapter.py as a documented stub. The real client is d1-8 and waits for the spikes.
 - [ ] Gate A: Models answer [Pending]
   - Pass when: Muse Spark, SAM 3.1 and Muse Voice all return real results. p50 and p95 latency written in spikes/.
   - Fallback: Weak SAM on line art: local SAM 3.1 checkpoint with point prompts, same day.
@@ -93,8 +95,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 3: Wed Oct 28
 
-- [ ] d3-1 S0 ingest (2 h)
+- [x] d3-1 S0 ingest (2 h)
   - Type and size check, PDF page render, deskew, blur check, 2048 px, hash.
+  - Note: Commit 20a637d. app/pipeline/s0_ingest.py, pure. Content sniffing, 10 MB guard before decoding, pypdfium2 page render at 200 dpi with page index, transparency to white, deskew only for a bright quad over 20 to 98 percent of the photo with 40 levels contrast (a chart frame is not cropped), blur floor 0.15 measured on synthetic and heart (sharp 0.49 to 0.56, 4 px blur 0.09 to 0.13), sha256 of normalized pixels. 22 tests. Synthetic PNG 34 ms, photo deskew 63 ms (90 percent of ink within 10 px), PDF 83 ms.
 - [ ] d3-2 S1 understand (2 h)
   - Muse Spark structured output: type, title, summary, parts, color meaning, verdict.
 - [ ] d3-3 S2 ground (2 h)
@@ -111,6 +114,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d3-7 Vectorize masks and scale to page mm (1.5 h)
   - Contour tracing, simplification to at most 200 points, fit into the Letter or A4 figure area, pixel to mm. Property tests on random shapes.
   - Note: Commit c891307. PageFit (centered fit into the figure area, page mm and back) and mask_to_polygons_mm (contours, mitred half-pixel offset, per-piece polygons, Douglas-Peucker 0.1 mm doubled to the 200 point cap). 13 tests incl. 3 hypothesis properties. Synthetic: worst Hausdorff 0.081 mm, area error under 1 percent, 4 to 65 points per part, 7 ms for 8 parts.
+- [ ] d3-8 Pipeline runner with stage cache and SQLite jobs (2 h)
+  - S0 to S5 in order, content-hash cache per stage under data/figures/<sha256>/, job records in SQLite with stage timings, mock S1 and S2.
+- [ ] d3-9 Figure API routes and middleware (2 h)
+  - POST /api/figures, GET status, regions.json, tactile.svg, print.pdf, PATCH a region, POST publish. Request id, JSON logs, error envelope, upload guard, CORS. API test runs the synthetic figure end to end.
 
 ## Day 4: Thu Oct 29
 
