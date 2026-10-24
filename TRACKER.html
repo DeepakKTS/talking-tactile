@@ -170,19 +170,18 @@ tr:last-child td{border-bottom:0}
 <h3>Three ways it stays current</h3>
 <ol><li><b>Your clicks.</b> Ticking a task or editing a note saves to this browser at once.</li>
 <li><b>Save to file.</b> Writes everything back into TRACKER.html, so it can be committed. In Chrome or Edge it saves in place after the first time. Other browsers download a fresh copy, which you move into the repo.</li>
-<li><b>Claude Code.</b> It can edit the state JSON inside the file whenever it finishes a task. When you next open the file, its changes are merged with anything you did in the browser. For each task or note, the newest edit wins.</li></ol>
+<li><b>Claude Code.</b> It updates this file only through <code>scripts/tracker.py</code>, whenever it starts or finishes a task. When you next open the file, its changes are merged with anything you did in the browser. For each task or note, the newest edit wins.</li></ol>
 <p class="note">A web page cannot watch your repo by itself. Nothing updates unless you, or Claude Code, change it. The "Changes not saved to file" label tells you when the browser copy is ahead of the file.</p>
 <h3>Add this to CLAUDE.md</h3>
 <pre id="p-claude">## Tracker
-TRACKER.html is the project memory. When a task is started, finished, blocked or cut:
-1. Edit only the JSON inside the script tag with id "tt-state" in TRACKER.html.
-2. Set the task's status (todo, doing, done, blocked, cut). For done, set done_at to the current ISO time.
-3. Set "changed_at" to the current ISO time on every item you edit.
-4. Add one entry at the start of "log": {"ts": ISO time, "kind": "claude", "text": "what changed"}.
-5. Increase "rev" by 1 and set "updated_at" to the current ISO time.
-6. Record measured numbers in "metrics" (value, measured_at, source: live or mock), new bugs in "issues", choices in "decisions".
-Keep the JSON valid. Never edit anything else in that file.</pre>
+TRACKER.html is the project memory. Update it only with scripts/tracker.py, never by hand.
+- Start of every session: python scripts/tracker.py show
+- Starting a task: python scripts/tracker.py status &lt;id&gt; doing
+- Finishing: python scripts/tracker.py status &lt;id&gt; done --note "what was done and measured"
+- Blocked or cut: the same command, with the reason in --note
+- Numbers: tracker.py metric. Bugs: tracker.py issue. Choices: tracker.py decision. Gates: tracker.py gate.</pre>
 <div class="cp"><span class="muted">Paste it under the Never section of CLAUDE.md.</span><button class="btn" data-act="copy" data-src="p-claude">Copy</button></div>
+<p class="note warn">If Claude Code changed this file while this tab was open, reload the tab before you press Save to file. Otherwise the save overwrites its changes.</p>
 <h3>Daily routine</h3>
 <ol><li>Morning: open the file, read Today, press Copy session brief, paste it into Claude Code.</li>
 <li>During the day: tick tasks, add notes, record numbers in Metrics, log anything surprising.</li>
@@ -441,22 +440,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 
 <section class="hb" id="hb-prompts"><h2>Prompts for Claude Code</h2>
 <h3>Start of a session</h3>
-<pre id="p-s1">Read CLAUDE.md, RULES.md and the state JSON in TRACKER.html. Tell me today's open tasks, anything overdue and the next gate. Do not write code yet.</pre>
+<pre id="p-s1">Read CLAUDE.md and RULES.md, then run python scripts/tracker.py show. Tell me today's open tasks, anything overdue and the next gate. Do not write code yet.</pre>
 <div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s1">Copy</button></div>
 <h3>Work one task</h3>
-<pre id="p-s2">Work on task [id] from TRACKER.html. Follow RULES.md. Write the test first. When it passes, update the task in TRACKER.html as CLAUDE.md describes, and add one log entry.</pre>
+<pre id="p-s2">Work on task [id] from TRACKER.html. Follow RULES.md. Run python scripts/tracker.py status [id] doing. Write the test first. When it passes, run python scripts/tracker.py status [id] done --note "what was done and measured", then python scripts/tracker.py todo.</pre>
 <div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s2">Copy</button></div>
 <h3>Spike a model</h3>
-<pre id="p-s3">Run the meta-api-spike skill for SAM 3.1 with fixtures/heart.png and these five phrases: left ventricle, right ventricle, left atrium, right atrium, aorta. Save the fixture, write spikes/sam.md with p50 and p95 latency and cost, and record the numbers in the TRACKER.html metrics or log.</pre>
+<pre id="p-s3">Run the meta-api-spike skill for SAM 3.1 with fixtures/heart.png and these five phrases: left ventricle, right ventricle, left atrium, right atrium, aorta. Save the fixture, write spikes/sam.md with p50 and p95 latency and cost, and record the numbers with python scripts/tracker.py metric, or python scripts/tracker.py log if no metric fits.</pre>
 <div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s3">Copy</button></div>
 <h3>Check a gate</h3>
-<pre id="p-s4">Run the run-eval skill for the touch and latency suites. Update eval/RESULTS.md and the matching metrics in TRACKER.html. Tell me plainly whether Gate B passes, with the numbers.</pre>
+<pre id="p-s4">Run the run-eval skill for the touch and latency suites. Update eval/RESULTS.md. Record each matching metric with python scripts/tracker.py metric [metric id] [value] --source live or mock, and set the gate with python scripts/tracker.py gate B [status] --evidence "the numbers". Tell me plainly whether Gate B passes, with the numbers.</pre>
 <div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s4">Copy</button></div>
 <h3>Over the time box</h3>
-<pre id="p-s5">Task [id] is 50 percent over its time box. Read its fallback in TRACKER.html, apply it, mark the task as done or cut, and record a decision explaining why.</pre>
+<pre id="p-s5">Task [id] is 50 percent over its time box. Read its fallback in TODO.md, which is generated from TRACKER.html. If it has none, propose one to me first. Otherwise apply it, run python scripts/tracker.py status [id] done or cut --note "why", and record the choice with python scripts/tracker.py decision.</pre>
 <div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s5">Copy</button></div>
 <h3>End of day</h3>
-<pre id="p-s6">Summarize today from git log. Add one log entry to TRACKER.html. List tomorrow's first three tasks by id. Point out anything that puts the next gate at risk.</pre>
+<pre id="p-s6">Summarize today from git log. Add one entry with python scripts/tracker.py log, then run python scripts/tracker.py todo. List tomorrow's first three tasks by id. Point out anything that puts the next gate at risk.</pre>
 <div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s6">Copy</button></div>
 </section>
 
@@ -524,8 +523,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 2,
- "updated_at": "2026-10-24T05:35:41.791Z",
+ "rev": 6,
+ "updated_at": "2026-10-24T06:07:11.391Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -705,11 +704,12 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "1.5 h",
    "fallback": "",
    "status": "todo",
-   "note": "",
+   "note": "Pin Python 3.11 for services/api with uv (uv python pin 3.11, then uv venv); system python3 is 3.13. Check that the liblouis Python bindings (louis) install on macOS. Fallback: call lou_translate through subprocess.",
    "done_at": null,
    "tags": [
     "setup"
-   ]
+   ],
+   "changed_at": "2026-10-24T06:07:11.361Z"
   },
   {
    "id": "d1-5",
@@ -1623,6 +1623,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "title": "Hand tracking in a Web Worker",
    "decision": "MediaPipe Hand Landmarker in a worker, pending the Day 2 benchmark.",
    "why": "Detection blocks the main thread according to its docs."
+  },
+  {
+   "id": "dec-mvlzy4v0x1td",
+   "date": "2026-10-24",
+   "title": "Kit conflicts found before Day 1",
+   "decision": "Fixed Oct 24: TODO.md is generated from the tracker; RULES.md preamble, 4.4 and 8.3, CLAUDE.md done item 5 and README now point to tracker.py; the handbook bullet and prompts use tracker.py; the folder is a git repo on main. Still open: python3 is 3.13 against the 3.11 rule, pinned with uv on d1-4; d1-4 says to copy the kit into the root, which is already done; most tasks have no fallback, so one is proposed when a time box runs over (RULES 8.3); d1-2 Muse Wonder was missing from the old TODO.md, and the tracker wins.",
+   "why": "TRACKER.html is the single source of truth for tasks. Other files point to it or are generated from it.",
+   "changed_at": "2026-10-24T06:07:11.391Z"
   }
  ],
  "risks": [
@@ -1685,6 +1693,26 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T06:07:11.391Z",
+   "kind": "claude",
+   "text": "Decision: Kit conflicts found before Day 1."
+  },
+  {
+   "ts": "2026-10-24T06:07:11.361Z",
+   "kind": "claude",
+   "text": "Task d1-4 \"Repo skeleton and kit\" note updated, still todo. Note: Pin Python 3.11 for services/api with uv (uv python pin 3.11, then uv venv); system python3 is 3.13. Check that the liblouis Python bindings (louis) install on macOS. Fallback: call lou_translate through subprocess."
+  },
+  {
+   "ts": "2026-10-24T06:07:11.330Z",
+   "kind": "claude",
+   "text": "Second and final handbook edit: the Claude Code bullet and the six session prompts now use scripts/tracker.py instead of direct JSON edits. Outside the handbook template and the JSON block, nothing changed."
+  },
+  {
+   "ts": "2026-10-24T05:44:59.697Z",
+   "kind": "claude",
+   "text": "Handbook in TRACKER.html now shows the tracker.py rules from CLAUDE.md and warns to reload before Save to file. Added tracker.py todo; TODO.md is now generated. RULES.md 8.3 points to tracker fallbacks."
+  },
   {
    "ts": "2026-10-24T05:35:41.791Z",
    "kind": "claude",

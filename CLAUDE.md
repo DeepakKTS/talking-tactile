@@ -67,7 +67,7 @@ MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
 2. Has a test, or an eval item if it is perceptual.
 3. Logged latency or cost if it touches a Meta model or the camera loop.
 4. Keyboard-only flow still works in Explore.
-5. TODO.md updated.
+5. Tracker updated with scripts/tracker.py, then TODO.md regenerated with python scripts/tracker.py todo.
 
 ## Never
 

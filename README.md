@@ -7,7 +7,7 @@ Drop these files into the root of the repo on Day 1.
 | CLAUDE.md | Read automatically by Claude Code at the repo root. The project map |
 | RULES.md | Hard rules: privacy, grounding, tactile design, budgets, accessibility, style |
 | SKILLS.md | Index of the project skills in `.claude/skills/` |
-| TODO.md | Day by day checklist with gates and fallbacks |
+| TODO.md | Day by day checklist with gates and fallbacks. Generated from TRACKER.html by `python scripts/tracker.py todo` |
 | PLAN.md | The full plan: architecture, pipeline, edge cases, eval, risks, demo |
 | APPLICATION.md | What to type into the hackathon application |
 | config/tactile_rules.yaml | Design constants with their sources |

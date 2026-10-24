@@ -1,6 +1,6 @@
 # RULES.md
 
-These are hard rules. If a rule blocks you, stop and write the conflict in TODO.md under "Decisions needed". Do not work around it.
+These are hard rules. If a rule blocks you, stop and record the conflict with "python scripts/tracker.py decision". Do not work around it.
 
 ## 1. Secrets and privacy
 
@@ -37,7 +37,7 @@ These are hard rules. If a rule blocks you, stop and write the conflict in TODO.
 4.1 The camera loop processes only the newest frame. If the worker is busy, drop the frame. Never queue frames.
 4.2 Images go to SAM at a longest side of 2048 px or less.
 4.3 Polygons are simplified to 200 vertices or fewer per region.
-4.4 A budget miss is a bug. Log it in TODO.md with the measured number.
+4.4 A budget miss is a bug. Log it with "python scripts/tracker.py issue", including the measured number.
 
 ## 5. Reliability
 
@@ -65,7 +65,7 @@ These are hard rules. If a rule blocks you, stop and write the conflict in TODO.
 
 8.1 Nothing from "Enhancements" in PLAN.md starts before Gate C passes.
 8.2 Feature freeze at noon on Nov 3. After that, only bug fixes, the demo video and the README.
-8.3 If a task runs over its time box by half again, stop and pick the fallback written next to it in TODO.md.
+8.3 If a task runs over its time box by half again, stop and pick its fallback in TRACKER.html. If it has none, propose one to me before continuing.
 
 ## 9. Code
 
