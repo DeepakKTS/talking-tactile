@@ -23,6 +23,7 @@ from app.models.regions import Texture
 from app.synthetic.load import SyntheticFigure, load_synthetic
 
 RULES = load_tactile_rules()
+LINE = RULES.render.outline_width_mm
 EARCONS = load_explore().earcons
 G = RULES.spacing.min_gap_mm
 AX, AY, AW, AH = RULES.page.figure_area_mm("letter")
@@ -65,6 +66,7 @@ def test_child_too_close_to_its_parent_outline() -> None:
     v = validate_sheet(sheet([p, c]), RULES)
     assert rules_of(v) == [("min_gap", ("p", "c"))]
     assert v[0].measured == pytest.approx(1.0)
+    assert v[0].limit == G + LINE  # the parent's outline is drawn inside its edge
 
 
 def test_child_poking_out_of_its_parent() -> None:
@@ -151,7 +153,7 @@ def naive_sheet(fig: SyntheticFigure, parts: list[ReconciledPart]) -> tuple[Shee
 
 def fixed_sheet(fig: SyntheticFigure, naive: Sheet, groups: dict[str, int]) -> Sheet:
     pts = make_point_symbols(naive.regions, RULES.spacing, RULES.layout)
-    spaced, _ = enforce_gaps(pts, G, RULES.layout)
+    spaced, _ = enforce_gaps(pts, G, RULES.layout, LINE)
     limit = RULES.textures.limit_for(fig.truth.grade_band)
     final, textures = assign_textures(spaced, groups, limit, RULES.textures.order, EARCONS)
     return naive.model_copy(update={"regions": final, "textures": textures})

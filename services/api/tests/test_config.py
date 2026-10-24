@@ -131,6 +131,8 @@ TACTILE_BAD = [
     ("textures.order", ["dots", "lines", "grid", "cross", "stripes"], "order"),
     ("layout.point_symbol_vertices", 4, "point_symbol_vertices"),
     ("layout.gap_max_passes", 0, "gap_max_passes"),
+    ("render.outline_width_mm", 0, "outline_width_mm"),
+    ("render", DELETE, "render"),
     ("pipeline.normalize_max_side_px", 2048.5, "normalize_max_side_px"),
     ("principles", "spacing", "principles"),
 ]
@@ -165,6 +167,7 @@ EXPLORE_BAD = [
     ("fingertip.one_euro.typo", 1, "typo"),
     ("guidance.update_ms", 0, "update_ms"),
     ("health.off_page_points_before_recal", 1.5, "off_page_points_before_recal"),
+    ("registration.mark_inset_mm", -1, "mark_inset_mm"),
 ]
 
 

@@ -56,6 +56,20 @@ layout:                            # S4 fixes. Engineering values
   inside_point_tolerance_mm: 0.1   # precision of the point inside a region (point symbol center, centroid_mm)
   neighbor_max_gap_mm: 20.0        # regions this close are listed as neighbors in regions.json
 
+render:                            # S5 drawing. Engineering values; check on the first traced sheet
+  outline_width_mm: 1.0            # raised outline, drawn inside each part's edge, so the gap between two
+                                   # parts stays true. Nested parts and braille inside a part add this width
+  texture_line_mm: 0.5             # lines in the lines, grid and cross textures
+  texture_dot_mm: 1.5              # dots in the dots texture
+  texture_spacing_mm: 5.0          # between texture lines or dots
+  texture_min_piece_mm: 4.0        # texture line pieces shorter than this are left out: too short to feel as a line
+  guide_line_mm: 0.3               # print-only guides: registration marks and the calibration bar
+  mark_arm_mm: 8.0                 # length of each arm of the L-shaped corner marks
+  print_text_mm: 3.0               # print text for the teacher (title, instructions, key words)
+  bar_height_mm: 1.0               # the 100 mm calibration bar is a filled bar this tall
+  key_swatch_mm: [30.0, 20.0]      # width, height of each texture sample on the key page
+  coordinate_decimals: 2           # page mm in tactile.svg and regions.json are rounded to this
+
 principles:
   - represent, not interpret       # APH handout
   - spacing is the key to avoiding clutter

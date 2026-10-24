@@ -152,6 +152,20 @@ class Layout(_Section):
     neighbor_max_gap_mm: PosFloat
 
 
+class Render(_Section):
+    outline_width_mm: PosFloat
+    texture_line_mm: PosFloat
+    texture_dot_mm: PosFloat
+    texture_spacing_mm: PosFloat
+    texture_min_piece_mm: PosFloat
+    guide_line_mm: PosFloat
+    mark_arm_mm: PosFloat
+    print_text_mm: PosFloat
+    bar_height_mm: PosFloat
+    key_swatch_mm: tuple[PosFloat, PosFloat]
+    coordinate_decimals: NonNegInt
+
+
 class TactileRules(_Section):
     spacing: Spacing
     textures: Textures
@@ -161,6 +175,7 @@ class TactileRules(_Section):
     reconcile: Reconcile
     vectorize: Vectorize
     layout: Layout
+    render: Render
     principles: list[StrictStr]
 
 
@@ -214,6 +229,10 @@ class Health(_Section):
     off_page_points_before_recal: PosInt
 
 
+class Registration(_Section):
+    mark_inset_mm: PosFloat
+
+
 class ExploreConfig(_Section):
     hysteresis: Hysteresis
     dwell: Dwell
@@ -221,6 +240,7 @@ class ExploreConfig(_Section):
     fingertip: Fingertip
     guidance: Guidance
     health: Health
+    registration: Registration
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:

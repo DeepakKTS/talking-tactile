@@ -156,26 +156,38 @@ def _inner_clearance(child: Polygon, parent: Polygon) -> float:
     return float(parent.exterior.distance(child))
 
 
-def _pair_ok(regions: dict[str, LayoutRegion], a: str, b: str, gap: float) -> bool:
+def _pair_ok(
+    regions: dict[str, LayoutRegion], a: str, b: str, gap: float, nested_gap: float
+) -> bool:
     if a in _ancestors(regions, b):
-        return _inner_clearance(regions[b].polygon, regions[a].polygon) >= gap - _EPS
+        return _inner_clearance(regions[b].polygon, regions[a].polygon) >= nested_gap - _EPS
     if b in _ancestors(regions, a):
-        return _inner_clearance(regions[a].polygon, regions[b].polygon) >= gap - _EPS
+        return _inner_clearance(regions[a].polygon, regions[b].polygon) >= nested_gap - _EPS
     return float(regions[a].polygon.distance(regions[b].polygon)) >= gap - _EPS
 
 
+class _Gaps(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    gap: float  # between unrelated outlines
+    nested: float  # from a child to its parent's edge
+    tol: float  # simplification tolerance
+
+
 def _cut(
-    regions: dict[str, LayoutRegion], a: str, b: str, gap: float, tol: float
+    regions: dict[str, LayoutRegion], a: str, b: str, gaps: _Gaps
 ) -> tuple[str, Polygon | None]:
     """Which region to shrink for the pair (a, b), and its new outline."""
     ra, rb = regions[a], regions[b]
+    tol = gaps.tol
     # One tolerance for the simplification, one for the chords of the buffered arcs.
-    margin = gap + 2 * tol
+    margin = gaps.gap + 2 * tol
+    nested_margin = gaps.nested + 2 * tol
     for outer, inner in ((ra, rb), (rb, ra)):
         if outer.id in _ancestors(regions, inner.id):
             if inner.kind == "area":
-                return inner.id, _tidy(inner.polygon & outer.polygon.buffer(-margin), tol)
-            return outer.id, _tidy(outer.polygon - inner.polygon.buffer(margin), tol)
+                return inner.id, _tidy(inner.polygon & outer.polygon.buffer(-nested_margin), tol)
+            return outer.id, _tidy(outer.polygon - inner.polygon.buffer(nested_margin), tol)
     if ra.kind == "point" and rb.kind == "area":
         shrink, keep = rb, ra
     elif rb.kind == "point" and ra.kind == "area":
@@ -186,11 +198,13 @@ def _cut(
 
 
 def enforce_gaps(
-    regions: Sequence[LayoutRegion], gap_mm: float, layout: Layout
+    regions: Sequence[LayoutRegion], gap_mm: float, layout: Layout, line_mm: float
 ) -> tuple[list[LayoutRegion], list[tuple[str, str]]]:
     """Shrinks outlines until every pair of raised outlines is at least gap_mm apart.
-    A child keeps gap_mm from its parent's outline. Point symbols never shrink; two point
+    Outlines are drawn line_mm wide inside each part's edge, so a child keeps
+    gap_mm + line_mm from its parent's edge. Point symbols never shrink; two point
     symbols that are too close are returned as unresolved, untouched."""
+    nested_gap = gap_mm + line_mm
     cur = {r.id: r for r in regions}
     order = [r.id for r in regions]
     tol = layout.gap_simplify_tolerance_mm
@@ -198,12 +212,12 @@ def enforce_gaps(
     for _ in range(layout.gap_max_passes):
         changed = False
         for a, b in itertools.combinations(order, 2):
-            if (a, b) in stuck or _pair_ok(cur, a, b, gap_mm):
+            if (a, b) in stuck or _pair_ok(cur, a, b, gap_mm, nested_gap):
                 continue
             if cur[a].kind == "point" and cur[b].kind == "point":
                 stuck.add((a, b))
                 continue
-            rid, poly = _cut(cur, a, b, gap_mm, tol)
+            rid, poly = _cut(cur, a, b, _Gaps(gap=gap_mm, nested=nested_gap, tol=tol))
             if poly is None:
                 stuck.add((a, b))
                 continue
@@ -213,6 +227,8 @@ def enforce_gaps(
         if not changed:
             break
     unresolved = [
-        (a, b) for a, b in itertools.combinations(order, 2) if not _pair_ok(cur, a, b, gap_mm)
+        (a, b)
+        for a, b in itertools.combinations(order, 2)
+        if not _pair_ok(cur, a, b, gap_mm, nested_gap)
     ]
     return [cur[rid] for rid in order], unresolved

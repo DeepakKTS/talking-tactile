@@ -21,3 +21,6 @@ guidance:
 health:
   no_hand_warn_ms: 2000
   off_page_points_before_recal: 15
+registration:
+  mark_inset_mm: 12.7        # corner marks on every printed sheet, this far in from each page edge.
+                             # Explore maps the 4 clicked marks to page mm with these positions

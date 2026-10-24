@@ -27,8 +27,9 @@ from app.geometry.validate import validate_sheet
 from app.synthetic.load import load_synthetic
 
 RULES = load_tactile_rules()
+LINE = RULES.render.outline_width_mm
 B = RULES.braille
-C = B.clearance_to_line_mm
+C = B.clearance_to_line_mm + RULES.render.outline_width_mm  # outlines are drawn inside edges
 G = RULES.spacing.min_gap_mm
 AX, AY, AW, AH = RULES.page.figure_area_mm("letter")
 TR = Translator(B)
@@ -171,7 +172,7 @@ def test_synthetic_sheet_gets_braille_and_a_key_and_passes() -> None:
     rec = reconcile(raw, text, fit.mm_per_px, RULES.reconcile)
     regions = make_point_symbols(regions_from_parts(rec.parts, fit, RULES.vectorize),
                                  RULES.spacing, RULES.layout)  # fmt: skip
-    regions, _ = enforce_gaps(regions, G, RULES.layout)
+    regions, _ = enforce_gaps(regions, G, RULES.layout, LINE)
     groups = group_by_color(fig.image, rec.parts, RULES.layout.color_group_max_delta)
     regions, textures = assign_textures(regions, groups, 3, RULES.textures.order, EARCONS)
     s = Sheet(page="letter", grade_band="k5", regions=regions, textures=textures)
@@ -180,7 +181,9 @@ def test_synthetic_sheet_gets_braille_and_a_key_and_passes() -> None:
     assert validate_sheet(final, RULES) == []
     label = {r.id: r.label for r in regions}
     placed = {label[p.region_id]: (p.kind, p.inside) for p in out.placements}
-    assert placed["cross vessel"] == ("label", True)
+    # The 15 mm bar is too thin for braille once the 1 mm outline and 3.7 mm clearance
+    # are taken on both sides (6.1 + 2 x 4.7 = 15.5 mm).
+    assert placed["cross vessel"] == ("abbrev", False)
     assert placed["left lobe"] == ("label", True)
     assert placed["pore"] == ("abbrev", False)
     assert placed["stem"] == ("abbrev", False)
@@ -192,4 +195,4 @@ def test_translations_cover_labels_and_abbreviations() -> None:
     s = sheet([region("a", "inner core", at(0, 0, 25, 25))])
     t = translate_for_sheet(s, TR, B)
     assert t.abbrevs == abbreviations(["inner core"], B.abbrev_letters)
-    assert set(t.braille) == {"inner core", "ic"}
+    assert set(t.braille) == {"inner core", "ic", "key"}

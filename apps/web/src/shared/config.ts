@@ -38,6 +38,7 @@ const ExploreSchema = z.strictObject({
   }),
   guidance: z.strictObject({ update_ms: posInt, arrive_inside_ms: nonNegInt }),
   health: z.strictObject({ no_hand_warn_ms: posInt, off_page_points_before_recal: posInt }),
+  registration: z.strictObject({ mark_inset_mm: posNum }),
 });
 
 export type ExploreConfig = z.infer<typeof ExploreSchema>;

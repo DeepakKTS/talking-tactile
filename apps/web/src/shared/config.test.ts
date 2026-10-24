@@ -50,6 +50,7 @@ describe("explore config", () => {
     ["fingertip.one_euro.typo", 1],
     ["guidance.update_ms", 0],
     ["health.off_page_points_before_recal", 1.5],
+    ["registration.mark_inset_mm", -1],
     ["extra_section", {}],
   ])("refuses %s = %s and names the field", (path, value) => {
     const field = path.split(".").pop() ?? path;

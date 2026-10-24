@@ -23,6 +23,7 @@ from app.geometry.textures import assign_textures, group_by_color
 from app.synthetic.load import SyntheticFigure, load_synthetic
 
 RULES = load_tactile_rules()
+LINE = RULES.render.outline_width_mm
 EARCONS = load_explore().earcons
 G = RULES.spacing.min_gap_mm
 POINT = RULES.spacing.point_symbol_min_mm
@@ -68,7 +69,7 @@ def test_small_parts_become_point_symbols_and_large_ones_stay() -> None:
 def test_two_close_parts_end_up_a_full_gap_apart_and_only_the_larger_shrinks() -> None:
     a = region("a", box(0, 0, 50, 40))
     b = region("b", box(52, 0, 100, 40))  # 2 mm apart, b smaller
-    out, unresolved = enforce_gaps([a, b], G, RULES.layout)
+    out, unresolved = enforce_gaps([a, b], G, RULES.layout, LINE)
     got = by_id(out)
     assert unresolved == []
     assert got["a"].polygon.distance(got["b"].polygon) >= G
@@ -81,25 +82,25 @@ def test_two_close_parts_end_up_a_full_gap_apart_and_only_the_larger_shrinks() -
 
 def test_parts_already_far_apart_are_untouched() -> None:
     a, b = region("a", box(0, 0, 10, 10)), region("b", box(20, 0, 30, 10))
-    out, _ = enforce_gaps([a, b], G, RULES.layout)
+    out, _ = enforce_gaps([a, b], G, RULES.layout, LINE)
     assert [r.polygon.equals(o.polygon) for r, o in zip(out, [a, b], strict=True)] == [True, True]
 
 
 def test_a_child_near_the_parent_outline_shrinks_inward() -> None:
     parent = region("p", box(0, 0, 60, 60))
     child = region("c", box(1, 20, 20, 40), parent="p")
-    out, unresolved = enforce_gaps([parent, child], G, RULES.layout)
+    out, unresolved = enforce_gaps([parent, child], G, RULES.layout, LINE)
     got = by_id(out)
     assert unresolved == []
     assert got["p"].polygon.equals(parent.polygon)
     assert got["c"].polygon.within(parent.polygon)
-    assert got["c"].polygon.distance(parent.polygon.exterior) >= G
+    assert got["c"].polygon.distance(parent.polygon.exterior) >= G + LINE
 
 
 def test_a_point_symbol_never_shrinks_the_area_does() -> None:
     area = region("a", box(0, 0, 40, 40))
     pt = make_point_symbols([region("p", box(41, 18, 43, 20))], RULES.spacing, RULES.layout)[0]
-    out, unresolved = enforce_gaps([area, pt], G, RULES.layout)
+    out, unresolved = enforce_gaps([area, pt], G, RULES.layout, LINE)
     got = by_id(out)
     assert unresolved == []
     assert got["p"].polygon.equals(pt.polygon)
@@ -111,7 +112,7 @@ def test_two_point_symbols_too_close_are_reported_not_moved() -> None:
         [region("p", box(10, 10, 12, 12)), region("q", box(14, 10, 16, 12))],
         RULES.spacing, RULES.layout,
     )  # fmt: skip
-    out, unresolved = enforce_gaps(pts, G, RULES.layout)
+    out, unresolved = enforce_gaps(pts, G, RULES.layout, LINE)
     assert unresolved == [("p", "q")]
     assert [r.polygon.equals(p.polygon) for r, p in zip(out, pts, strict=True)] == [True, True]
 
@@ -120,7 +121,7 @@ def test_a_cut_that_splits_a_part_keeps_the_largest_piece() -> None:
     u_shape = region("u", Polygon([(0, 0), (60, 0), (60, 40), (40, 40), (40, 10), (20, 10),
                                    (20, 40), (0, 40)]))  # fmt: skip
     plug = region("plug", box(21, 11, 39, 60))  # fills the notch, then overlaps below
-    out, _ = enforce_gaps([u_shape, plug], G, RULES.layout)
+    out, _ = enforce_gaps([u_shape, plug], G, RULES.layout, LINE)
     got = by_id(out)
     assert got["u"].polygon.geom_type == "Polygon"
     assert got["u"].polygon.distance(got["plug"].polygon) >= G
@@ -152,7 +153,7 @@ def test_gap_enforcement_only_shrinks_and_leaves_every_gap_clear(
             poly = poly.difference(f.polygon)
         if poly.geom_type == "Polygon" and poly.area > 1:
             flat.append(r.model_copy(update={"polygon": poly}))
-    out, unresolved = enforce_gaps(flat, G, RULES.layout)
+    out, unresolved = enforce_gaps(flat, G, RULES.layout, LINE)
     assert unresolved == []
     original = by_id(flat)
     for r in out:
@@ -228,7 +229,7 @@ def test_synthetic_color_groups_are_the_categories(fig: SyntheticFigure, laid_ou
 def test_synthetic_layout_fixes_every_planted_problem(fig: SyntheticFigure, laid_out) -> None:
     _, regions, groups = laid_out
     pts = make_point_symbols(regions, RULES.spacing, RULES.layout)
-    spaced, unresolved = enforce_gaps(pts, G, RULES.layout)
+    spaced, unresolved = enforce_gaps(pts, G, RULES.layout, LINE)
     limit = RULES.textures.limit_for(fig.truth.grade_band)
     final, textures = assign_textures(spaced, groups, limit, RULES.textures.order, EARCONS)
     labels = {r.label: r for r in final}
@@ -240,7 +241,7 @@ def test_synthetic_layout_fixes_every_planted_problem(fig: SyntheticFigure, laid
     for a, b in itertools.combinations(final, 2):
         if a.parent == b.id or b.parent == a.id:
             child, parent = (a, b) if a.parent == b.id else (b, a)
-            assert child.polygon.distance(parent.polygon.exterior) >= G
+            assert child.polygon.distance(parent.polygon.exterior) >= G + LINE
         else:
             assert a.polygon.distance(b.polygon) >= G - 1e-6, (a.label, b.label)
     gap = labels["left lobe"].polygon.distance(labels["right lobe"].polygon)

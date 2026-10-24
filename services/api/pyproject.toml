@@ -14,6 +14,8 @@ dependencies = [
   "httpx>=0.28",
   "pillow>=11",
   "python-multipart>=0.0.20",
+  "cairosvg>=2.9.1",
+  "pypdf>=6.21.2",
 ]
 
 [dependency-groups]
@@ -43,6 +45,9 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PL"]
 
+[tool.ruff.lint.pylint]
+max-args = 8  # pipeline stages take the rules and the earlier stage outputs explicitly
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR2004", "PLR0913", "PLR0915", "PLR0917"]
 
@@ -51,3 +56,7 @@ python_version = "3.11"
 strict = true
 files = ["app"]
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["cairosvg"]  # no type information published
+ignore_missing_imports = true

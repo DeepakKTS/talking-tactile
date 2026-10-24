@@ -18,7 +18,8 @@ from shapely.ops import unary_union
 from app.config import TactileRules
 from app.geometry.layout import LayoutRegion, size_mm
 from app.geometry.sheet import Sheet
-from app.models.regions import MAX_POLYGON_POINTS, MIN_POLYGON_POINTS
+from app.models.regions import MAX_POLYGON_POINTS, MIN_POLYGON_POINTS, RegionsFile
+from app.render.svg import sheet_ids
 
 _EPS = 1e-6
 
@@ -102,6 +103,8 @@ def _ancestors(by_id: dict[str, LayoutRegion], rid: str) -> set[str]:
 
 def _gaps(sheet: Sheet, rules: TactileRules) -> list[Violation]:
     gap = rules.spacing.min_gap_mm
+    # Outlines are drawn inside each part's edge: a child needs the line width extra.
+    nested_gap = gap + rules.render.outline_width_mm
     by_id = {r.id: r for r in sheet.regions}
     out: list[Violation] = []
     for a, b in itertools.combinations(sheet.regions, 2):
@@ -113,19 +116,19 @@ def _gaps(sheet: Sheet, rules: TactileRules) -> list[Violation]:
             d = float(parent.polygon.exterior.distance(child.polygon)) if inside else 0.0
             where = f"{d:.2f} mm inside" if inside else "partly outside"
             msg = f"{child.id} is {where} its parent {parent.id}"
-            ids = [parent.id, child.id]
+            ids, need = [parent.id, child.id], nested_gap
         else:
             d = float(a.polygon.distance(b.polygon))
             msg = f"{a.id} and {b.id} are {d:.2f} mm apart"
-            ids = [a.id, b.id]
-        if d < gap - _EPS:
+            ids, need = [a.id, b.id], gap
+        if d < need - _EPS:
             out.append(
                 Violation(
                     rule="min_gap",
                     regions=ids,
                     measured=d,
-                    limit=gap,
-                    message=f"{msg}, the minimum is {gap} mm",
+                    limit=need,
+                    message=f"{msg}, the minimum is {need} mm",
                 )
             )
     return out
@@ -198,7 +201,7 @@ def _textures(sheet: Sheet, rules: TactileRules) -> list[Violation]:
 def _braille(sheet: Sheet, rules: TactileRules) -> list[Violation]:
     if not sheet.braille:
         return []
-    clearance = rules.braille.clearance_to_line_mm
+    clearance = rules.braille.clearance_to_line_mm + rules.render.outline_width_mm
     gap = rules.spacing.min_gap_mm
     ax, ay, aw, ah = rules.page.figure_area_mm(sheet.page)
     area = box(ax, ay, ax + aw, ay + ah).buffer(_EPS)
@@ -256,6 +259,34 @@ def _braille(sheet: Sheet, rules: TactileRules) -> list[Violation]:
                     f"{d:.2f} mm apart, the minimum is {gap} mm",
                 )
             )
+    return out
+
+
+def check_svg_ids(svg: str, regions_file: RegionsFile) -> list[Violation]:
+    """Every region drawn in tactile.svg is in regions.json, and the reverse."""
+    drawn = set(sheet_ids(svg))
+    listed = {r.id for r in regions_file.regions}
+    out: list[Violation] = []
+    for rid in sorted(listed - drawn):
+        out.append(
+            Violation(
+                rule="svg_ids",
+                regions=[rid],
+                measured=0,
+                limit=1,
+                message=f"{rid} is in regions.json but not drawn in tactile.svg",
+            )
+        )
+    for rid in sorted(drawn - listed):
+        out.append(
+            Violation(
+                rule="svg_ids",
+                regions=[rid],
+                measured=1,
+                limit=0,
+                message=f"{rid} is drawn in tactile.svg but not in regions.json",
+            )
+        )
     return out
 
 

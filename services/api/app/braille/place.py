@@ -5,7 +5,8 @@
 3. its abbreviation beside the part (within max_outside_offset_mm),
 4. nothing on the sheet: the part is listed as key only for the teacher to review.
 
-Every braille block keeps clearance_to_line_mm from every raised outline, min_gap_mm from
+Every braille block keeps clearance_to_line_mm from every raised line (the part's edge plus
+the outline width drawn inside it), min_gap_mm from
 other braille, stays in the figure area, and never sits on a part other than its own (or
 one that contains it). Abbreviations used on the sheet are listed in the key. Pure: the
 translations are made beforehand by translate_for_sheet.
@@ -45,10 +46,15 @@ class BrailleLayout(BaseModel):
     key_only: list[str]  # region ids with no braille on the sheet
 
 
+KEY_TITLE = "key"
+
+
 def translate_for_sheet(sheet: Sheet, translator: Translator, rules: Braille) -> Translations:
+    """Braille for every label, abbreviation and texture meaning, and the key page title."""
     labels = list(dict.fromkeys(r.label for r in sheet.regions))
     abbrevs = abbreviations(labels, rules.abbrev_letters)
-    texts = list(dict.fromkeys([*labels, *abbrevs.values()]))
+    meanings = [t.meaning for t in sheet.textures]
+    texts = list(dict.fromkeys([*labels, *abbrevs.values(), *meanings, KEY_TITLE]))
     return Translations(
         abbrevs=abbrevs, braille=dict(zip(texts, translator.translate(texts), strict=True))
     )
@@ -59,6 +65,8 @@ class _Placer:
         self.t = t
         self.b = rules.braille
         self.gap = rules.spacing.min_gap_mm
+        # Outlines are drawn inside each part's edge, so braille keeps the line width extra.
+        self.clearance = rules.braille.clearance_to_line_mm + rules.render.outline_width_mm
         ax, ay, aw, ah = rules.page.figure_area_mm(sheet.page)
         self.area = box(ax, ay, ax + aw, ay + ah)
         self.regions = sheet.regions
@@ -79,7 +87,7 @@ class _Placer:
         cells = self.t.braille[text]
         w, h = block_size(len(cells), self.b)
         step = self.b.search_step_mm
-        clearance = self.b.clearance_to_line_mm
+        clearance = self.clearance
         domain: shapely.Geometry
         if inside:
             domain = r.polygon.buffer(-clearance)
