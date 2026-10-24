@@ -523,8 +523,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 6,
- "updated_at": "2026-10-24T06:07:11.391Z",
+ "rev": 11,
+ "updated_at": "2026-10-24T06:13:43.832Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -675,12 +675,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "It is listed on the event page. Read its docs and decide if it has a real job here. Default answer: no.",
    "timebox": "20 min",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Read dev.meta.ai/docs/models and pricing-rate-limits. Wonder is muse-wonder-1.0, preview, 1M context, same request shape as Spark, 4.00/20.00 per 1M tokens. Decision: no job in the product; optional S1 comparison only if Spark recall misses 80 percent. Also noted: rate limit table says sam-3.1, models table says sam-3-1; SAM spike will confirm.",
+   "done_at": "2026-10-24T06:13:43.832Z",
    "tags": [
     "models"
-   ]
+   ],
+   "changed_at": "2026-10-24T06:13:43.832Z"
   },
   {
    "id": "d1-3",
@@ -1631,6 +1632,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Fixed Oct 24: TODO.md is generated from the tracker; RULES.md preamble, 4.4 and 8.3, CLAUDE.md done item 5 and README now point to tracker.py; the handbook bullet and prompts use tracker.py; the folder is a git repo on main. Still open: python3 is 3.13 against the 3.11 rule, pinned with uv on d1-4; d1-4 says to copy the kit into the root, which is already done; most tasks have no fallback, so one is proposed when a time box runs over (RULES 8.3); d1-2 Muse Wonder was missing from the old TODO.md, and the tracker wins.",
    "why": "TRACKER.html is the single source of truth for tasks. Other files point to it or are generated from it.",
    "changed_at": "2026-10-24T06:07:11.391Z"
+  },
+  {
+   "id": "dec-mvm04gienz30",
+   "date": "2026-10-24",
+   "title": "Start before Oct 26",
+   "decision": "Spikes on main in spikes/, product code on branch early-start until the Official Rules are read",
+   "why": "De-risk the unknowns early while keeping pre-event work reversible",
+   "changed_at": "2026-10-24T06:12:06.424Z"
+  },
+  {
+   "id": "dec-mvm06jnbaq1b",
+   "date": "2026-10-24",
+   "title": "Muse Wonder has no job here",
+   "decision": "Do not use muse-wonder-1.0 in the product. Muse Spark 1.3 stays on S1, S3 and answers. Only if Spark misses 80 percent part recall on the authoring eval, run S1 on Wonder for those 20 figures as a measured comparison; it is a model id change on the same request.",
+   "why": "Docs (dev.meta.ai/docs/models#muse-wonder, read Oct 24): Wonder is a preview model for long-horizon agentic and multi-file coding work, at 4.00 in and 20.00 out per 1M tokens versus Spark 1.25 and 4.25 (3.2x and 4.7x), Standard mode only. Our calls are short and latency bound: answers must start in under 2 s, and the budget is 150 USD.",
+   "changed_at": "2026-10-24T06:13:43.802Z"
   }
  ],
  "risks": [
@@ -1693,6 +1710,31 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T06:13:43.832Z",
+   "kind": "claude",
+   "text": "Task d1-2 \"Check what Muse Wonder is\" is now done. Note: Read dev.meta.ai/docs/models and pricing-rate-limits. Wonder is muse-wonder-1.0, preview, 1M context, same request shape as Spark, 4.00/20.00 per 1M tokens. Decision: no job in the product; optional S1 comparison only if Spark recall misses 80 percent. Also noted: rate limit table says sam-3.1, models table says sam-3-1; SAM spike will confirm."
+  },
+  {
+   "ts": "2026-10-24T06:13:43.802Z",
+   "kind": "claude",
+   "text": "Decision: Muse Wonder has no job here."
+  },
+  {
+   "ts": "2026-10-24T06:12:14.346Z",
+   "kind": "claude",
+   "text": "Task d1-2 \"Check what Muse Wonder is\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T06:12:14.316Z",
+   "kind": "claude",
+   "text": "Early start plan: 1) d1-2 read Muse Wonder docs, decision on whether it has a job (default no). 2) d0-8 find 20 openly licensed eval figures with verified licenses into spikes/eval-figures.md, heart diagram to fixtures/heart.png. 3) d1-5, d1-6, d1-7 spike scripts in spikes/ with uv inline deps on Python 3.11, docs read first; key not in services/api/.env yet, so scripts first and ask for the key. 4) Tracking prototype in spikes/tracking/ plus test-sheet.pdf, then the user prints and runs the 9 point test. 5) With the key: run spikes, save fixtures, record p50, p95 and cost, set Gate A with evidence."
+  },
+  {
+   "ts": "2026-10-24T06:12:06.424Z",
+   "kind": "claude",
+   "text": "Decision: Start before Oct 26."
+  },
   {
    "ts": "2026-10-24T06:07:11.391Z",
    "kind": "claude",

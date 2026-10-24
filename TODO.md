@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 6, updated 2026-10-24T06:07:11.391Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 11, updated 2026-10-24T06:13:43.832Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -31,8 +31,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 - [ ] d1-1 Watch kickoff, read and accept the Official Rules (1.5 h)
   - Write anything that changes the plan into PLAN.md section 17 and a decision here.
-- [ ] d1-2 Check what Muse Wonder is (20 min)
+- [x] d1-2 Check what Muse Wonder is (20 min)
   - It is listed on the event page. Read its docs and decide if it has a real job here. Default answer: no.
+  - Note: Read dev.meta.ai/docs/models and pricing-rate-limits. Wonder is muse-wonder-1.0, preview, 1M context, same request shape as Spark, 4.00/20.00 per 1M tokens. Decision: no job in the product; optional S1 comparison only if Spark recall misses 80 percent. Also noted: rate limit table says sam-3.1, models table says sam-3-1; SAM spike will confirm.
 - [ ] d1-3 Get the API key and credits, set BUDGET_USD (20 min)
   - Key goes only in services/api/.env.
 - [ ] d1-4 Repo skeleton and kit (1.5 h)
