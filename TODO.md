@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 11, updated 2026-10-24T06:13:43.832Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 13, updated 2026-10-24T06:31:38.865Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -22,8 +22,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Fallback: Hot glue and layered card also work.
 - [ ] d0-7 Read BANA tactile graphics guidelines, units 1 to 3 (2 h)
   - Use the 2022 edition. Note anything that changes config/tactile_rules.yaml.
-- [ ] d0-8 List 20 openly licensed figures for the eval set (1.5 h)
+- [x] d0-8 List 20 openly licensed figures for the eval set (1.5 h)
   - 5 labeled diagrams, 5 bar charts, 5 line graphs, 5 maps. Write the license next to each.
+  - Note: spikes/eval-figures.md: 20 figures, 5 per type, all on Wikimedia Commons. Licenses: 7 PD, 1 CC0, 7 CC BY 4.0, 5 CC BY-SA 3.0/4.0, each checked on the file page and the Commons API, then rechecked independently (20 of 20 match). fixtures/heart.png is Heart_diagram-en.svg by ZooFari, CC BY-SA 3.0, 2048x1612 on white. Learned: Commons thumbnails come back at 3840 px with transparent backgrounds, so S0 must flatten onto white and resize locally; CC BY-SA figures need the license carried onto the tactile sheet.
 - [ ] d0-9 Note phone model and laptop GPU (10 min)
   - Baseline for the Day 2 device decision.
 
