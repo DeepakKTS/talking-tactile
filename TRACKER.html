@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 57,
- "updated_at": "2026-10-24T16:55:30.396Z",
+ "rev": 59,
+ "updated_at": "2026-10-24T16:57:30.871Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1115,13 +1115,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 1625b6e. app/geometry/neighbors.py: centroid_mm at the pole of inaccessibility (inside even for a C shape), neighbors within 20 mm plus direct inside/around, direction of the shortest outline-to-outline line in 8 sectors. 19 tests incl. 3 hypothesis properties (symmetry, quarter turn of the sheet, centroid inside). Synthetic: vessel down from outer chamber, right lobe right of left lobe, stem has left lobe up.",
+   "done_at": "2026-10-24T16:57:30.839Z",
    "tags": [
     "geometry"
    ],
-   "changed_at": "2026-10-24T16:55:30.396Z"
+   "changed_at": "2026-10-24T16:57:30.839Z"
   },
   {
    "id": "d4-7",
@@ -1130,13 +1130,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "tactile-rules-check skill: gaps, texture count, point symbol size, polygon validity and page bounds, later braille and SVG ids. Must find every planted violation in the synthetic figure before the fixes and none after.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
+   "status": "doing",
    "note": "",
    "done_at": null,
    "tags": [
     "geometry"
    ],
-   "changed_at": "2026-10-24T16:45:42.235Z"
+   "changed_at": "2026-10-24T16:57:30.871Z"
   },
   {
    "id": "d5-1",
@@ -1847,6 +1847,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:57:30.871Z",
+   "kind": "claude",
+   "text": "Task d4-7 \"Tactile rules validator\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T16:57:30.839Z",
+   "kind": "claude",
+   "text": "Task d4-6 \"Centroids and neighbor directions\" is now done. Note: Commit 1625b6e. app/geometry/neighbors.py: centroid_mm at the pole of inaccessibility (inside even for a C shape), neighbors within 20 mm plus direct inside/around, direction of the shortest outline-to-outline line in 8 sectors. 19 tests incl. 3 hypothesis properties (symmetry, quarter turn of the sheet, centroid inside). Synthetic: vessel down from outer chamber, right lobe right of left lobe, stem has left lobe up."
+  },
   {
    "ts": "2026-10-24T16:55:30.396Z",
    "kind": "claude",

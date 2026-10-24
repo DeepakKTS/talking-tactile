@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 57, updated 2026-10-24T16:55:30.396Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 59, updated 2026-10-24T16:57:30.871Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -126,9 +126,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d4-5 Print two copies and trace with puffy paint (1 h)
   - Let them dry overnight. Tape the sheet edges for the demo.
   - Fallback: Hot glue or layered card.
-- [ ] d4-6 Centroids and neighbor directions (1 h) [doing]
+- [x] d4-6 Centroids and neighbor directions (1 h)
   - Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.
-- [ ] d4-7 Tactile rules validator (1.5 h)
+  - Note: Commit 1625b6e. app/geometry/neighbors.py: centroid_mm at the pole of inaccessibility (inside even for a C shape), neighbors within 20 mm plus direct inside/around, direction of the shortest outline-to-outline line in 8 sectors. 19 tests incl. 3 hypothesis properties (symmetry, quarter turn of the sheet, centroid inside). Synthetic: vessel down from outer chamber, right lobe right of left lobe, stem has left lobe up.
+- [ ] d4-7 Tactile rules validator (1.5 h) [doing]
   - tactile-rules-check skill: gaps, texture count, point symbol size, polygon validity and page bounds, later braille and SVG ids. Must find every planted violation in the synthetic figure before the fixes and none after.
 
 ## Day 5: Fri Oct 30. Gate C
