@@ -140,6 +140,15 @@ class TestStatus(TrackerTestCase):
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(self.read_text(), self.before_text)
 
+    def test_note_only_keeps_status_and_says_so(self) -> None:
+        s = self.assert_ok_write("status", "d1-4", "todo", "--note", "Pin Python 3.11 with uv")
+        t = self.find(s["tasks"], "d1-4")
+        self.assertEqual((t["status"], t["note"], t["done_at"]), ("todo", "Pin Python 3.11 with uv", None))
+        self.assertEqual(
+            s["log"][0]["text"],
+            'Task d1-4 "Repo skeleton and kit" note updated, still todo. Note: Pin Python 3.11 with uv',
+        )
+
     def test_only_target_task_changes(self) -> None:
         s = self.assert_ok_write("status", "d0-1", "doing")
         for old, new in zip(self.initial["tasks"], s["tasks"]):
@@ -239,6 +248,118 @@ class TestGate(TrackerTestCase):
     def test_invalid_gate(self) -> None:
         self.assert_fails_unchanged("gate", "E", "pass")
         self.assert_fails_unchanged("gate", "A", "maybe")
+
+
+class TestTodo(TrackerTestCase):
+    def todo(self, *extra: str) -> str:
+        r = self.run_cli("todo", *extra)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return (self.dir / "TODO.md").read_text(encoding="utf-8")
+
+    def test_header_days_and_every_task_once(self) -> None:
+        text = self.todo()
+        self.assertEqual(text.splitlines()[0], tracker.TODO_HEADER)
+        self.assertEqual(
+            text.splitlines()[0],
+            "Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.",
+        )
+        headings = [line for line in text.splitlines() if line.startswith("## Day ")]
+        self.assertEqual(len(headings), 11)
+        self.assertEqual(headings[0], "## Day 0: Oct 23 to 25")
+        self.assertEqual(headings[1], "## Day 1: Mon Oct 26. Gate A")
+        self.assertEqual(headings[5], "## Day 5: Fri Oct 30. Gate C")
+        for t in self.initial["tasks"]:
+            self.assertEqual(len(re.findall(rf"^- \[[ x]\] (~~)?{re.escape(t['id'])} ", text, re.M)), 1, t["id"])
+        self.assertTrue(text.endswith("\n"))
+
+    def test_tasks_sit_under_their_day(self) -> None:
+        text = self.todo()
+        sections = re.split(r"^## ", text, flags=re.M)
+        for t in self.initial["tasks"]:
+            sec = next(s for s in sections if re.search(rf"^- \[[ x]\] (~~)?{re.escape(t['id'])} ", s, re.M))
+            self.assertTrue(sec.startswith(f"Day {t['day']}:"), t["id"])
+
+    def test_timebox_detail_and_fallback(self) -> None:
+        text = self.todo()
+        self.assertIn(
+            "- [ ] d0-6 Buy materials (1 h)\n"
+            "  - Puffy fabric paint in 2 colors, heavy cardstock, a phone stand or gooseneck clamp, masking tape, a ruler.\n"
+            "  - Fallback: Hot glue and layered card also work.\n",
+            text,
+        )
+        self.assertIn(
+            "- [ ] d0-1 Submit the hackathon application (1 h)\n"
+            "  - Use the crisp answers in Handbook, Application answers. One application only.\n"
+            "- [ ] d0-2",
+            text,
+        )
+        self.assertEqual(text.count("  - Fallback:"), sum(1 for t in self.initial["tasks"] if t["fallback"]) + 4)
+        for t in self.initial["tasks"]:
+            if t["detail"]:
+                self.assertEqual(text.count(f"\n  - {t['detail']}\n"), 1, t["id"])
+
+    def test_empty_detail_and_fallback_add_no_lines(self) -> None:
+        state = json.loads(json.dumps(self.initial))
+        t = self.find(state["tasks"], "d0-6")
+        t["detail"], t["fallback"] = "", ""
+        text = tracker.render_todo(state)
+        self.assertIn("- [ ] d0-6 Buy materials (1 h)\n- [ ] d0-7", text)
+
+    def test_status_marks_and_notes(self) -> None:
+        self.assertEqual(self.run_cli("status", "d0-1", "done", "--note", "Sent Sat").returncode, 0)
+        self.assertEqual(self.run_cli("status", "d0-2", "cut").returncode, 0)
+        self.assertEqual(self.run_cli("status", "d0-3", "doing").returncode, 0)
+        self.assertEqual(self.run_cli("status", "d0-4", "blocked", "--note", "No reply").returncode, 0)
+        text = self.todo()
+        self.assertIn(
+            "- [x] d0-1 Submit the hackathon application (1 h)\n"
+            "  - Use the crisp answers in Handbook, Application answers. One application only.\n"
+            "  - Note: Sent Sat\n",
+            text,
+        )
+        self.assertIn("- [ ] ~~d0-2 Make the Weavory repo public and its README current~~ (30 min) [cut]", text)
+        self.assertIn("- [ ] d0-3 Email Northeastern disability services (20 min) [doing]", text)
+        self.assertIn(
+            "- [ ] d0-4 Email Perkins School for the Blind (20 min) [blocked]\n"
+            "  - Ask an educator or transcriber for a remote review of one tactile sheet and the talking layer.\n"
+            "  - Note: No reply\n",
+            text,
+        )
+
+    def test_gates_render_with_status_and_evidence(self) -> None:
+        self.assertEqual(self.run_cli("gate", "A", "pass", "--evidence", "spikes/ p50 1.1 s").returncode, 0)
+        text = self.todo()
+        self.assertIn("- [x] Gate A: Models answer [Passed]\n  - Pass when: ", text)
+        self.assertIn("  - Evidence: spikes/ p50 1.1 s\n", text)
+        self.assertIn("- [ ] Gate B: Tracking is accurate [Pending]", text)
+        day1 = re.split(r"^## ", text, flags=re.M)[2]
+        self.assertTrue(day1.startswith("Day 1:") and "Gate A:" in day1)
+
+    def test_open_issues(self) -> None:
+        self.assertIn("## Open issues\n\nNone.", self.todo())
+        self.assertEqual(self.run_cli("issue", "Earcon late, 140 ms", "--severity", "high").returncode, 0)
+        self.assertIn("- (high) Earcon late, 140 ms", self.todo())
+
+    def test_does_not_touch_tracker_and_is_deterministic(self) -> None:
+        first = self.todo()
+        self.assertEqual(self.read_text(), self.before_text)
+        self.assertEqual(self.todo(), first)
+        self.assertEqual(sorted(p.name for p in self.dir.iterdir()), ["TODO.md", "TRACKER.html"])
+
+    def test_out_option(self) -> None:
+        out = self.dir / "sub.md"
+        r = self.run_cli("todo", "--out", str(out))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertTrue(out.read_text(encoding="utf-8").startswith(tracker.TODO_HEADER))
+        self.assertFalse((self.dir / "TODO.md").exists())
+
+    def test_broken_tracker_writes_nothing(self) -> None:
+        pre, raw, post = split(self.before_text)
+        with open(self.file, "w", encoding="utf-8", newline="") as f:
+            f.write(pre + raw.replace("{", "{,", 1) + post)
+        r = self.run_cli("todo")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertFalse((self.dir / "TODO.md").exists())
 
 
 class TestBrokenFile(TrackerTestCase):

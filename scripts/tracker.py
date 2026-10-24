@@ -33,6 +33,13 @@ SOURCES = ["live", "mock"]
 LOG_CAP = 500  # same cap as logEvent() in the page
 DAY1 = dt.date(2026, 10, 26)
 LAST_DAY = 10
+# Same labels as DAYS in the page.
+DAY_LABELS = {
+    0: "Oct 23 to 25", 1: "Mon Oct 26", 2: "Tue Oct 27", 3: "Wed Oct 28", 4: "Thu Oct 29",
+    5: "Fri Oct 30", 6: "Sat Oct 31", 7: "Sun Nov 1", 8: "Mon Nov 2", 9: "Tue Nov 3", 10: "Wed Nov 4",
+}
+GATE_WORDS = {"pending": "Pending", "pass": "Passed", "fail": "Failed", "fallback": "Fallback taken"}
+TODO_HEADER = "Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand."
 
 
 class TrackerError(Exception):
@@ -229,7 +236,10 @@ def cmd_status(state: dict, args: argparse.Namespace) -> str | None:
         t["done_at"] = None
     if args.note is not None:
         t["note"] = args.note
-    text = f'Task {t["id"]} "{t["title"]}" is now {args.status}.'
+    if prev == args.status:
+        text = f'Task {t["id"]} "{t["title"]}" note updated, still {args.status}.'
+    else:
+        text = f'Task {t["id"]} "{t["title"]}" is now {args.status}.'
     if args.note:
         text += f" Note: {args.note}"
     commit(state, t, text, ts)
@@ -300,12 +310,93 @@ def cmd_gate(state: dict, args: argparse.Namespace) -> str | None:
     return text
 
 
+def render_todo(state: dict) -> str:
+    """TODO.md as a pure function of the tracker state."""
+    tasks, gates = state["tasks"], state["gates"]
+    out = [
+        TODO_HEADER,
+        "",
+        "# TODO.md",
+        "",
+        f"Tracker rev {state.get('rev')}, updated {state.get('updated_at')}. "
+        "Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.",
+        "If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.",
+    ]
+    days = sorted({t.get("day") for t in tasks} | {g.get("day") for g in gates}, key=lambda d: (d is None, d))
+    for day in days:
+        day_gates = [g for g in gates if g.get("day") == day]
+        heading = f"## Day {day}: {DAY_LABELS.get(day, '')}".rstrip(": ")
+        if day_gates:
+            heading += ". Gate " + ", ".join(g["id"] for g in day_gates)
+        out += ["", heading, ""]
+        for t in (t for t in tasks if t.get("day") == day):
+            status = t.get("status", "todo")
+            label = f"{t['id']} {t['title']}"
+            line = f"- [{'x' if status == 'done' else ' '}] "
+            line += f"~~{label}~~" if status == "cut" else label
+            if t.get("timebox"):
+                line += f" ({t['timebox']})"
+            if status not in ("todo", "done"):
+                line += f" [{status}]"
+            out.append(line)
+            if t.get("detail"):
+                out.append(f"  - {t['detail']}")
+            if t.get("fallback"):
+                out.append(f"  - Fallback: {t['fallback']}")
+            if t.get("note"):
+                out.append(f"  - Note: {t['note']}")
+        for g in day_gates:
+            status = g.get("status", "pending")
+            out.append(
+                f"- [{'x' if status == 'pass' else ' '}] Gate {g['id']}: {g.get('title', '')} "
+                f"[{GATE_WORDS.get(status, status)}]"
+            )
+            out.append(f"  - Pass when: {g.get('test', '')}")
+            if g.get("fallback"):
+                out.append(f"  - Fallback: {g['fallback']}")
+            if g.get("evidence"):
+                out.append(f"  - Evidence: {g['evidence']}")
+    open_issues = [i for i in state["issues"] if i.get("status") != "closed"]
+    out += ["", "## Open issues", ""]
+    out += [f"- ({i.get('severity')}) {i.get('title')}" + (f": {i['note']}" if i.get("note") else "") for i in open_issues]
+    if not open_issues:
+        out.append("None. Add one with scripts/tracker.py issue.")
+    return "\n".join(out) + "\n"
+
+
+def atomic_write(path: Path, text: str) -> None:
+    fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    tmp = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        if path.exists():
+            shutil.copymode(path, tmp)
+        os.replace(tmp, path)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+
+def cmd_todo(state: dict, args: argparse.Namespace) -> str | None:
+    out = args.out or args.file.parent / "TODO.md"
+    atomic_write(out, render_todo(state))
+    print(f"Wrote {out} from tracker rev {state.get('rev')}.")
+    return None
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Update TRACKER.html safely.")
     p.add_argument("--file", type=Path, default=DEFAULT_FILE, help="tracker file (default: repo TRACKER.html)")
     sub = p.add_subparsers(dest="command", required=True)
 
     sub.add_parser("show", help="print a summary").set_defaults(func=cmd_show)
+
+    s = sub.add_parser("todo", help="regenerate TODO.md from the tracker")
+    s.add_argument("--out", type=Path, help="output file (default: TODO.md next to the tracker)")
+    s.set_defaults(func=cmd_todo)
 
     s = sub.add_parser("status", help="set a task status")
     s.add_argument("task_id")
