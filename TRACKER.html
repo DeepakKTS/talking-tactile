@@ -523,8 +523,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 20,
- "updated_at": "2026-10-24T06:41:58.912Z",
+ "rev": 22,
+ "updated_at": "2026-10-24T06:45:51.121Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -796,12 +796,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "getUserMedia, drop frames when busy, never queue.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Prototype in spikes/tracking (main.js, lib/pump.js): getUserMedia 1280x720, requestVideoFrameCallback, ImageBitmap transferred to a module worker, one frame in flight, drop never queue. Node tests for the pump (4). Headless Chrome with a fake camera and a 100 ms stub worker: camera 20 fps, 78 of 118 frames dropped, max in flight 1, frame to result p95 105.5 ms (no queuing). Port to apps/web on early-start later.",
+   "done_at": "2026-10-24T06:45:51.121Z",
    "tags": [
     "frontend"
-   ]
+   ],
+   "changed_at": "2026-10-24T06:45:51.121Z"
   },
   {
    "id": "d2-2",
@@ -1722,6 +1723,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T06:45:51.121Z",
+   "kind": "claude",
+   "text": "Task d2-1 \"Camera module, newest frame only\" is now done. Note: Prototype in spikes/tracking (main.js, lib/pump.js): getUserMedia 1280x720, requestVideoFrameCallback, ImageBitmap transferred to a module worker, one frame in flight, drop never queue. Node tests for the pump (4). Headless Chrome with a fake camera and a 100 ms stub worker: camera 20 fps, 78 of 118 frames dropped, max in flight 1, frame to result p95 105.5 ms (no queuing). Port to apps/web on early-start later."
+  },
+  {
+   "ts": "2026-10-24T06:44:03.857Z",
+   "kind": "claude",
+   "text": "Task d2-1 \"Camera module, newest frame only\" is now doing."
+  },
   {
    "ts": "2026-10-24T06:41:58.912Z",
    "kind": "claude",

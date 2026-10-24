@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 20, updated 2026-10-24T06:41:58.912Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 22, updated 2026-10-24T06:45:51.121Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -61,8 +61,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 2: Tue Oct 27. Gate B
 
-- [ ] d2-1 Camera module, newest frame only (1 h)
+- [x] d2-1 Camera module, newest frame only (1 h)
   - getUserMedia, drop frames when busy, never queue.
+  - Note: Prototype in spikes/tracking (main.js, lib/pump.js): getUserMedia 1280x720, requestVideoFrameCallback, ImageBitmap transferred to a module worker, one frame in flight, drop never queue. Node tests for the pump (4). Headless Chrome with a fake camera and a 100 ms stub worker: camera 20 fps, 78 of 118 frames dropped, max in flight 1, frame to result p95 105.5 ms (no queuing). Port to apps/web on early-start later.
 - [ ] d2-2 Hand worker with MediaPipe Hand Landmarker (2 h)
   - VIDEO mode, two hands, landmarks only back to the main thread.
 - [ ] d2-3 Homography from 4 clicked corners (1 h)
