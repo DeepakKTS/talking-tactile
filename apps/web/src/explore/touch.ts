@@ -16,10 +16,12 @@ import type { ExploreConfig } from "../shared/config";
 import type { Pt } from "./homography";
 import type { IndexedRegion, RegionIndex } from "./regionIndex";
 
+/** t is when the event fires; since is when the change behind it began, such as the first
+ * frame inside the shrunk outline for an earcon. */
 export type TouchEvent =
-  | { kind: "earcon"; region: IndexedRegion; t: number }
-  | { kind: "exit"; region: IndexedRegion; t: number }
-  | { kind: "label"; region: IndexedRegion; t: number };
+  | { kind: "earcon"; region: IndexedRegion; t: number; since: number }
+  | { kind: "exit"; region: IndexedRegion; t: number; since: number }
+  | { kind: "label"; region: IndexedRegion; t: number; since: number };
 
 export type Phase = "outside" | "entering" | "inside" | "dwelled" | "leaving";
 
@@ -109,10 +111,11 @@ export class TouchMachine {
 
   private commit(to: IndexedRegion | null, p: Pt, t: number, events: TouchEvent[]): void {
     const from = this.current;
+    const since = this.pending?.since ?? t;
     if (from && !this.index.contains(from, p, -this.cfg.hysteresis.exit_grow_mm)) {
-      this.sound({ kind: "exit", region: from, t }, events);
+      this.sound({ kind: "exit", region: from, t, since }, events);
     }
-    if (to) this.sound({ kind: "earcon", region: to, t }, events);
+    if (to) this.sound({ kind: "earcon", region: to, t, since }, events);
     this.current = to;
     this.pending = null;
     this.dwelled = false;
@@ -142,7 +145,7 @@ export class TouchMachine {
     if (!this.current || this.dwelled || this.pending || this.slowSince === null) return;
     if (t - Math.max(this.slowSince, this.insideSince) >= this.cfg.dwell.hold_ms) {
       this.dwelled = true;
-      events.push({ kind: "label", region: this.current, t });
+      events.push({ kind: "label", region: this.current, t, since: Math.max(this.slowSince, this.insideSince) });
     }
   }
 
