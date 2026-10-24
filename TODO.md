@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 15, updated 2026-10-24T06:34:06.910Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 18, updated 2026-10-24T06:37:11.217Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -43,9 +43,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d1-5 Spike Muse Spark (1 h) [blocked]
   - One figure in, structured parts list out. Use the meta-api-spike skill.
   - Note: Script and notes written from the docs: spikes/spark_spike.py (understand case with heart.png and S1 schema, answer case streamed with TTFT and cache check), spikes/muse-spark.md. Dry run passes on Python 3.11 via uv. Blocked on the API key in services/api/.env.
-- [ ] d1-6 Spike SAM 3.1 (1.5 h)
+- [ ] d1-6 Spike SAM 3.1 (1.5 h) [blocked]
   - Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.
   - Fallback: Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.
+  - Note: Script and notes written from the docs: spikes/sam_spike.py (5 heart phrases x2 plus text, streamed, parsed with meta-sam-parser, overlays to spikes/out/sam/), spikes/sam.md. Parser wiring and mask placement checked offline with the docs example. Blocked on the API key.
 - [ ] d1-7 Spike Muse Voice Transcribe (1 h)
   - Stream 10 seconds of audio. Get partial and final text. Try keyword hints.
   - Fallback: Use push-to-talk sync mode if realtime is awkward.

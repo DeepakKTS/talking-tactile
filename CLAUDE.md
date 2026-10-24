@@ -22,7 +22,7 @@ Two users:
 | Model | Where | Job |
 |---|---|---|
 | `muse-spark-1.3` | Author S1, S3. Explore answers | Reads the figure, proposes parts as short phrases, maps labels to masks, answers questions from figure data |
-| `sam-3-1` | Author S2. Explore registration | Segments every proposed part zero-shot. Finds the sheet for registration |
+| `sam-3.1` | Author S2. Explore registration | Segments every proposed part zero-shot. Finds the sheet for registration |
 | `muse-voice-transcribe-1.0` | Explore voice | Streaming speech to text with keyword hints built from region labels |
 
 Base URL `https://api.meta.ai/v1`, OpenAI compatible. Voice uses `wss://api.meta.ai/v1/asr/realtime`. Confirm exact request shapes for SAM and Voice on Day 1 with the `meta-api-spike` skill before writing feature code against them.

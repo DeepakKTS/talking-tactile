@@ -87,8 +87,8 @@ Storage: SQLite for jobs and edits. Files under `data/figures/<sha256>/`. Same f
 |---|---|---|
 | Understand figure | muse-spark-1.3 | image in, structured output, reasoning medium |
 | Map labels to masks | muse-spark-1.3 | image with numbered mask outlines, structured output |
-| Segment parts | sam-3-1 | one short noun phrase per call, image at 2048 px max |
-| Find the sheet (fallback) | sam-3-1 | phrase "sheet of paper" |
+| Segment parts | sam-3.1 | Responses API, streamed. One short noun phrase per call, image at 2048 px max. Masks are box-local, base85 special-token text; parse with meta-sam-parser |
+| Find the sheet (fallback) | sam-3.1 | phrase "sheet of paper" |
 | Answer a question | muse-spark-1.3 | text only, streaming, reasoning low, static figure context first so it can be cached |
 | Transcribe | muse-voice-transcribe-1.0 | realtime WebSocket, keyword hints from region labels, language hint English |
 
@@ -254,7 +254,7 @@ Stretch (after the hackathon unless everything is green)
 
 ## 17. Settle on Day 1
 
-- SAM 3.1 hosted request shape: one phrase or many per call, mask format returned
+- SAM 3.1 hosted request shape: one phrase or many per call, mask format returned. From the docs (Oct 24): model `sam-3.1` on `POST /v1/responses`, one concept per request, every instance returned as a box plus a box-local mask in special-token text, `one_bit` or `lossless` encoding, optional confidence. Confirm with the live spike
 - Voice realtime event names and the keyword hint parameter
 - Whether Muse Spark 1.3 caches a repeated prompt prefix
 - Real latencies for each call

@@ -523,8 +523,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 15,
- "updated_at": "2026-10-24T06:34:06.910Z",
+ "rev": 18,
+ "updated_at": "2026-10-24T06:37:11.217Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -736,13 +736,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.",
    "timebox": "1.5 h",
    "fallback": "Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.",
-   "status": "todo",
-   "note": "",
+   "status": "blocked",
+   "note": "Script and notes written from the docs: spikes/sam_spike.py (5 heart phrases x2 plus text, streamed, parsed with meta-sam-parser, overlays to spikes/out/sam/), spikes/sam.md. Parser wiring and mask placement checked offline with the docs example. Blocked on the API key.",
    "done_at": null,
    "tags": [
     "spike",
     "models"
-   ]
+   ],
+   "changed_at": "2026-10-24T06:37:11.217Z"
   },
   {
    "id": "d1-7",
@@ -1650,6 +1651,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Do not use muse-wonder-1.0 in the product. Muse Spark 1.3 stays on S1, S3 and answers. Only if Spark misses 80 percent part recall on the authoring eval, run S1 on Wonder for those 20 figures as a measured comparison; it is a model id change on the same request.",
    "why": "Docs (dev.meta.ai/docs/models#muse-wonder, read Oct 24): Wonder is a preview model for long-horizon agentic and multi-file coding work, at 4.00 in and 20.00 out per 1M tokens versus Spark 1.25 and 4.25 (3.2x and 4.7x), Standard mode only. Our calls are short and latency bound: answers must start in under 2 s, and the budget is 150 USD.",
    "changed_at": "2026-10-24T06:13:43.802Z"
+  },
+  {
+   "id": "dec-mvm10pl867ql",
+   "date": "2026-10-24",
+   "title": "SAM 3.1 request shape from the docs",
+   "decision": "Use model id sam-3.1 on POST /v1/responses, streamed, one noun phrase per call, one_bit masks with include_confidence, parsed with meta-sam-parser 0.1.0. Masks are box-local. PLAN.md 5.4 and 17, CLAUDE.md and .env.example updated. The live spike confirms the id against sam-3-1.",
+   "why": "The API docs (dev.meta.ai/docs/sam/*, read Oct 24) use sam-3.1 and the Responses API with special-token text output, while the kit and the product page said sam-3-1 and assumed an OpenAI style call. The meta-api-spike skill says to update PLAN.md when the shape differs.",
+   "changed_at": "2026-10-24T06:37:11.186Z"
   }
  ],
  "risks": [
@@ -1712,6 +1721,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T06:37:11.217Z",
+   "kind": "claude",
+   "text": "Task d1-6 \"Spike SAM 3.1\" is now blocked. Note: Script and notes written from the docs: spikes/sam_spike.py (5 heart phrases x2 plus text, streamed, parsed with meta-sam-parser, overlays to spikes/out/sam/), spikes/sam.md. Parser wiring and mask placement checked offline with the docs example. Blocked on the API key."
+  },
+  {
+   "ts": "2026-10-24T06:37:11.186Z",
+   "kind": "claude",
+   "text": "Decision: SAM 3.1 request shape from the docs."
+  },
+  {
+   "ts": "2026-10-24T06:34:59.955Z",
+   "kind": "claude",
+   "text": "Task d1-6 \"Spike SAM 3.1\" is now doing."
+  },
   {
    "ts": "2026-10-24T06:34:06.910Z",
    "kind": "claude",
