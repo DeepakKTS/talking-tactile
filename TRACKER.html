@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 78,
- "updated_at": "2026-10-24T17:56:00.754Z",
+ "rev": 82,
+ "updated_at": "2026-10-24T18:11:50.880Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1072,13 +1072,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "POST /api/figures, GET status, regions.json, tactile.svg, print.pdf, PATCH a region, POST publish. Request id, JSON logs, error envelope, upload guard, CORS. API test runs the synthetic figure end to end.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 5525b68 on early-start. POST /api/figures (idempotent per image, options and edit version), GET status, draft regions.json, tactile.svg, print.pdf, PATCH /regions/{rid} (label, describe, merge, delete), POST /regions (add by name through SAM, cached), POST publish (numbered read-only copies in data/published), GET published index and published/{n or latest}/{file} for Explore. Figure id checked as 64 lowercase hex before any path, also inside FigureCache. Edits are a versioned SQLite layer, replayed on S3 parts before S4; their hash joins the S4 and S5 keys, so an edit re-runs S4 and S5 only. Middleware: request id (echoed when well formed), JSON logs with stage, ms, cost and the request id carried into pipeline tasks, error envelope, upload guard (Content-Length over 10 MB plus form slack is 413 before reading; S0 refuses the rest; PNG, JPEG or one PDF page), CORS for localhost:5173 only. ETag is the sha256, 304 on If-None-Match. 29 API tests (end to end upload, edit, publish, fetch; duplicate; concurrent double submit; concurrent publish and edits, which fail without the lock; 10 bad id and traversal paths; oversized; wrong type; bad edits; CORS; live mode 503), 15 edit tests. Smoke tested over HTTP with uvicorn. Found and fixed: regions.json wrote grade_band null when no grade band was given, so S5 failed.",
+   "done_at": "2026-10-24T18:11:50.880Z",
    "tags": [
     "api"
    ],
-   "changed_at": "2026-10-24T17:24:14.425Z"
+   "changed_at": "2026-10-24T18:11:50.880Z"
   },
   {
    "id": "d3-10",
@@ -1087,14 +1087,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "S1 and S2 keys hash the prompt file and response schema (prompts in app/prompts/). Every key includes the digests of the upstream outputs it consumed. Mock mode keys hash the fixture files. A test for each that would have caught the silent stale hit.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 5525b68 on early-start. Prompts moved to app/prompts/s1_understand.v1.json and s2_ground.v1.json; the Prompt object hashed into the key is the one passed to the client. S1 and S2 keys add the response schema digest and MetaClient.cache_tag (mock: sha256 over the fixture files). Every key adds the digests of the upstream outputs it consumed; each entry writes .digest last and a hit must match it, so a damaged entry is rebuilt. Tests, each checked to fail with its key input removed: one character in the S1 prompt re-runs S1 to S5; a new S1 answer under the same key re-runs S2 to S5 with S0 cached and the new title in regions.json; an edited truth.json re-runs S1 to S5 with no manual deletion. Mock synthetic cold S1 60, S2 26, S3 115, S4 405, S5 66 ms; warm hits 0 to 3 ms each including digest checks.",
+   "done_at": "2026-10-24T18:11:50.851Z",
    "tags": [
     "pipeline",
     "cache"
    ],
-   "changed_at": "2026-10-24T17:56:00.754Z"
+   "changed_at": "2026-10-24T18:11:50.851Z"
   },
   {
    "id": "d4-1",
@@ -1874,6 +1874,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "print.pdf is the sheet followed by key pages; the key lists each abbreviation used on the sheet and each texture sample with its meaning, in braille with print notes. tactile.svg is the sheet only, in layers guides, textures, outlines, braille.",
    "why": "PLAN.md S5 lists key as a tactile.svg layer, but the figure fills the page inside the 1 inch margin and a key of 5 to 25 braille rows does not fit beside it. BANA allows the key on a separate page. Explore needs only the sheet.",
    "changed_at": "2026-10-24T17:23:32.917Z"
+  },
+  {
+   "id": "dec-mvmpu1s1k9q9",
+   "date": "2026-10-24",
+   "title": "Stage cache key chain",
+   "decision": "Each key hashes the previous key and the digests of the upstream outputs the stage reads, plus prompt file, response schema and client cache tag for S1 and S2 (code hash, config and options for S3 to S5, edit layer for S4 and S5). Entries store a digest of their files and a hit must match it.",
+   "why": "Covers every silent stale hit found in review (prompt edits, a changed S1 answer, edited mock fixtures). Keeping the previous key gives up early cutoff: S3 re-runs even when S2's output is byte-identical, which costs about 100 ms of code and no Meta call.",
+   "changed_at": "2026-10-24T18:11:50.788Z"
+  },
+  {
+   "id": "dec-mvmpu1sz43sc",
+   "date": "2026-10-24",
+   "title": "Figure API idempotency and locks",
+   "decision": "A repeated upload returns the newest job with the same figure id, options and edit version that has not failed. One admission lock per figure for submit, edit and publish; runs of one figure queue on a second lock that admission never waits on. Edits name regions and act on the reconciled part (r3_2 is part r3); added parts are t1, t2 in edit order.",
+   "why": "Two simultaneous requests cannot start two runs or take the same edit or published version, and a request never waits behind a 90 second live pipeline run. Other options (grade band, page) are a different sheet, so they get their own job.",
+   "changed_at": "2026-10-24T18:11:50.821Z"
   }
  ],
  "risks": [
@@ -1936,6 +1952,26 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T18:11:50.880Z",
+   "kind": "claude",
+   "text": "Task d3-9 \"Figure API routes and middleware\" is now done. Note: Commit 5525b68 on early-start. POST /api/figures (idempotent per image, options and edit version), GET status, draft regions.json, tactile.svg, print.pdf, PATCH /regions/{rid} (label, describe, merge, delete), POST /regions (add by name through SAM, cached), POST publish (numbered read-only copies in data/published), GET published index and published/{n or latest}/{file} for Explore. Figure id checked as 64 lowercase hex before any path, also inside FigureCache. Edits are a versioned SQLite layer, replayed on S3 parts before S4; their hash joins the S4 and S5 keys, so an edit re-runs S4 and S5 only. Middleware: request id (echoed when well formed), JSON logs with stage, ms, cost and the request id carried into pipeline tasks, error envelope, upload guard (Content-Length over 10 MB plus form slack is 413 before reading; S0 refuses the rest; PNG, JPEG or one PDF page), CORS for localhost:5173 only. ETag is the sha256, 304 on If-None-Match. 29 API tests (end to end upload, edit, publish, fetch; duplicate; concurrent double submit; concurrent publish and edits, which fail without the lock; 10 bad id and traversal paths; oversized; wrong type; bad edits; CORS; live mode 503), 15 edit tests. Smoke tested over HTTP with uvicorn. Found and fixed: regions.json wrote grade_band null when no grade band was given, so S5 failed."
+  },
+  {
+   "ts": "2026-10-24T18:11:50.851Z",
+   "kind": "claude",
+   "text": "Task d3-10 \"Cache keys cover prompts, upstream outputs and mock fixtures\" is now done. Note: Commit 5525b68 on early-start. Prompts moved to app/prompts/s1_understand.v1.json and s2_ground.v1.json; the Prompt object hashed into the key is the one passed to the client. S1 and S2 keys add the response schema digest and MetaClient.cache_tag (mock: sha256 over the fixture files). Every key adds the digests of the upstream outputs it consumed; each entry writes .digest last and a hit must match it, so a damaged entry is rebuilt. Tests, each checked to fail with its key input removed: one character in the S1 prompt re-runs S1 to S5; a new S1 answer under the same key re-runs S2 to S5 with S0 cached and the new title in regions.json; an edited truth.json re-runs S1 to S5 with no manual deletion. Mock synthetic cold S1 60, S2 26, S3 115, S4 405, S5 66 ms; warm hits 0 to 3 ms each including digest checks."
+  },
+  {
+   "ts": "2026-10-24T18:11:50.821Z",
+   "kind": "claude",
+   "text": "Decision: Figure API idempotency and locks."
+  },
+  {
+   "ts": "2026-10-24T18:11:50.788Z",
+   "kind": "claude",
+   "text": "Decision: Stage cache key chain."
+  },
   {
    "ts": "2026-10-24T17:56:00.754Z",
    "kind": "claude",

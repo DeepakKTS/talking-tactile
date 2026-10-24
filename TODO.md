@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 78, updated 2026-10-24T17:56:00.754Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 82, updated 2026-10-24T18:11:50.880Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -118,10 +118,12 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d3-8 Pipeline runner with stage cache and SQLite jobs (2 h)
   - S0 to S5 in order, content-hash cache per stage under data/figures/<sha256>/, job records in SQLite with stage timings, mock S1 and S2.
   - Note: Commit 73687bf on early-start. app/pipeline/runner.py: submit runs S0 (bad upload makes no job), run takes S1 to S5 with mock S1 and S2. One file per stage s1_understand to s5_render, each with save and load for the cache. Cache under data/figures/<figure_id>/<stage>/<key>/, key chain over the previous key: S1 and S2 on client mode, version, max_parts and text phrase (a code change never pays for a call again); S3 to S5 on the source hash, config and job options. Resumes after the latest cached stage, rebuilds an unreadable entry, writes through a temp dir and rename. S2 keeps to sam_concurrency (tested at 4). describe_only stops after S1. SQLite jobs and stage_runs (ran, cached, skipped; ms; cost). Mock synthetic figure: cold run S0 65, S1 47, S2 23, S3 106, S4 403, S5 65 ms (1.16 s process); same upload again 55 ms with zero Meta calls, same regions.json. 12 tests, 319 api tests pass. Live mode waits on d1-8. Numbered overlay Spark pass in S3 not built (needs the spike).
-- [ ] d3-9 Figure API routes and middleware (2 h)
+- [x] d3-9 Figure API routes and middleware (2 h)
   - POST /api/figures, GET status, regions.json, tactile.svg, print.pdf, PATCH a region, POST publish. Request id, JSON logs, error envelope, upload guard, CORS. API test runs the synthetic figure end to end.
-- [ ] d3-10 Cache keys cover prompts, upstream outputs and mock fixtures (1.5 h) [doing]
+  - Note: Commit 5525b68 on early-start. POST /api/figures (idempotent per image, options and edit version), GET status, draft regions.json, tactile.svg, print.pdf, PATCH /regions/{rid} (label, describe, merge, delete), POST /regions (add by name through SAM, cached), POST publish (numbered read-only copies in data/published), GET published index and published/{n or latest}/{file} for Explore. Figure id checked as 64 lowercase hex before any path, also inside FigureCache. Edits are a versioned SQLite layer, replayed on S3 parts before S4; their hash joins the S4 and S5 keys, so an edit re-runs S4 and S5 only. Middleware: request id (echoed when well formed), JSON logs with stage, ms, cost and the request id carried into pipeline tasks, error envelope, upload guard (Content-Length over 10 MB plus form slack is 413 before reading; S0 refuses the rest; PNG, JPEG or one PDF page), CORS for localhost:5173 only. ETag is the sha256, 304 on If-None-Match. 29 API tests (end to end upload, edit, publish, fetch; duplicate; concurrent double submit; concurrent publish and edits, which fail without the lock; 10 bad id and traversal paths; oversized; wrong type; bad edits; CORS; live mode 503), 15 edit tests. Smoke tested over HTTP with uvicorn. Found and fixed: regions.json wrote grade_band null when no grade band was given, so S5 failed.
+- [x] d3-10 Cache keys cover prompts, upstream outputs and mock fixtures (1.5 h)
   - S1 and S2 keys hash the prompt file and response schema (prompts in app/prompts/). Every key includes the digests of the upstream outputs it consumed. Mock mode keys hash the fixture files. A test for each that would have caught the silent stale hit.
+  - Note: Commit 5525b68 on early-start. Prompts moved to app/prompts/s1_understand.v1.json and s2_ground.v1.json; the Prompt object hashed into the key is the one passed to the client. S1 and S2 keys add the response schema digest and MetaClient.cache_tag (mock: sha256 over the fixture files). Every key adds the digests of the upstream outputs it consumed; each entry writes .digest last and a hit must match it, so a damaged entry is rebuilt. Tests, each checked to fail with its key input removed: one character in the S1 prompt re-runs S1 to S5; a new S1 answer under the same key re-runs S2 to S5 with S0 cached and the new title in regions.json; an edited truth.json re-runs S1 to S5 with no manual deletion. Mock synthetic cold S1 60, S2 26, S3 115, S4 405, S5 66 ms; warm hits 0 to 3 ms each including digest checks.
 
 ## Day 4: Thu Oct 29
 
