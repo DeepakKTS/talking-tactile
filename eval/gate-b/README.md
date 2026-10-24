@@ -4,7 +4,11 @@ Gate B: mean fingertip error of 4 mm or less on the 9 point sheet. The protocol 
 decided before the run (TRACKER decision "When the Oct 25 touch test counts as Gate B"):
 the test sheet `spikes/tracking/test-sheet.pdf` printed at 100 percent with the 100 mm
 bar checked, the demo phone as the camera, 45 touches (9 targets times 5) and normal room
-lighting. A run that departs from any of these is a practice run, and Gate B stays pending.
+lighting. Added the same day (decision "Demo and Gate B run the page on the demo phone
+itself"): the page runs in the demo phone's own browser, not through Continuity Camera;
+the phone sits in a fixed mount for the whole run; and after calibration the drawn
+outline is checked against the printed corner marks and targets before the first touch.
+A run that departs from any of these is a practice run, and Gate B stays pending.
 
 ## Before the run
 
@@ -13,6 +17,10 @@ lighting. A run that departs from any of these is a practice run, and Gate B sta
    JSON with `analyze_touch.py`: the contact point lands on every target. About 50 s.
 2. `cd spikes/tracking && npm test` passes. It includes the comparison with the shipped
    tracking code.
+3. The phone is in its mount, with all 4 corner marks in view, and it does not move until
+   the run ends.
+4. After calibration, the magenta outline and targets sit on the printed ones. If not,
+   press R and tap the corners again. Note in `run.md` that the check was done.
 
 ## What goes here
 

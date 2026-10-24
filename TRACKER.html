@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 102,
- "updated_at": "2026-10-24T23:00:47.371Z",
+ "rev": 103,
+ "updated_at": "2026-10-24T23:42:07.164Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1950,6 +1950,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Decided on Oct 24, before the run. The touch test on Oct 25 counts as Gate B only if it follows the gate protocol: the test sheet (spikes/tracking/test-sheet.pdf, printed at 100 percent with the 100 mm bar checked), the demo phone as the camera, the planned touch count (45 touches, 9 targets times 5, as the page plans them) and normal room lighting. A run that departs from any of these is a practice run: its numbers are logged, and Gate B stays pending.",
    "why": "Fixing the protocol before the result is known means a result cannot be relabeled afterward. A bad run cannot be called practice, and a good practice run cannot be promoted to the gate.",
    "changed_at": "2026-10-24T23:00:47.371Z"
+  },
+  {
+   "id": "dec-mvn1ms6xwe3m",
+   "date": "2026-10-24",
+   "title": "Demo and Gate B run the page on the demo phone itself",
+   "decision": "The demo and the Gate B touch test run the page in the demo phone's own browser, not on a laptop with the phone as its webcam (Continuity Camera). The phone sits in a fixed mount for the whole run. This adds a step to the Gate B protocol decided earlier on Oct 24: the phone is mounted, and after calibration the drawn outline is checked against the printed corner marks and targets before the first touch. A run without both is a practice run.",
+   "why": "The accuracy and latency numbers must come from the setup that ships: MediaPipe on the phone, the phone's camera and the phone's browser. Continuity Camera would measure the laptop's tracking instead. A fixed mount keeps the calibration valid for every touch, and checking the outline catches a bad corner tap before it reaches 45 touches.",
+   "changed_at": "2026-10-24T23:42:07.164Z"
   }
  ],
  "risks": [
@@ -2022,6 +2030,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-24T23:42:07.164Z",
+   "kind": "claude",
+   "text": "Decision: Demo and Gate B run the page on the demo phone itself."
+  },
   {
    "ts": "2026-10-24T23:00:47.371Z",
    "kind": "claude",

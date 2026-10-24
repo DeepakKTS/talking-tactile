@@ -18,7 +18,7 @@ No QR codes, no stickers, no special tablet. The camera and the models do the wo
 | | Author mode | Explore mode |
 |---|---|---|
 | User | Teacher of students with visual impairments, or a transcriber | Student who is blind or has low vision |
-| Device | Laptop browser | Phone or laptop with a camera looking down at the sheet |
+| Device | Laptop browser | Phone or laptop with a camera looking down at the sheet. The demo and Gate B use the phone's own browser (section 17) |
 | Input | A figure image or PDF page | Fingertip position and voice |
 | Output | Tactile SVG, print PDF at 1:1, regions.json | Earcons, spoken labels, spoken answers, guidance |
 | Needs a screen | Yes | No |
@@ -259,4 +259,4 @@ Stretch (after the hackathon unless everything is green)
 - Whether Muse Spark 1.3 caches a repeated prompt prefix
 - Real latencies for each call
 - What the Official Rules require: public repo, video length, open source license
-- Whether Explore runs fast enough in a phone browser, or needs a laptop with the phone as a webcam
+- Where Explore runs. Decided Oct 24: the demo and Gate B run the page in the demo phone's own browser, in a fixed mount, not on a laptop with the phone as its webcam (Continuity Camera). The measured accuracy and latency are then the shipped setup's. Whether it is fast enough is measured on that phone (d2-5, Gate B). A shortfall calls for a new decision, not a quiet switch to the laptop
