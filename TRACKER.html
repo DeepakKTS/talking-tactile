@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 41,
- "updated_at": "2026-10-24T16:34:07.474Z",
+ "rev": 42,
+ "updated_at": "2026-10-24T16:36:21.817Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -813,13 +813,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Load and validate config/tactile_rules.yaml and config/explore.yaml at startup in Python and TypeScript. Tests for missing and invalid values. No magic numbers elsewhere.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 2e0ec29. Python app/config.py: pydantic, strict types, extra keys forbidden, no defaults; create_app refuses to start on a bad value; max_area_textures checked against the schema limit. 40 config tests (missing file, YAML syntax, non-mapping, 19 tactile and 14 explore bad values, file named in the error). TypeScript src/shared/config.ts: explore.yaml bundled by a Vite transform, zod strictObject, validated on import in main.tsx; 19 vitest tests. Totals: 92 pytest, 66 vitest.",
+   "done_at": "2026-10-24T16:36:21.817Z",
    "tags": [
     "config"
    ],
-   "changed_at": "2026-10-24T16:34:07.474Z"
+   "changed_at": "2026-10-24T16:36:21.817Z"
   },
   {
    "id": "d2-1",
@@ -1783,6 +1783,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:36:21.817Z",
+   "kind": "claude",
+   "text": "Task d1-11 \"Config loaders\" is now done. Note: Commit 2e0ec29. Python app/config.py: pydantic, strict types, extra keys forbidden, no defaults; create_app refuses to start on a bad value; max_area_textures checked against the schema limit. 40 config tests (missing file, YAML syntax, non-mapping, 19 tactile and 14 explore bad values, file named in the error). TypeScript src/shared/config.ts: explore.yaml bundled by a Vite transform, zod strictObject, validated on import in main.tsx; 19 vitest tests. Totals: 92 pytest, 66 vitest."
+  },
   {
    "ts": "2026-10-24T16:34:07.474Z",
    "kind": "claude",
