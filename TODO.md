@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 45, updated 2026-10-24T16:44:02.386Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 53, updated 2026-10-24T16:48:16.684Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -99,13 +99,17 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Muse Spark structured output: type, title, summary, parts, color meaning, verdict.
 - [ ] d3-3 S2 ground (2 h)
   - One SAM 3.1 call per phrase, four at a time, plus print text.
-- [ ] d3-4 S3 reconcile (2 h)
+- [x] d3-4 S3 reconcile (2 h)
   - Merge near duplicates, nest contained parts, drop slivers, numbered overlay mapping.
-- [ ] d3-5 Unit tests for overlap rules (1 h)
+  - Note: Commit d9ad1aa. app/geometry/reconcile.py, pure, on Masks. On the synthetic raw masks: 8 parts out, each cleaned part equals its truth mask (speck, text leak, duplicate and sliver handled), core nested under outer chamber, the 45 mm2 lobe overlap goes to the smaller lobe. 82 ms p50 for 10 parts and 8 text masks at 1479 x 2048. The Muse Spark numbered-overlay mapping is not built; it needs the key.
+- [x] d3-5 Unit tests for overlap rules (1 h)
   - pytest cases for merge, contain, partial overlap.
+  - Note: Written first, in the d3-4 commit d9ad1aa: 17 unit cases (text, specks, sliver, duplicate at and below 0.8 IoU, nested chains, the 0.95 containment threshold, overlap to the smaller part and tie on score, trim speck cleanup, size mismatch) and a 300-example hypothesis property test.
 - [x] d3-6 Synthetic test figure (2 h)
   - Generator for fixtures/synthetic/: about 8 labeled shapes with a nested part, two neighbors inside the minimum gap, one part below the point symbol size, fill colors that carry meaning, printed labels, and SAM-like raw masks with a near duplicate, a partial overlap, a sliver, a speck and a text leak. Outputs figure.png, exact truth masks and truth.json. Every geometry test uses it.
   - Note: Commit 0a108bd. Mask type (read-only 2-D bool, label, score, source sam/teacher/synthetic; 16 tests). Generator app/synthetic: exact shapes rasterized at pixel centers, 1479 x 2048 px on the Letter figure area (8.959 px/mm). 8 parts: nested core (clearance above 2x min gap), lobes 2.0 mm apart (only pair under 3.2 mm, checked by distance transform), 4.0 mm pore (only part under 6.4 mm), 4 color categories on a k5 sheet (limit 3). Raw masks: duplicate IoU above 0.8, 45 mm2 lobe overlap, 0.25 mm sliver, 0.8 mm2 speck, text leak equal to the label mask. 12 tests incl. regenerate-and-compare. 168 KB on disk. Totals 130 pytest, 66 vitest.
+- [ ] d3-7 Vectorize masks and scale to page mm (1.5 h) [doing]
+  - Contour tracing, simplification to at most 200 points, fit into the Letter or A4 figure area, pixel to mm. Property tests on random shapes.
 
 ## Day 4: Thu Oct 29
 
@@ -120,6 +124,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d4-5 Print two copies and trace with puffy paint (1 h)
   - Let them dry overnight. Tape the sheet edges for the demo.
   - Fallback: Hot glue or layered card.
+- [ ] d4-6 Centroids and neighbor directions (1 h)
+  - Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.
+- [ ] d4-7 Tactile rules validator (1.5 h)
+  - tactile-rules-check skill: gaps, texture count, point symbol size, polygon validity and page bounds, later braille and SVG ids. Must find every planted violation in the synthetic figure before the fixes and none after.
 
 ## Day 5: Fri Oct 30. Gate C
 
