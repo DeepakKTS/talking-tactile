@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "figure_id": "4f2a9c0d1b7e3a5f6c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
+  "title": "Golden contract figure",
+  "figure_type": "labeled_diagram",
+  "grade_band": "9_12",
+  "page": { "size": "letter", "width_mm": 215.9, "height_mm": 279.4 },
+  "summary": "A test figure with four parts. One part sits inside another.",
+  "textures": [
+    { "id": "dots", "meaning": "chamber", "earcon_hz": 440 },
+    { "id": "lines", "meaning": "vessel", "earcon_hz": 523.25 }
+  ],
+  "regions": [
+    {
+      "id": "r1",
+      "label": "outer chamber",
+      "abbrev": "oc",
+      "description": "The large chamber that holds the core.",
+      "polygon_mm": [[40, 60], [120, 60], [120, 140], [40, 140]],
+      "centroid_mm": [80, 100],
+      "texture": "dots",
+      "parent": null,
+      "neighbors": [
+        { "id": "r2", "direction": "inside" },
+        { "id": "r3", "direction": "right" }
+      ],
+      "source": "sam",
+      "confidence": 0.91,
+      "verified_by_teacher": true
+    },
+    {
+      "id": "r2",
+      "label": "core",
+      "polygon_mm": [[65, 85], [95, 85], [95, 115], [65, 115]],
+      "centroid_mm": [80, 100],
+      "texture": "lines",
+      "parent": "r1",
+      "neighbors": [{ "id": "r1", "direction": "around" }],
+      "source": "sam",
+      "confidence": 0.84,
+      "verified_by_teacher": false
+    },
+    {
+      "id": "r3",
+      "label": "right vessel",
+      "abbrev": "rv",
+      "polygon_mm": [[130, 70], [175, 70], [175.5, 130.25], [130, 130]],
+      "centroid_mm": [152.6, 100.1],
+      "texture": "lines",
+      "parent": null,
+      "neighbors": [
+        { "id": "r1", "direction": "left" },
+        { "id": "r4", "direction": "down_left" }
+      ],
+      "source": "teacher",
+      "verified_by_teacher": true
+    },
+    {
+      "id": "r4",
+      "label": "valve",
+      "polygon_mm": [[80, 160], [86.4, 160], [86.4, 166.4], [80, 166.4]],
+      "parent": null,
+      "source": "sam",
+      "confidence": 0.5,
+      "verified_by_teacher": false
+    }
+  ]
+}

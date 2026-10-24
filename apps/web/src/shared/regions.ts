@@ -1,0 +1,28 @@
+// regions.json in the browser. docs/regions.schema.json is the source of truth:
+// the types are generated from it (regions.gen.ts) and parseRegions validates against it.
+import Ajv2020 from "ajv/dist/2020";
+import schema from "../../../../docs/regions.schema.json";
+import type { TalkingTactileRegionsFile } from "./regions.gen";
+
+export type RegionsFile = TalkingTactileRegionsFile;
+export type Region = RegionsFile["regions"][number];
+export type Texture = RegionsFile["textures"][number];
+export type Neighbor = NonNullable<Region["neighbors"]>[number];
+export type Direction = Neighbor["direction"];
+export type PointMm = Region["polygon_mm"][number];
+
+export class RegionsError extends Error {
+  override name = "RegionsError";
+}
+
+const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true });
+const validate = ajv.compile<RegionsFile>(schema);
+
+// Returns the input typed as a RegionsFile, or throws RegionsError listing every problem.
+export function parseRegions(data: unknown): RegionsFile {
+  if (validate(data)) return data;
+  const problems = (validate.errors ?? []).map(
+    (e) => `${e.instancePath || "/"} ${e.message ?? "is invalid"}`,
+  );
+  throw new RegionsError(`regions.json is invalid: ${problems.join("; ")}`);
+}
