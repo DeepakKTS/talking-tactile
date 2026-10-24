@@ -523,8 +523,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 18,
- "updated_at": "2026-10-24T06:37:11.217Z",
+ "rev": 20,
+ "updated_at": "2026-10-24T06:41:58.912Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -752,13 +752,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Stream 10 seconds of audio. Get partial and final text. Try keyword hints.",
    "timebox": "1 h",
    "fallback": "Use push-to-talk sync mode if realtime is awkward.",
-   "status": "todo",
-   "note": "",
+   "status": "blocked",
+   "note": "Script and notes written from the docs: spikes/voice_spike.py (9.3 s say question with 6 domain terms; 24 kHz with and without keywords, 16 kHz with keywords, 4 runs each; plus the file endpoint), spikes/muse-voice.md. Client checked against a local fake server: pacing 1.005x real time, close 1000. PLAN.md section 17 updated. Blocked on the API key.",
    "done_at": null,
    "tags": [
     "spike",
     "models"
-   ]
+   ],
+   "changed_at": "2026-10-24T06:41:58.912Z"
   },
   {
    "id": "d1-8",
@@ -1721,6 +1722,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T06:41:58.912Z",
+   "kind": "claude",
+   "text": "Task d1-7 \"Spike Muse Voice Transcribe\" is now blocked. Note: Script and notes written from the docs: spikes/voice_spike.py (9.3 s say question with 6 domain terms; 24 kHz with and without keywords, 16 kHz with keywords, 4 runs each; plus the file endpoint), spikes/muse-voice.md. Client checked against a local fake server: pacing 1.005x real time, close 1000. PLAN.md section 17 updated. Blocked on the API key."
+  },
+  {
+   "ts": "2026-10-24T06:37:24.153Z",
+   "kind": "claude",
+   "text": "Task d1-7 \"Spike Muse Voice Transcribe\" is now doing."
+  },
   {
    "ts": "2026-10-24T06:37:11.217Z",
    "kind": "claude",

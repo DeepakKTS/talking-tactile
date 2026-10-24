@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 18, updated 2026-10-24T06:37:11.217Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 20, updated 2026-10-24T06:41:58.912Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -47,9 +47,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.
   - Fallback: Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.
   - Note: Script and notes written from the docs: spikes/sam_spike.py (5 heart phrases x2 plus text, streamed, parsed with meta-sam-parser, overlays to spikes/out/sam/), spikes/sam.md. Parser wiring and mask placement checked offline with the docs example. Blocked on the API key.
-- [ ] d1-7 Spike Muse Voice Transcribe (1 h)
+- [ ] d1-7 Spike Muse Voice Transcribe (1 h) [blocked]
   - Stream 10 seconds of audio. Get partial and final text. Try keyword hints.
   - Fallback: Use push-to-talk sync mode if realtime is awkward.
+  - Note: Script and notes written from the docs: spikes/voice_spike.py (9.3 s say question with 6 domain terms; 24 kHz with and without keywords, 16 kHz with keywords, 4 runs each; plus the file endpoint), spikes/muse-voice.md. Client checked against a local fake server: pacing 1.005x real time, close 1000. PLAN.md section 17 updated. Blocked on the API key.
 - [ ] d1-8 Meta client wrapper (2 h)
   - Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.
 - [ ] d1-9 Gate A check (15 min)
