@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 53,
- "updated_at": "2026-10-24T16:48:16.684Z",
+ "rev": 55,
+ "updated_at": "2026-10-24T16:50:31.400Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1025,13 +1025,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Contour tracing, simplification to at most 200 points, fit into the Letter or A4 figure area, pixel to mm. Property tests on random shapes.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit c891307. PageFit (centered fit into the figure area, page mm and back) and mask_to_polygons_mm (contours, mitred half-pixel offset, per-piece polygons, Douglas-Peucker 0.1 mm doubled to the 200 point cap). 13 tests incl. 3 hypothesis properties. Synthetic: worst Hausdorff 0.081 mm, area error under 1 percent, 4 to 65 points per part, 7 ms for 8 parts.",
+   "done_at": "2026-10-24T16:50:31.370Z",
    "tags": [
     "geometry"
    ],
-   "changed_at": "2026-10-24T16:48:16.684Z"
+   "changed_at": "2026-10-24T16:50:31.370Z"
   },
   {
    "id": "d4-1",
@@ -1040,13 +1040,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Polygons in mm, gap enforcement, textures, point symbols.",
    "timebox": "3 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
+   "status": "doing",
+   "note": "Point symbols, gap enforcement by shrinking, textures by color group within the grade limit.",
    "done_at": null,
    "tags": [
     "backend",
     "author"
-   ]
+   ],
+   "changed_at": "2026-10-24T16:50:31.400Z"
   },
   {
    "id": "d4-2",
@@ -1846,6 +1847,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:50:31.400Z",
+   "kind": "claude",
+   "text": "Task d4-1 \"S4 layout\" is now doing. Note: Point symbols, gap enforcement by shrinking, textures by color group within the grade limit."
+  },
+  {
+   "ts": "2026-10-24T16:50:31.370Z",
+   "kind": "claude",
+   "text": "Task d3-7 \"Vectorize masks and scale to page mm\" is now done. Note: Commit c891307. PageFit (centered fit into the figure area, page mm and back) and mask_to_polygons_mm (contours, mitred half-pixel offset, per-piece polygons, Douglas-Peucker 0.1 mm doubled to the 200 point cap). 13 tests incl. 3 hypothesis properties. Synthetic: worst Hausdorff 0.081 mm, area error under 1 percent, 4 to 65 points per part, 7 ms for 8 parts."
+  },
   {
    "ts": "2026-10-24T16:48:16.684Z",
    "kind": "claude",
