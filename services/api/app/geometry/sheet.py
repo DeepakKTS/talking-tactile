@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict
 
+from app.braille.models import Placement
 from app.geometry.layout import LayoutRegion
 from app.models.regions import GradeBand, PageSize, Texture
 
@@ -13,3 +14,4 @@ class Sheet(BaseModel):
     grade_band: GradeBand | None
     regions: list[LayoutRegion]
     textures: list[Texture]
+    braille: list[Placement] = []

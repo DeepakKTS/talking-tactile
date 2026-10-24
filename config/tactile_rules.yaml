@@ -18,8 +18,14 @@ braille:                     # BANA signage guideline values. Paper braille may 
   cell_to_cell_mm: [6.1, 7.6]      # corresponding dots in adjacent cells
   line_spacing_mm: 10.2            # dot 1 to dot 1, NPS Harpers Ferry tactile map guidelines
   clearance_to_line_mm: 3.7        # braille dots to nearest tactile line, NPS guidelines
+  dot_to_dot_mm: [2.3, 2.5]        # dots in the same cell. ADA 2010 Standards table 703.3.1, the
+                                   # source of the signage ranges above. Placement uses the low end of each range
   table: en-ueb-g2.ctb             # liblouis Unified English Braille, grade 2
   display: unicode.dis
+  search_step_mm: 0.5              # placement search grid. Engineering
+  max_outside_offset_mm: 15.0      # an abbreviation placed beside its part stays this close. Engineering
+  abbrev_letters: 2                # abbreviations start this long and grow until unique. Engineering
+  translate_timeout_s: 10.0        # one lou_translate call for all labels of a figure
 
 page:
   sizes: [letter, a4]

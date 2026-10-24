@@ -2,10 +2,10 @@
 with the regions involved, the rule, the measured value and the limit. It never fixes or
 loosens anything: fixes belong in the geometry stages.
 
-Checks so far: ids and parents, polygon validity and the point cap, inside the figure
-area, the minimum gap between outlines and inside a parent, the point symbol size, and
-the area texture count for the grade band. Braille clearance and SVG ids are added with
-the braille and render stages.
+Checks: ids and parents, polygon validity and the point cap, inside the figure area, the
+minimum gap between outlines and inside a parent, the point symbol size, the area texture
+count for the grade band, and braille: clearance to every line, the gap between braille
+blocks, and never sitting on another part. SVG ids are checked with the render stage.
 """
 
 import itertools
@@ -13,6 +13,7 @@ from collections import Counter
 
 from pydantic import BaseModel, ConfigDict
 from shapely.geometry import box
+from shapely.ops import unary_union
 
 from app.config import TactileRules
 from app.geometry.layout import LayoutRegion, size_mm
@@ -194,6 +195,70 @@ def _textures(sheet: Sheet, rules: TactileRules) -> list[Violation]:
     return out
 
 
+def _braille(sheet: Sheet, rules: TactileRules) -> list[Violation]:
+    if not sheet.braille:
+        return []
+    clearance = rules.braille.clearance_to_line_mm
+    gap = rules.spacing.min_gap_mm
+    ax, ay, aw, ah = rules.page.figure_area_mm(sheet.page)
+    area = box(ax, ay, ax + aw, ay + ah).buffer(_EPS)
+    by_id = {r.id: r for r in sheet.regions}
+    lines = unary_union([r.polygon.exterior for r in sheet.regions])
+    out: list[Violation] = []
+    for p in sheet.braille:
+        rect, rid = p.line.rect, p.region_id
+        if not rect.within(area):
+            out.append(
+                Violation(
+                    rule="inside_page",
+                    regions=[rid],
+                    measured=0,
+                    limit=0,
+                    message=f"braille for {rid} is outside the figure area",
+                )
+            )
+        d = float(rect.distance(lines))
+        if d < clearance - _EPS:
+            out.append(
+                Violation(
+                    rule="braille_clearance",
+                    regions=[rid],
+                    measured=d,
+                    limit=clearance,
+                    message=f"braille for {rid} is {d:.2f} mm from a line, "
+                    f"the minimum is {clearance} mm",
+                )
+            )
+        allowed = (_ancestors(by_id, rid) if rid in by_id else set()) | (
+            {rid} if p.inside else set()
+        )
+        for q in sheet.regions:
+            if q.id not in allowed and rect.intersects(q.polygon):
+                out.append(
+                    Violation(
+                        rule="braille_overlap",
+                        regions=[rid, q.id],
+                        measured=1,
+                        limit=0,
+                        message=f"braille for {rid} sits on {q.id}",
+                    )
+                )
+    for a, b in itertools.combinations(sheet.braille, 2):
+        d = float(a.line.rect.distance(b.line.rect))
+        if d < gap - _EPS:
+            out.append(
+                Violation(
+                    rule="braille_gap",
+                    regions=[a.region_id, b.region_id],
+                    measured=d,
+                    limit=gap,
+                    message=f"braille for {a.region_id} and {b.region_id} is "
+                    f"{d:.2f} mm apart, the minimum is {gap} mm",
+                )
+            )
+    return out
+
+
 def validate_sheet(sheet: Sheet, rules: TactileRules) -> list[Violation]:
     return [
         *_ids(sheet),
@@ -201,4 +266,5 @@ def validate_sheet(sheet: Sheet, rules: TactileRules) -> list[Violation]:
         *_gaps(sheet, rules),
         *_point_sizes(sheet, rules),
         *_textures(sheet, rules),
+        *_braille(sheet, rules),
     ]

@@ -6,6 +6,7 @@ UV := uv run --project $(API)
 .PHONY: dev api web install test test-api test-web lint typecheck eval check
 
 install:
+	@command -v lou_translate > /dev/null || { echo "liblouis is missing: brew install liblouis"; exit 1; }
 	cd $(API) && uv sync
 	cd $(WEB) && npm ci
 

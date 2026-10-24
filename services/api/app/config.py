@@ -83,13 +83,23 @@ class Braille(_Section):
     cell_to_cell_mm: tuple[PosFloat, PosFloat]
     line_spacing_mm: PosFloat
     clearance_to_line_mm: PosFloat
+    dot_to_dot_mm: tuple[PosFloat, PosFloat]
     table: Annotated[StrictStr, Field(min_length=1)]
     display: Annotated[StrictStr, Field(min_length=1)]
+    search_step_mm: PosFloat
+    max_outside_offset_mm: PosFloat
+    abbrev_letters: PosInt
+    translate_timeout_s: PosFloat
 
     @model_validator(mode="after")
     def _ranges(self) -> Self:
         _ordered("dot_base_diameter_mm", self.dot_base_diameter_mm)
         _ordered("cell_to_cell_mm", self.cell_to_cell_mm)
+        _ordered("dot_to_dot_mm", self.dot_to_dot_mm)
+        if 2 * self.dot_to_dot_mm[0] + self.dot_base_diameter_mm[0] >= self.line_spacing_mm:
+            raise ValueError("line_spacing_mm leaves no room between braille lines")
+        if self.dot_to_dot_mm[0] + self.dot_base_diameter_mm[0] >= self.cell_to_cell_mm[0]:
+            raise ValueError("cell_to_cell_mm leaves no room between braille cells")
         return self
 
 
