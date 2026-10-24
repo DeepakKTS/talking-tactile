@@ -12,9 +12,20 @@
 2. Explore, script mode (?source=script): hands are injected at 30 fps as worker results would
    arrive. Touches every part on the published sheet, checks earcon then label, then
    turns the network off and checks labels, earcons, guidance and the offline answer.
-   Measures Escape to speech stopped.
-3. Explore, camera mode: Chrome's fake camera and the real MediaPipe worker, with every request
+   Measures Escape to speech stopped. Real speechSynthesis, with speak() wrapped to record
+   the voice each utterance was given; every one must be a local voice (localService).
+3. Offline from load: a fresh page goes offline as soon as the published regions.json has
+   loaded, then a scripted finger touches every part and is guided to one. No request may
+   be made after that point.
+4. No local voice: getVoices() hides the local voices, as on a device with only network
+   voices. The page must show the notice, make the mirror polite and never call speak().
+5. Failed loads are told: regions.json refused with and without a saved copy.
+6. Explore, camera mode: Chrome's fake camera and the real MediaPipe worker, with every request
    that is not to this machine refused, so the wasm and the model must be local.
+
+Every page's requests are recorded. A request that fails, or answers 400 or more, fails the
+run unless the check that caused it also saw the page tell the user. The requests /explore
+made are printed by path.
 
 Prints the measured numbers as JSON and exits non-zero if a check fails.
 """
@@ -44,7 +55,48 @@ PAGE_MM = (215.9, 279.4)
 W, H = round(PAGE_MM[0] * SCALE), round(PAGE_MM[1] * SCALE)
 INSET = 12.7
 OFFLINE = "Questions need the network. Labels still work."
+NO_VOICE = "This device has no voice that works offline"
 SHOTS = ROOT / "data" / "e2e"  # git-ignored screenshots
+# Records the voice each utterance was given, then speaks it with the real speechSynthesis.
+SPEECH_JS = """
+(() => {
+  const rec = { spoken: [] };
+  window.__speech = rec;
+  const speak = speechSynthesis.speak.bind(speechSynthesis);
+  speechSynthesis.speak = (u) => {
+    rec.spoken.push({ text: u.text, voice: u.voice ? u.voice.name : null, local: !!(u.voice && u.voice.localService) });
+    speak(u);
+  };
+})();
+"""
+# A device whose voices all need the network.
+NETWORK_VOICES_JS = """
+(() => {
+  const voices = speechSynthesis.getVoices.bind(speechSynthesis);
+  speechSynthesis.getVoices = () => voices().filter((v) => !v.localService);
+})();
+"""
+
+
+class Requests:
+    """Every request a context makes, and the ones that failed or answered 400 or more."""
+
+    def __init__(self, context: Any, name: str) -> None:
+        self.name = name
+        self.seen: list[dict[str, Any]] = []
+        self.failed: list[dict[str, Any]] = []
+        self.told: list[str] = []  # failed urls a check saw the page explain
+        context.on("request", lambda r: self.seen.append({"url": r.url, "type": r.resource_type, "method": r.method}))
+        context.on("requestfailed", lambda r: self.failed.append({"url": r.url, "why": r.failure}))
+        context.on("response", lambda r: r.status >= 400 and self.failed.append({"url": r.url, "why": r.status}))
+
+    def told_about(self, part: str) -> list[dict[str, Any]]:
+        hits = [f for f in self.failed if part in f["url"]]
+        self.told += [f["url"] for f in hits]
+        return hits
+
+    def silent(self) -> list[dict[str, Any]]:
+        return [f for f in self.failed if f["url"] not in self.told]
 
 
 def free_port() -> int:
@@ -115,16 +167,86 @@ def log_len(page: Page) -> int:
     return page.evaluate("() => window.__tt.log.length")
 
 
-def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str]) -> dict[str, Any]:
+def explore_url(base: str, fid: str) -> str:
     corners = [INSET, INSET, PAGE_MM[0] - INSET, INSET, PAGE_MM[0] - INSET, PAGE_MM[1] - INSET, INSET, PAGE_MM[1] - INSET]
     q = ",".join(f"{c * SCALE:.3f}" for c in corners)
-    page.goto(f"{base}/explore?figure={fid}&source=script&corners={q}")
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
-    # Keyboard only from here: Start has the focus, Enter presses it.
+    return f"{base}/explore?figure={fid}&source=script&corners={q}"
+
+
+def start_by_keys(page: Page) -> None:
+    # Keyboard only: Start has the focus once the sheet loads, Enter presses it.
     page.wait_for_function("document.activeElement && document.activeElement.textContent === 'Start exploring'")
     page.keyboard.press("Enter")
     page.wait_for_function("window.__tt.started && window.__tt.calibrated", timeout=10000)
     page.wait_for_timeout(300)
+
+
+def says(page: Page, n: int) -> list[str]:
+    return [e.get("text", "") for e in log_since(page, n) if e["kind"] == "say"]
+
+
+def typed(page: Page, text: str) -> list[str]:
+    n = log_len(page)
+    page.get_by_label("Ask, or say where is, more, repeat, stop, what is here").focus()
+    page.keyboard.type(text)
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(300)
+    page.evaluate("() => document.activeElement.blur()")
+    return says(page, n)
+
+
+def touch_all(page: Page, regions: list[dict[str, Any]], rounds: int, fail: list[str], when: str) -> int:
+    """Touches each part's centroid in turn; each must give its earcon, then its label."""
+    ok = 0
+    for _ in range(rounds):
+        for r in regions:
+            n = log_len(page)
+            # A scripted finger jumps across the sheet; the 1 euro filter needs a moment to settle.
+            play(page, hold((5.0, 5.0), 300) + hold(tuple(r["centroid_mm"]), 1500) + hold((5.0, 5.0), 300))
+            got = [e for e in log_since(page, n) if e["kind"] in ("earcon", "say")]
+            want_say = r["label"][0].upper() + r["label"][1:]
+            if got[:2] and got[0]["kind"] == "earcon" and got[1:2] and got[1].get("text") == want_say:
+                ok += 1
+            else:
+                fail.append(f"{when}, touching {r['label']}: heard {got[:3]}")
+    return ok
+
+
+def guide_to_stem(page: Page, regions: list[dict[str, Any]], fail: list[str], when: str) -> dict[str, Any]:
+    """A typed "where is the stem": the sentence, beeps that speed up near it, then the chime."""
+    out: dict[str, Any] = {}
+    stem = next(r for r in regions if r["label"] == "stem")
+    start = (190.0, 260.0)
+    n = log_len(page)
+    play(page, hold(start, 300))
+    typed(page, "where is the stem")
+    play(page, hold(start, 3000))
+    guide = log_since(page, n)
+    said = [e["text"] for e in guide if e["kind"] == "say"]
+    beeps = [e for e in guide if e["kind"] == "beep"]
+    out["guidance_sentence"] = said[-1] if said else None
+    out["guidance_beeps_far"] = len(beeps)
+    if not said or not said[-1].startswith("Stem. Left"):
+        fail.append(f"{when}, guidance sentence: {said}")
+    n = log_len(page)
+    near = (stem["centroid_mm"][0] + 25, stem["centroid_mm"][1])
+    play(page, hold(near, 3000))
+    out["guidance_beeps_near"] = sum(e["kind"] == "beep" for e in log_since(page, n))
+    if out["guidance_beeps_near"] <= out["guidance_beeps_far"]:
+        fail.append(f"{when}, beeps did not speed up near the part")
+    n = log_len(page)
+    play(page, hold(tuple(stem["centroid_mm"]), 800))
+    arrive = log_since(page, n)
+    out["arrival"] = [e["kind"] if e["kind"] != "say" else e["text"] for e in arrive if e["kind"] in ("chime", "say")]
+    if "chime" not in out["arrival"] or "Stem" not in out["arrival"]:
+        fail.append(f"{when}, no chime and label on arrival: {arrive}")
+    return out
+
+
+def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str]) -> dict[str, Any]:
+    page.goto(explore_url(base, fid))
+    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    start_by_keys(page)
     out: dict[str, Any] = {}
 
     def keys(*presses: str) -> list[str]:
@@ -132,33 +254,9 @@ def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fai
         for k in presses:
             page.keyboard.press(k)
             page.wait_for_timeout(50)
-        return [e.get("text", "") for e in log_since(page, n) if e["kind"] == "say"]
+        return says(page, n)
 
-    def typed(text: str) -> list[str]:
-        n = log_len(page)
-        page.get_by_label("Ask, or say where is, more, repeat, stop, what is here").focus()
-        page.keyboard.type(text)
-        page.keyboard.press("Enter")
-        page.wait_for_timeout(300)
-        page.evaluate("() => document.activeElement.blur()")
-        return [e.get("text", "") for e in log_since(page, n) if e["kind"] == "say"]
-
-    def touch_all(rounds: int) -> int:
-        ok = 0
-        for _ in range(rounds):
-            for r in regions:
-                n = log_len(page)
-                # A scripted finger jumps across the sheet; the 1 euro filter needs a moment to settle.
-                play(page, hold((5.0, 5.0), 300) + hold(tuple(r["centroid_mm"]), 1500) + hold((5.0, 5.0), 300))
-                got = [e for e in log_since(page, n) if e["kind"] in ("earcon", "say")]
-                want_say = r["label"][0].upper() + r["label"][1:]
-                if got[:2] and got[0]["kind"] == "earcon" and got[1:2] and got[1].get("text") == want_say:
-                    ok += 1
-                else:
-                    fail.append(f"touching {r['label']}: heard {got[:3]}")
-        return ok
-
-    out["online_touches_ok"] = touch_all(3)
+    out["online_touches_ok"] = touch_all(page, regions, 3, fail, "online")
     lobe = next(r for r in regions if r["label"] == "left lobe")
     play(page, hold(tuple(lobe["centroid_mm"]), 900))
     out["keys_w_m_period"] = keys("w", "m", ".")
@@ -166,37 +264,11 @@ def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fai
         fail.append(f"W, M and period keys: {out['keys_w_m_period']}")
     page.context.set_offline(True)
     out["offline"] = page.evaluate("() => !navigator.onLine")
-    out["offline_touches_ok"] = touch_all(1)
-
-    # Guidance with the network off.
-    stem = next(r for r in regions if r["label"] == "stem")
-    start = (190.0, 260.0)
-    n = log_len(page)
-    play(page, hold(start, 300))
-    typed("where is the stem")
-    play(page, hold(start, 3000))
-    guide = log_since(page, n)
-    says = [e["text"] for e in guide if e["kind"] == "say"]
-    beeps = [e for e in guide if e["kind"] == "beep"]
-    out["guidance_sentence"] = says[-1] if says else None
-    out["guidance_beeps_far"] = len(beeps)
-    if not says or not says[-1].startswith("Stem. Left"):
-        fail.append(f"guidance sentence: {says}")
-    n = log_len(page)
-    near = (stem["centroid_mm"][0] + 25, stem["centroid_mm"][1])
-    play(page, hold(near, 3000))
-    out["guidance_beeps_near"] = sum(e["kind"] == "beep" for e in log_since(page, n))
-    if out["guidance_beeps_near"] <= out["guidance_beeps_far"]:
-        fail.append("beeps did not speed up near the part")
-    n = log_len(page)
-    play(page, hold(tuple(stem["centroid_mm"]), 800))
-    arrive = log_since(page, n)
-    out["arrival"] = [e["kind"] if e["kind"] != "say" else e["text"] for e in arrive if e["kind"] in ("chime", "say")]
-    if "chime" not in out["arrival"] or "Stem" not in out["arrival"]:
-        fail.append(f"no chime and label on arrival: {arrive}")
+    out["offline_touches_ok"] = touch_all(page, regions, 1, fail, "offline")
+    out.update(guide_to_stem(page, regions, fail, "offline"))
 
     # A question with the network off.
-    asked = typed("What does the stem do?")
+    asked = typed(page, "What does the stem do?")
     out["offline_answer"] = asked
     if asked != [OFFLINE]:
         fail.append(f"offline question: {asked}")
@@ -230,12 +302,18 @@ def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fai
     # Who speaks: the app voice with a quiet mirror, or the screen reader and no app voice.
     mirror = "document.querySelector('[role=log]')"
     out["mirror_live_app"] = page.evaluate(f"() => {mirror}.getAttribute('aria-live')")
-    spoken0 = page.evaluate("() => window.__speaks")
+    spoken = page.evaluate("() => window.__speech.spoken")
+    out["app_voice"] = {"utterances": len(spoken), "voices": sorted({s["voice"] or "none" for s in spoken})}
+    if not spoken or not all(s["local"] for s in spoken):
+        fail.append(f"the app voice did not always use the local voice: {out['app_voice']}")
+    if page.get_by_text(NO_VOICE).count():
+        fail.append("the no local voice notice showed with a local voice")
+    spoken0 = len(spoken)
     page.get_by_label("Who speaks").select_option("screen_reader")
     out["mirror_live_screen_reader"] = page.evaluate(f"() => {mirror}.getAttribute('aria-live')")
     page.evaluate("() => document.activeElement.blur()")
     keys("w", "m")
-    out["app_voice_calls_in_screen_reader_mode"] = page.evaluate("() => window.__speaks") - spoken0
+    out["app_voice_calls_in_screen_reader_mode"] = page.evaluate("() => window.__speech.spoken.length") - spoken0
     lines = page.evaluate(f"() => [...{mirror}.children].map((p) => p.textContent)")
     out["mirror_last_lines"] = lines[-2:]
     if out["mirror_live_app"] != "off" or out["mirror_live_screen_reader"] != "polite":
@@ -297,6 +375,73 @@ def author(page: Page, base: str, api: str, fail: list[str]) -> tuple[str, dict[
     return fid, out
 
 
+def offline_from_load(page: Page, reqs: Requests, base: str, fid: str, regions: list[dict[str, Any]],
+                      fail: list[str]) -> dict[str, Any]:
+    """Offline from the moment the published regions.json has loaded."""
+    out: dict[str, Any] = {}
+    page.goto(explore_url(base, fid))
+    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    sheet = [r["url"] for r in reqs.seen if r["url"].endswith("/regions.json")]
+    out["regions_json"] = [u.split("/", 3)[3] for u in sheet]
+    if len(sheet) != 1 or "/published/" not in sheet[0]:
+        fail.append(f"offline from load: the sheet came from {sheet}")
+    page.context.set_offline(True)
+    out["offline"] = page.evaluate("() => !navigator.onLine")
+    n = len(reqs.seen)
+    start_by_keys(page)
+    out["touches_ok"] = touch_all(page, regions, 1, fail, "offline from load")
+    out.update(guide_to_stem(page, regions, fail, "offline from load"))
+    out["answer"] = typed(page, "What does the stem do?")
+    if out["answer"] != [OFFLINE]:
+        fail.append(f"offline from load, question: {out['answer']}")
+    out["requests_after_offline"] = [r["url"] for r in reqs.seen[n:]]
+    if out["requests_after_offline"]:
+        fail.append(f"offline from load, requests made: {out['requests_after_offline'][:5]}")
+    out["utterances_local"] = page.evaluate("() => window.__speech.spoken.every((s) => s.local)")
+    page.context.set_offline(False)
+    return out
+
+
+def no_local_voice(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str]) -> dict[str, Any]:
+    """Only network voices: the app voice must step aside, and say so."""
+    page.add_init_script(NETWORK_VOICES_JS)
+    page.goto(explore_url(base, fid))
+    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    start_by_keys(page)
+    out: dict[str, Any] = {"voices_listed": page.evaluate("() => speechSynthesis.getVoices().length")}
+    notice = page.get_by_role("alert").filter(has_text=NO_VOICE)
+    out["notice_visible"] = notice.count() == 1 and notice.is_visible()
+    out["mirror_live"] = page.evaluate("() => document.querySelector('[role=log]').getAttribute('aria-live')")
+    lobe = next(r for r in regions if r["label"] == "left lobe")
+    touch_all(page, [lobe], 1, fail, "no local voice")
+    out["mirror_has_label"] = page.evaluate("() => document.querySelector('[role=log]').textContent.includes('Left lobe')")
+    out["speak_calls"] = page.evaluate("() => window.__speech.spoken.length")
+    if not out["notice_visible"] or out["mirror_live"] != "polite" or not out["mirror_has_label"] or out["speak_calls"]:
+        fail.append(f"no local voice: {out}")
+    page.screenshot(path=str(SHOTS / "no_local_voice.png"), full_page=True)
+    return out
+
+
+def failed_loads_are_told(saved: tuple[Any, Requests], fresh: tuple[Any, Requests], base: str, fid: str,
+                          fail: list[str]) -> dict[str, Any]:
+    """regions.json refused: with a saved copy the page says it opened that, without one it says why."""
+    out: dict[str, Any] = {}
+    cases = [("with_saved_copy", *saved, "Opened the saved copy; the network is down."),
+             ("no_saved_copy", *fresh, "The sheet could not be loaded. Check the network.")]
+    for name, ctx, reqs, want in cases:
+        page = ctx.new_page()
+        page.route("**/regions.json", lambda route: route.abort("internetdisconnected"))
+        page.goto(explore_url(base, fid))
+        page.get_by_text(want).wait_for(timeout=10000)
+        told = reqs.told_about("/regions.json")
+        out[name] = {"failed": len(told), "said": want}
+        if len(told) != 1 or reqs.silent():
+            fail.append(f"failed load {name}: told {told}, silent {reqs.silent()}")
+        page.unroute("**/regions.json")
+        page.close()
+    return out
+
+
 def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
     refused: list[str] = []
 
@@ -356,14 +501,21 @@ def main() -> None:
                     "--autoplay-policy=no-user-gesture-required"]
             browser = p.chromium.launch(channel="chrome", headless=True, args=args)
             errors: list[str] = []
-            teacher = browser.new_context().new_page()
+            audits: list[Requests] = []
+            teacher_ctx = browser.new_context()
+            audits.append(Requests(teacher_ctx, "author"))
+            teacher = teacher_ctx.new_page()
             teacher.on("pageerror", lambda e: errors.append(str(e)))
             fid, result["author"] = author(teacher, base, api, fail)
             regions = json.loads(urllib.request.urlopen(regions_url.format(api=api, fid=fid)).read())["regions"]
             if "pore opening" not in {r["label"] for r in regions}:
                 fail.append("the published regions.json lacks the teacher's rename")
             result.update({"figure_id": fid, "regions": len(regions)})
-            explore_run(browser, base, fid, regions, fail, errors, result)
+            explore_run(browser, base, fid, regions, fail, errors, result, audits)
+            silent = [{"page": a.name, **f} for a in audits for f in a.silent()]
+            result["silent_failures"] = silent
+            if silent:
+                fail.append(f"requests failed with nothing said: {silent[:5]}")
             browser.close()
     finally:
         for proc in procs:
@@ -377,20 +529,32 @@ def main() -> None:
 
 
 def explore_run(browser: Any, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str],
-                errors: list[str], result: dict[str, Any]) -> None:
-    page = browser.new_context().new_page()
-    page.add_init_script("""
-      window.__speaks = 0;
-      if (window.speechSynthesis) {
-        const speak = speechSynthesis.speak.bind(speechSynthesis);
-        speechSynthesis.speak = (u) => { window.__speaks++; speak(u); };
-      }
-    """)
-    page.on("pageerror", lambda e: errors.append(str(e)))
+                errors: list[str], result: dict[str, Any], audits: list[Requests]) -> None:
+    def context(name: str) -> tuple[Any, Page, Requests]:
+        ctx = browser.new_context()
+        reqs = Requests(ctx, name)
+        audits.append(reqs)
+        ctx.add_init_script(SPEECH_JS)
+        page = ctx.new_page()
+        page.on("pageerror", lambda e: errors.append(str(e)))
+        return ctx, page, reqs
+
+    script_ctx, page, script_reqs = context("explore script")
     result["script"] = scripted(page, base, fid, regions, fail)
-    cam = browser.new_context().new_page()
-    cam.on("pageerror", lambda e: errors.append(str(e)))
+    _, page, reqs = context("explore offline from load")
+    result["offline_from_load"] = offline_from_load(page, reqs, base, fid, regions, fail)
+    _, page, _ = context("explore no local voice")
+    result["no_local_voice"] = no_local_voice(page, base, fid, regions, fail)
+    fresh_ctx, _, fresh_reqs = context("explore no saved copy")
+    result["failed_loads"] = failed_loads_are_told((script_ctx, script_reqs), (fresh_ctx, fresh_reqs), base, fid, fail)
+    _, cam, cam_reqs = context("explore camera")
     result["camera"] = camera(cam, base, fid, fail)
+    # What /explore asked for, by path, in script mode and in camera mode with MediaPipe.
+    paths: dict[str, set[str]] = {}
+    for r in script_reqs.seen + cam_reqs.seen:
+        host, path = r["url"].split("/")[2], "/" + r["url"].split("/", 3)[3].split("?")[0]
+        paths.setdefault(f"{r['type']} {path.replace(fid, '<id>')}", set()).add(host.split(":")[0])
+    result["explore_requests"] = sorted(f"{k} ({', '.join(sorted(v))})" for k, v in paths.items())
     result["page_errors"] = errors
     if errors:
         fail.append(f"page errors: {errors[:3]}")

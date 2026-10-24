@@ -57,6 +57,7 @@ make lint         # ruff + eslint
 make typecheck    # mypy strict on app/ + tsc
 make check        # test + lint + typecheck, what the pre-commit hook runs
 make eval         # runs eval/ and writes eval/RESULTS.md
+uv run apps/web/e2e/explore_e2e.py   # headless Chrome on a mock API: author flow, Explore online and offline, no local voice, camera with MediaPipe. Prints JSON, exits non-zero on a failed check
 MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
 sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests and make check on the staged content
 ```
