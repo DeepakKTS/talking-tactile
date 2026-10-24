@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Blocks the commit if the tracker tests or the tracking node tests fail.
+# Install once with: sh scripts/install-hooks.sh
+# Note: the tests run on the working tree, so unstaged edits count too.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+echo "pre-commit: tracker tests"
+python3 -m unittest scripts/test_tracker.py
+
+echo "pre-commit: tracking node tests"
+(cd spikes/tracking && node --test --test-reporter=dot test/*.test.mjs)
+
+find scripts spikes -name __pycache__ -type d -prune -exec rm -rf {} +
+echo "pre-commit: all tests passed"
