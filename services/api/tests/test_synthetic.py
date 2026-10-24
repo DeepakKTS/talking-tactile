@@ -2,6 +2,8 @@
 geometry stages must catch and fix. Every later geometry test relies on these facts."""
 
 import itertools
+import json
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -9,7 +11,8 @@ import pytest
 
 from app.config import load_tactile_rules
 from app.models.mask import BoolImage
-from app.synthetic import spec
+from app.paths import FIXTURES_DIR
+from app.synthetic import sheet, spec
 from app.synthetic.generate import generate
 from app.synthetic.load import SyntheticFigure, load_synthetic
 
@@ -165,3 +168,12 @@ def test_raw_masks_carry_the_planted_reconcile_cases(fig: SyntheticFigure) -> No
 
     becomes = {r.id: r.becomes for r in fig.truth.raw_masks}
     assert {b for b in becomes.values() if b} == {p.id for p in fig.truth.parts}
+
+
+def test_explore_fixture_matches_the_pipeline(tmp_path: Path) -> None:
+    """fixtures/synthetic/regions.json is what Explore's tests run on. It must be exactly
+    what make synthetic-sheet writes; after a geometry change, rerun it and copy the file."""
+    sheet.main(out=tmp_path)
+    made = json.loads((tmp_path / "regions.json").read_text("utf-8"))
+    kept = json.loads((FIXTURES_DIR / "synthetic" / "regions.json").read_text("utf-8"))
+    assert made == kept

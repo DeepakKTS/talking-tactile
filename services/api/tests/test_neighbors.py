@@ -146,3 +146,31 @@ def test_synthetic_neighbors_read_like_the_figure() -> None:
     assert got["left lobe"]["right lobe"] == "right"
     assert got["cross vessel"]["left lobe"] == "down"
     assert got["stem"]["left lobe"] == "up"
+
+
+def test_a_parent_centroid_is_on_the_parent_and_off_its_children() -> None:
+    # Explore guides a finger to the centroid, and the smallest region under a point wins,
+    # so a parent's target must not sit on a child.
+    outer = region("outer", box(0, 0, 60, 60))
+    core = region("core", box(15, 15, 45, 45), parent="outer")
+    grand = region("grand", box(25, 25, 35, 35), parent="core")
+    got = centroids([outer, core, grand], TOL)
+    for r, kids in [(outer, [core]), (core, [grand]), (grand, [])]:
+        pt = Point(got[r.id])
+        assert r.polygon.contains(pt)
+        assert not any(k.polygon.buffer(TOL).contains(pt) for k in kids), r.id
+    assert Point(got["outer"]).distance(core.polygon) >= 7.5 - TOL  # the middle of the ring
+
+
+def test_synthetic_centroids_hit_their_own_region_first() -> None:
+    fig = load_synthetic()
+    fit = fit_to_page(fig.truth.width_px, fig.truth.height_px, "letter", RULES.page)
+    parts = [m for m in fig.raw_masks.values() if m.label != "text label"]
+    text = [m for m in fig.raw_masks.values() if m.label == "text label"]
+    rec = reconcile(parts, text, fit.mm_per_px, RULES.reconcile)
+    regions = regions_from_parts(rec.parts, fit, RULES.vectorize)
+    got = centroids(regions, TOL)
+    for r in regions:
+        pt = Point(got[r.id])
+        holders = [x for x in regions if x.polygon.contains(pt)]
+        assert min(holders, key=lambda x: x.polygon.area).id == r.id, r.label

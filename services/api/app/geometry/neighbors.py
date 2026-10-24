@@ -11,7 +11,8 @@ import itertools
 import math
 from collections.abc import Sequence
 
-from shapely.ops import nearest_points
+from shapely.geometry import Polygon
+from shapely.ops import nearest_points, unary_union
 
 from app.geometry.layout import LayoutRegion, inside_point
 from app.models.regions import Direction, Neighbor
@@ -35,12 +36,26 @@ def direction_of(dx: float, dy: float) -> Direction:
     return _SECTORS[index]
 
 
+def _own_area(r: LayoutRegion, regions: Sequence[LayoutRegion]) -> Polygon:
+    """The part of r that no smaller region covers: where Explore says r's label, since the
+    smallest region under a finger wins. Its largest piece, or all of r if nothing is left."""
+    smaller = [
+        x.polygon
+        for x in regions
+        if x.id != r.id and x.polygon.area < r.polygon.area and x.polygon.intersects(r.polygon)
+    ]
+    own = r.polygon.difference(unary_union(smaller)) if smaller else r.polygon
+    pieces = [g for g in getattr(own, "geoms", [own]) if isinstance(g, Polygon) and not g.is_empty]
+    return max(pieces, key=lambda g: g.area) if pieces else r.polygon
+
+
 def centroids(
     regions: Sequence[LayoutRegion], tolerance_mm: float
 ) -> dict[str, tuple[float, float]]:
-    """A point inside each region: the center of its largest inscribed circle. A true
-    centroid can fall outside a curved part, and guidance needs a target on the part."""
-    return {r.id: inside_point(r.polygon, tolerance_mm) for r in regions}
+    """A point inside each region and off every smaller region on it: the center of the
+    largest circle inscribed in what is left. A true centroid can fall outside a curved
+    part, and guidance needs a target where the part's own label is spoken."""
+    return {r.id: inside_point(_own_area(r, regions), tolerance_mm) for r in regions}
 
 
 def _toward(a: LayoutRegion, b: LayoutRegion) -> Direction:
