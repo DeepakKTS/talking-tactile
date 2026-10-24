@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 83,
- "updated_at": "2026-10-24T18:12:10.713Z",
+ "rev": 95,
+ "updated_at": "2026-10-24T20:49:31.249Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1225,13 +1225,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Box check, point-in-polygon, hysteresis, dwell, vitest coverage.",
    "timebox": "2.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commits 2099e86, 9967ea0 on early-start. apps/web/src/explore: regionIndex.ts (box check, even-odd point in polygon, signed edge distance for shrunk and grown outlines, smallest area first, earcon pitch from texture) and touch.ts (enter on outline shrunk 1 mm, 120 ms hold then earcon; dwell under 15 mm/s for 600 ms then label once; exit on outline grown 2 mm, 120 ms then tick; earcons and ticks capped 6 per second; speed over a 200 ms window, dwell clock backdated to the window start). Every value from explore.yaml. fast-check, 300 runs each: border rest with jitter under 1 mm never flickers; scanning at 25 mm/s or more never speaks a label and stays capped; each property fails with its mechanism removed. Region lookup 0.39 us per point on the synthetic sheet (8 regions), 2.96 us at 60 regions of 200 points.",
+   "done_at": "2026-10-24T20:49:30.928Z",
    "tags": [
     "frontend",
     "explore"
-   ]
+   ],
+   "changed_at": "2026-10-24T20:49:30.928Z"
   },
   {
    "id": "d5-3",
@@ -1240,13 +1241,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Earcons decoded once. Cap at 6 per second.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commits 85fa08d, b0ce014, d7a609a on early-start. audio.ts renders every earcon pitch, the exit tick, the guidance beep and the 3 note chime once at start (9 AudioBuffers for the synthetic sheet, none rendered after). Dwell labels, exit tick and more (description, or two neighbors in words from regions.json) in session.ts. Headless Chrome: 24 of 24 touches online gave earcon then label; frame to earcon 0.2 ms p50, 0.3 ms p95; dwell met to label handed to speech 0.4 ms p50, 0.5 ms p95.",
+   "done_at": "2026-10-24T20:49:30.965Z",
    "tags": [
     "frontend",
     "explore"
-   ]
+   ],
+   "changed_at": "2026-10-24T20:49:30.965Z"
   },
   {
    "id": "d5-4",
@@ -1255,13 +1257,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Labels, earcons and guidance work with the network off.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit d7a609a on early-start. Headless run with the network off after load: all 8 parts earcon then label, guidance sentence, beeps and arrival chime work, a question says 'Questions need the network. Labels still work.' MediaPipe wasm and model are served by the app; the camera run refused every non-local request and still loaded mediapipe GPU (0 refused). The last published regions.json is kept in localStorage for an offline reopen. A page reload with no network still needs the app files (no service worker, by choice).",
+   "done_at": "2026-10-24T20:49:31.000Z",
    "tags": [
     "frontend",
     "explore"
-   ]
+   ],
+   "changed_at": "2026-10-24T20:49:31.000Z"
   },
   {
    "id": "d5-5",
@@ -1300,13 +1303,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "where is, more, repeat, stop, what is here.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit fc6117e on early-start. intents.ts: stop, repeat, more, what is here, where is, after fillers; labels and braille abbreviations matched on spelling or a rough sound key (rite and write match right), min_label_similarity 0.75 from explore.yaml; no match says 'There is no X on this sheet.' Everything else goes to /api/ask with the current and last two regions. 31 tests.",
+   "done_at": "2026-10-24T20:49:31.034Z",
    "tags": [
     "frontend",
     "voice"
-   ]
+   ],
+   "changed_at": "2026-10-24T20:49:31.034Z"
   },
   {
    "id": "d6-3",
@@ -1346,13 +1350,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Direction in words once, beeps speed up, chime and label on arrival.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit fc6117e on early-start. guidance.ts: direction to the part's centroid in 8 sectors (same as the Python neighbors code, reversal property tested), distance to the outline in whole cm, said once when a finger is seen; beeps from 1.5 per s at 150 mm to 10 per s at the edge, updated every 300 ms, none over its own speech; chime and label after 200 ms inside. Headless offline: 'Stem. Left, 12 centimeters.', 3 beeps in 3 s far, 27 near, chime and Stem on arrival.",
+   "done_at": "2026-10-24T20:49:31.069Z",
    "tags": [
     "frontend",
     "explore"
-   ]
+   ],
+   "changed_at": "2026-10-24T20:49:31.069Z"
   },
   {
    "id": "d7-1",
@@ -1651,9 +1656,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "target": 100,
    "unit": "ms",
    "report_only": false,
-   "value": null,
-   "measured_at": null,
-   "source": ""
+   "value": 141.6,
+   "measured_at": "2026-10-24T20:49:31.104Z",
+   "source": "mock",
+   "changed_at": "2026-10-24T20:49:31.104Z"
   },
   {
    "id": "lat-answer",
@@ -1890,6 +1896,30 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "A repeated upload returns the newest job with the same figure id, options and edit version that has not failed. One admission lock per figure for submit, edit and publish; runs of one figure queue on a second lock that admission never waits on. Edits name regions and act on the reconciled part (r3_2 is part r3); added parts are t1, t2 in edit order.",
    "why": "Two simultaneous requests cannot start two runs or take the same edit or published version, and a request never waits behind a 90 second live pipeline run. Other options (grade band, page) are a different sheet, so they get their own job.",
    "changed_at": "2026-10-24T18:11:50.821Z"
+  },
+  {
+   "id": "dec-mvmtpv8vxq7m",
+   "date": "2026-10-24",
+   "title": "Publish refuses a version that breaks a tactile rule",
+   "decision": "POST /api/figures/{id}/publish reads report.json written with the exact files it would copy (the newest finished job at the current edit version). Any violation returns 409 rules_violated with the edit version and, for each violation, its region ids, rule name, measured value and limit. A missing or unreadable report returns 409 rules_unchecked. No override for now: extra fields such as force are ignored. Explore loads only numbered published copies, so a refused version is never reachable. Commit dd451d0 on early-start.",
+   "why": "A sheet that breaks a gap, size or braille rule cannot be read by touch, and a published version is what the student gets. Refusing at publish, against the report of that exact version, keeps a bad edit from ever reaching Explore while the previous clean version stays live. An override can come later if a teacher needs one.",
+   "changed_at": "2026-10-24T20:00:34.164Z"
+  },
+  {
+   "id": "dec-mvmvgthk436a",
+   "date": "2026-10-24",
+   "title": "Explore sounds and speech on a part switch, nesting and the mirror",
+   "decision": "Moving straight from one part into another plays the first part's exit tick, then the next earcon; going into a child inside its parent plays only the child's earcon. The dwell clock starts at the start of the speed window that showed the slowdown, so dwell to label is hold_ms. The aria-live mirror is polite only in screen reader mode and off with the app voice.",
+   "why": "The exit tick is the signal users asked for when leaving a hotspot, and a child is not left behind when entering it. A late dwell clock would add the 200 ms window to every label, against the dwell plus 150 ms budget. RULES 6.2 and 6.3 conflict when the app voice speaks and a screen reader also reads a polite region; never both wins, and the mirror stays as a visible log.",
+   "changed_at": "2026-10-24T20:49:31.212Z"
+  },
+  {
+   "id": "dec-mvmvgtiny2ai",
+   "date": "2026-10-24",
+   "title": "centroid_mm sits on the region's own area",
+   "decision": "The pipeline puts each centroid at the inscribed circle center of the region minus any smaller region that overlaps it. Regions with nothing on them keep their old point. No schema change: same field and shape. Commit 48079bb on early-start.",
+   "why": "Explore says the smallest region under a finger and guides to centroid_mm; the outer chamber's centroid was the inner core's, so guidance to it would have landed on the core.",
+   "changed_at": "2026-10-24T20:49:31.249Z"
   }
  ],
  "risks": [
@@ -1950,8 +1980,78 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "plan": "Read them Oct 26 and update the plan that day."
   }
  ],
- "issues": [],
+ "issues": [
+  {
+   "id": "i-mvmvgtgm6qh2",
+   "ts": "2026-10-24T20:49:31.174Z",
+   "title": "Touch to earcon cannot meet the 100 ms budget (RULES 4) while explore.yaml enter_hold_ms is 120: headless enter to earcon is 141.6 ms p95 before any camera latency (code is 0.3 ms of it). Either the budget means code after the hold, or the hold must drop to about 60 ms and the border flicker property rechecked. Decide with the touch eval.",
+   "severity": "medium",
+   "status": "open",
+   "note": "",
+   "changed_at": "2026-10-24T20:49:31.174Z"
+  }
+ ],
  "log": [
+  {
+   "ts": "2026-10-24T20:49:31.249Z",
+   "kind": "claude",
+   "text": "Decision: centroid_mm sits on the region's own area."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.212Z",
+   "kind": "claude",
+   "text": "Decision: Explore sounds and speech on a part switch, nesting and the mirror."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.174Z",
+   "kind": "claude",
+   "text": "Issue opened: Touch to earcon cannot meet the 100 ms budget (RULES 4) while explore.yaml enter_hold_ms is 120: headless enter to earcon is 141.6 ms p95 before any camera latency (code is 0.3 ms of it). Either the budget means code after the hold, or the hold must drop to about 60 ms and the border flicker property rechecked. Decide with the touch eval.."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.140Z",
+   "kind": "claude",
+   "text": "Headless Explore run (uv run apps/web/e2e/explore_e2e.py, Chrome 155 headless, mock API, synthetic figure published, hands injected at 30 fps): enter to earcon p50 139.8 ms, p95 141.6 ms (34 earcons), of which code from landmarks to earcon start is 0.2 ms p50 and 0.3 ms p95; the rest is enter_hold_ms 120 plus frame timing. Real MediaPipe worker on Chrome's fake camera: capture to landmarks 13.7 ms p50, 16.9 ms p95, mediapipe GPU, 3 of 105 frames dropped, never queued. Region lookup (vitest): 0.39 us per point at 8 regions, 2.96 us at 60 regions of 200 points. The metric lat-earcon holds the headless enter to earcon p95; camera latency on a real device is not in it."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.104Z",
+   "kind": "claude",
+   "text": "Metric \"Touch to earcon, p95\" set to 141.6 ms (mock)."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.069Z",
+   "kind": "claude",
+   "text": "Task d6-5 \"Guidance mode\" is now done. Note: Commit fc6117e on early-start. guidance.ts: direction to the part's centroid in 8 sectors (same as the Python neighbors code, reversal property tested), distance to the outline in whole cm, said once when a finger is seen; beeps from 1.5 per s at 150 mm to 10 per s at the edge, updated every 300 ms, none over its own speech; chime and label after 200 ms inside. Headless offline: 'Stem. Left, 12 centimeters.', 3 beeps in 3 s far, 27 near, chime and Stem on arrival."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.034Z",
+   "kind": "claude",
+   "text": "Task d6-2 \"Local intent parser\" is now done. Note: Commit fc6117e on early-start. intents.ts: stop, repeat, more, what is here, where is, after fillers; labels and braille abbreviations matched on spelling or a rough sound key (rite and write match right), min_label_similarity 0.75 from explore.yaml; no match says 'There is no X on this sheet.' Everything else goes to /api/ask with the current and last two regions. 31 tests."
+  },
+  {
+   "ts": "2026-10-24T20:49:31.000Z",
+   "kind": "claude",
+   "text": "Task d5-4 \"Offline mode\" is now done. Note: Commit d7a609a on early-start. Headless run with the network off after load: all 8 parts earcon then label, guidance sentence, beeps and arrival chime work, a question says 'Questions need the network. Labels still work.' MediaPipe wasm and model are served by the app; the camera run refused every non-local request and still loaded mediapipe GPU (0 refused). The last published regions.json is kept in localStorage for an offline reopen. A page reload with no network still needs the app files (no service worker, by choice)."
+  },
+  {
+   "ts": "2026-10-24T20:49:30.965Z",
+   "kind": "claude",
+   "text": "Task d5-3 \"Earcons, dwell labels, exit tick, more\" is now done. Note: Commits 85fa08d, b0ce014, d7a609a on early-start. audio.ts renders every earcon pitch, the exit tick, the guidance beep and the 3 note chime once at start (9 AudioBuffers for the synthetic sheet, none rendered after). Dwell labels, exit tick and more (description, or two neighbors in words from regions.json) in session.ts. Headless Chrome: 24 of 24 touches online gave earcon then label; frame to earcon 0.2 ms p50, 0.3 ms p95; dwell met to label handed to speech 0.4 ms p50, 0.5 ms p95."
+  },
+  {
+   "ts": "2026-10-24T20:49:30.928Z",
+   "kind": "claude",
+   "text": "Task d5-2 \"Region engine and state machine\" is now done. Note: Commits 2099e86, 9967ea0 on early-start. apps/web/src/explore: regionIndex.ts (box check, even-odd point in polygon, signed edge distance for shrunk and grown outlines, smallest area first, earcon pitch from texture) and touch.ts (enter on outline shrunk 1 mm, 120 ms hold then earcon; dwell under 15 mm/s for 600 ms then label once; exit on outline grown 2 mm, 120 ms then tick; earcons and ticks capped 6 per second; speed over a 200 ms window, dwell clock backdated to the window start). Every value from explore.yaml. fast-check, 300 runs each: border rest with jitter under 1 mm never flickers; scanning at 25 mm/s or more never speaks a label and stays capped; each property fails with its mechanism removed. Region lookup 0.39 us per point on the synthetic sheet (8 regions), 2.96 us at 60 regions of 200 points."
+  },
+  {
+   "ts": "2026-10-24T20:01:06.766Z",
+   "kind": "claude",
+   "text": "Phase 4 check before Phase 6: liblouis via lou_translate subprocess, decision recorded; key-only fallback covered by test_no_room_anywhere_means_key_only and the abbreviation cases in test_braille_place.py; 300 dpi scale covered by test_print_scale_measured_at_300_dpi (pdftoppm present, runs). Regenerated data/synthetic/print.pdf on early-start (2 pages, 0 violations) and measured that file at 300 dpi: 2550 x 3300 px, bar 100.08 mm, leftmost outline point of all 8 regions within 0.039 mm of regions.json. Still open on Day 4: d4-4 (heart needs live SAM) and d4-5 (print and trace)."
+  },
+  {
+   "ts": "2026-10-24T20:00:34.164Z",
+   "kind": "claude",
+   "text": "Decision: Publish refuses a version that breaks a tactile rule."
+  },
   {
    "ts": "2026-10-24T18:12:10.713Z",
    "kind": "claude",

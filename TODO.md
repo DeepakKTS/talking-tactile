@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 83, updated 2026-10-24T18:12:10.713Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 95, updated 2026-10-24T20:49:31.249Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -152,12 +152,15 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 - [ ] d5-1 Auto registration (2.5 h)
   - /api/register: OpenCV outline first, SAM fallback, four rotation check, confidence.
-- [ ] d5-2 Region engine and state machine (2.5 h)
+- [x] d5-2 Region engine and state machine (2.5 h)
   - Box check, point-in-polygon, hysteresis, dwell, vitest coverage.
-- [ ] d5-3 Earcons, dwell labels, exit tick, more (1.5 h)
+  - Note: Commits 2099e86, 9967ea0 on early-start. apps/web/src/explore: regionIndex.ts (box check, even-odd point in polygon, signed edge distance for shrunk and grown outlines, smallest area first, earcon pitch from texture) and touch.ts (enter on outline shrunk 1 mm, 120 ms hold then earcon; dwell under 15 mm/s for 600 ms then label once; exit on outline grown 2 mm, 120 ms then tick; earcons and ticks capped 6 per second; speed over a 200 ms window, dwell clock backdated to the window start). Every value from explore.yaml. fast-check, 300 runs each: border rest with jitter under 1 mm never flickers; scanning at 25 mm/s or more never speaks a label and stays capped; each property fails with its mechanism removed. Region lookup 0.39 us per point on the synthetic sheet (8 regions), 2.96 us at 60 regions of 200 points.
+- [x] d5-3 Earcons, dwell labels, exit tick, more (1.5 h)
   - Earcons decoded once. Cap at 6 per second.
-- [ ] d5-4 Offline mode (1 h)
+  - Note: Commits 85fa08d, b0ce014, d7a609a on early-start. audio.ts renders every earcon pitch, the exit tick, the guidance beep and the 3 note chime once at start (9 AudioBuffers for the synthetic sheet, none rendered after). Dwell labels, exit tick and more (description, or two neighbors in words from regions.json) in session.ts. Headless Chrome: 24 of 24 touches online gave earcon then label; frame to earcon 0.2 ms p50, 0.3 ms p95; dwell met to label handed to speech 0.4 ms p50, 0.5 ms p95.
+- [x] d5-4 Offline mode (1 h)
   - Labels, earcons and guidance work with the network off.
+  - Note: Commit d7a609a on early-start. Headless run with the network off after load: all 8 parts earcon then label, guidance sentence, beeps and arrival chime work, a question says 'Questions need the network. Labels still work.' MediaPipe wasm and model are served by the app; the camera run refused every non-local request and still loaded mediapipe GPU (0 refused). The last published regions.json is kept in localStorage for an offline reopen. A page reload with no network still needs the app files (no service worker, by choice).
 - [ ] d5-5 Gate C check (30 min)
   - The heart figure works end to end on the real traced sheet.
   - Fallback: Cut Plus features, spend Day 6 on the loop.
@@ -169,14 +172,16 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 - [ ] d6-1 Voice capture and proxy (2.5 h)
   - AudioWorklet, 16 kHz mono, /api/voice relay, keyword hints from labels.
-- [ ] d6-2 Local intent parser (1 h)
+- [x] d6-2 Local intent parser (1 h)
   - where is, more, repeat, stop, what is here.
+  - Note: Commit fc6117e on early-start. intents.ts: stop, repeat, more, what is here, where is, after fillers; labels and braille abbreviations matched on spelling or a rough sound key (rite and write match right), min_label_similarity 0.75 from explore.yaml; no match says 'There is no X on this sheet.' Everything else goes to /api/ask with the current and last two regions. 31 tests.
 - [ ] d6-3 Grounded answers (2 h)
   - /api/ask with the cached figure context, streamed, first sentence spoken early.
 - [ ] d6-4 Barge-in (30 min)
   - Space cancels speech and starts listening.
-- [ ] d6-5 Guidance mode (2 h)
+- [x] d6-5 Guidance mode (2 h)
   - Direction in words once, beeps speed up, chime and label on arrival.
+  - Note: Commit fc6117e on early-start. guidance.ts: direction to the part's centroid in 8 sectors (same as the Python neighbors code, reversal property tested), distance to the outline in whole cm, said once when a finger is seen; beeps from 1.5 per s at 150 mm to 10 per s at the edge, updated every 300 ms, none over its own speech; chime and label after 200 ms inside. Headless offline: 'Stem. Left, 12 centimeters.', 3 beeps in 3 s far, 27 near, chime and Stem on arrival.
 
 ## Day 7: Sun Nov 1
 
@@ -226,4 +231,4 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Open issues
 
-None. Add one with scripts/tracker.py issue.
+- (medium) Touch to earcon cannot meet the 100 ms budget (RULES 4) while explore.yaml enter_hold_ms is 120: headless enter to earcon is 141.6 ms p95 before any camera latency (code is 0.3 ms of it). Either the budget means code after the hold, or the hold must drop to about 60 ms and the border flicker property rechecked. Decide with the touch eval.
