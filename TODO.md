@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 95, updated 2026-10-24T20:49:31.249Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 96, updated 2026-10-24T21:14:43.338Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -185,8 +185,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 7: Sun Nov 1
 
-- [ ] d7-1 Teacher review screen (3 h)
+- [x] d7-1 Teacher review screen (3 h)
   - Edit, merge, delete, add by name, publish.
+  - Note: Commits 56c1698, 903e500 on early-start. API: draft-only GET source.png (S0 image) and report.json (the rules report publish would refuse with), 404 under /published/. /author: upload (PNG, JPEG, PDF page number, grade band, paper), stage progress by name with times, review with the figure as uploaded, parts flagged Checked or Not checked in words beside an amber or green bar, the tactile preview with the selected part outlined from regions.json; mark checked, rename, describe, merge, delete with confirm, add by name; rules report in words; refused publish lists each violation (parts, rule, measured, limit); publish gives that version's print PDF, print and trace steps and the Explore link; ?figure= reopens. 10 vitest tests on a fake API. Headless Chrome against the mock API: upload through the file input, rename pore, mark left lobe checked (8 then 6 not checked), all rules pass, publish v1, PDF link serves %PDF, Explore link opens v1 and Explore runs on it. Live mode waits on d1-8.
 - [ ] d7-2 Accessibility pass (1.5 h)
   - Keyboard only, VoiceOver or NVDA, onboarding audio. accessibility-pass skill.
 - [ ] d7-3 Tester session or remote expert review (1.5 h)

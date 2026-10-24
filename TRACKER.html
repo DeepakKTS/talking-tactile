@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 95,
- "updated_at": "2026-10-24T20:49:31.249Z",
+ "rev": 96,
+ "updated_at": "2026-10-24T21:14:43.338Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1366,13 +1366,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Edit, merge, delete, add by name, publish.",
    "timebox": "3 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commits 56c1698, 903e500 on early-start. API: draft-only GET source.png (S0 image) and report.json (the rules report publish would refuse with), 404 under /published/. /author: upload (PNG, JPEG, PDF page number, grade band, paper), stage progress by name with times, review with the figure as uploaded, parts flagged Checked or Not checked in words beside an amber or green bar, the tactile preview with the selected part outlined from regions.json; mark checked, rename, describe, merge, delete with confirm, add by name; rules report in words; refused publish lists each violation (parts, rule, measured, limit); publish gives that version's print PDF, print and trace steps and the Explore link; ?figure= reopens. 10 vitest tests on a fake API. Headless Chrome against the mock API: upload through the file input, rename pore, mark left lobe checked (8 then 6 not checked), all rules pass, publish v1, PDF link serves %PDF, Explore link opens v1 and Explore runs on it. Live mode waits on d1-8.",
+   "done_at": "2026-10-24T21:14:43.338Z",
    "tags": [
     "frontend",
     "author"
-   ]
+   ],
+   "changed_at": "2026-10-24T21:14:43.338Z"
   },
   {
    "id": "d7-2",
@@ -1992,6 +1993,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-24T21:14:43.338Z",
+   "kind": "claude",
+   "text": "Task d7-1 \"Teacher review screen\" is now done. Note: Commits 56c1698, 903e500 on early-start. API: draft-only GET source.png (S0 image) and report.json (the rules report publish would refuse with), 404 under /published/. /author: upload (PNG, JPEG, PDF page number, grade band, paper), stage progress by name with times, review with the figure as uploaded, parts flagged Checked or Not checked in words beside an amber or green bar, the tactile preview with the selected part outlined from regions.json; mark checked, rename, describe, merge, delete with confirm, add by name; rules report in words; refused publish lists each violation (parts, rule, measured, limit); publish gives that version's print PDF, print and trace steps and the Explore link; ?figure= reopens. 10 vitest tests on a fake API. Headless Chrome against the mock API: upload through the file input, rename pore, mark left lobe checked (8 then 6 not checked), all rules pass, publish v1, PDF link serves %PDF, Explore link opens v1 and Explore runs on it. Live mode waits on d1-8."
+  },
   {
    "ts": "2026-10-24T20:49:31.249Z",
    "kind": "claude",
