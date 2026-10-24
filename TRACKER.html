@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 76,
- "updated_at": "2026-10-24T17:50:26.770Z",
+ "rev": 78,
+ "updated_at": "2026-10-24T17:56:00.754Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1079,6 +1079,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "api"
    ],
    "changed_at": "2026-10-24T17:24:14.425Z"
+  },
+  {
+   "id": "d3-10",
+   "day": 3,
+   "title": "Cache keys cover prompts, upstream outputs and mock fixtures",
+   "detail": "S1 and S2 keys hash the prompt file and response schema (prompts in app/prompts/). Every key includes the digests of the upstream outputs it consumed. Mock mode keys hash the fixture files. A test for each that would have caught the silent stale hit.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "doing",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "pipeline",
+    "cache"
+   ],
+   "changed_at": "2026-10-24T17:56:00.754Z"
   },
   {
    "id": "d4-1",
@@ -1920,6 +1936,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T17:56:00.754Z",
+   "kind": "claude",
+   "text": "Task d3-10 \"Cache keys cover prompts, upstream outputs and mock fixtures\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T17:55:56.593Z",
+   "kind": "claude",
+   "text": "Task d3-10 \"Cache keys cover prompts, upstream outputs and mock fixtures\" added to day 3."
+  },
   {
    "ts": "2026-10-24T17:50:26.770Z",
    "kind": "claude",

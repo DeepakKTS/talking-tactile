@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 76, updated 2026-10-24T17:50:26.770Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 78, updated 2026-10-24T17:56:00.754Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -120,6 +120,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Commit 73687bf on early-start. app/pipeline/runner.py: submit runs S0 (bad upload makes no job), run takes S1 to S5 with mock S1 and S2. One file per stage s1_understand to s5_render, each with save and load for the cache. Cache under data/figures/<figure_id>/<stage>/<key>/, key chain over the previous key: S1 and S2 on client mode, version, max_parts and text phrase (a code change never pays for a call again); S3 to S5 on the source hash, config and job options. Resumes after the latest cached stage, rebuilds an unreadable entry, writes through a temp dir and rename. S2 keeps to sam_concurrency (tested at 4). describe_only stops after S1. SQLite jobs and stage_runs (ran, cached, skipped; ms; cost). Mock synthetic figure: cold run S0 65, S1 47, S2 23, S3 106, S4 403, S5 65 ms (1.16 s process); same upload again 55 ms with zero Meta calls, same regions.json. 12 tests, 319 api tests pass. Live mode waits on d1-8. Numbered overlay Spark pass in S3 not built (needs the spike).
 - [ ] d3-9 Figure API routes and middleware (2 h)
   - POST /api/figures, GET status, regions.json, tactile.svg, print.pdf, PATCH a region, POST publish. Request id, JSON logs, error envelope, upload guard, CORS. API test runs the synthetic figure end to end.
+- [ ] d3-10 Cache keys cover prompts, upstream outputs and mock fixtures (1.5 h) [doing]
+  - S1 and S2 keys hash the prompt file and response schema (prompts in app/prompts/). Every key includes the digests of the upstream outputs it consumed. Mock mode keys hash the fixture files. A test for each that would have caught the silent stale hit.
 
 ## Day 4: Thu Oct 29
 
