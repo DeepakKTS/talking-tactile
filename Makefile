@@ -3,7 +3,7 @@ API := services/api
 WEB := apps/web
 UV := uv run --project $(API)
 
-.PHONY: dev api web install test test-api test-web lint typecheck eval check
+.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet
 
 install:
 	@command -v lou_translate > /dev/null || { echo "liblouis is missing: brew install liblouis"; exit 1; }
@@ -41,6 +41,10 @@ typecheck:
 
 eval:
 	$(UV) python eval/run.py
+
+# The synthetic figure through S3 to S5, into data/synthetic/ (print.pdf to print and trace).
+synthetic-sheet:
+	cd $(API) && uv run python -m app.synthetic.sheet
 
 # Everything the pre-commit hook runs for product code.
 check: test lint typecheck
