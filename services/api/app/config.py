@@ -144,6 +144,29 @@ class Pipeline(_Section):
 Fraction = Annotated[StrictFloat, Field(gt=0, le=1)]
 
 
+class Prices(_Section):
+    input_per_mtok: NonNegFloat | None = None
+    cached_input_per_mtok: NonNegFloat | None = None
+    output_per_mtok: NonNegFloat | None = None
+    per_image: NonNegFloat | None = None
+    per_audio_hour: NonNegFloat | None = None
+
+
+class Meta(_Section):
+    budget_usd: PosFloat
+    warn_at_fractions: list[Annotated[StrictFloat, Field(gt=0, lt=1)]]
+    max_parts: PosInt
+    sam_concurrency: PosInt
+    text_phrase: Annotated[StrictStr, Field(min_length=1)]
+    prices_usd: dict[StrictStr, Prices]
+
+    @model_validator(mode="after")
+    def _ascending(self) -> Self:
+        if self.warn_at_fractions != sorted(set(self.warn_at_fractions)):
+            raise ValueError("warn_at_fractions must be ascending without repeats")
+        return self
+
+
 class Reconcile(_Section):
     duplicate_iou: Fraction
     contain_fraction: Fraction
@@ -184,6 +207,7 @@ class TactileRules(_Section):
     braille: Braille
     page: PageRules
     pipeline: Pipeline
+    meta: Meta
     reconcile: Reconcile
     vectorize: Vectorize
     layout: Layout

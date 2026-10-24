@@ -46,6 +46,18 @@ pipeline:                          # engineering values, not design rules
   deskew_max_area_fraction: 0.98   # a four-sided outline this large is the image border, not a page
   deskew_min_contrast: 40          # the page must be this much brighter (0-255) than what surrounds it
 
+meta:                              # Meta Model API use. Prices from the pricing page as quoted in PLAN.md 5.4;
+                                   # confirm against live usage on Day 1
+  budget_usd: 150                  # hackathon credits
+  warn_at_fractions: [0.7, 0.9]    # PLAN.md 5.3: warn at 70 and 90 percent of the budget
+  max_parts: 25                    # PLAN.md S1: up to 25 parts per figure
+  sam_concurrency: 4               # PLAN.md S2: four SAM calls at a time
+  text_phrase: text label          # S2 also asks SAM for print text, so it can be cut out of the raised layer
+  prices_usd:
+    muse-spark-1.3: { input_per_mtok: 1.25, cached_input_per_mtok: 0.15, output_per_mtok: 4.25 }
+    sam-3.1: { per_image: 0.0025 }
+    muse-voice-transcribe-1.0: { per_audio_hour: 0.18 }
+
 reconcile:                         # S3 rules on raw masks. Engineering values, tuned on the eval figures
   duplicate_iou: 0.8               # PLAN.md section 6, S3: merge near duplicates above this overlap
   contain_fraction: 0.95           # share of the smaller mask inside the larger one to nest it

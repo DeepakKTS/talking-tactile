@@ -16,8 +16,8 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, ConfigDict
 
 from app.config import Pipeline
+from app.models.image import RGB
 
-RGB = NDArray[np.uint8]
 SourceType = Literal["png", "jpeg", "pdf"]
 IngestCode = Literal["too_large", "unsupported_type", "unreadable", "bad_page", "blurry"]
 
