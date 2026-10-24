@@ -1,0 +1,28 @@
+# Tactile design constants. Every value has a source.
+# Before the final render, re-check each value against the BANA
+# Guidelines and Standards for Tactile Graphics, 2022 edition.
+
+spacing:
+  min_gap_mm: 3.2            # 1/8 inch absolute minimum between elements. tactilegraphics.org readability page
+  point_symbol_min_mm: 6.4   # 1/4 inch minimum point symbol. APH "Planning and Designing Quality Tactile Graphics" handout
+
+textures:
+  max_area_textures: 5           # APH handout, "limit of 5"
+  max_area_textures_lower_grades: 3  # APH handout, "limit of 3 for lower grades"
+
+braille:                     # BANA signage guideline values. Paper braille may differ.
+  dot_base_diameter_mm: [1.5, 1.6]
+  cell_to_cell_mm: [6.1, 7.6]      # corresponding dots in adjacent cells
+  line_spacing_mm: 10.2            # dot 1 to dot 1, NPS Harpers Ferry tactile map guidelines
+  clearance_to_line_mm: 3.7        # braille dots to nearest tactile line, NPS guidelines
+  table: en-ueb-g2.ctb             # liblouis Unified English Braille, grade 2
+  display: unicode.dis
+
+page:
+  sizes: [letter, a4]
+  calibration_bar_mm: 100          # printed on every sheet so scaling can be checked with a ruler
+
+principles:
+  - represent, not interpret       # APH handout
+  - spacing is the key to avoiding clutter
+  - eliminate unnecessary elements of the original picture

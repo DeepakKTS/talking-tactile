@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talking Tactile tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--paper:#F4F7FA;--sheet:#FFFFFF;--ink:#14213D;--muted:#566377;--rule:#D3DAE3;--raised:#0F6E56;--raised-soft:#DCF1E9;--warn:#8F5600;--warn-soft:#FBEED6;--bad:#A3302B;--bad-soft:#F8E2E0;--focus:#2459D6;--shadow:0 1px 0 rgba(20,33,61,.06);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0D141D;--sheet:#141E2A;--ink:#E6ECF3;--muted:#9AA7B8;--rule:#263445;--raised:#46C7A2;--raised-soft:#123A30;--warn:#E3A84E;--warn-soft:#3A2B12;--bad:#F07C74;--bad-soft:#3B1A19;--focus:#7FA2FF;--shadow:none;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0D141D;--sheet:#141E2A;--ink:#E6ECF3;--muted:#9AA7B8;--rule:#263445;--raised:#46C7A2;--raised-soft:#123A30;--warn:#E3A84E;--warn-soft:#3A2B12;--bad:#F07C74;--bad-soft:#3B1A19;--focus:#7FA2FF;--shadow:none;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.55}
+h1,h2,h3{line-height:1.2;margin:0}
+h1{font-size:1.7rem;letter-spacing:-.01em}
+h2{font-size:1.35rem;margin:0 0 .9rem}
+h3{font-size:1.02rem;margin:0 0 .6rem}
+h3 small,h2 small{font-weight:400;color:var(--muted);font-size:.85rem;margin-left:.4rem}
+p{margin:.35rem 0 .6rem}
+a{color:var(--focus)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:0;background:var(--sheet);padding:.5rem .8rem;z-index:9}.skip:focus{left:.5rem}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);font-style:italic}
+#app{max-width:1260px;margin:0 auto;padding:1.4rem 1.4rem 4rem}
+.top{display:grid;grid-template-columns:1fr auto auto;gap:1.2rem;align-items:end;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+.brand .sub{margin:.15rem 0 0;color:var(--muted)}
+.clock{display:flex;gap:1.4rem}
+.clock div{display:flex;flex-direction:column}
+.clock b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.clock span{font-size:.8rem;color:var(--muted)}
+.acts{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.btn{font:inherit;font-size:.92rem;padding:.45rem .85rem;border-radius:7px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--raised);border-color:var(--raised);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#06231B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{color:#06231B}}
+.link{font:inherit;font-size:.9rem;background:none;border:0;padding:.1rem 0;color:var(--focus);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.link.danger{color:var(--bad)}
+.pill{font-size:.8rem;padding:.2rem .55rem;border-radius:99px}
+.pill.ok{background:var(--raised-soft);color:var(--raised)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.strip{display:grid;grid-template-columns:150px 1fr;gap:1rem;align-items:center;padding:1.1rem 0 .4rem}
+.sl{display:flex;flex-direction:column}
+.sl b{font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
+.sl span{font-size:.85rem;color:var(--muted)}
+.sl .today{color:var(--ink);font-weight:700;margin-top:.25rem}
+.cells{display:grid;grid-template-columns:repeat(11,minmax(52px,1fr));gap:.45rem}
+.cell{font:inherit;display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.55rem .25rem .45rem;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow)}
+.cell:hover{border-color:var(--muted)}
+.cell.now{border:2px solid var(--ink);padding:.5rem .2rem .4rem}
+.cell.late{border-color:var(--warn)}
+.cell.full{background:var(--raised-soft)}
+.dots{display:grid;grid-template-columns:repeat(2,10px);gap:5px 7px;min-height:44px;align-content:start}
+.d{width:10px;height:10px;border-radius:50%;border:1.6px solid var(--muted);display:block;opacity:.75}
+.d-done{background:var(--raised);border-color:var(--raised);opacity:1;box-shadow:inset 0 -1.5px 0 rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.4)}
+.d-doing{border-color:var(--warn);background:linear-gradient(90deg,var(--warn) 50%,transparent 50%);opacity:1}
+.d-blocked{border-color:var(--bad);border-width:2.2px;opacity:1}
+.d-cut{border-style:dashed;opacity:.35}
+.cl{font-weight:700;font-size:.85rem}
+.cs{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.focus{margin:.6rem 0 0;color:var(--muted)}
+.focus b{color:var(--ink)}
+.banner{margin:.8rem 0 0;padding:.6rem .8rem;border-radius:8px;background:var(--warn-soft);color:var(--ink);border-left:4px solid var(--warn)}
+.banner.bad{background:var(--bad-soft);border-left-color:var(--bad)}
+.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:2rem;margin-top:1.4rem}
+.side{position:sticky;top:1rem;align-self:start;display:flex;flex-direction:column;gap:.15rem}
+.nv{font:inherit;text-align:left;padding:.42rem .7rem;border-radius:7px;border:0;background:none;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.nv:hover{background:var(--sheet)}
+.nv.on{background:var(--sheet);font-weight:700;box-shadow:inset 3px 0 0 var(--raised)}
+.badge{font-size:.72rem;background:var(--bad-soft);color:var(--bad);border-radius:99px;padding:0 .45rem}
+.badge.late{background:var(--warn-soft);color:var(--warn)}
+.navfoot{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.navfoot input{width:100%}
+.tools{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;margin-top:.7rem}
+main{min-width:0;max-width:860px}
+main:focus{outline:none}
+.block{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:1rem 1.1rem;margin:0 0 1rem}
+.block.late{border-color:var(--warn);border-left-width:4px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.grid3 .block{margin:0}
+.big{font-size:1.6rem;font-weight:700;margin:.1rem 0 .5rem;font-variant-numeric:tabular-nums}
+.big small{font-size:.9rem;font-weight:400;color:var(--muted)}
+.kv{display:flex;justify-content:space-between;margin:.2rem 0;border-bottom:1px dotted var(--rule)}
+.bar{height:10px;border-radius:99px;background:var(--paper);border:1px solid var(--rule);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--raised)}
+.bar.warn span{background:var(--warn)}.bar.bad span{background:var(--bad)}
+input[type=text],input[type=search],input[type=number],input[type=date],select,textarea{font:inherit;font-size:.93rem;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:7px;padding:.4rem .55rem}
+textarea{width:100%;resize:vertical}
+.num{width:6.5rem}
+.row{display:flex;gap:.7rem;align-items:flex-end;flex-wrap:wrap;margin-top:.4rem}
+.row label,.filters label{display:flex;flex-direction:column;font-size:.82rem;color:var(--muted);gap:.2rem}
+.grow{flex:1;min-width:180px}
+.grow input{width:100%}
+.fl{display:flex;flex-direction:column;gap:.2rem;font-size:.82rem;color:var(--muted);margin-top:.5rem}
+.filters{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-end}
+.tasks{list-style:none;margin:0;padding:0}
+.task{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:.6rem;padding:.6rem 0;border-top:1px solid var(--rule);align-items:start}
+.task:first-child{border-top:0}
+.tick{position:relative;display:block;width:22px;height:22px;margin-top:.1rem;cursor:pointer}
+.tick input{position:absolute;opacity:0;width:22px;height:22px;margin:0;cursor:pointer}
+.tick .box{display:block;width:22px;height:22px;border-radius:50%;border:2px solid var(--muted)}
+.tick input:checked+.box{background:var(--raised);border-color:var(--raised);box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
+.tick input:focus-visible+.box{outline:3px solid var(--focus);outline-offset:2px}
+.tt{font-weight:700}
+.s-done .tt{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.s-cut .tt{color:var(--muted);font-style:italic}
+.s-blocked .tt{color:var(--bad)}
+.tm{display:flex;flex-wrap:wrap;gap:.25rem .7rem;font-size:.8rem;color:var(--muted);margin-top:.1rem}
+.tag{background:var(--paper);border:1px solid var(--rule);border-radius:5px;padding:0 .35rem}
+details{margin-top:.3rem}
+summary{cursor:pointer;font-size:.85rem;color:var(--focus)}
+details p{font-size:.92rem}
+.fb{color:var(--warn)}
+.st select{font-size:.82rem;padding:.25rem .4rem}
+.gates{display:flex;flex-direction:column;gap:.35rem}
+.gate{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.15rem .5rem;font-size:.88rem;padding:.15rem 0;border-bottom:1px dotted var(--rule)}
+.gate em{font-style:normal;font-size:.78rem;padding:0 .4rem;border-radius:5px;background:var(--paper)}
+.g-pass em{background:var(--raised-soft);color:var(--raised)}
+.g-fail em{background:var(--bad-soft);color:var(--bad)}
+.g-fallback em{background:var(--warn-soft);color:var(--warn)}
+.gatecard.g-pass{border-left:4px solid var(--raised)}.gatecard.g-fail{border-left:4px solid var(--bad)}.gatecard.g-fallback{border-left:4px solid var(--warn)}
+.tablewrap{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;margin-bottom:1rem}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:.8rem;color:var(--muted);font-weight:700}
+tr:last-child td{border-bottom:0}
+.res{font-size:.8rem;padding:.1rem .45rem;border-radius:5px;white-space:nowrap}
+.r-pass{background:var(--raised-soft);color:var(--raised)}.r-fail{background:var(--bad-soft);color:var(--bad)}.r-none{color:var(--muted)}.r-report{background:var(--paper)}
+.risk.lv-high{border-left:4px solid var(--bad)}.risk.lv-medium{border-left:4px solid var(--warn)}
+.issue.sev-high{border-left:4px solid var(--bad)}.issue.closed{opacity:.6}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:grid;grid-template-columns:150px 1fr;gap:.8rem;padding:.4rem 0;border-bottom:1px solid var(--rule);font-size:.92rem}
+.log time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.85rem}
+.log .k-manual span{font-weight:700}
+.notes{min-height:420px}
+#toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--paper);padding:.55rem 1rem;border-radius:8px;transition:opacity .2s,transform .2s;pointer-events:none;z-index:20}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.plain{margin:0;padding-left:1.1rem}
+.hbwrap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:1.4rem}
+.toc{position:sticky;top:1rem;align-self:start;margin:0;padding-left:2rem;font-size:.88rem;max-height:80vh;overflow:auto}
+.toc li{margin:.15rem 0}.toc .dim a{color:var(--muted);text-decoration:none}
+.hb{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;scroll-margin-top:1rem}
+.hb h2{font-size:1.15rem}
+.hb h3{margin-top:1rem}
+.hb ul,.hb ol{padding-left:1.2rem;margin:.3rem 0 .7rem}
+.hb li{margin:.2rem 0}
+.hb table{font-size:.88rem}
+.hb pre{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:.7rem .8rem;overflow-x:auto;font-size:.82rem;line-height:1.45;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hb code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--paper);padding:0 .25rem;border-radius:4px}
+.cp{display:flex;justify-content:space-between;align-items:center;margin-top:.6rem}
+.note{border-left:4px solid var(--raised);background:var(--raised-soft);padding:.5rem .8rem;border-radius:0 8px 8px 0}
+.note.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+@media (max-width:980px){.top{grid-template-columns:1fr}.acts{justify-content:flex-start}.cells{grid-template-columns:repeat(6,minmax(52px,1fr))}.strip{grid-template-columns:1fr}.layout{grid-template-columns:1fr}.side{position:static;flex-direction:row;flex-wrap:wrap}.navfoot{width:100%}.grid3{grid-template-columns:1fr}.hbwrap{grid-template-columns:1fr}.toc{position:static;max-height:none}}
+@media (max-width:560px){#app{padding:1rem .8rem 3rem}.cells{grid-template-columns:repeat(4,minmax(52px,1fr))}.clock{flex-wrap:wrap;gap:.8rem}.task{grid-template-columns:28px minmax(0,1fr)}.st{grid-column:2}.log li{grid-template-columns:1fr;gap:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{.side,.acts,.navfoot,#toast,.banner{display:none}.layout{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<noscript>This tracker needs JavaScript. The raw state is in the script tag with id tt-state.</noscript>
+<template id="handbook">
+<section class="hb" id="hb-start"><h2>How this file works</h2>
+<p>This file is the project's memory. It holds every task, gate, metric, decision, risk, issue, contact and log entry, plus this handbook. It lives in the repo root as <code>TRACKER.html</code> and opens in any browser, with no server.</p>
+<h3>Three ways it stays current</h3>
+<ol><li><b>Your clicks.</b> Ticking a task or editing a note saves to this browser at once.</li>
+<li><b>Save to file.</b> Writes everything back into TRACKER.html, so it can be committed. In Chrome or Edge it saves in place after the first time. Other browsers download a fresh copy, which you move into the repo.</li>
+<li><b>Claude Code.</b> It can edit the state JSON inside the file whenever it finishes a task. When you next open the file, its changes are merged with anything you did in the browser. For each task or note, the newest edit wins.</li></ol>
+<p class="note">A web page cannot watch your repo by itself. Nothing updates unless you, or Claude Code, change it. The "Changes not saved to file" label tells you when the browser copy is ahead of the file.</p>
+<h3>Add this to CLAUDE.md</h3>
+<pre id="p-claude">## Tracker
+TRACKER.html is the project memory. When a task is started, finished, blocked or cut:
+1. Edit only the JSON inside the script tag with id "tt-state" in TRACKER.html.
+2. Set the task's status (todo, doing, done, blocked, cut). For done, set done_at to the current ISO time.
+3. Set "changed_at" to the current ISO time on every item you edit.
+4. Add one entry at the start of "log": {"ts": ISO time, "kind": "claude", "text": "what changed"}.
+5. Increase "rev" by 1 and set "updated_at" to the current ISO time.
+6. Record measured numbers in "metrics" (value, measured_at, source: live or mock), new bugs in "issues", choices in "decisions".
+Keep the JSON valid. Never edit anything else in that file.</pre>
+<div class="cp"><span class="muted">Paste it under the Never section of CLAUDE.md.</span><button class="btn" data-act="copy" data-src="p-claude">Copy</button></div>
+<h3>Daily routine</h3>
+<ol><li>Morning: open the file, read Today, press Copy session brief, paste it into Claude Code.</li>
+<li>During the day: tick tasks, add notes, record numbers in Metrics, log anything surprising.</li>
+<li>Evening: one log entry, Save to file, commit with the code.</li></ol>
+<h3>Backups</h3><p>Export JSON before risky edits. Import JSON restores it. Reset to file throws away browser changes and reloads what the file holds.</p>
+</section>
+
+<section class="hb" id="hb-facts"><h2>Quick facts</h2>
+<table><tbody>
+<tr><th>Applications close</th><td>Oct 25, 11:59 PM ET, or earlier if 20,000 people are accepted</td></tr>
+<tr><th>Approval notice</th><td>By Oct 26, 9:00 AM ET</td></tr>
+<tr><th>Kickoff</th><td>Oct 26</td></tr>
+<tr><th>Workshops</th><td>Oct 27 to Nov 4, plus Discord office hours</td></tr>
+<tr><th>Submission</th><td>Nov 4, 9:00 PM ET. Our own target is 3:00 PM ET</td></tr>
+<tr><th>Judging</th><td>Nov 4 to Nov 8. Closing ceremony and winners Nov 9</td></tr>
+<tr><th>Track</th><td>Indie developer: creativity, technical ambition, whether it works</td></tr>
+<tr><th>Theme we name</th><td>Push the Frontier</td></tr>
+<tr><th>Credits</th><td>$150 in Meta Model API credits per participant. Some partners offer extra credits for open-weights models</td></tr>
+<tr><th>Indie prizes</th><td>$150,000, $100,000, $75,000, $50,000, $25,000 for first to fifth, plus up to $50,000 in bonus prizes, according to a guide that quotes the waiver</td></tr>
+<tr><th>Judging weights</th><td>Impact 30, Use of Meta tooling 25, Demo 25, Technical depth 20, according to the same guide. Confirm in the Official Rules</td></tr>
+</tbody></table>
+<h3>Models and endpoints</h3>
+<table><tbody>
+<tr><th>Base URL</th><td><code>https://api.meta.ai/v1</code>, OpenAI compatible, with an Anthropic compatible Messages format too</td></tr>
+<tr><th>Muse Spark</th><td><code>muse-spark-1.3</code>. 1M token context. Text, image, video and PDF in. Tool calling, structured output, search grounding, reasoning effort from minimal to xhigh</td></tr>
+<tr><th>SAM 3.1</th><td><code>sam-3-1</code>. Short noun phrase in, a box and mask for every match out. Tracks objects through video</td></tr>
+<tr><th>Muse Voice Transcribe</th><td><code>muse-voice-transcribe-1.0</code>. Realtime at <code>wss://api.meta.ai/v1/asr/realtime</code>. Keyword and language hints. Speaker labels and end of speech detection inside the model</td></tr>
+<tr><th>Muse Wonder</th><td>Listed on the event page. Not yet checked. Task d1-2</td></tr>
+</tbody></table>
+<h3>Prices and limits, to confirm on Day 1</h3>
+<ul><li>Muse Spark Standard: $1.25 per million input tokens, $4.25 per million output. Contributor mode is cheaper but lets Meta train on your data, so keep it away from real student voices.</li>
+<li>SAM 3.1: $2.50 per 1,000 images, $0.20 per 1,000 video frames.</li>
+<li>Muse Voice Transcribe: $0.18 per hour.</li>
+<li>Rate limits per team: Spark 3,000 requests and 4 million tokens per minute. SAM 3,000 requests per minute.</li></ul>
+</section>
+
+<section class="hb" id="hb-idea"><h2>The idea in one minute</h2>
+<p>A teacher uploads a science figure. Muse Spark names its parts, SAM 3.1 outlines each one, and code turns them into a printable sheet that follows tactile design rules. Traced with puffy paint, it becomes a raised graphic.</p>
+<p>A blind student puts the sheet under a phone camera. When a finger rests on a part, the app says its name. The student asks questions out loud and gets short answers drawn only from that figure.</p>
+<p><b>Why it matters:</b> by hand, one tactile figure takes 1 to 5 hours, or 200 to 1,000 hours per textbook. Older talking systems needed QR codes, color tags or special tablets on every sheet.</p>
+<p><b>What is new:</b> no markers at all, one region map that drives both the print and the speech, and answers grounded in code computed geometry.</p>
+</section>
+
+<section class="hb" id="hb-arch"><h2>Architecture</h2>
+<ul><li><b>Browser.</b> React and TypeScript strict, built with Vite. Routes <code>/author</code> and <code>/explore</code>. Hand tracking in a Web Worker.</li>
+<li><b>Backend.</b> Python 3.11 and FastAPI in one process. SQLite and files under <code>data/figures/&lt;sha256&gt;/</code>.</li>
+<li><b>Meta layer.</b> One client wrapper with timeouts, retry with backoff and jitter, a semaphore of 4 for SAM, a cache and a cost meter. <code>MOCK_META=1</code> replays fixtures.</li>
+<li><b>Local libraries.</b> OpenCV, shapely, liblouis with the UEB grade 2 table, cairosvg.</li></ul>
+<h3>Routes</h3>
+<table><tbody>
+<tr><td><code>POST /api/figures</code></td><td>Upload, start the pipeline</td></tr>
+<tr><td><code>GET /api/figures/{id}</code></td><td>Status and stage timings</td></tr>
+<tr><td><code>GET .../regions.json, tactile.svg, print.pdf</code></td><td>Outputs</td></tr>
+<tr><td><code>PATCH /api/figures/{id}/regions/{rid}</code></td><td>Teacher edits</td></tr>
+<tr><td><code>POST /api/figures/{id}/publish</code></td><td>Lock a reviewed version</td></tr>
+<tr><td><code>POST /api/register</code></td><td>One frame in, corners, rotation, confidence out</td></tr>
+<tr><td><code>POST /api/ask</code></td><td>Question in, answer streamed as server-sent events</td></tr>
+<tr><td><code>WS /api/voice</code></td><td>Audio relay to Muse Voice Transcribe</td></tr>
+</tbody></table>
+<h3>Repo map</h3>
+<pre>apps/web/            /author and /explore
+  src/explore/       camera loop, homography, region engine, audio
+  src/workers/       hand tracker
+services/api/app/    routes, pipeline (s0 to s5), meta client, geometry, braille
+config/              tactile_rules.yaml, explore.yaml
+docs/                regions.schema.json
+eval/                figures, touch tests, questions, RESULTS.md
+fixtures/            recorded Meta responses for mock mode
+TRACKER.html         this file</pre>
+</section>
+
+<section class="hb" id="hb-contract"><h2>The regions.json contract</h2>
+<p>The hand-off between Author and Explore. Explore needs nothing else to speak labels, play earcons and guide. Changing it needs a version bump.</p>
+<ul><li>Top level: schema_version, figure_id (sha256), title, figure_type, grade_band, page size in mm, summary, textures (at most 5).</li>
+<li>Each region: id, label, abbrev, description, polygon_mm (at most 200 points), centroid_mm, texture, parent, neighbors with direction, source (sam or teacher), confidence, verified_by_teacher.</li>
+<li>Neighbor directions are computed in code: up, down, left, right, the four diagonals, inside, around.</li></ul>
+</section>
+
+<section class="hb" id="hb-pipeline"><h2>Authoring pipeline</h2>
+<ol><li><b>S0 Ingest.</b> Check type and size, render the PDF page, straighten a photo, reject blur, resize to 2048 px, hash.</li>
+<li><b>S1 Understand, Muse Spark.</b> Type, title, summary, up to 25 parts as short phrases, color meaning, verdict: tactile, split, or words only.</li>
+<li><b>S2 Ground, SAM 3.1.</b> One call per phrase, four at a time, plus one for print text.</li>
+<li><b>S3 Reconcile.</b> Code merges and nests. Then Spark sees numbered outlines and says which number is which label. It never writes a coordinate.</li>
+<li><b>S4 Layout.</b> Polygons in mm, gaps, textures, point symbols, braille or a key.</li>
+<li><b>S5 Render.</b> SVG in layers, print PDF with a 100 mm calibration bar, regions.json, validation report.</li>
+<li><b>Rules check.</b> A failure stops the job and names the rule and region.</li>
+<li><b>S6 Review.</b> Teacher approves, edits, merges, deletes or adds by name, then publishes.</li></ol>
+<h3>Tactile rules and their sources</h3>
+<table><tbody>
+<tr><td>Gap between raised elements</td><td>3.2 mm (1/8 inch)</td><td>tactilegraphics.org</td></tr>
+<tr><td>Smallest point symbol</td><td>6.4 mm (1/4 inch)</td><td>APH handout</td></tr>
+<tr><td>Area textures per sheet</td><td>5, or 3 for lower grades</td><td>APH handout</td></tr>
+<tr><td>Braille dot base</td><td>1.5 to 1.6 mm</td><td>BANA signage guidelines</td></tr>
+<tr><td>Cell to cell</td><td>6.1 to 7.6 mm</td><td>BANA signage guidelines</td></tr>
+<tr><td>Braille line spacing</td><td>10.2 mm</td><td>NPS tactile map guidelines</td></tr>
+<tr><td>Principle</td><td>Represent, do not interpret</td><td>APH handout</td></tr>
+</tbody></table>
+<p class="muted">Signage values are a starting point. Confirm against the BANA 2022 tactile graphics guidelines before printing.</p>
+</section>
+
+<section class="hb" id="hb-explore"><h2>Explore loop</h2>
+<ol><li><b>Register.</b> Spoken notice, one frame to the server. OpenCV outline first, SAM fallback. Four rotations compared with the rendered SVG. Low confidence gives spoken help. R repeats it.</li>
+<li><b>Track.</b> MediaPipe Hand Landmarker in a worker, two hands, 21 points each. The pointing hand has the index finger out and the others curled.</li>
+<li><b>Contact point.</b> The fingertip moved back along the finger by a tuned offset, because contact is under the pad.</li>
+<li><b>Smooth.</b> 1 euro filter. Tune by setting beta to 0 and lowering the min cutoff until jitter at rest is gone, then raising beta until fast moves stop lagging.</li>
+<li><b>Map.</b> Homography from camera pixels to sheet mm.</li>
+<li><b>Decide.</b> Point-in-polygon, smallest region first, then the state machine.</li></ol>
+<h3>When to speak</h3>
+<table><tbody>
+<tr><td>Outside to Entering</td><td>finger inside the region shrunk by 1 mm</td></tr>
+<tr><td>Entering to Inside</td><td>held 120 ms, play the texture earcon</td></tr>
+<tr><td>Inside to Dwelled</td><td>slower than 15 mm/s for 600 ms, speak the label</td></tr>
+<tr><td>Inside or Dwelled to Leaving</td><td>finger outside the region grown by 2 mm</td></tr>
+<tr><td>Leaving to Outside</td><td>out for 120 ms, soft exit tick</td></tr>
+</tbody></table>
+<p>Earcons are capped at 6 per second. All values live in <code>config/explore.yaml</code> and are tuned with the touch eval.</p>
+<p class="note warn">A camera cannot tell touching from hovering just above the sheet. We rely on dwell time and say so in the README.</p>
+<h3>Guidance mode</h3><p>"Where is the aorta" is handled on the device. The direction is spoken once, then beeps speed up with distance, then a chime and the label on arrival.</p>
+</section>
+
+<section class="hb" id="hb-voice"><h2>Voice questions</h2>
+<ol><li>Hold Space. The mic opens and app speech pauses.</li>
+<li>16 kHz mono audio goes over a WebSocket to the backend, then to Muse Voice with region labels as keyword hints.</li>
+<li>On release, the local intent parser handles where is, more, repeat, stop and what is here.</li>
+<li>Anything else goes to <code>/api/ask</code> with the region, the last two regions and computed spatial facts.</li>
+<li>Muse Spark streams. The first sentence is spoken as soon as it is complete. Space cancels and listens again.</li></ol>
+<h3>Rules for answers</h3>
+<ul><li>One or two sentences. "More" gives detail.</li>
+<li>Only from the figure. If it is not shown, say so.</li>
+<li>No sight words. Never "as you can see".</li>
+<li>Directions and distances come from code, never from the model.</li></ul>
+</section>
+
+<section class="hb" id="hb-budgets"><h2>Speed, memory and cost</h2>
+<table><tbody>
+<tr><td>Touch to earcon</td><td>under 100 ms</td></tr>
+<tr><td>Dwell to label</td><td>dwell plus under 150 ms</td></tr>
+<tr><td>Release Space to first word</td><td>under 2 s</td></tr>
+<tr><td>Upload to review screen</td><td>under 90 s</td></tr>
+</tbody></table>
+<ul><li>One frame in flight. Drop frames, never queue. No pixels back from the worker.</li>
+<li>Images capped at 2048 px. Masks as 1-bit PNG. Polygons at most 200 points.</li>
+<li>Same figure twice costs nothing: every stage is cached by content hash.</li>
+<li>A budget miss is an issue with the measured number.</li></ul>
+</section>
+
+<section class="hb" id="hb-rules"><h2>Hard rules</h2>
+<ul><li>The API key never reaches the browser.</li>
+<li>Camera frames stay on the device, except the single registration frame, sent after a spoken notice and never stored.</li>
+<li>No magic numbers in geometry. Everything comes from <code>config/tactile_rules.yaml</code>.</li>
+<li>The renderer fails loudly rather than shrinking past a minimum.</li>
+<li>Every Meta response used in a test or the demo is recorded as a fixture.</li>
+<li>Everything in Explore works from the keyboard. Space talks, R recalibrates, Escape stops speech, H replays help.</li>
+<li>App voice or screen reader, never both.</li>
+<li>Nothing from Enhancements before Gate C. Freeze at noon on Nov 3.</li>
+<li>A task 50 percent over its time box takes its fallback.</li></ul>
+</section>
+
+<section class="hb" id="hb-scope"><h2>Not building, and why</h2>
+<ul><li>Accounts and login, because one teacher and one student on one machine is the demo.</li>
+<li>Redis, Celery, Postgres, Kubernetes, microservices, because one process handles this load.</li>
+<li>Training or fine tuning, because zero-shot SAM 3.1 is the point.</li>
+<li>OpenCV in the browser, because a 4 point homography is a few lines of math.</li>
+<li>Muse Image, because a generated picture must never replace the textbook figure.</li>
+<li>A native app or glasses SDK, because a browser is enough for now.</li>
+<li>Braille math codes. Math labels stay audio only.</li></ul>
+<p class="note">The test for any new idea: does it make the Nov 4 demo more likely to work, or only more likely to impress? If only the second, it waits.</p>
+</section>
+
+<section class="hb" id="hb-edges"><h2>Edge cases</h2>
+<table><tbody>
+<tr><td>Photo at an angle</td><td>Straighten from the page outline</td></tr>
+<tr><td>Blurry or tiny image</td><td>Reject with a plain reason</td></tr>
+<tr><td>Figure is a photograph</td><td>Recommend words only</td></tr>
+<tr><td>40 or more labels</td><td>Suggest two sheets</td></tr>
+<tr><td>Meaning in color only</td><td>Map to at most 5 textures, otherwise merge or split</td></tr>
+<tr><td>SAM misses a part</td><td>Teacher adds it by name. Local checkpoint with a click</td></tr>
+<tr><td>Outlines overlap</td><td>Contained becomes child, near duplicates merge, partial goes to the smaller</td></tr>
+<tr><td>Part below the minimum</td><td>Point symbol or merge into parent</td></tr>
+<tr><td>Braille does not fit</td><td>Abbreviation plus a key</td></tr>
+<tr><td>Printer scaled the page</td><td>Measure the 100 mm bar</td></tr>
+<tr><td>Glare or dark room</td><td>Confidence drops, spoken tip</td></tr>
+<tr><td>Sheet moved</td><td>Points land off the page, ask to recalibrate</td></tr>
+<tr><td>Two hands</td><td>Speak only for the pointing hand</td></tr>
+<tr><td>Finger on a border</td><td>Hysteresis holds the previous part</td></tr>
+<tr><td>Fast scanning</td><td>Earcons only, labels wait for a pause</td></tr>
+<tr><td>App speech heard by the mic</td><td>Mic closed while speaking unless headphones</td></tr>
+<tr><td>Answer not in the figure</td><td>Say so, name the closest part shown</td></tr>
+<tr><td>Network drops</td><td>Labels and guidance keep working, questions pause</td></tr>
+<tr><td>429 or 5xx</td><td>Backoff with jitter, "one moment" after 1.5 s</td></tr>
+<tr><td>Credits low</td><td>Warn at 70 and 90 percent, switch to mock</td></tr>
+</tbody></table>
+</section>
+
+<section class="hb" id="hb-eval"><h2>Evaluation</h2>
+<ul><li><b>Authoring:</b> 20 openly licensed figures. Part recall, label accuracy, rule violations, seconds per figure. Baselines: 1 to 5 hours by hand, 6.3 to 10.2 minutes with the 2007 UW system.</li>
+<li><b>Touch:</b> 9 point sheet, 5 touches each. Mean and p95 error in mm, hit rate on 30 touches, false switches per minute.</li>
+<li><b>Latency:</b> p50 and p95 for touch to earcon and release to first word.</li>
+<li><b>Voice:</b> 20 recorded questions, with and without keyword hints.</li>
+<li><b>Answers:</b> 20 questions, 5 not answerable from the figure.</li>
+<li><b>People:</b> find 3 parts, ask 3 questions, their own words, with consent.</li></ul>
+<p>Only numbers from <code>eval/RESULTS.md</code> go in the Metrics tab, the README and the video.</p>
+</section>
+
+<section class="hb" id="hb-tester"><h2>If there is no blind tester</h2>
+<p class="note warn">A blind user's experience cannot be simulated. Eyes-closed testing and AI personas measure the system, not its usefulness. Label every piece of evidence for what it is.</p>
+<ol><li>Northeastern's disability services office first.</li>
+<li>Remote expert review of the print PDF by a teacher of students with visual impairments or a braille transcriber.</li>
+<li>Remote test of the talking layer on a flat printout, with a hosted Explore page and a sighted helper placing the sheet.</li>
+<li>Ask in the hackathon Discord.</li>
+<li>An evidence-based design table linking each choice to BANA, APH or CamIO user feedback.</li>
+<li>Engineering tests: rules validator, replayed hand videos, screen reader and keyboard passes, eyes-closed tuning that is never cited as user feedback.</li></ol>
+<p>If nothing lands, the README says: not yet tested with blind users, design follows published guidelines and research, a user study is the next step.</p>
+</section>
+
+<section class="hb" id="hb-demo"><h2>Demo script, about two and a half minutes</h2>
+<table><tbody>
+<tr><td>0:00</td><td>One sentence on the hours it takes to make one figure tactile</td></tr>
+<tr><td>0:15</td><td>Teacher uploads a heart diagram, stages tick by, review screen</td></tr>
+<tr><td>0:45</td><td>The traced sheet, a ruler on the 100 mm bar</td></tr>
+<tr><td>1:00</td><td>Sheet under the phone, onboarding voice, earcons, "Left ventricle"</td></tr>
+<tr><td>1:25</td><td>"What does it do?" One sentence answer</td></tr>
+<tr><td>1:40</td><td>"Where is the aorta?" Beeps, chime, label</td></tr>
+<tr><td>2:00</td><td>Measured numbers on screen</td></tr>
+<tr><td>2:15</td><td>Which Meta model does which job, and why no Muse Image</td></tr>
+</tbody></table>
+<p>Record a day early. Never record a step that only works sometimes.</p>
+</section>
+
+<section class="hb" id="hb-apply"><h2>Application answers</h2>
+<h3>What do you want to build?</h3>
+<pre id="p-a1">I want to build Talking Tactile: science diagrams a blind student can feel with their fingers and ask questions about.
+
+Today, turning one textbook figure into a tactile graphic takes 1 to 5 hours by hand. A whole book can take 200 to 1,000 hours (University of Washington). Older talking versions needed QR codes or special tablets, which kept them expensive and rare.
+
+Here's my plan. Muse Spark reads the figure and names its parts. SAM 3.1 outlines each one. My code turns that into a print-ready raised sheet that follows BANA tactile guidelines.
+
+Then a phone camera watches the sheet. When a finger stops on a part, the app says what it is. The student can ask a question out loud. Muse Voice Transcribe hears it, and Muse Spark answers from that figure only.
+
+No markers, no special hardware. Just a camera that knows what you're touching. Theme: Push the Frontier.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-a1">Copy</button></div>
+<h3>An AI project you recently built</h3>
+<pre id="p-a2">Weavory, an MCP memory server for AI agents. It's live on npm as @weavory/mcp (github.com/DeepakKTS/weavory.ai). I built it for NandaHack 2026 at MIT Media Lab.
+
+The problem: when agents share memory, one bad agent can plant a false fact and the rest will trust it.
+
+So every belief is signed with Ed25519 and chained into a BLAKE3 audit log, which makes tampering visible. Agents vouch for each other, and a trust score decides what gets recalled. You can also replay what any agent believed at any past moment.
+
+It's strict TypeScript with five MCP tools, and all 232 tests pass. In the demo, a forged approval on a $42,000 insurance claim gets caught and quarantined.
+
+At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure OpenAI and AWS Bedrock.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-a2">Copy</button></div>
+<h3>The other questions</h3>
+<ul><li>Track: Indie developer.</li><li>Used Meta Model API before: answer truthfully.</li><li>How likely to build with it: very likely.</li><li>Overall opinion: neutral, or the not used yet option.</li><li>Questions 13 to 16 are not scored.</li></ul>
+</section>
+
+<section class="hb" id="hb-prompts"><h2>Prompts for Claude Code</h2>
+<h3>Start of a session</h3>
+<pre id="p-s1">Read CLAUDE.md, RULES.md and the state JSON in TRACKER.html. Tell me today's open tasks, anything overdue and the next gate. Do not write code yet.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s1">Copy</button></div>
+<h3>Work one task</h3>
+<pre id="p-s2">Work on task [id] from TRACKER.html. Follow RULES.md. Write the test first. When it passes, update the task in TRACKER.html as CLAUDE.md describes, and add one log entry.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s2">Copy</button></div>
+<h3>Spike a model</h3>
+<pre id="p-s3">Run the meta-api-spike skill for SAM 3.1 with fixtures/heart.png and these five phrases: left ventricle, right ventricle, left atrium, right atrium, aorta. Save the fixture, write spikes/sam.md with p50 and p95 latency and cost, and record the numbers in the TRACKER.html metrics or log.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s3">Copy</button></div>
+<h3>Check a gate</h3>
+<pre id="p-s4">Run the run-eval skill for the touch and latency suites. Update eval/RESULTS.md and the matching metrics in TRACKER.html. Tell me plainly whether Gate B passes, with the numbers.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s4">Copy</button></div>
+<h3>Over the time box</h3>
+<pre id="p-s5">Task [id] is 50 percent over its time box. Read its fallback in TRACKER.html, apply it, mark the task as done or cut, and record a decision explaining why.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s5">Copy</button></div>
+<h3>End of day</h3>
+<pre id="p-s6">Summarize today from git log. Add one log entry to TRACKER.html. List tomorrow's first three tasks by id. Point out anything that puts the next gate at risk.</pre>
+<div class="cp"><span></span><button class="btn" data-act="copy" data-src="p-s6">Copy</button></div>
+</section>
+
+<section class="hb" id="hb-stuck"><h2>When you are stuck</h2>
+<ul><li><b>Over the time box by half:</b> take the fallback written on the task. Record the decision.</li>
+<li><b>A gate fails:</b> take its fallback the same day. Do not carry it into tomorrow.</li>
+<li><b>An API behaves oddly:</b> run the meta-api-spike skill again and compare with the saved fixture.</li>
+<li><b>Tracking jitters:</b> lower the 1 euro min cutoff. If fast moves lag, raise beta.</li>
+<li><b>Labels flicker on borders:</b> grow the exit outline before touching the dwell time.</li>
+<li><b>Registration fails:</b> better light, tape the sheet, check all four corners are in view.</li>
+<li><b>A demo step is flaky:</b> cut it from the script.</li>
+<li><b>Tired and behind:</b> the MVP list is the whole job. Plus and Stretch can wait.</li></ul>
+</section>
+
+<section class="hb" id="hb-day1"><h2>Questions to settle on Day 1</h2>
+<ul><li>SAM 3.1 request shape: one phrase or several per call, and the mask format returned.</li>
+<li>Muse Voice realtime event names and the keyword hint parameter.</li>
+<li>Whether Muse Spark 1.3 caches a repeated prompt prefix.</li>
+<li>Real latency for each call.</li>
+<li>What Muse Wonder is.</li>
+<li>What the Official Rules require: public repo, video length, license.</li>
+<li>Whether Explore is fast enough in a phone browser.</li></ul>
+</section>
+
+<section class="hb" id="hb-glossary"><h2>Glossary</h2>
+<table><tbody>
+<tr><td>Tactile graphic</td><td>A raised picture read with the fingers</td></tr>
+<tr><td>BANA</td><td>Braille Authority of North America, which publishes tactile graphics guidelines</td></tr>
+<tr><td>APH</td><td>American Printing House for the Blind</td></tr>
+<tr><td>TVI</td><td>Teacher of students with visual impairments</td></tr>
+<tr><td>UEB</td><td>Unified English Braille</td></tr>
+<tr><td>Earcon</td><td>A short sound that means something, like a tone for a texture</td></tr>
+<tr><td>Dwell</td><td>Holding the finger still long enough to ask for the label</td></tr>
+<tr><td>Hysteresis</td><td>Using a smaller outline to enter and a larger one to leave, so borders do not flicker</td></tr>
+<tr><td>Homography</td><td>A 3 x 3 matrix that maps camera pixels onto the flat sheet</td></tr>
+<tr><td>1 euro filter</td><td>A smoothing filter that removes jitter at rest and keeps fast moves responsive</td></tr>
+<tr><td>Registration</td><td>Finding the sheet's corners and rotation in the camera image</td></tr>
+<tr><td>Gate</td><td>A pass test at the end of a planned day</td></tr>
+</tbody></table>
+</section>
+
+<section class="hb" id="hb-sources"><h2>Sources</h2>
+<ul>
+<li>University of Washington Tactile Graphics Assistant studies, 2005 and 2007</li>
+<li>Coughlan and Miele, CamIO, PMC5714613</li>
+<li>Reichinger and colleagues, 2016, tactile reliefs with finger tracking</li>
+<li>Fusco and Morash, 2015, The Tactile Graphics Helper</li>
+<li>BANA Guidelines and Standards for Tactile Graphics, 2010 and 2022</li>
+<li>APH, Planning and Designing Quality Tactile Graphics</li>
+<li>tactilegraphics.org, readability</li>
+<li>BANA Guidelines for the Creation of Braille Signage, 2023</li>
+<li>NPS Harpers Ferry Center tactile map guidelines, 2008</li>
+<li>Meta Model API products and pricing, and model pages for Muse Spark, SAM 3.1 and Muse Voice Transcribe</li>
+<li>MediaPipe Hand Landmarker for web</li>
+<li>Casiez, Roussel and Vogel, 1 euro filter, CHI 2012</li>
+<li>liblouis documentation</li>
+<li>ReconScribe guide to the hackathon, quoting the event waiver</li>
+<li>Meta, The Biggest News From Connect 2026</li>
+<li>Be My Eyes and Meta, March 2026</li></ul>
+<p class="muted">The full list with links is in the build plan PDF.</p>
+</section>
+
+</template>
+<script id="tt-state" type="application/json">
+{
+ "schema": 1,
+ "project": "Talking Tactile",
+ "rev": 1,
+ "updated_at": "2026-10-24T00:00:00.000Z",
+ "file_saved_at": "2026-10-24T00:00:00.000Z",
+ "budget_usd": 150,
+ "tasks": [
+  {
+   "id": "d0-1",
+   "day": 0,
+   "title": "Submit the hackathon application",
+   "detail": "Use the crisp answers in Handbook, Application answers. One application only.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "apply"
+   ]
+  },
+  {
+   "id": "d0-2",
+   "day": 0,
+   "title": "Make the Weavory repo public and its README current",
+   "detail": "Reviewers will click github.com/DeepakKTS/weavory.ai. Check the 232 tests and npm link are visible.",
+   "timebox": "30 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "apply"
+   ]
+  },
+  {
+   "id": "d0-3",
+   "day": 0,
+   "title": "Email Northeastern disability services",
+   "detail": "Ask for a student who reads tactile graphics, or staff who make them, for a 15 to 30 minute session between Nov 1 and Nov 3.",
+   "timebox": "20 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "tester"
+   ]
+  },
+  {
+   "id": "d0-4",
+   "day": 0,
+   "title": "Email Perkins School for the Blind",
+   "detail": "Ask an educator or transcriber for a remote review of one tactile sheet and the talking layer.",
+   "timebox": "20 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "tester"
+   ]
+  },
+  {
+   "id": "d0-5",
+   "day": 0,
+   "title": "Email one braille transcription service",
+   "detail": "Ask for a short remote design review of a print PDF. Offer to credit them.",
+   "timebox": "20 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "tester"
+   ]
+  },
+  {
+   "id": "d0-6",
+   "day": 0,
+   "title": "Buy materials",
+   "detail": "Puffy fabric paint in 2 colors, heavy cardstock, a phone stand or gooseneck clamp, masking tape, a ruler.",
+   "timebox": "1 h",
+   "fallback": "Hot glue and layered card also work.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "materials"
+   ]
+  },
+  {
+   "id": "d0-7",
+   "day": 0,
+   "title": "Read BANA tactile graphics guidelines, units 1 to 3",
+   "detail": "Use the 2022 edition. Note anything that changes config/tactile_rules.yaml.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "research"
+   ]
+  },
+  {
+   "id": "d0-8",
+   "day": 0,
+   "title": "List 20 openly licensed figures for the eval set",
+   "detail": "5 labeled diagrams, 5 bar charts, 5 line graphs, 5 maps. Write the license next to each.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "eval"
+   ]
+  },
+  {
+   "id": "d0-9",
+   "day": 0,
+   "title": "Note phone model and laptop GPU",
+   "detail": "Baseline for the Day 2 device decision.",
+   "timebox": "10 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "setup"
+   ]
+  },
+  {
+   "id": "d1-1",
+   "day": 1,
+   "title": "Watch kickoff, read and accept the Official Rules",
+   "detail": "Write anything that changes the plan into PLAN.md section 17 and a decision here.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "rules"
+   ]
+  },
+  {
+   "id": "d1-2",
+   "day": 1,
+   "title": "Check what Muse Wonder is",
+   "detail": "It is listed on the event page. Read its docs and decide if it has a real job here. Default answer: no.",
+   "timebox": "20 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "models"
+   ]
+  },
+  {
+   "id": "d1-3",
+   "day": 1,
+   "title": "Get the API key and credits, set BUDGET_USD",
+   "detail": "Key goes only in services/api/.env.",
+   "timebox": "20 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "setup"
+   ]
+  },
+  {
+   "id": "d1-4",
+   "day": 1,
+   "title": "Repo skeleton and kit",
+   "detail": "apps/web, services/api, Makefile, CI with lint and tests. Copy the kit and this file into the root.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "setup"
+   ]
+  },
+  {
+   "id": "d1-5",
+   "day": 1,
+   "title": "Spike Muse Spark",
+   "detail": "One figure in, structured parts list out. Use the meta-api-spike skill.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "spike",
+    "models"
+   ]
+  },
+  {
+   "id": "d1-6",
+   "day": 1,
+   "title": "Spike SAM 3.1",
+   "detail": "Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.",
+   "timebox": "1.5 h",
+   "fallback": "Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "spike",
+    "models"
+   ]
+  },
+  {
+   "id": "d1-7",
+   "day": 1,
+   "title": "Spike Muse Voice Transcribe",
+   "detail": "Stream 10 seconds of audio. Get partial and final text. Try keyword hints.",
+   "timebox": "1 h",
+   "fallback": "Use push-to-talk sync mode if realtime is awkward.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "spike",
+    "models"
+   ]
+  },
+  {
+   "id": "d1-8",
+   "day": 1,
+   "title": "Meta client wrapper",
+   "detail": "Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend"
+   ]
+  },
+  {
+   "id": "d1-9",
+   "day": 1,
+   "title": "Gate A check",
+   "detail": "All three models answer and latencies are written in spikes/.",
+   "timebox": "15 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "gate"
+   ]
+  },
+  {
+   "id": "d2-1",
+   "day": 2,
+   "title": "Camera module, newest frame only",
+   "detail": "getUserMedia, drop frames when busy, never queue.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend"
+   ]
+  },
+  {
+   "id": "d2-2",
+   "day": 2,
+   "title": "Hand worker with MediaPipe Hand Landmarker",
+   "detail": "VIDEO mode, two hands, landmarks only back to the main thread.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend"
+   ]
+  },
+  {
+   "id": "d2-3",
+   "day": 2,
+   "title": "Homography from 4 clicked corners",
+   "detail": "3 x 3 matrix, a few lines of math. Auto registration comes on Day 5.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend"
+   ]
+  },
+  {
+   "id": "d2-4",
+   "day": 2,
+   "title": "Run the 9 point touch test",
+   "detail": "Print the test sheet, 45 touches, record mean and p95 error in mm.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "eval"
+   ]
+  },
+  {
+   "id": "d2-5",
+   "day": 2,
+   "title": "Measure fps on phone browser and laptop",
+   "detail": "Pick the device for Explore.",
+   "timebox": "30 min",
+   "fallback": "Laptop plus phone as webcam.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend"
+   ]
+  },
+  {
+   "id": "d2-6",
+   "day": 2,
+   "title": "Record hand touch videos for replay tests",
+   "detail": "Lets tracking accuracy be measured the same way every run, with no person needed.",
+   "timebox": "30 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "eval",
+    "no-tester"
+   ]
+  },
+  {
+   "id": "d2-7",
+   "day": 2,
+   "title": "Gate B check",
+   "detail": "Mean fingertip error 4 mm or less.",
+   "timebox": "15 min",
+   "fallback": "Require the pointing pose, dwell 800 ms, parts above 12 mm.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "gate"
+   ]
+  },
+  {
+   "id": "d3-1",
+   "day": 3,
+   "title": "S0 ingest",
+   "detail": "Type and size check, PDF page render, deskew, blur check, 2048 px, hash.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author"
+   ]
+  },
+  {
+   "id": "d3-2",
+   "day": 3,
+   "title": "S1 understand",
+   "detail": "Muse Spark structured output: type, title, summary, parts, color meaning, verdict.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author",
+    "models"
+   ]
+  },
+  {
+   "id": "d3-3",
+   "day": 3,
+   "title": "S2 ground",
+   "detail": "One SAM 3.1 call per phrase, four at a time, plus print text.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author",
+    "models"
+   ]
+  },
+  {
+   "id": "d3-4",
+   "day": 3,
+   "title": "S3 reconcile",
+   "detail": "Merge near duplicates, nest contained parts, drop slivers, numbered overlay mapping.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author"
+   ]
+  },
+  {
+   "id": "d3-5",
+   "day": 3,
+   "title": "Unit tests for overlap rules",
+   "detail": "pytest cases for merge, contain, partial overlap.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "tests"
+   ]
+  },
+  {
+   "id": "d4-1",
+   "day": 4,
+   "title": "S4 layout",
+   "detail": "Polygons in mm, gap enforcement, textures, point symbols.",
+   "timebox": "3 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author"
+   ]
+  },
+  {
+   "id": "d4-2",
+   "day": 4,
+   "title": "Braille with liblouis",
+   "detail": "UEB grade 2, placement, key fallback with abbreviations.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author"
+   ]
+  },
+  {
+   "id": "d4-3",
+   "day": 4,
+   "title": "S5 render",
+   "detail": "tactile.svg, print.pdf with 100 mm calibration bar, regions.json, validation report.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "author"
+   ]
+  },
+  {
+   "id": "d4-4",
+   "day": 4,
+   "title": "Rules check passes on the heart figure",
+   "detail": "tactile-rules-check skill. Fix causes, never loosen rules.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "author",
+    "tests"
+   ]
+  },
+  {
+   "id": "d4-5",
+   "day": 4,
+   "title": "Print two copies and trace with puffy paint",
+   "detail": "Let them dry overnight. Tape the sheet edges for the demo.",
+   "timebox": "1 h",
+   "fallback": "Hot glue or layered card.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "materials"
+   ]
+  },
+  {
+   "id": "d5-1",
+   "day": 5,
+   "title": "Auto registration",
+   "detail": "/api/register: OpenCV outline first, SAM fallback, four rotation check, confidence.",
+   "timebox": "2.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "explore"
+   ]
+  },
+  {
+   "id": "d5-2",
+   "day": 5,
+   "title": "Region engine and state machine",
+   "detail": "Box check, point-in-polygon, hysteresis, dwell, vitest coverage.",
+   "timebox": "2.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "explore"
+   ]
+  },
+  {
+   "id": "d5-3",
+   "day": 5,
+   "title": "Earcons, dwell labels, exit tick, more",
+   "detail": "Earcons decoded once. Cap at 6 per second.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "explore"
+   ]
+  },
+  {
+   "id": "d5-4",
+   "day": 5,
+   "title": "Offline mode",
+   "detail": "Labels, earcons and guidance work with the network off.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "explore"
+   ]
+  },
+  {
+   "id": "d5-5",
+   "day": 5,
+   "title": "Gate C check",
+   "detail": "The heart figure works end to end on the real traced sheet.",
+   "timebox": "30 min",
+   "fallback": "Cut Plus features, spend Day 6 on the loop.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "gate"
+   ]
+  },
+  {
+   "id": "d6-1",
+   "day": 6,
+   "title": "Voice capture and proxy",
+   "detail": "AudioWorklet, 16 kHz mono, /api/voice relay, keyword hints from labels.",
+   "timebox": "2.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "backend",
+    "voice"
+   ]
+  },
+  {
+   "id": "d6-2",
+   "day": 6,
+   "title": "Local intent parser",
+   "detail": "where is, more, repeat, stop, what is here.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "voice"
+   ]
+  },
+  {
+   "id": "d6-3",
+   "day": 6,
+   "title": "Grounded answers",
+   "detail": "/api/ask with the cached figure context, streamed, first sentence spoken early.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "backend",
+    "voice",
+    "models"
+   ]
+  },
+  {
+   "id": "d6-4",
+   "day": 6,
+   "title": "Barge-in",
+   "detail": "Space cancels speech and starts listening.",
+   "timebox": "30 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "voice"
+   ]
+  },
+  {
+   "id": "d6-5",
+   "day": 6,
+   "title": "Guidance mode",
+   "detail": "Direction in words once, beeps speed up, chime and label on arrival.",
+   "timebox": "2 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "explore"
+   ]
+  },
+  {
+   "id": "d7-1",
+   "day": 7,
+   "title": "Teacher review screen",
+   "detail": "Edit, merge, delete, add by name, publish.",
+   "timebox": "3 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "frontend",
+    "author"
+   ]
+  },
+  {
+   "id": "d7-2",
+   "day": 7,
+   "title": "Accessibility pass",
+   "detail": "Keyboard only, VoiceOver or NVDA, onboarding audio. accessibility-pass skill.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "a11y"
+   ]
+  },
+  {
+   "id": "d7-3",
+   "day": 7,
+   "title": "Tester session or remote expert review",
+   "detail": "Record tasks, times and their own words, with consent.",
+   "timebox": "1.5 h",
+   "fallback": "Expert review of the print PDF, or an honest README note.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "tester"
+   ]
+  },
+  {
+   "id": "d7-4",
+   "day": 7,
+   "title": "Evidence-based design table",
+   "detail": "Map each design choice to its source: BANA, APH, CamIO user feedback.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "no-tester",
+    "docs"
+   ]
+  },
+  {
+   "id": "d8-1",
+   "day": 8,
+   "title": "Fix the top three issues",
+   "detail": "From testing and the Issues tab.",
+   "timebox": "3 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "fix"
+   ]
+  },
+  {
+   "id": "d8-2",
+   "day": 8,
+   "title": "Three more figure types",
+   "detail": "add-figure-type skill.",
+   "timebox": "2.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "author"
+   ]
+  },
+  {
+   "id": "d8-3",
+   "day": 8,
+   "title": "Run every eval suite",
+   "detail": "run-eval skill. Fill the Metrics tab from eval/RESULTS.md.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "eval"
+   ]
+  },
+  {
+   "id": "d9-1",
+   "day": 9,
+   "title": "Feature freeze at noon",
+   "detail": "Only bug fixes, video and README after this.",
+   "timebox": "0",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "scope"
+   ]
+  },
+  {
+   "id": "d9-2",
+   "day": 9,
+   "title": "Demo readiness checklist",
+   "detail": "demo-readiness skill. Passes twice in a row.",
+   "timebox": "1 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "demo"
+   ]
+  },
+  {
+   "id": "d9-3",
+   "day": 9,
+   "title": "Record the demo video",
+   "detail": "Two takes minimum. Only steps that work every time.",
+   "timebox": "2 h",
+   "fallback": "Cut the failing step from the script.",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "demo"
+   ]
+  },
+  {
+   "id": "d9-4",
+   "day": 9,
+   "title": "README with measured numbers",
+   "detail": "Setup, models and why, numbers from RESULTS.md, honest tester status.",
+   "timebox": "1.5 h",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "docs"
+   ]
+  },
+  {
+   "id": "d10-1",
+   "day": 10,
+   "title": "Fresh clone test",
+   "detail": "Clone, make dev, run the demo script once.",
+   "timebox": "45 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "demo"
+   ]
+  },
+  {
+   "id": "d10-2",
+   "day": 10,
+   "title": "Submit by 3 PM ET",
+   "detail": "The official deadline is 9 PM ET. Do not use it.",
+   "timebox": "30 min",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "submit"
+   ]
+  }
+ ],
+ "gates": [
+  {
+   "id": "A",
+   "day": 1,
+   "title": "Models answer",
+   "test": "Muse Spark, SAM 3.1 and Muse Voice all return real results. p50 and p95 latency written in spikes/.",
+   "fallback": "Weak SAM on line art: local SAM 3.1 checkpoint with point prompts, same day.",
+   "status": "pending",
+   "evidence": ""
+  },
+  {
+   "id": "B",
+   "day": 2,
+   "title": "Tracking is accurate",
+   "test": "Mean fingertip error of 4 mm or less on the 9 point sheet.",
+   "fallback": "Require the pointing pose, dwell 800 ms, keep parts above 12 mm.",
+   "status": "pending",
+   "evidence": ""
+  },
+  {
+   "id": "C",
+   "day": 5,
+   "title": "One figure end to end",
+   "test": "The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.",
+   "fallback": "Cut Plus features. Spend Day 6 on the loop only.",
+   "status": "pending",
+   "evidence": ""
+  },
+  {
+   "id": "D",
+   "day": 9,
+   "title": "Demo ready",
+   "test": "Demo readiness checklist passes twice in a row, live, with no restart.",
+   "fallback": "Cut the failing step from the script. Never record a flaky step.",
+   "status": "pending",
+   "evidence": ""
+  }
+ ],
+ "metrics": [
+  {
+   "id": "touch-mean",
+   "suite": "Touch",
+   "name": "Mean fingertip error",
+   "cmp": "\u003c=",
+   "target": 4,
+   "unit": "mm",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "touch-p95",
+   "suite": "Touch",
+   "name": "p95 fingertip error",
+   "cmp": "\u003c=",
+   "target": 8,
+   "unit": "mm",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "touch-hit",
+   "suite": "Touch",
+   "name": "Region hit rate on 30 touches",
+   "cmp": ">=",
+   "target": 95,
+   "unit": "%",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "touch-false",
+   "suite": "Touch",
+   "name": "False switches per minute at rest",
+   "cmp": "\u003c=",
+   "target": 1,
+   "unit": "per min",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "lat-earcon",
+   "suite": "Latency",
+   "name": "Touch to earcon, p95",
+   "cmp": "\u003c=",
+   "target": 100,
+   "unit": "ms",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "lat-answer",
+   "suite": "Latency",
+   "name": "Release Space to first word, p50",
+   "cmp": "\u003c=",
+   "target": 2.0,
+   "unit": "s",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "auth-time",
+   "suite": "Authoring",
+   "name": "Upload to review screen",
+   "cmp": "\u003c=",
+   "target": 90,
+   "unit": "s",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "auth-recall",
+   "suite": "Authoring",
+   "name": "Part recall on 20 figures",
+   "cmp": ">=",
+   "target": 80,
+   "unit": "%",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "auth-viol",
+   "suite": "Authoring",
+   "name": "Rule violations",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "count",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "ans-refuse",
+   "suite": "Answers",
+   "name": "Correct refusals out of 5",
+   "cmp": ">=",
+   "target": 5,
+   "unit": "of 5",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "voice-hint",
+   "suite": "Voice",
+   "name": "Term accuracy with keyword hints",
+   "cmp": ">=",
+   "target": 0,
+   "unit": "%",
+   "report_only": true,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  },
+  {
+   "id": "voice-nohint",
+   "suite": "Voice",
+   "name": "Term accuracy without hints",
+   "cmp": ">=",
+   "target": 0,
+   "unit": "%",
+   "report_only": true,
+   "value": null,
+   "measured_at": null,
+   "source": ""
+  }
+ ],
+ "costs": [],
+ "outreach": [
+  {
+   "id": "o1",
+   "who": "Northeastern disability services office",
+   "channel": "Email",
+   "status": "not contacted",
+   "date": "",
+   "note": "Ask for a tactile graphics reader or staff member"
+  },
+  {
+   "id": "o2",
+   "who": "Perkins School for the Blind",
+   "channel": "Email or contact form",
+   "status": "not contacted",
+   "date": "",
+   "note": "Educator or transcriber, remote review"
+  },
+  {
+   "id": "o3",
+   "who": "A braille transcription service",
+   "channel": "Email",
+   "status": "not contacted",
+   "date": "",
+   "note": "Review of the print PDF"
+  },
+  {
+   "id": "o4",
+   "who": "Hackathon Discord",
+   "channel": "Post",
+   "status": "not contacted",
+   "date": "",
+   "note": "Ask if any participant is blind, low vision, or teaches in the field"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "dec-1",
+   "date": "2026-10-24",
+   "title": "Project is Talking Tactile",
+   "decision": "Build markerless talking tactile graphics.",
+   "why": "Documented problem, clear Meta model fit, strong demo, low crowding."
+  },
+  {
+   "id": "dec-2",
+   "date": "2026-10-24",
+   "title": "Theme is Push the Frontier",
+   "decision": "Name Push the Frontier in the application.",
+   "why": "Build for Your World asks for firsthand experience, which I do not claim."
+  },
+  {
+   "id": "dec-3",
+   "date": "2026-10-24",
+   "title": "No Muse Image",
+   "decision": "Do not use Muse Image anywhere.",
+   "why": "A generated picture must never replace the textbook figure."
+  },
+  {
+   "id": "dec-4",
+   "date": "2026-10-24",
+   "title": "One backend process",
+   "decision": "FastAPI, async tasks, SQLite, files.",
+   "why": "Solo ten day build. No queues, no containers."
+  },
+  {
+   "id": "dec-5",
+   "date": "2026-10-24",
+   "title": "Hand tracking in a Web Worker",
+   "decision": "MediaPipe Hand Landmarker in a worker, pending the Day 2 benchmark.",
+   "why": "Detection blocks the main thread according to its docs."
+  }
+ ],
+ "risks": [
+  {
+   "id": "r1",
+   "title": "No blind tester in time",
+   "level": "high",
+   "status": "open",
+   "plan": "Outreach now. Fallback: remote expert review, then an honest README note."
+  },
+  {
+   "id": "r2",
+   "title": "SAM weak on thin line art",
+   "level": "high",
+   "status": "open",
+   "plan": "Day 1 test on 5 figures. Teacher adds parts by name. Local checkpoint with clicks."
+  },
+  {
+   "id": "r3",
+   "title": "Fingertip error too high",
+   "level": "high",
+   "status": "open",
+   "plan": "Gate B and its fallbacks."
+  },
+  {
+   "id": "r4",
+   "title": "API latency",
+   "level": "medium",
+   "status": "open",
+   "plan": "Local intents for common requests. First sentence spoken early."
+  },
+  {
+   "id": "r5",
+   "title": "Hand-made sheet quality",
+   "level": "medium",
+   "status": "open",
+   "plan": "Two copies on Day 4, dry overnight. Hot glue backup."
+  },
+  {
+   "id": "r6",
+   "title": "Running out of credits",
+   "level": "medium",
+   "status": "open",
+   "plan": "Cost meter, mock mode for development."
+  },
+  {
+   "id": "r7",
+   "title": "Scope creep",
+   "level": "high",
+   "status": "open",
+   "plan": "Gates, the scope test, freeze at noon on Nov 3."
+  },
+  {
+   "id": "r8",
+   "title": "Official rules conflict",
+   "level": "high",
+   "status": "open",
+   "plan": "Read them Oct 26 and update the plan that day."
+  }
+ ],
+ "issues": [],
+ "log": [
+  {
+   "ts": "2026-10-24T00:00:00.000Z",
+   "kind": "auto",
+   "text": "Tracker created. Plan, kit and application answers are ready."
+  }
+ ],
+ "notes": "",
+ "ui": {
+  "theme": "auto"
+ }
+}
+</script>
+<script>
+(function(){
+'use strict';
+var KEY='talking-tactile-tracker-v1', TZ='America/New_York';
+var DATES={app:'2026-10-26T03:59:00Z',kickoff:'2026-10-26T17:00:00Z',target:'2026-11-04T20:00:00Z',submit:'2026-11-05T02:00:00Z',closing:'2026-11-09T17:00:00Z'};
+var DAYS=[
+ {n:0,label:'Oct 23 to 25',iso:['2026-10-23','2026-10-24','2026-10-25'],focus:'Apply, line up feedback, buy materials. No project code yet.'},
+ {n:1,label:'Mon Oct 26',iso:['2026-10-26'],focus:'Kickoff, rules, keys, repo. Spikes on Spark, SAM and Voice.',gate:'A'},
+ {n:2,label:'Tue Oct 27',iso:['2026-10-27'],focus:'Hand tracking, homography, the 9 point touch test.',gate:'B'},
+ {n:3,label:'Wed Oct 28',iso:['2026-10-28'],focus:'Authoring stages S0 to S3.'},
+ {n:4,label:'Thu Oct 29',iso:['2026-10-29'],focus:'S4 and S5, print, trace the first sheet, dry overnight.'},
+ {n:5,label:'Fri Oct 30',iso:['2026-10-30'],focus:'Explore loop on the real sheet.',gate:'C'},
+ {n:6,label:'Sat Oct 31',iso:['2026-10-31'],focus:'Voice, grounded answers, guidance mode.'},
+ {n:7,label:'Sun Nov 1',iso:['2026-11-01'],focus:'Review screen, accessibility pass, tester or expert review.'},
+ {n:8,label:'Mon Nov 2',iso:['2026-11-02'],focus:'Fixes from testing, more figure types, full eval.'},
+ {n:9,label:'Tue Nov 3',iso:['2026-11-03'],focus:'Freeze at noon, demo video, README.',gate:'D'},
+ {n:10,label:'Wed Nov 4',iso:['2026-11-04'],focus:'Fresh clone test. Submit by 3 PM ET.'}
+];
+var VIEWS=[['today','Today'],['tasks','All tasks'],['gates','Gates'],['metrics','Metrics'],['budget','Credits'],['people','Feedback'],['decisions','Decisions'],['risks','Risks'],['issues','Issues'],['log','Log'],['notes','Notes'],['handbook','Handbook']];
+var STATUSES=[['todo','To do'],['doing','Doing'],['done','Done'],['blocked','Blocked'],['cut','Cut']];
+var state, original, view='today', filt={day:'all',status:'open',q:''}, banner='', storageOK=true, fileHandle=null, hbQuery='';
+
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function nowISO(){return new Date().toISOString()}
+function uid(p){return p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function etDate(d){var p=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d||new Date());var o={};p.forEach(function(x){o[x.type]=x.value});return o.year+'-'+o.month+'-'+o.day}
+function fmtET(iso){if(!iso)return '';return new Intl.DateTimeFormat('en-US',{timeZone:TZ,month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(iso))+' ET'}
+function currentDay(){var t=etDate();if(t<'2026-10-26')return 0;for(var i=0;i<DAYS.length;i++){if(DAYS[i].iso.indexOf(t)>=0)return i}return 11}
+function until(iso){var ms=new Date(iso)-new Date();if(ms<=0)return null;var m=Math.floor(ms/60000),d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mm=m%60;return (d?d+' d ':'')+(h?h+' h ':'')+(d?'':mm+' min')}
+
+/* ---------- storage ---------- */
+function readEmbedded(){return JSON.parse($('#tt-state').textContent)}
+function ensure(a){
+ ['tasks','gates','metrics','outreach','decisions','risks','costs','issues','log'].forEach(function(k){a[k]=a[k]||[]});
+ a.ui=a.ui||{theme:'auto'};if(a.notes==null)a.notes='';if(!a.budget_usd)a.budget_usd=150;if(!a.rev)a.rev=1;return a;
+}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function mergeBoth(file,loc){
+ var out=ensure(clone(file));loc=ensure(clone(loc));
+ ['tasks','gates','metrics','outreach','risks','issues','decisions'].forEach(function(k){
+  var idx={};out[k].forEach(function(x,i){idx[x.id]=i});
+  loc[k].forEach(function(x){
+   if(idx[x.id]===undefined){out[k].push(x);return}
+   var f=out[k][idx[x.id]];if((x.changed_at||'')>(f.changed_at||''))out[k][idx[x.id]]=x;
+  });
+ });
+ var seen={};out.log=out.log.concat(loc.log).filter(function(l){var key=l.ts+'|'+l.text;if(seen[key])return false;seen[key]=1;return true}).sort(function(a,b){return a.ts<b.ts?1:-1});
+ var cs={};out.costs=out.costs.concat(loc.costs).filter(function(c){var key=c.ts+'|'+c.item;if(cs[key])return false;cs[key]=1;return true});
+ if((loc.notes_changed_at||'')>(out.notes_changed_at||'')){out.notes=loc.notes;out.notes_changed_at=loc.notes_changed_at}
+ out.ui=loc.ui||out.ui;
+ return out;
+}
+function load(){
+ var emb=ensure(readEmbedded());original=clone(emb);var loc=null;
+ try{var r=localStorage.getItem(KEY);if(r)loc=ensure(JSON.parse(r))}catch(e){storageOK=false}
+ if(!loc){state=clone(emb);state.base_rev=emb.rev}
+ else if(emb.rev===loc.base_rev){state=loc;var miss=clone(emb);['tasks','gates','metrics','outreach','decisions','risks'].forEach(function(k){var ids={};state[k].forEach(function(x){ids[x.id]=1});miss[k].forEach(function(x){if(!ids[x.id])state[k].push(x)})});
+  if(state.rev!==state.base_rev)banner='This browser has changes that are not in the file yet. Use Save to file so the repo has them.'}
+ else{state=mergeBoth(emb,loc);state.base_rev=emb.rev;state.rev=Math.max(emb.rev,loc.rev||0)+1;
+  banner=(loc.rev===loc.base_rev)?'The file changed since this browser last saw it, probably from Claude Code. It was loaded, with nothing lost. Save to file to confirm.':'The file and this browser both changed. They were merged, keeping the newest edit of each item. Save to file to keep the result.'}
+ if(!storageOK)banner='This browser is blocking local storage here, so changes last only until you close the tab. Use Save to file often.';
+ try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+}
+function persist(silent){
+ state.rev=(state.rev||1)+1;state.updated_at=nowISO();
+ try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true}catch(e){storageOK=false}
+ if(!silent)render();else renderStatusOnly();
+}
+function touch(o){if(o)o.changed_at=nowISO();return o}
+function logEvent(text,kind){state.log.unshift({ts:nowISO(),kind:kind||'auto',text:text});if(state.log.length>500)state.log.length=500}
+
+function buildFileHTML(){
+ var root=document.documentElement.cloneNode(true);
+ $('#app',root).innerHTML='';
+ root.removeAttribute('data-theme');
+ var out=clone(state);delete out.base_rev;var json=JSON.stringify(out,null,1).replace(/</g,'\\u003c');
+ $('#tt-state',root).textContent='\n'+json+'\n';
+ return '<!DOCTYPE html>\n'+root.outerHTML;
+}
+function download(name,text,type){
+ var b=new Blob([text],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function saveToFile(){
+ var prevBase=state.base_rev;state.base_rev=state.rev;state.file_saved_at=nowISO();
+ try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+ var html=buildFileHTML();
+ var done=function(how){toast(how);render()};
+ if(window.showSaveFilePicker){
+  (fileHandle?Promise.resolve(fileHandle):window.showSaveFilePicker({suggestedName:'TRACKER.html',types:[{description:'HTML file',accept:{'text/html':['.html']}}]}))
+  .then(function(h){fileHandle=h;return h.createWritable()}).then(function(w){return w.write(html).then(function(){return w.close()})})
+  .then(function(){done('Saved to TRACKER.html')})
+  .catch(function(e){if(e&&e.name==='AbortError'){state.base_rev=prevBase;try{localStorage.setItem(KEY,JSON.stringify(state))}catch(x){}render();return}download('TRACKER.html',html,'text/html');done('Downloaded TRACKER.html. Replace the copy in your repo with it.')});
+ } else {download('TRACKER.html',html,'text/html');done('Downloaded TRACKER.html. Replace the copy in your repo with it.')}
+}
+function copyText(t){
+ var ok=function(){toast('Copied')};
+ if(navigator.clipboard&&window.isSecureContext!==false){navigator.clipboard.writeText(t).then(ok,function(){fallbackCopy(t)})}else fallbackCopy(t);
+}
+function fallbackCopy(t){var ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied')}catch(e){toast('Copy failed. Select the text and copy it by hand.')}ta.remove()}
+var toastTimer;function toast(m){var t=$('#toast');if(!t)return;t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},2600)}
+
+/* ---------- derived ---------- */
+function live(){return state.tasks.filter(function(t){return t.status!=='cut'})}
+function progress(list){list=list||live();var d=list.filter(function(t){return t.status==='done'}).length;return {done:d,total:list.length,pct:list.length?Math.round(d*100/list.length):0}}
+function dayTasks(n){return state.tasks.filter(function(t){return t.day===n})}
+function overdue(){var c=currentDay();return state.tasks.filter(function(t){return t.day<c&&(t.status==='todo'||t.status==='doing'||t.status==='blocked')})}
+function metricState(m){if(m.value===null||m.value===''||m.value===undefined)return 'none';if(m.report_only)return 'report';var v=Number(m.value);return (m.cmp==='<='?v<=m.target:v>=m.target)?'pass':'fail'}
+function spent(){return state.costs.reduce(function(s,c){return s+Number(c.usd||0)},0)}
+function dirty(){return state.rev!==state.base_rev}
+
+/* ---------- rendering ---------- */
+function cell(n){
+ var ts=dayTasks(n);var cur=currentDay();var p=progress(ts.filter(function(t){return t.status!=='cut'}));
+ var dots=ts.map(function(t){return '<i class="d d-'+t.status+'" title="'+esc(t.title)+'"></i>'}).join('');
+ var cls='cell'+(n===cur?' now':'')+(n<cur&&p.pct<100?' late':'')+(p.total&&p.pct===100?' full':'');
+ return '<button class="'+cls+'" data-act="goday" data-day="'+n+'" aria-label="Day '+n+', '+p.done+' of '+p.total+' done"><span class="dots">'+dots+'</span><span class="cl">D'+n+'</span><span class="cs">'+p.done+'/'+p.total+'</span></button>';
+}
+function header(){
+ var p=progress(),cur=currentDay();var nx=until(DATES.submit),tg=until(DATES.target),ap=until(DATES.app);
+ var dayTxt=cur===11?'Build window over':('Day '+cur+' of 10');
+ var foc=cur<=10?DAYS[cur].focus:'Judging runs Nov 4 to 8. Closing ceremony Nov 9.';
+ var save=dirty()?'<span class="pill warn">Changes not saved to file</span>':'<span class="pill ok">File is up to date</span>';
+ return '<header class="top"><div class="brand"><h1>Talking Tactile</h1><p class="sub">Build tracker and handbook</p></div>'+
+ '<div class="clock"><div><b>'+(tg?esc(tg):'past')+'</b><span>to our 3 PM ET target</span></div><div><b>'+(nx?esc(nx):'closed')+'</b><span>to the 9 PM ET deadline</span></div>'+(ap?'<div><b>'+esc(ap)+'</b><span>to the application deadline</span></div>':'')+'</div>'+
+ '<div class="acts">'+save+'<button class="btn primary" data-act="save">Save to file</button><button class="btn" data-act="brief">Copy session brief</button></div></header>'+
+ '<section class="strip" aria-label="Progress by day"><div class="sl"><b>'+p.pct+'%</b><span>'+p.done+' of '+p.total+' tasks</span><span class="today">'+esc(dayTxt)+'</span></div><div class="cells">'+DAYS.map(function(d){return cell(d.n)}).join('')+'</div></section>'+
+ '<p class="focus"><b>Focus:</b> '+esc(foc)+'</p>'+(banner?'<div class="banner" role="status">'+esc(banner)+' <button class="link" data-act="dismiss">Dismiss</button></div>':'');
+}
+function nav(){return '<nav class="side" aria-label="Sections">'+VIEWS.map(function(v){var badge='';if(v[0]==='issues'){var n=state.issues.filter(function(i){return i.status!=='closed'}).length;if(n)badge='<span class="badge">'+n+'</span>'}if(v[0]==='today'){var o=overdue().length;if(o)badge='<span class="badge late">'+o+'</span>'}return '<button class="nv'+(view===v[0]?' on':'')+'" data-act="view" data-view="'+v[0]+'"'+(view===v[0]?' aria-current="page"':'')+'>'+v[1]+badge+'</button>'}).join('')+
+ '<div class="navfoot"><label for="q" class="vh">Search everything</label><input id="q" type="search" placeholder="Search tasks and handbook" value="'+esc(filt.q)+'" data-act="gsearch"><div class="tools"><button class="link" data-act="export">Export JSON</button><button class="link" data-act="import">Import JSON</button><button class="link" data-act="theme">Theme: '+esc(state.ui.theme)+'</button><button class="link danger" data-act="reset">Reset to file</button></div></div></nav>'}
+function statusSel(t){return '<select data-act="tstatus" data-id="'+t.id+'" aria-label="Status">'+STATUSES.map(function(s){return '<option value="'+s[0]+'"'+(t.status===s[0]?' selected':'')+'>'+s[1]+'</option>'}).join('')+'</select>'}
+function taskRow(t){
+ var done=t.status==='done';
+ return '<li class="task s-'+t.status+'" id="t-'+t.id+'"><label class="tick"><input type="checkbox" data-act="toggle" data-id="'+t.id+'"'+(done?' checked':'')+'><span class="box" aria-hidden="true"></span><span class="vh">Done</span></label>'+
+ '<div class="tb"><div class="tt">'+esc(t.title)+'</div><div class="tm"><span>D'+t.day+'</span>'+(t.timebox?'<span>'+esc(t.timebox)+'</span>':'')+(t.done_at?'<span>done '+esc(fmtET(t.done_at))+'</span>':'')+(t.tags||[]).map(function(g){return '<span class="tag">'+esc(g)+'</span>'}).join('')+'</div>'+
+ '<details><summary>Details and notes</summary>'+(t.detail?'<p>'+esc(t.detail)+'</p>':'')+(t.fallback?'<p class="fb"><b>If it overruns:</b> '+esc(t.fallback)+'</p>':'')+
+ '<label class="fl">Notes<textarea data-act="tnote" data-id="'+t.id+'" rows="2" placeholder="What happened, what you measured, what is left">'+esc(t.note)+'</textarea></label>'+
+ '<div class="row"><button class="link danger" data-act="tdel" data-id="'+t.id+'">Delete task</button></div></details></div><div class="st">'+statusSel(t)+'</div></li>';
+}
+function vToday(){
+ var cur=currentDay(),o=overdue();var todays=cur<=10?dayTasks(cur):[];var open=todays.filter(function(t){return t.status!=='done'&&t.status!=='cut'});
+ var blocked=state.tasks.filter(function(t){return t.status==='blocked'});
+ var g=state.gates.map(function(x){return '<div class="gate g-'+x.status+'"><span><b>Gate '+x.id+'</b> '+esc(x.title)+'</span><em>'+esc(x.status)+'</em></div>'}).join('');
+ var sp=spent(),pc=Math.round(sp*100/state.budget_usd);
+ var mm=state.metrics.map(metricState);var pass=mm.filter(function(x){return x==='pass'}).length,fail=mm.filter(function(x){return x==='fail'}).length,none=mm.filter(function(x){return x==='none'}).length;
+ var people=state.outreach.filter(function(x){return x.status==='scheduled'||x.status==='done'}).length;
+ return '<h2>Today</h2>'+
+ (o.length?'<div class="block late"><h3>Overdue from earlier days</h3><ul class="tasks">'+o.map(taskRow).join('')+'</ul></div>':'')+
+ '<div class="block"><h3>'+(cur<=10?'Day '+cur+', '+esc(DAYS[cur].label):'After the build window')+'</h3>'+(open.length?'<ul class="tasks">'+open.map(taskRow).join('')+'</ul>':'<p class="empty">Nothing open for today. Pull the next task from tomorrow, or write a log entry.</p>')+'</div>'+
+ (blocked.length?'<div class="block"><h3>Blocked</h3><ul class="tasks">'+blocked.map(taskRow).join('')+'</ul></div>':'')+
+ '<div class="grid3"><div class="block"><h3>Gates</h3><div class="gates">'+g+'</div></div>'+
+ '<div class="block"><h3>Credits</h3><p class="big">$'+sp.toFixed(2)+' <small>of $'+state.budget_usd+'</small></p>'+bar(pc,pc>=90?'bad':pc>=70?'warn':'')+'</div>'+
+ '<div class="block"><h3>Evidence</h3><p class="kv"><span>Metrics passing</span><b>'+pass+'</b></p><p class="kv"><span>Failing</span><b>'+fail+'</b></p><p class="kv"><span>Not measured</span><b>'+none+'</b></p><p class="kv"><span>Feedback sessions set</span><b>'+people+'</b></p></div></div>'+
+ '<div class="block"><h3>Quick log</h3><div class="row"><label for="qlog" class="vh">Log entry</label><input id="qlog" type="text" placeholder="One line: what changed, what you learned"><button class="btn" data-act="qlog">Add to log</button></div></div>';
+}
+function bar(p,c){return '<div class="bar '+(c||'')+'" role="progressbar" aria-valuenow="'+p+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+Math.min(100,p)+'%"></span></div>'}
+function vTasks(){
+ var list=state.tasks.filter(function(t){
+  if(filt.day!=='all'&&String(t.day)!==String(filt.day))return false;
+  if(filt.status==='open'&&(t.status==='done'||t.status==='cut'))return false;
+  if(filt.status!=='open'&&filt.status!=='all'&&t.status!==filt.status)return false;
+  if(filt.tq){var h=(t.title+' '+t.detail+' '+t.note+' '+(t.tags||[]).join(' ')).toLowerCase();if(h.indexOf(filt.tq.toLowerCase())<0)return false}
+  return true});
+ var groups={};list.forEach(function(t){(groups[t.day]=groups[t.day]||[]).push(t)});
+ var dayOpts='<option value="all">All days</option>'+DAYS.map(function(d){return '<option value="'+d.n+'"'+(String(filt.day)===String(d.n)?' selected':'')+'>Day '+d.n+', '+esc(d.label)+'</option>'}).join('');
+ var stOpts=[['open','Open'],['all','Everything']].concat(STATUSES).map(function(s){return '<option value="'+s[0]+'"'+(filt.status===s[0]?' selected':'')+'>'+s[1]+'</option>'}).join('');
+ return '<h2>All tasks</h2><div class="filters"><label>Day <select data-act="fday">'+dayOpts+'</select></label><label>Show <select data-act="fstatus">'+stOpts+'</select></label><label class="grow">Filter <input type="search" data-act="ftq" value="'+esc(filt.tq||'')+'" placeholder="Words in title, detail, notes or tags"></label></div>'+
+ (list.length?Object.keys(groups).sort(function(a,b){return a-b}).map(function(k){var d=DAYS[k];var p=progress(dayTasks(Number(k)).filter(function(t){return t.status!=='cut'}));return '<div class="block"><h3>Day '+k+', '+esc(d.label)+' <small>'+p.done+' of '+p.total+' done</small></h3><p class="muted">'+esc(d.focus)+'</p><ul class="tasks">'+groups[k].map(taskRow).join('')+'</ul></div>'}).join(''):'<p class="empty">No tasks match. Change the filters above.</p>')+
+ '<div class="block"><h3>Add a task</h3><div class="row"><label>Day <select id="nday">'+DAYS.map(function(d){return '<option value="'+d.n+'"'+(d.n===Math.min(currentDay(),10)?' selected':'')+'>D'+d.n+'</option>'}).join('')+'</select></label><label class="grow">Task <input id="ntitle" type="text" placeholder="Start with a verb"></label><button class="btn" data-act="tadd">Add task</button></div></div>';
+}
+function vGates(){return '<h2>Gates</h2><p class="muted">A gate is a pass test at the end of a day. If it fails, take the fallback the same day.</p>'+state.gates.map(function(g){return '<div class="block gatecard g-'+g.status+'"><h3>Gate '+g.id+': '+esc(g.title)+' <small>end of day '+g.day+'</small></h3><p><b>Pass test:</b> '+esc(g.test)+'</p><p class="fb"><b>If it fails:</b> '+esc(g.fallback)+'</p><div class="row"><label>Status <select data-act="gstatus" data-id="'+g.id+'">'+[['pending','Pending'],['pass','Passed'],['fail','Failed'],['fallback','Fallback taken']].map(function(s){return '<option value="'+s[0]+'"'+(g.status===s[0]?' selected':'')+'>'+s[1]+'</option>'}).join('')+'</select></label></div><label class="fl">Evidence<textarea data-act="gev" data-id="'+g.id+'" rows="2" placeholder="Numbers and where they came from">'+esc(g.evidence)+'</textarea></label></div>'}).join('')}
+function vMetrics(){
+ return '<h2>Metrics</h2><p class="muted">Enter numbers only from eval/RESULTS.md. These are the numbers the README and the video may use.</p><div class="tablewrap"><table><thead><tr><th>Suite</th><th>Metric</th><th>Goal</th><th>Measured</th><th>Result</th><th>Source</th><th>When</th></tr></thead><tbody>'+
+ state.metrics.map(function(m){var s=metricState(m);var goal=m.report_only?'report it':(m.cmp==='<='?'at most ':'at least ')+m.target+' '+m.unit;return '<tr><td>'+esc(m.suite)+'</td><td>'+esc(m.name)+'</td><td>'+esc(goal)+'</td><td><input class="num" type="number" step="any" data-act="mval" data-id="'+m.id+'" value="'+(m.value==null?'':esc(m.value))+'" aria-label="'+esc(m.name)+'"> '+esc(m.unit)+'</td><td><span class="res r-'+s+'">'+({pass:'Pass',fail:'Miss',none:'Not measured',report:'Recorded'})[s]+'</span></td><td><select data-act="msrc" data-id="'+m.id+'" aria-label="Source"><option value=""'+(m.source?'':' selected')+'>Choose</option><option value="live"'+(m.source==='live'?' selected':'')+'>Live</option><option value="mock"'+(m.source==='mock'?' selected':'')+'>Mock</option></select></td><td class="muted">'+esc(fmtET(m.measured_at))+'</td></tr>'}).join('')+'</tbody></table></div>';
+}
+function vBudget(){var sp=spent(),pc=Math.round(sp*100/state.budget_usd);var warn=pc>=90?'<p class="banner bad">Over 90 percent spent. Switch development to mock mode now.</p>':pc>=70?'<p class="banner">Over 70 percent spent. Use mock mode for anything that is not a real test.</p>':'';
+ return '<h2>Credits</h2><div class="block"><p class="big">$'+sp.toFixed(2)+' spent <small>$'+(state.budget_usd-sp).toFixed(2)+' left of $'+state.budget_usd+'</small></p>'+bar(pc,pc>=90?'bad':pc>=70?'warn':'')+warn+'<p class="muted">Copy totals from the cost meter in the api logs once a day.</p></div>'+
+ '<div class="block"><h3>Add spend</h3><div class="row"><label class="grow">What <input id="citem" type="text" placeholder="For example: Day 1 spikes"></label><label>USD <input id="cusd" class="num" type="number" step="0.01" min="0"></label><button class="btn" data-act="cadd">Add</button></div></div>'+
+ (state.costs.length?'<div class="tablewrap"><table><thead><tr><th>When</th><th>What</th><th>USD</th><th></th></tr></thead><tbody>'+state.costs.map(function(c,i){return '<tr><td class="muted">'+esc(fmtET(c.ts))+'</td><td>'+esc(c.item)+'</td><td>$'+Number(c.usd).toFixed(2)+'</td><td><button class="link danger" data-act="cdel" data-i="'+i+'">Remove</button></td></tr>'}).join('')+'</tbody></table></div>':'<p class="empty">No spend recorded yet.</p>')}
+function vPeople(){var st=['not contacted','emailed','replied','scheduled','done','no response'];
+ return '<h2>Feedback</h2><p class="muted">The biggest risk is having no blind tester. Track every contact here. If nothing lands by Nov 3, the README says so plainly.</p>'+
+ state.outreach.map(function(o){return '<div class="block person"><h3>'+esc(o.who)+' <small>'+esc(o.channel)+'</small></h3><div class="row"><label>Status <select data-act="ostatus" data-id="'+o.id+'">'+st.map(function(s){return '<option'+(o.status===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label><label>Date <input type="date" data-act="odate" data-id="'+o.id+'" value="'+esc(o.date)+'"></label></div><label class="fl">Notes<textarea data-act="onote" data-id="'+o.id+'" rows="2">'+esc(o.note)+'</textarea></label></div>'}).join('')+
+ '<div class="block"><h3>Add a contact</h3><div class="row"><label class="grow">Who <input id="owho" type="text"></label><label>How <input id="ochan" type="text" placeholder="Email, call, form"></label><button class="btn" data-act="oadd">Add contact</button></div></div>'}
+function vDecisions(){return '<h2>Decisions</h2><p class="muted">Write down anything you would otherwise argue with yourself about later.</p>'+
+ '<div class="block"><h3>Record a decision</h3><label class="fl">Decision<input id="dtitle" type="text" placeholder="Short title"></label><label class="fl">What we chose<textarea id="ddec" rows="2"></textarea></label><label class="fl">Why<textarea id="dwhy" rows="2"></textarea></label><button class="btn" data-act="dadd">Save decision</button></div>'+
+ state.decisions.slice().reverse().map(function(d){return '<div class="block dec"><h3>'+esc(d.title)+' <small>'+esc(d.date)+'</small></h3><p>'+esc(d.decision)+'</p><p class="muted"><b>Why:</b> '+esc(d.why)+'</p></div>'}).join('')}
+function vRisks(){return '<h2>Risks</h2>'+state.risks.map(function(r){return '<div class="block risk lv-'+r.level+'"><h3>'+esc(r.title)+' <small>'+esc(r.level)+'</small></h3><p>'+esc(r.plan)+'</p><div class="row"><label>Status <select data-act="rstatus" data-id="'+r.id+'">'+['open','watching','mitigated','happened'].map(function(s){return '<option'+(r.status===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label></div></div>'}).join('')}
+function vIssues(){var sev=['high','medium','low'];return '<h2>Issues</h2><p class="muted">Bugs, budget misses and anything that broke. A performance budget miss goes here with the measured number.</p>'+
+ '<div class="block"><h3>New issue</h3><div class="row"><label class="grow">What broke <input id="ititle" type="text"></label><label>Severity <select id="isev">'+sev.map(function(s){return '<option>'+s+'</option>'}).join('')+'</select></label><button class="btn" data-act="iadd">Add issue</button></div></div>'+
+ (state.issues.length?state.issues.map(function(i){return '<div class="block issue sev-'+i.severity+(i.status==='closed'?' closed':'')+'"><h3>'+esc(i.title)+' <small>'+esc(i.severity)+', opened '+esc(fmtET(i.ts))+'</small></h3><label class="fl">Notes<textarea data-act="inote" data-id="'+i.id+'" rows="2">'+esc(i.note)+'</textarea></label><div class="row"><label>Status <select data-act="istatus" data-id="'+i.id+'">'+['open','fixing','closed'].map(function(s){return '<option'+(i.status===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></label></div></div>'}).join(''):'<p class="empty">No issues. Good. Log the first one the moment something misbehaves.</p>')}
+function vLog(){return '<h2>Log</h2><div class="block"><div class="row"><label for="llog" class="vh">Log entry</label><input id="llog" type="text" placeholder="What happened"><button class="btn" data-act="ladd">Add to log</button></div></div><ol class="log">'+state.log.map(function(l){return '<li class="k-'+esc(l.kind)+'"><time>'+esc(fmtET(l.ts))+'</time><span>'+esc(l.text)+'</span></li>'}).join('')+'</ol>'}
+function vNotes(){return '<h2>Notes</h2><p class="muted">Scratch space. Saved when you click away.</p><textarea id="notes" class="notes" data-act="notes" rows="20" placeholder="Anything worth remembering">'+esc(state.notes)+'</textarea>'}
+function vHandbook(){
+ var tpl=$('#handbook');var frag=tpl.content.cloneNode(true);var div=document.createElement('div');div.appendChild(frag);
+ var secs=div.querySelectorAll('section.hb');var toc='';var q=hbQuery.toLowerCase();var shown=0;
+ secs.forEach(function(s){var h=s.querySelector('h2');var id=s.id;var hit=!q||s.textContent.toLowerCase().indexOf(q)>=0;if(!hit)s.setAttribute('hidden','');else shown++;toc+='<li'+(hit?'':' class="dim"')+'><a href="#'+id+'" data-act="hbjump" data-id="'+id+'">'+esc(h?h.textContent:id)+'</a></li>'});
+ return '<h2>Handbook</h2><div class="filters"><label class="grow">Search the handbook <input type="search" data-act="hbsearch" value="'+esc(hbQuery)+'" placeholder="For example: homography, prices, dwell"></label></div>'+(q?'<p class="muted">'+shown+' sections match.</p>':'')+'<div class="hbwrap"><ol class="toc">'+toc+'</ol><div class="hbody">'+div.innerHTML+'</div></div>';
+}
+function vSearch(){var q=filt.q.toLowerCase();var ts=state.tasks.filter(function(t){return (t.title+' '+t.detail+' '+t.note).toLowerCase().indexOf(q)>=0});
+ var tpl=$('#handbook');var div=document.createElement('div');div.appendChild(tpl.content.cloneNode(true));var hs=[].slice.call(div.querySelectorAll('section.hb')).filter(function(s){return s.textContent.toLowerCase().indexOf(q)>=0});
+ return '<h2>Search: '+esc(filt.q)+'</h2><div class="block"><h3>Tasks <small>'+ts.length+'</small></h3>'+(ts.length?'<ul class="tasks">'+ts.map(taskRow).join('')+'</ul>':'<p class="empty">No tasks match.</p>')+'</div><div class="block"><h3>Handbook <small>'+hs.length+'</small></h3>'+(hs.length?'<ul class="plain">'+hs.map(function(s){return '<li><button class="link" data-act="hbopen" data-id="'+s.id+'">'+esc(s.querySelector('h2').textContent)+'</button></li>'}).join('')+'</ul>':'<p class="empty">No handbook sections match.</p>')+'</div>'}
+var RENDER={today:vToday,tasks:vTasks,gates:vGates,metrics:vMetrics,budget:vBudget,people:vPeople,decisions:vDecisions,risks:vRisks,issues:vIssues,log:vLog,notes:vNotes,handbook:vHandbook,search:vSearch};
+function applyTheme(){var t=state.ui.theme;if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t)}
+function render(){
+ applyTheme();var app=$('#app');var focusId=document.activeElement&&document.activeElement.id;
+ app.innerHTML='<a class="skip" href="#main">Skip to content</a>'+header()+'<div class="layout">'+nav()+'<main id="main" tabindex="-1">'+(RENDER[view]||vToday)()+'</main></div><div id="toast" role="status" aria-live="polite"></div><input type="file" id="importfile" accept="application/json,.json" hidden>';
+ if(focusId){var el=document.getElementById(focusId);if(el&&el.tagName==='INPUT'){el.focus();try{var v=el.value;el.setSelectionRange(v.length,v.length)}catch(e){}}}
+}
+function renderStatusOnly(){var top=$('.acts');if(top){var p=$('.acts .pill');if(p){p.outerHTML=dirty()?'<span class="pill warn">Changes not saved to file</span>':'<span class="pill ok">File is up to date</span>'}}}
+
+/* ---------- brief ---------- */
+function brief(){
+ var cur=currentDay(),p=progress();var L=[];
+ L.push('# Talking Tactile status, '+fmtET(nowISO()));
+ L.push('');L.push((cur<=10?'Day '+cur+' of 10 ('+DAYS[cur].label+'). Focus: '+DAYS[cur].focus:'Build window is over.'));
+ L.push('Progress: '+p.done+' of '+p.total+' tasks ('+p.pct+'%). Time to our 3 PM ET target: '+(until(DATES.target)||'passed')+'.');
+ L.push('Gates: '+state.gates.map(function(g){return g.id+' '+g.status}).join(', ')+'.');
+ var open=cur<=10?dayTasks(cur).filter(function(t){return t.status!=='done'&&t.status!=='cut'}):[];
+ L.push('');L.push('## Open today');open.length?open.forEach(function(t){L.push('- ['+t.id+'] '+t.title+(t.note?' (note: '+t.note+')':''))}):L.push('- none');
+ var o=overdue();if(o.length){L.push('');L.push('## Overdue');o.forEach(function(t){L.push('- ['+t.id+'] D'+t.day+' '+t.title+' ('+t.status+')')})}
+ var b=state.tasks.filter(function(t){return t.status==='blocked'});if(b.length){L.push('');L.push('## Blocked');b.forEach(function(t){L.push('- ['+t.id+'] '+t.title+': '+(t.note||'no note'))})}
+ var is=state.issues.filter(function(i){return i.status!=='closed'});if(is.length){L.push('');L.push('## Open issues');is.forEach(function(i){L.push('- ('+i.severity+') '+i.title+(i.note?': '+i.note:''))})}
+ var ms=state.metrics.filter(function(m){return metricState(m)!=='none'});if(ms.length){L.push('');L.push('## Measured');ms.forEach(function(m){L.push('- '+m.name+': '+m.value+' '+m.unit+' ('+metricState(m)+(m.source?', '+m.source:'')+')')})}
+ L.push('');L.push('## Recent decisions');state.decisions.slice(-4).forEach(function(d){L.push('- '+d.title+': '+d.decision)});
+ L.push('');L.push('## Credits');L.push('- $'+spent().toFixed(2)+' of $'+state.budget_usd+' spent');
+ L.push('');L.push('## Last log entries');state.log.slice(0,6).forEach(function(l){L.push('- '+fmtET(l.ts)+': '+l.text)});
+ L.push('');L.push('Follow CLAUDE.md and RULES.md. Update the state JSON in TRACKER.html when a task changes.');
+ return L.join('\n');
+}
+
+/* ---------- events ---------- */
+function find(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].id===id)return arr[i]}
+function setTaskStatus(t,s){if(t.status===s)return;var prev=t.status;t.status=s;touch(t);t.done_at=s==='done'?nowISO():(prev==='done'?null:t.done_at);logEvent('Task '+t.id+' "'+t.title+'" is now '+s+'.')}
+document.addEventListener('click',function(e){
+ var el=e.target.closest('[data-act]');if(!el)return;var a=el.getAttribute('data-act'),id=el.getAttribute('data-id');
+ if(el.tagName==='SELECT'||el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&el.type!=='checkbox'))return;
+ if(a==='toggle'){return}
+ if(a==='view'){view=el.getAttribute('data-view');filt.q='';render();$('#main').focus();return}
+ if(a==='goday'){filt.day=el.getAttribute('data-day');filt.status='all';view='tasks';render();return}
+ if(a==='save'){saveToFile();return}
+ if(a==='brief'){copyText(brief());return}
+ if(a==='dismiss'){banner='';render();return}
+ if(a==='export'){download('talking-tactile-state.json',JSON.stringify(state,null,1),'application/json');return}
+ if(a==='import'){$('#importfile').click();return}
+ if(a==='theme'){var o=['auto','light','dark'];state.ui.theme=o[(o.indexOf(state.ui.theme)+1)%3];try{localStorage.setItem(KEY,JSON.stringify(state))}catch(x){}render();return}
+ if(a==='reset'){if(confirm('Replace everything in this browser with the state stored in the file? Unsaved browser changes will be lost.')){state=clone(original);state.base_rev=original.rev;try{localStorage.removeItem(KEY)}catch(x){}banner='Reset to the state stored in the file.';render()}return}
+ if(a==='tdel'){if(confirm('Delete this task? Use Cut instead if you only dropped it from scope.')){state.tasks=state.tasks.filter(function(t){return t.id!==id});logEvent('Task '+id+' deleted.');persist()}return}
+ if(a==='tadd'){var ti=$('#ntitle').value.trim();if(!ti){toast('Write the task first.');$('#ntitle').focus();return}var dn=Number($('#nday').value);var t=touch({id:uid('t'),day:dn,title:ti,detail:'',timebox:'',fallback:'',status:'todo',note:'',done_at:null,tags:['added']});state.tasks.push(t);logEvent('Task added to D'+dn+': '+ti);persist();return}
+ if(a==='qlog'||a==='ladd'){var inp=$(a==='qlog'?'#qlog':'#llog');var v=inp.value.trim();if(!v){toast('Write the log entry first.');inp.focus();return}logEvent(v,'manual');persist();toast('Added to log');return}
+ if(a==='cadd'){var it=$('#citem').value.trim(),u=parseFloat($('#cusd').value);if(!it||!(u>=0)){toast('Add what it was for and an amount.');return}state.costs.unshift({ts:nowISO(),item:it,usd:Math.round(u*100)/100});logEvent('Spend recorded: $'+u.toFixed(2)+' for '+it+'.');persist();return}
+ if(a==='cdel'){state.costs.splice(Number(el.getAttribute('data-i')),1);persist();return}
+ if(a==='oadd'){var w=$('#owho').value.trim();if(!w){toast('Add who you are contacting.');return}state.outreach.push(touch({id:uid('o'),who:w,channel:$('#ochan').value.trim(),status:'not contacted',date:'',note:''}));persist();return}
+ if(a==='dadd'){var dt=$('#dtitle').value.trim(),dd=$('#ddec').value.trim();if(!dt||!dd){toast('A decision needs a title and what was chosen.');return}state.decisions.push(touch({id:uid('dec'),date:etDate(),title:dt,decision:dd,why:$('#dwhy').value.trim()}));logEvent('Decision: '+dt+'.');persist();return}
+ if(a==='iadd'){var itl=$('#ititle').value.trim();if(!itl){toast('Describe what broke.');return}state.issues.unshift(touch({id:uid('i'),ts:nowISO(),title:itl,severity:$('#isev').value,status:'open',note:''}));logEvent('Issue opened: '+itl+'.');persist();return}
+ if(a==='hbjump'){e.preventDefault();var s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth',block:'start'});return}
+ if(a==='hbopen'){view='handbook';hbQuery='';filt.q='';render();var s2=document.getElementById(id);if(s2)s2.scrollIntoView({block:'start'});return}
+ if(a==='copy'){var src=document.getElementById(el.getAttribute('data-src'));if(src)copyText(src.textContent.trim());return}
+});
+document.addEventListener('change',function(e){
+ var el=e.target;var a=el.getAttribute('data-act');var id=el.getAttribute('data-id');
+ if(el.id==='importfile'){var f=el.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var s=JSON.parse(r.result);if(!s||!Array.isArray(s.tasks))throw new Error('not a tracker file');var b=state.base_rev;state=ensure(s);state.base_rev=b;logEvent('State imported from '+f.name+'.');persist();toast('Imported')}catch(x){toast('That file is not a Talking Tactile tracker export.')}};r.readAsText(f);return}
+ if(!a)return;
+ if(a==='toggle'){var t=find(state.tasks,id);setTaskStatus(t,el.checked?'done':'todo');persist();return}
+ if(a==='tstatus'){setTaskStatus(find(state.tasks,id),el.value);persist();return}
+ if(a==='tnote'){touch(find(state.tasks,id)).note=el.value;persist(true);return}
+ if(a==='gstatus'){var g=touch(find(state.gates,id));g.status=el.value;logEvent('Gate '+id+' is now '+el.value+'.');persist();return}
+ if(a==='gev'){touch(find(state.gates,id)).evidence=el.value;persist(true);return}
+ if(a==='mval'){var m=touch(find(state.metrics,id));m.value=el.value===''?null:Number(el.value);m.measured_at=el.value===''?null:nowISO();logEvent('Metric "'+m.name+'" set to '+(m.value==null?'empty':m.value+' '+m.unit)+'.');persist();return}
+ if(a==='msrc'){touch(find(state.metrics,id)).source=el.value;persist();return}
+ if(a==='ostatus'){var o=touch(find(state.outreach,id));o.status=el.value;logEvent('Feedback contact '+o.who+': '+el.value+'.');persist();return}
+ if(a==='odate'){touch(find(state.outreach,id)).date=el.value;persist(true);return}
+ if(a==='onote'){touch(find(state.outreach,id)).note=el.value;persist(true);return}
+ if(a==='rstatus'){var rk=touch(find(state.risks,id));rk.status=el.value;logEvent('Risk "'+rk.title+'" is now '+el.value+'.');persist();return}
+ if(a==='istatus'){var is=touch(find(state.issues,id));is.status=el.value;logEvent('Issue "'+is.title+'" is now '+el.value+'.');persist();return}
+ if(a==='inote'){touch(find(state.issues,id)).note=el.value;persist(true);return}
+ if(a==='notes'){state.notes=el.value;state.notes_changed_at=nowISO();persist(true);return}
+ if(a==='fday'){filt.day=el.value;render();return}
+ if(a==='fstatus'){filt.status=el.value;render();return}
+});
+document.addEventListener('input',function(e){
+ var a=e.target.getAttribute('data-act');
+ if(a==='gsearch'){filt.q=e.target.value;if(filt.q.trim().length>=2){view='search'}else if(view==='search'){view='today'}render();return}
+ if(a==='ftq'){filt.tq=e.target.value;var pos=e.target.selectionStart;render();var n=$('[data-act="ftq"]');if(n){n.focus();n.setSelectionRange(pos,pos)}return}
+ if(a==='hbsearch'){hbQuery=e.target.value;var p2=e.target.selectionStart;render();var n2=$('[data-act="hbsearch"]');if(n2){n2.focus();n2.setSelectionRange(p2,p2)}return}
+});
+document.addEventListener('keydown',function(e){
+ if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();var q=$('#q');if(q)q.focus()}
+ if(e.key==='Enter'&&document.activeElement&&['qlog','llog','ntitle'].indexOf(document.activeElement.id)>=0){e.preventDefault();var map={qlog:'qlog',llog:'ladd',ntitle:'tadd'};var b=$('[data-act="'+map[document.activeElement.id]+'"]');if(b)b.click()}
+});
+window.addEventListener('beforeunload',function(e){if(dirty()&&!storageOK){e.preventDefault();e.returnValue=''}});
+window.TT={brief:brief,buildFileHTML:buildFileHTML,get state(){return state}};
+load();render();
+setInterval(function(){var c=$('.clock');if(c&&!document.activeElement.matches('textarea,input')){render()}},60000);
+})();
+
+</script>
+</body>
+</html>

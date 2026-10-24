@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "talking-tactile/regions.schema.json",
+  "title": "Talking Tactile regions file",
+  "description": "The contract between Author and Explore. Explore must run from this file alone for labels, earcons and guidance.",
+  "type": "object",
+  "required": ["schema_version", "figure_id", "title", "figure_type", "page", "summary", "textures", "regions"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "figure_id": { "type": "string", "description": "sha256 of the normalized source image" },
+    "title": { "type": "string" },
+    "figure_type": { "enum": ["labeled_diagram", "bar_chart", "line_graph", "map", "flow_diagram", "other"] },
+    "grade_band": { "enum": ["k5", "6_8", "9_12", "college"] },
+    "page": {
+      "type": "object",
+      "required": ["size", "width_mm", "height_mm"],
+      "properties": {
+        "size": { "enum": ["letter", "a4"] },
+        "width_mm": { "type": "number" },
+        "height_mm": { "type": "number" }
+      }
+    },
+    "summary": { "type": "string", "description": "Spoken on first open. Two sentences at most." },
+    "textures": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "meaning", "earcon_hz"],
+        "properties": {
+          "id": { "enum": ["dots", "lines", "cross", "grid", "solid"] },
+          "meaning": { "type": "string" },
+          "earcon_hz": { "type": "number" }
+        }
+      }
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "polygon_mm", "source", "verified_by_teacher"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string", "description": "Spoken on dwell. The label only." },
+          "abbrev": { "type": "string", "description": "Braille key abbreviation when the full label does not fit" },
+          "description": { "type": "string", "description": "Spoken on 'more'. One or two sentences, from the figure or its caption." },
+          "polygon_mm": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }, "minItems": 3, "maxItems": 200 },
+          "centroid_mm": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "texture": { "type": "string" },
+          "parent": { "type": ["string", "null"] },
+          "neighbors": {
+            "type": "array",
+            "description": "Computed in code. Direction is from this region to the neighbor.",
+            "items": {
+              "type": "object",
+              "required": ["id", "direction"],
+              "properties": {
+                "id": { "type": "string" },
+                "direction": { "enum": ["up", "down", "left", "right", "up_left", "up_right", "down_left", "down_right", "inside", "around"] }
+              }
+            }
+          },
+          "source": { "enum": ["sam", "teacher"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "verified_by_teacher": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+# CLAUDE.md
+
+Read this first, every session. It is the map. Details live in PLAN.md, RULES.md and SKILLS.md.
+
+## What we are building
+
+Talking Tactile turns a printed STEM figure into a raised graphic that a blind student explores by touch. A phone camera watches the sheet, finds the student's fingertip, and speaks the name of the region under it. The student can ask questions out loud and get short answers grounded in that figure.
+
+Two users:
+- The teacher or transcriber (Author mode). Uploads a figure, reviews what the system found, prints the tactile sheet.
+- The student (Explore mode). Touches the sheet, hears labels, asks questions. Must work with no screen.
+
+## Hackathon facts that shape every decision
+
+- Meta Global AI Developer Hackathon, Indie track, solo. Build window Oct 26 to Nov 4, 2026. Submission due Nov 4, 9:00 PM ET. Our own deadline is Nov 4, 3:00 PM ET.
+- Budget: $150 of Meta Model API credits. Every call is metered by `services/api/app/meta/cost.py`.
+- No project code was written before Oct 26. Planning documents only.
+- Judging weights (from a guide quoting the event waiver, confirm in the Official Rules): Impact 30, Use of Meta tooling 25, Demo 25, Technical depth 20.
+
+## Meta models we use, and why each one is here
+
+| Model | Where | Job |
+|---|---|---|
+| `muse-spark-1.3` | Author S1, S3. Explore answers | Reads the figure, proposes parts as short phrases, maps labels to masks, answers questions from figure data |
+| `sam-3-1` | Author S2. Explore registration | Segments every proposed part zero-shot. Finds the sheet for registration |
+| `muse-voice-transcribe-1.0` | Explore voice | Streaming speech to text with keyword hints built from region labels |
+
+Base URL `https://api.meta.ai/v1`, OpenAI compatible. Voice uses `wss://api.meta.ai/v1/asr/realtime`. Confirm exact request shapes for SAM and Voice on Day 1 with the `meta-api-spike` skill before writing feature code against them.
+
+We do not use Muse Image. A generative model must never redraw a science figure, because a student would learn from a picture that is not the textbook's.
+
+## Repo map (created on Day 1)
+
+```
+apps/web/            React + TypeScript + Vite. Routes /author and /explore
+  src/explore/       camera loop, worker, homography, region engine, audio
+  src/author/        upload, review, print
+  src/workers/       hand tracker worker (MediaPipe Hand Landmarker)
+services/api/        Python 3.11, FastAPI
+  app/routes/        figures, ask, register, voice
+  app/pipeline/      s0_ingest .. s5_render, one file per stage
+  app/meta/          client, retries, cache, cost meter, mock fixtures
+  app/geometry/      vectorize, rules, homography, orientation
+  app/braille/       liblouis wrapper
+config/tactile_rules.yaml   sourced design constants
+docs/regions.schema.json    the contract between author and explore
+eval/                figures, touch tests, questions, scripts
+fixtures/            recorded Meta responses for MOCK_META=1
+```
+
+## Commands
+
+```
+make dev          # api on :8000, web on :5173
+make test         # pytest + vitest
+make eval         # runs eval/ and writes eval/RESULTS.md
+MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
+```
+
+## The contract
+
+`docs/regions.schema.json` is the single source of truth between Author and Explore. Change it only with a version bump and a migration note in PLAN.md. Explore must work from `regions.json` alone, with no network, for labels and earcons.
+
+## Definition of done for any task
+
+1. Works in mock mode and live mode.
+2. Has a test, or an eval item if it is perceptual.
+3. Logged latency or cost if it touches a Meta model or the camera loop.
+4. Keyboard-only flow still works in Explore.
+5. TODO.md updated.
+
+## Never
+
+- Put the Meta API key in the browser. All Meta calls go through the backend.
+- Let the language model guess geometry. Directions, neighbors and distances come from code.
+- Block the main thread with hand tracking. It runs in a Web Worker.
+- Add infrastructure we do not need (see "Not building" in PLAN.md).
+- Use em dashes or filler words in any text a user will hear or read.

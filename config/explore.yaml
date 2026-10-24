@@ -1,0 +1,21 @@
+# Starting values for the Explore region engine. Tune with the touch eval.
+hysteresis:
+  enter_shrink_mm: 1.0
+  exit_grow_mm: 2.0
+  enter_hold_ms: 120
+  exit_hold_ms: 120
+dwell:
+  speed_below_mm_s: 15
+  hold_ms: 600
+earcons:
+  max_per_second: 6
+fingertip:
+  contact_offset_mm: 4.0     # move back along the finger toward the knuckle
+  filter: one_euro
+  one_euro: { mincutoff_hz: 1.0, beta: 0.007, dcutoff_hz: 1.0 }   # tune per the 1 euro two step procedure
+guidance:
+  update_ms: 300
+  arrive_inside_ms: 200
+health:
+  no_hand_warn_ms: 2000
+  off_page_points_before_recal: 15
