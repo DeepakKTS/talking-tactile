@@ -2,10 +2,12 @@
 figure id (sha256 of the normalized pixels) out. Refuses with a plain message when the
 upload is too large, not a PNG, JPEG or PDF, unreadable, the wrong PDF page, or blurry.
 A photographed page (a bright four-sided page on a darker surface) is deskewed first.
-Pure: no files, no network."""
+ingest is pure: no files, no network. save and load are its form in the stage cache."""
 
 import hashlib
 import io
+import json
+from pathlib import Path
 from typing import Literal
 
 import cv2
@@ -182,3 +184,22 @@ def ingest(data: bytes, page_index: int, rules: Pipeline) -> Ingested:
         deskewed=flat is not None,
         sharpness=score,
     )
+
+
+_IMAGE_FILE = "normalized.png"
+_INFO_FILE = "ingest.json"
+
+
+def save(ing: Ingested, out: Path) -> None:
+    Image.fromarray(ing.image).save(out / _IMAGE_FILE)
+    (out / _INFO_FILE).write_text(ing.model_dump_json(exclude={"image"}, indent=1), "utf-8")
+
+
+def load(src: Path) -> Ingested:
+    with Image.open(src / _IMAGE_FILE) as img:
+        image = np.ascontiguousarray(np.asarray(img.convert("RGB"), dtype=np.uint8))
+    info = json.loads((src / _INFO_FILE).read_text("utf-8"))
+    ing = Ingested(image=image, **info)
+    if figure_id(image) != ing.figure_id:
+        raise ValueError("the cached image does not match its figure id")
+    return ing
