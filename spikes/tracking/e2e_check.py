@@ -7,6 +7,8 @@
   uv run spikes/tracking/e2e_check.py loop          stub worker with a 100 ms delay: frames must drop, never queue
   uv run spikes/tracking/e2e_check.py hands VIDEO [CPU|GPU]   MediaPipe on a y4m clip: hands must be found
   uv run spikes/tracking/e2e_check.py touch VIDEO [CPU|GPU]   same, then T and 3 Space presses record 3 touches
+  uv run spikes/tracking/e2e_check.py session       a whole 45 touch test through the page, scripted hands,
+                                                    then the downloaded JSON through analyze_touch.py
 
 Prints the page's stats as JSON. Exits non-zero if a check fails.
 """
@@ -16,13 +18,16 @@ from __future__ import annotations
 import functools
 import http.server
 import json
+import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
 HERE = Path(__file__).resolve().parent
+OUT = HERE.parent / "out"  # git-ignored
 
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
@@ -91,8 +96,114 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
     return stats
 
 
+# The page's worker, kept so session() can hand it results as MediaPipe would.
+KEEP_WORKER = """
+const W = window.Worker;
+window.Worker = function (...a) { const w = new W(...a); window.__worker = w; return w; };
+window.Worker.prototype = W.prototype;
+"""
+
+# A pointing hand built in sheet mm and mapped to pixels through the calibration, so its
+# contact point (4 mm back from the tip, toward the DIP joint) lands on each target. It
+# comes in from the right, then rests; one frame in 20 has no hand.
+PLAY_SESSION = """
+async () => {
+  const { homographyFromPoints, applyHomography } = await import('./lib/homography.js');
+  const s = window.__tt;
+  const toPx = homographyFromPoints(s.sheet.corners_mm, s.calib.corners);
+  const [vw, vh] = s.videoSize;
+  const offset = Number(document.getElementById('offset').value);
+  const hand = (x, y) => {
+    const mm = Array.from({ length: 21 }, () => [x, y + 60]);
+    const finger = (b, dx, tipFromWrist) => {
+      mm[b] = [x + dx, y + 36]; mm[b + 1] = [x + dx, y + 26];
+      mm[b + 2] = [x + dx, y + 60 - (34 + tipFromWrist) / 2]; mm[b + 3] = [x + dx, y + 60 - tipFromWrist];
+    };
+    finger(5, 0, 60 + offset);       // index: the tip is offset mm above (x, y)
+    mm[7] = [x, y + 10];             // its DIP joint, straight below the tip
+    [[9, 8], [13, 16], [17, 24]].forEach(([b, dx]) => finger(b, dx, 18)); // curled: tips nearer the wrist than the PIP
+    return { landmarks: mm.map((p) => { const [px, py] = applyHomography(toPx, p); return { x: px / vw, y: py / vh }; }) };
+  };
+  let n = 0;
+  while (s.touchTest.active) {
+    const i = s.touchTest.i;
+    const [tx, ty] = s.sheet.targets_mm[s.touchTest.seq[i]];
+    for (let k = 0; k < 90 && s.touchTest.active && s.touchTest.i === i; k++) {
+      const hands = n++ % 20 === 7 ? [] : [hand(tx + Math.max(0, 10 - k) * 2, ty)];
+      window.__worker.onmessage({ data: { type: 'result', id: -1, inferMs: 0, hands } });
+      await new Promise((r) => setTimeout(r, 1000 / 30));
+    }
+  }
+  return JSON.parse(localStorage.getItem('tt-last-touch-test'));
+}
+"""
+
+
+def session() -> list[str]:
+    """A whole touch test through the page: stub worker, ?corners=, T, then scripted hands
+    for all 45 touches. The JSON the page offers must analyze to a near zero error."""
+    t0 = time.monotonic()
+    srv, port = serve()
+    fail: list[str] = []
+    corners = [[110, 20], [540, 35], [560, 465], [90, 450]]
+    query = f"?stub=600000&seed=3&corners={','.join(str(v) for c in corners for v in c)}"
+    errors: list[str] = []
+    try:
+        with sync_playwright() as p:
+            args = ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"]
+            browser = p.chromium.launch(channel="chrome", headless=True, args=args)
+            page = browser.new_page()
+            page.on("pageerror", lambda e: errors.append(str(e)))
+            page.add_init_script(KEEP_WORKER)
+            page.goto(f"http://127.0.0.1:{port}/index.html{query}")
+            page.click("#start")
+            page.wait_for_function("window.__tt.calib && window.__tt.calib.toMm && window.__worker", timeout=30000)
+            page.keyboard.press("t")
+            page.wait_for_function("window.__tt.touchTest.active")
+            result = page.evaluate(PLAY_SESSION)
+            link = page.evaluate("() => { const a = document.querySelector('#results a'); return a && a.download; }")
+            browser.close()
+    finally:
+        srv.shutdown()
+    OUT.mkdir(exist_ok=True)
+    path = OUT / (link or "touch-test-missing.json")
+    path.write_text(json.dumps(result, indent=1))
+    py = subprocess.run([sys.executable, str(HERE / "analyze_touch.py"), str(path)], capture_output=True, text=True)
+    analysis = json.loads(py.stdout) if py.returncode == 0 else {}
+    recs = result.get("records", [])
+    frames = [f for r in recs for f in r.get("frames", [])]
+    seen = [f for f in frames if not f.get("lost")]
+    print(json.dumps({
+        "seconds": round(time.monotonic() - t0, 1), "file": str(path), "touches": len(recs),
+        "frames": len(frames), "lost_frames": len(frames) - len(seen),
+        "analysis": {k: analysis.get(k) for k in ("n", "mean_mm", "p95_mm", "max_mm", "gate_b")},
+        "page_errors": errors,
+    }, indent=1))
+    if errors:
+        fail.append(f"page errors: {errors[:3]}")
+    if not link or not link.startswith("touch-test-"):
+        fail.append(f"no download link: {link}")
+    if py.returncode != 0:
+        fail.append(f"analyze_touch.py failed: {py.stderr[-300:]}")
+    elif analysis["n"] != 45 or analysis["mean_mm"] > 0.5 or analysis["gate_b"] != "pass":
+        fail.append(f"analysis: {analysis}")
+    if result.get("version") != 2 or result.get("calibration", {}).get("cornersPx") != corners:
+        fail.append(f"version or calibration: {result.get('version')}, {result.get('calibration')}")
+    if result.get("corners") != corners or not result.get("videoSize"):
+        fail.append("corners or videoSize missing")
+    if any(not r.get("frames") for r in recs) or not all({"t", "tipPx", "dipPx", "rawMm", "mm"} <= f.keys() for f in seen):
+        fail.append("a touch has no frames, or a frame lacks a field")
+    if not frames or len(frames) == len(seen):
+        fail.append("no frames, or no lost frames recorded")
+    return fail
+
+
 def main() -> None:
     mode = sys.argv[1] if len(sys.argv) > 1 else "loop"
+    if mode == "session":
+        failures = session()
+        print("FAIL: " + "; ".join(failures) if failures else "PASS")
+        sys.exit(1 if failures else 0)
     video = sys.argv[2] if len(sys.argv) > 2 else None
     delegate = sys.argv[3] if len(sys.argv) > 3 else None
     stats = run(mode, video, seconds=6 if mode == "loop" else 8, delegate=delegate)

@@ -22,6 +22,7 @@ Keys: R recalibrate, T start the test, Space record now, Escape stop speech. The
 - `uv run spikes/tracking/e2e_check.py loop`: headless Chrome with a fake camera and a 100 ms stub worker. Frames must drop and never queue.
 - `uv run spikes/tracking/e2e_check.py hands CLIP.y4m CPU`: MediaPipe on a fake camera clip. A hand must be found and mapped onto the sheet.
 - `uv run spikes/tracking/e2e_check.py touch CLIP.y4m CPU`: the same, then T and 3 Space presses.
+- `uv run spikes/tracking/e2e_check.py session`: a whole 45 touch test through the page with scripted hands (stub worker, `?corners=`, T, dwell captures), then the downloaded JSON through `analyze_touch.py`. The contact point must land on every target, mean under 0.5 mm, with no page errors. Takes about 50 s, so it is not in the pre-commit hook; run it before a Gate B run.
 - `uv run spikes/tracking/make_sheet.py`: rebuild `test-sheet.pdf` from `sheet.json`.
 
 The test clip used so far is built from File:Index finger 2.JPG on Wikimedia Commons (public domain, PD-user-en, by Than Ball), panned over a white frame.

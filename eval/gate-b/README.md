@@ -6,6 +6,14 @@ the test sheet `spikes/tracking/test-sheet.pdf` printed at 100 percent with the 
 bar checked, the demo phone as the camera, 45 touches (9 targets times 5) and normal room
 lighting. A run that departs from any of these is a practice run, and Gate B stays pending.
 
+## Before the run
+
+1. `uv run spikes/tracking/e2e_check.py session` passes on the commit you will serve. It runs
+   a whole 45 touch test through the page with scripted hands and checks the downloaded
+   JSON with `analyze_touch.py`: the contact point lands on every target. About 50 s.
+2. `cd spikes/tracking && npm test` passes. It includes the comparison with the shipped
+   tracking code.
+
 ## What goes here
 
 - `touch-test-<finish time, UTC>.json`: the session as the touch-test page downloads
