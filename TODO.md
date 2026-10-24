@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 55, updated 2026-10-24T16:50:31.400Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 57, updated 2026-10-24T16:55:30.396Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -114,9 +114,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 4: Thu Oct 29
 
-- [ ] d4-1 S4 layout (3 h) [doing]
+- [x] d4-1 S4 layout (3 h)
   - Polygons in mm, gap enforcement, textures, point symbols.
-  - Note: Point symbols, gap enforcement by shrinking, textures by color group within the grade limit.
+  - Note: Commit 4a8e2e3. Point symbols (32-gon at least 6.4 mm across at the pole of inaccessibility), gap enforcement by cutting back the larger outline or the child, never a point symbol, by gap + 2 x 0.05 mm, repeated to 8 passes; two point symbols too close are reported, not moved. Textures by median fill color, largest group first, grade limit, pitches from explore.yaml. 14 tests incl. a 150-example property test; a 3000 case stress run: 0 unresolved, 0 pairs under 3.2 mm. Synthetic k5: pore is the only point symbol, right lobe shrunk, 3 textures, inner core untextured. vectorize and color 90 ms, fixes 1 ms. Braille placement is d4-2.
 - [ ] d4-2 Braille with liblouis (1.5 h)
   - UEB grade 2, placement, key fallback with abbreviations.
 - [ ] d4-3 S5 render (2 h)
@@ -126,7 +126,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d4-5 Print two copies and trace with puffy paint (1 h)
   - Let them dry overnight. Tape the sheet edges for the demo.
   - Fallback: Hot glue or layered card.
-- [ ] d4-6 Centroids and neighbor directions (1 h)
+- [ ] d4-6 Centroids and neighbor directions (1 h) [doing]
   - Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.
 - [ ] d4-7 Tactile rules validator (1.5 h)
   - tactile-rules-check skill: gaps, texture count, point symbol size, polygon validity and page bounds, later braille and SVG ids. Must find every planted violation in the synthetic figure before the fixes and none after.

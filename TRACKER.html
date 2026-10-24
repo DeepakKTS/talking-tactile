@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 55,
- "updated_at": "2026-10-24T16:50:31.400Z",
+ "rev": 57,
+ "updated_at": "2026-10-24T16:55:30.396Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1040,14 +1040,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Polygons in mm, gap enforcement, textures, point symbols.",
    "timebox": "3 h",
    "fallback": "",
-   "status": "doing",
-   "note": "Point symbols, gap enforcement by shrinking, textures by color group within the grade limit.",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 4a8e2e3. Point symbols (32-gon at least 6.4 mm across at the pole of inaccessibility), gap enforcement by cutting back the larger outline or the child, never a point symbol, by gap + 2 x 0.05 mm, repeated to 8 passes; two point symbols too close are reported, not moved. Textures by median fill color, largest group first, grade limit, pitches from explore.yaml. 14 tests incl. a 150-example property test; a 3000 case stress run: 0 unresolved, 0 pairs under 3.2 mm. Synthetic k5: pore is the only point symbol, right lobe shrunk, 3 textures, inner core untextured. vectorize and color 90 ms, fixes 1 ms. Braille placement is d4-2.",
+   "done_at": "2026-10-24T16:55:30.360Z",
    "tags": [
     "backend",
     "author"
    ],
-   "changed_at": "2026-10-24T16:50:31.400Z"
+   "changed_at": "2026-10-24T16:55:30.360Z"
   },
   {
    "id": "d4-2",
@@ -1115,13 +1115,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
+   "status": "doing",
    "note": "",
    "done_at": null,
    "tags": [
     "geometry"
    ],
-   "changed_at": "2026-10-24T16:45:42.206Z"
+   "changed_at": "2026-10-24T16:55:30.396Z"
   },
   {
    "id": "d4-7",
@@ -1847,6 +1847,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T16:55:30.396Z",
+   "kind": "claude",
+   "text": "Task d4-6 \"Centroids and neighbor directions\" is now doing."
+  },
+  {
+   "ts": "2026-10-24T16:55:30.360Z",
+   "kind": "claude",
+   "text": "Task d4-1 \"S4 layout\" is now done. Note: Commit 4a8e2e3. Point symbols (32-gon at least 6.4 mm across at the pole of inaccessibility), gap enforcement by cutting back the larger outline or the child, never a point symbol, by gap + 2 x 0.05 mm, repeated to 8 passes; two point symbols too close are reported, not moved. Textures by median fill color, largest group first, grade limit, pitches from explore.yaml. 14 tests incl. a 150-example property test; a 3000 case stress run: 0 unresolved, 0 pairs under 3.2 mm. Synthetic k5: pore is the only point symbol, right lobe shrunk, 3 textures, inner core untextured. vectorize and color 90 ms, fixes 1 ms. Braille placement is d4-2."
+  },
   {
    "ts": "2026-10-24T16:50:31.400Z",
    "kind": "claude",
