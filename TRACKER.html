@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 65,
- "updated_at": "2026-10-24T17:23:13.322Z",
+ "rev": 67,
+ "updated_at": "2026-10-24T17:23:32.917Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1795,6 +1795,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Translate labels by running lou_translate (liblouis 3.39.0 from Homebrew: brew install liblouis) as a subprocess, one call per figure with one label per line, tables from config/tactile_rules.yaml (unicode.dis, en-ueb-g2.ctb). The backend refuses to start if lou_translate is missing.",
    "why": "Checked Oct 24 on this Mac: the liblouis bindings are not on PyPI (the PyPI package named louis is an unrelated 2013 upload, not installed), and Homebrew installs them only for its own Python 3.15. They import into our 3.11 venv only by pointing it at Homebrew's site-packages, which is fragile. lou_translate works from any Python: 'left ventricle' gives the expected UEB grade 2 cells.",
    "changed_at": "2026-10-24T17:02:03.318Z"
+  },
+  {
+   "id": "dec-mvmo3xqbu7ds",
+   "date": "2026-10-24",
+   "title": "Raised outlines are drawn inside each part's edge",
+   "decision": "Each outline is a 1 mm band inside the part's polygon (render.outline_width_mm). The gap between two unrelated parts is the gap between their polygons; a child keeps min_gap + line width from its parent's edge, braille keeps clearance + line width from every edge, textures stay min_gap + line width inside.",
+   "why": "A centered stroke would eat half its width out of every gap, so a layout that passed 3.2 mm on polygons would print 2.2 mm between raised lines. Drawing inside keeps the polygon distances honest and lets the validator check what is printed.",
+   "changed_at": "2026-10-24T17:23:32.870Z"
+  },
+  {
+   "id": "dec-mvmo3xrm3oct",
+   "date": "2026-10-24",
+   "title": "The braille key goes on its own page",
+   "decision": "print.pdf is the sheet followed by key pages; the key lists each abbreviation used on the sheet and each texture sample with its meaning, in braille with print notes. tactile.svg is the sheet only, in layers guides, textures, outlines, braille.",
+   "why": "PLAN.md S5 lists key as a tactile.svg layer, but the figure fills the page inside the 1 inch margin and a key of 5 to 25 braille rows does not fit beside it. BANA allows the key on a separate page. Explore needs only the sheet.",
+   "changed_at": "2026-10-24T17:23:32.917Z"
   }
  ],
  "risks": [
@@ -1857,6 +1873,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T17:23:32.917Z",
+   "kind": "claude",
+   "text": "Decision: The braille key goes on its own page."
+  },
+  {
+   "ts": "2026-10-24T17:23:32.870Z",
+   "kind": "claude",
+   "text": "Decision: Raised outlines are drawn inside each part's edge."
+  },
   {
    "ts": "2026-10-24T17:23:13.322Z",
    "kind": "claude",
