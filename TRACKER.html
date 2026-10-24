@@ -207,8 +207,8 @@ TRACKER.html is the project memory. Update it only with scripts/tracker.py, neve
 <table><tbody>
 <tr><th>Base URL</th><td><code>https://api.meta.ai/v1</code>, OpenAI compatible, with an Anthropic compatible Messages format too</td></tr>
 <tr><th>Muse Spark</th><td><code>muse-spark-1.3</code>. 1M token context. Text, image, video and PDF in. Tool calling, structured output, search grounding, reasoning effort from minimal to xhigh</td></tr>
-<tr><th>SAM 3.1</th><td><code>sam-3-1</code>. Short noun phrase in, a box and mask for every match out. Tracks objects through video</td></tr>
-<tr><th>Muse Voice Transcribe</th><td><code>muse-voice-transcribe-1.0</code>. Realtime at <code>wss://api.meta.ai/v1/asr/realtime</code>. Keyword and language hints. Speaker labels and end of speech detection inside the model</td></tr>
+<tr><th>SAM 3.1</th><td><code>sam-3.1</code> on <code>POST /v1/responses</code>. One short noun phrase per request in, a box and a mask for every match out. Tracks objects through video</td></tr>
+<tr><th>Muse Voice Transcribe</th><td><code>muse-voice-transcribe-1.0</code>. Realtime at <code>wss://api.meta.ai/v1/asr/realtime</code>. Keyword and language hints. Speaker labels and end of speech detection inside the model. One-shot file endpoint <code>POST /v1/asr/transcribe</code> is the push-to-talk fallback</td></tr>
 <tr><th>Muse Wonder</th><td>Listed on the event page. Not yet checked. Task d1-2</td></tr>
 </tbody></table>
 <h3>Prices and limits, to confirm on Day 1</h3>
@@ -304,10 +304,11 @@ TRACKER.html         this file</pre>
 
 <section class="hb" id="hb-voice"><h2>Voice questions</h2>
 <ol><li>Hold Space. The mic opens and app speech pauses.</li>
-<li>16 kHz mono audio goes over a WebSocket to the backend, then to Muse Voice with region labels as keyword hints.</li>
+<li>Mono 16-bit PCM goes over a WebSocket to the backend, then to Muse Voice with region labels as keyword hints. Muse Voice takes 24 kHz, its native rate, or 16 kHz, which it resamples. The Day 1 spike picks one.</li>
 <li>On release, the local intent parser handles where is, more, repeat, stop and what is here.</li>
 <li>Anything else goes to <code>/api/ask</code> with the region, the last two regions and computed spatial facts.</li>
 <li>Muse Spark streams. The first sentence is spoken as soon as it is complete. Space cancels and listens again.</li></ol>
+<p class="note">Fallback: if realtime streaming is awkward, record while Space is held and send the whole clip once to <code>POST /v1/asr/transcribe</code> as a WAV.</p>
 <h3>Rules for answers</h3>
 <ul><li>One or two sentences. "More" gives detail.</li>
 <li>Only from the figure. If it is not shown, say so.</li>
@@ -523,8 +524,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 28,
- "updated_at": "2026-10-24T06:59:07.663Z",
+ "rev": 29,
+ "updated_at": "2026-10-24T07:03:30.752Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1726,6 +1727,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T07:03:30.752Z",
+   "kind": "claude",
+   "text": "Handbook factual corrections: SAM id is sam-3.1 on POST /v1/responses; voice audio is mono PCM16 at 24 kHz native or 16 kHz resampled, chosen by the spike; POST /v1/asr/transcribe named as the push-to-talk fallback. Only the handbook template changed; the JSON block was byte-identical before this log entry."
+  },
   {
    "ts": "2026-10-24T06:59:07.663Z",
    "kind": "claude",
