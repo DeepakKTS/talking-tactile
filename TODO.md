@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 26, updated 2026-10-24T06:55:52.869Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 28, updated 2026-10-24T06:59:07.663Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -70,8 +70,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d2-3 Homography from 4 clicked corners (1 h)
   - 3 x 3 matrix, a few lines of math. Auto registration comes on Day 5.
   - Note: spikes/tracking: lib/homography.js (4 point DLT, convex check for click order), lib/oneeuro.js (per axis, config/explore.yaml values), lib/fingertip.js (pointing hand picker, 4 mm contact offset toward DIP), calib.js (click A to D, overlay of projected sheet and targets, saved per camera size). 18 node tests. Headless: whole frame as sheet, fingertip mapped to 62.7, 69.5 mm, matching the hand math within 0.1 mm, pointing pose recognized. Watch: MediaPipe warns NORM_RECT projection is exact only for square input; check in the touch test.
-- [ ] d2-4 Run the 9 point touch test (1 h)
+- [ ] d2-4 Run the 9 point touch test (1 h) [blocked]
   - Print the test sheet, 45 touches, record mean and p95 error in mm.
+  - Note: Ready for the user to print and run. spikes/tracking/test-sheet.pdf (Letter, 4 lettered corners, 9 targets, 100 mm bar; measured at 300 dpi: bar 100.41 mm with end caps, target centers within 0.005 mm of sheet.json). Touch test mode: 45 touches (9 x 5, seeded, no back to back repeats), dwell capture 15 mm/s for 600 ms or Space, mean, p95, bias, per target, JSON download. 25 node tests; headless touch flow passes. Waiting on the physical test.
 - [ ] d2-5 Measure fps on phone browser and laptop (30 min)
   - Pick the device for Explore.
   - Fallback: Laptop plus phone as webcam.

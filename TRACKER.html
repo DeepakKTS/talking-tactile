@@ -523,8 +523,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 26,
- "updated_at": "2026-10-24T06:55:52.869Z",
+ "rev": 28,
+ "updated_at": "2026-10-24T06:59:07.663Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -841,12 +841,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Print the test sheet, 45 touches, record mean and p95 error in mm.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
+   "status": "blocked",
+   "note": "Ready for the user to print and run. spikes/tracking/test-sheet.pdf (Letter, 4 lettered corners, 9 targets, 100 mm bar; measured at 300 dpi: bar 100.41 mm with end caps, target centers within 0.005 mm of sheet.json). Touch test mode: 45 touches (9 x 5, seeded, no back to back repeats), dwell capture 15 mm/s for 600 ms or Space, mean, p95, bias, per target, JSON download. 25 node tests; headless touch flow passes. Waiting on the physical test.",
    "done_at": null,
    "tags": [
     "eval"
-   ]
+   ],
+   "changed_at": "2026-10-24T06:59:07.663Z"
   },
   {
    "id": "d2-5",
@@ -1725,6 +1726,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T06:59:07.663Z",
+   "kind": "claude",
+   "text": "Task d2-4 \"Run the 9 point touch test\" is now blocked. Note: Ready for the user to print and run. spikes/tracking/test-sheet.pdf (Letter, 4 lettered corners, 9 targets, 100 mm bar; measured at 300 dpi: bar 100.41 mm with end caps, target centers within 0.005 mm of sheet.json). Touch test mode: 45 touches (9 x 5, seeded, no back to back repeats), dwell capture 15 mm/s for 600 ms or Space, mean, p95, bias, per target, JSON download. 25 node tests; headless touch flow passes. Waiting on the physical test."
+  },
+  {
+   "ts": "2026-10-24T06:56:35.035Z",
+   "kind": "claude",
+   "text": "Task d2-4 \"Run the 9 point touch test\" is now doing."
+  },
   {
    "ts": "2026-10-24T06:55:52.869Z",
    "kind": "claude",
