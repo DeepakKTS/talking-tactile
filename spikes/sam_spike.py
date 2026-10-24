@@ -126,7 +126,7 @@ def main() -> None:
         return
 
     env = load_env()
-    key = env["META_API_KEY"]
+    key = env["MODEL_API_KEY"]
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
     print("headers:", redacted_headers(headers))
     rows, first_ms, done_ms = [], [], []

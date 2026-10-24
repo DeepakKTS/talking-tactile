@@ -181,7 +181,7 @@ def main() -> None:
         return
 
     env = load_env()
-    key = env["META_API_KEY"]
+    key = env["MODEL_API_KEY"]
     url = env.get("META_ASR_URL", "wss://api.meta.ai/v1/asr/realtime")
     configs = [("24k_hints", 24000, True), ("24k_nohints", 24000, False), ("16k_hints", 16000, True)]
     cases, audio_s, fixture_saved = [], 0.0, False

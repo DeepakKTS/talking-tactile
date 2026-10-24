@@ -36,9 +36,12 @@ def load_env() -> dict[str, str]:
                 continue
             k, v = line.split("=", 1)
             env[k.strip()] = v.strip().strip('"').strip("'")
-    if not env.get("META_API_KEY"):
+    # MODEL_API_KEY is the name Meta's docs use (dev.meta.ai/docs/authentication).
+    if not env.get("MODEL_API_KEY"):
+        if env.get("META_API_KEY"):
+            sys.exit(f"{ENV_FILE} has META_API_KEY. Rename that line to MODEL_API_KEY.")
         sys.exit(
-            f"No META_API_KEY in {ENV_FILE}. Copy .env.example there and add the key. "
+            f"No MODEL_API_KEY in {ENV_FILE}. Copy .env.example there and add the key. "
             "Use --dry-run to check the request without a key."
         )
     env.setdefault("META_API_BASE", "https://api.meta.ai/v1")
