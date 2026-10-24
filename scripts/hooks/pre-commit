@@ -1,15 +1,54 @@
 #!/usr/bin/env bash
-# Blocks the commit if the tracker tests or the tracking node tests fail.
+# Blocks the commit if the tracker tests or the tracking node tests fail on the STAGED content.
+# Unstaged changes and untracked files are stashed first (git stash --keep-index) and always
+# restored on exit, pass or fail. Ignored files (such as services/api/.env) are never touched.
 # Install once with: sh scripts/install-hooks.sh
-# Note: the tests run on the working tree, so unstaged edits count too.
 set -euo pipefail
-cd "$(git rev-parse --show-toplevel)"
 
-echo "pre-commit: tracker tests"
-python3 -m unittest scripts/test_tracker.py
+# Everything runs inside main, so bash has parsed the whole hook before the stash can
+# change this file on disk (git runs the hook from the working tree).
+main() {
+  cd "$(git rev-parse --show-toplevel)"
 
-echo "pre-commit: tracking node tests"
-(cd spikes/tracking && node --test --test-reporter=dot test/*.test.mjs)
+  stashed=0
+  restore() {
+    local rc=$?
+    if [ "$stashed" = 1 ]; then
+      # Back to HEAD, then reapply the stash with its index. The stash's base is HEAD, so
+      # staged and unstaged edits to the same lines come back exactly, with no merge.
+      git reset --hard -q
+      if git stash pop --index -q; then
+        echo "pre-commit: unstaged changes restored"
+      else
+        echo "pre-commit: could not restore unstaged changes. They are safe in 'git stash list'." >&2
+        rc=1
+      fi
+    fi
+    find scripts spikes -name __pycache__ -type d -prune -exec rm -rf {} +
+    exit "$rc"
+  }
+  trap restore EXIT
 
-find scripts spikes -name __pycache__ -type d -prune -exec rm -rf {} +
-echo "pre-commit: all tests passed"
+  if git rev-parse -q --verify MERGE_HEAD > /dev/null; then
+    echo "pre-commit: merge in progress, testing the working tree as it is"
+  elif ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+    before=$(git rev-parse -q --verify refs/stash || true)
+    git stash push --keep-index --include-untracked -q -m "pre-commit: unstaged changes"
+    after=$(git rev-parse -q --verify refs/stash || true)
+    # Only restore a stash this hook created, never an older one of yours.
+    if [ "$after" != "$before" ]; then
+      stashed=1
+      echo "pre-commit: testing staged content (unstaged changes stashed)"
+    fi
+  fi
+
+  echo "pre-commit: tracker tests"
+  python3 -m unittest scripts/test_tracker.py
+
+  echo "pre-commit: tracking node tests"
+  (cd spikes/tracking && node --test --test-reporter=dot test/*.test.mjs)
+
+  echo "pre-commit: all tests passed"
+}
+
+main "$@"; exit $?
