@@ -4,6 +4,17 @@
 import { createHash } from "node:crypto";
 
 export const VIDEO = [1280, 720];
+
+// Every shipped file the generator's results depend on, from the repo root. parity.test.mjs
+// checks that this list covers their imports, and that none has changed since.
+export const SHIPPED_SOURCES = [
+  "apps/web/src/explore/fingertip.ts",
+  "apps/web/src/explore/hands.ts",
+  "apps/web/src/explore/homography.ts",
+  "apps/web/src/explore/oneEuro.ts",
+  "apps/web/src/shared/config.ts",
+  "config/explore.yaml",
+];
 export const RUN_FRAMES = 150;
 export const RUNS = 6;
 

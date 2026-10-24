@@ -3,14 +3,15 @@
 // inputs in inputs.mjs, so test/parity.test.mjs on main can hold the spike to it. Run it
 // with vitest.config.mjs after any change to the port or to the inputs.
 import { execSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { readFileSync, writeFileSync } from "node:fs";
 import { it } from "vitest";
 import { EXPLORE } from "@port/shared/config";
 import { applyHomography, homographyFromPoints } from "@port/explore/homography";
 import { OneEuroFilter2D, oneEuroParams } from "@port/explore/oneEuro";
 import { FingertipTracker } from "@port/explore/fingertip";
 import sheet from "@spike/sheet.json";
-import { VIDEO, digest, landmarksPx, makeInputs } from "./inputs.mjs";
+import { SHIPPED_SOURCES, VIDEO, digest, landmarksPx, makeInputs } from "./inputs.mjs";
 
 it("writes the shipped code's outputs", () => {
   const inputs = makeInputs(sheet.corners_mm);
@@ -36,10 +37,17 @@ it("writes the shipped code's outputs", () => {
     });
   })]));
   const git = (cmd: string) => execSync(`git ${cmd}`, { cwd: process.cwd() }).toString().trim();
+  const root = git("rev-parse --show-toplevel");
+  const sources = Object.fromEntries(SHIPPED_SOURCES.map((f) => [f, createHash("sha256").update(readFileSync(`${root}/${f}`)).digest("hex")]));
   const fx = EXPLORE.fingertip;
   writeFileSync(new URL("./port_outputs.json", import.meta.url), `${JSON.stringify({
     note: "Outputs of the shipped tracking code for the inputs in inputs.mjs. Made by generate.port.ts; do not edit.",
-    port: { branch: git("rev-parse --abbrev-ref HEAD"), commit: git("rev-parse --short HEAD"), dirty: git("status --porcelain -- src") !== "" },
+    port: {
+      branch: git("rev-parse --abbrev-ref HEAD"),
+      commit: git("rev-parse --short HEAD"),
+      dirty: git(`-C ${root} status --porcelain -- ${SHIPPED_SOURCES.join(" ")}`) !== "",
+      sources,
+    },
     config: { one_euro: fx.one_euro, contact_offset_mm: fx.contact_offset_mm, lost_reset_ms: fx.lost_reset_ms, min_curled: EXPLORE.hands.min_curled },
     inputsSha256: digest(inputs),
     homography,
