@@ -6,13 +6,14 @@
 
   uv run apps/web/e2e/explore_e2e.py
 
-1. Starts the API in mock mode on a temporary data dir, uploads the synthetic figure,
-   waits for it and publishes it. Builds the web app and serves it with vite preview.
-2. Script mode (?source=script): hands are injected at 30 fps as worker results would
+1. Starts the API in mock mode on a temporary data dir, builds the web app and serves it
+   with vite preview. In /author: uploads the synthetic figure through the file input,
+   renames a part, marks one checked, publishes, and follows the print and Explore links.
+2. Explore, script mode (?source=script): hands are injected at 30 fps as worker results would
    arrive. Touches every part on the published sheet, checks earcon then label, then
    turns the network off and checks labels, earcons, guidance and the offline answer.
    Measures Escape to speech stopped.
-3. Camera mode: Chrome's fake camera and the real MediaPipe worker, with every request
+3. Explore, camera mode: Chrome's fake camera and the real MediaPipe worker, with every request
    that is not to this machine refused, so the wasm and the model must be local.
 
 Prints the measured numbers as JSON and exits non-zero if a check fails.
@@ -43,6 +44,7 @@ PAGE_MM = (215.9, 279.4)
 W, H = round(PAGE_MM[0] * SCALE), round(PAGE_MM[1] * SCALE)
 INSET = 12.7
 OFFLINE = "Questions need the network. Labels still work."
+SHOTS = ROOT / "data" / "e2e"  # git-ignored screenshots
 
 
 def free_port() -> int:
@@ -66,26 +68,6 @@ def api_json(url: str, data: bytes | None = None, headers: dict[str, str] | None
     req = urllib.request.Request(url, data=data, headers=headers or {}, method="POST" if data is not None else "GET")
     with urllib.request.urlopen(req, timeout=60) as r:
         return json.loads(r.read())
-
-
-def publish_synthetic(api: str) -> str:
-    boundary = "ttboundary"
-    body = (
-        f"--{boundary}\r\nContent-Disposition: form-data; name=\"grade_band\"\r\n\r\nk5\r\n"
-        f"--{boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"figure.png\"\r\n"
-        "Content-Type: application/octet-stream\r\n\r\n"
-    ).encode() + FIGURE.read_bytes() + f"\r\n--{boundary}--\r\n".encode()
-    up = api_json(f"{api}/api/figures", body, {"Content-Type": f"multipart/form-data; boundary={boundary}"})
-    fid = up["figure_id"]
-    for _ in range(300):
-        status = api_json(f"{api}/api/figures/{fid}")
-        if status["job"]["status"] == "done":
-            break
-        if status["job"]["status"] == "failed":
-            raise RuntimeError(status)
-        time.sleep(0.1)
-    api_json(f"{api}/api/figures/{fid}/publish", b"", {"Content-Type": "application/json"})
-    return fid
 
 
 # A pointing hand in page mm with its index tip at (x, y), drawn in the scripted view.
@@ -264,9 +246,55 @@ def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fai
         fail.append(f"mirror lines: {lines[-2:]}")
     page.get_by_label("Who speaks").select_option("app")
 
+    page.screenshot(path=str(SHOTS / "explore.png"), full_page=True)
     out["metrics"] = page.evaluate("() => window.__tt.metrics.summary()")
     page.context.set_offline(False)
     return out
+
+
+def author(page: Page, base: str, api: str, fail: list[str]) -> tuple[str, dict[str, Any]]:
+    """The teacher's flow in the real UI: upload, review, two edits, publish."""
+    out: dict[str, Any] = {}
+    page.goto(f"{base}/author")
+    page.get_by_label("Figure (PNG, JPEG or a PDF page)").set_input_files(str(FIGURE))
+    page.get_by_label("Grade band").select_option("k5")
+    page.get_by_role("button", name="Make a tactile sheet").click()
+    parts = page.get_by_role("list", name="Parts")
+    parts.wait_for(timeout=60000)
+    fid = page.url.split("figure=")[1]
+    publish = page.get_by_role("button", name="Publish for students")
+    out["not_checked_at_start"] = parts.get_by_text("Not checked").count()
+    out["images_loaded"] = page.evaluate(
+        "() => [...document.querySelectorAll('img')].map((i) => [i.alt, i.complete && i.naturalWidth > 0])"
+    )
+    if not all(ok for _, ok in out["images_loaded"]) or len(out["images_loaded"]) != 2:
+        fail.append(f"review images: {out['images_loaded']}")
+
+    page.get_by_role("button", name="Edit pore").click()
+    page.get_by_label("New name for pore").fill("pore opening")
+    page.get_by_role("button", name="Rename pore").click()
+    parts.get_by_text("pore opening", exact=True).wait_for(timeout=30000)
+    page.wait_for_function("() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
+    page.get_by_role("button", name="Mark left lobe checked").click()
+    page.get_by_role("button", name="Mark left lobe checked").wait_for(state="detached", timeout=30000)
+    page.wait_for_function("() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
+    out["not_checked_after_edits"] = parts.get_by_text("Not checked").count()
+    if out["not_checked_after_edits"] != out["not_checked_at_start"] - 2:
+        fail.append(f"checked flags: {out['not_checked_at_start']} then {out['not_checked_after_edits']}")
+    out["rules"] = page.get_by_text("All tactile rules pass.").count() == 1
+
+    publish.click()
+    explore = page.get_by_role("link", name="Open version 1 in Explore")
+    explore.wait_for(timeout=30000)
+    out["explore_link"] = explore.get_attribute("href")
+    SHOTS.mkdir(parents=True, exist_ok=True)
+    page.get_by_role("button", name="Show on sheet").nth(1).click()
+    page.screenshot(path=str(SHOTS / "author.png"), full_page=True)
+    pdf = page.get_by_role("link", name="Download print PDF, version 1").get_attribute("href") or ""
+    out["print_pdf_is_pdf"] = urllib.request.urlopen(f"{api}{pdf}").read(4) == b"%PDF"
+    if out["explore_link"] != f"/explore?figure={fid}&version=1" or not out["print_pdf_is_pdf"]:
+        fail.append(f"publish links: {out['explore_link']}, pdf {out['print_pdf_is_pdf']}")
+    return fid, out
 
 
 def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
@@ -321,30 +349,21 @@ def main() -> None:
                                       cwd=WEB, env=env, stdout=subprocess.DEVNULL))
         wait_http(f"{api}/api/health")
         wait_http(base)
-        fid = publish_synthetic(api)
-        regions = json.loads(urllib.request.urlopen(f"{api}/api/figures/{fid}/published/latest/regions.json").read())["regions"]
-        result: dict[str, Any] = {"figure_id": fid, "regions": len(regions)}
+        regions_url = "{api}/api/figures/{fid}/published/latest/regions.json"
+        result: dict[str, Any] = {}
         with sync_playwright() as p:
             args = ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream",
                     "--autoplay-policy=no-user-gesture-required"]
             browser = p.chromium.launch(channel="chrome", headless=True, args=args)
-            page = browser.new_context().new_page()
-            page.add_init_script("""
-              window.__speaks = 0;
-              if (window.speechSynthesis) {
-                const speak = speechSynthesis.speak.bind(speechSynthesis);
-                speechSynthesis.speak = (u) => { window.__speaks++; speak(u); };
-              }
-            """)
             errors: list[str] = []
-            page.on("pageerror", lambda e: errors.append(str(e)))
-            result["script"] = scripted(page, base, fid, regions, fail)
-            cam = browser.new_context().new_page()
-            cam.on("pageerror", lambda e: errors.append(str(e)))
-            result["camera"] = camera(cam, base, fid, fail)
-            result["page_errors"] = errors
-            if errors:
-                fail.append(f"page errors: {errors[:3]}")
+            teacher = browser.new_context().new_page()
+            teacher.on("pageerror", lambda e: errors.append(str(e)))
+            fid, result["author"] = author(teacher, base, api, fail)
+            regions = json.loads(urllib.request.urlopen(regions_url.format(api=api, fid=fid)).read())["regions"]
+            if "pore opening" not in {r["label"] for r in regions}:
+                fail.append("the published regions.json lacks the teacher's rename")
+            result.update({"figure_id": fid, "regions": len(regions)})
+            explore_run(browser, base, fid, regions, fail, errors, result)
             browser.close()
     finally:
         for proc in procs:
@@ -355,6 +374,26 @@ def main() -> None:
         print("FAIL:\n- " + "\n- ".join(fail))
         sys.exit(1)
     print("PASS")
+
+
+def explore_run(browser: Any, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str],
+                errors: list[str], result: dict[str, Any]) -> None:
+    page = browser.new_context().new_page()
+    page.add_init_script("""
+      window.__speaks = 0;
+      if (window.speechSynthesis) {
+        const speak = speechSynthesis.speak.bind(speechSynthesis);
+        speechSynthesis.speak = (u) => { window.__speaks++; speak(u); };
+      }
+    """)
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    result["script"] = scripted(page, base, fid, regions, fail)
+    cam = browser.new_context().new_page()
+    cam.on("pageerror", lambda e: errors.append(str(e)))
+    result["camera"] = camera(cam, base, fid, fail)
+    result["page_errors"] = errors
+    if errors:
+        fail.append(f"page errors: {errors[:3]}")
 
 
 if __name__ == "__main__":

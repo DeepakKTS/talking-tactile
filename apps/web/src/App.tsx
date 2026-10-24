@@ -1,9 +1,10 @@
+import { AuthorPage } from "./author/AuthorPage";
 import { ExplorePage } from "./explore/ExplorePage";
 import { routeFromPath } from "./route";
 
 export function App() {
   const route = routeFromPath(window.location.pathname);
-  if (route === "author") return <main><h1>Author</h1></main>;
+  if (route === "author") return <AuthorPage />;
   if (route === "explore") return <ExplorePage />;
   return (
     <main>

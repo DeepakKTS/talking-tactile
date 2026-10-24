@@ -234,6 +234,7 @@ export function ExplorePage() {
     session.current = s;
     await eng.start(s.pitches);
     setStarted(true);
+    setStatus(`${file.title}. Exploring.`);
     trace.current.started = true;
     s.intro();
 
