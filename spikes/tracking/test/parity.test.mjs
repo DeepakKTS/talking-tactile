@@ -83,11 +83,6 @@ for (const name of Object.keys(PATH_CASES)) {
     assert.ok(r.frames > 500, `only ${r.frames} frames compared`);
     assert.equal(r.presence, 0, "a frame had a point in one and none in the other");
     assert.equal(r.pointing, 0, "frames where one called the hand pointing and the other did not");
-    if (name === "one hand, frames stall for 400 ms") {
-      // Known difference, fixed next: after a stall the shipped code restarts its filter.
-      assert.ok(r.worst > 1, `worst ${r.worst} mm`);
-      return;
-    }
     assert.ok(r.worst < TOL_MM, `worst ${r.worst} mm`);
   });
 }

@@ -59,7 +59,7 @@ export class FingertipMapper {
     this.filter = new OneEuroFilter2D(filter);
     this.lostResetMs = lostResetMs;
     this.toMm = null;
-    this.lastHandAt = 0;
+    this.lastHandAt = -Infinity;
   }
 
   setCalibration(toMm) {
@@ -67,9 +67,10 @@ export class FingertipMapper {
     this.filter.reset();
   }
 
-  // True once no hand has been seen for lostResetMs.
+  // True once no hand has been seen for lostResetMs, whether frames came without one or
+  // no frames came at all (a stalled camera or tab). Same test as the shipped code.
   lost(nowMs) {
-    return nowMs - this.lastHandAt > this.lostResetMs;
+    return nowMs - this.lastHandAt >= this.lostResetMs;
   }
 
   // handsPx: arrays of 21 [x, y] points in pixels. Null with no hand or no calibration.
@@ -83,6 +84,8 @@ export class FingertipMapper {
     const tipMm = applyHomography(this.toMm, pts[LANDMARK.INDEX_TIP]);
     const dipMm = applyHomography(this.toMm, pts[LANDMARK.INDEX_DIP]);
     const raw = contactPoint(tipMm, dipMm, offsetMm);
+    // After a gap the filter starts over, so it never smooths across a jump.
+    if (this.lost(nowMs)) this.filter.reset();
     const mm = this.filter.filter(raw, nowMs / 1000);
     this.lastHandAt = nowMs;
     return { mm, raw, pointing: pick.pointing, t: nowMs };
