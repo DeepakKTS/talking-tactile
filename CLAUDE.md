@@ -84,4 +84,5 @@ TRACKER.html is the project memory. Update it only with scripts/tracker.py, neve
 - Starting a task: python scripts/tracker.py status <id> doing
 - Finishing: python scripts/tracker.py status <id> done --note "what was done and measured"
 - Blocked or cut: the same command, with the reason in --note
+- New task: python scripts/tracker.py add <day> TITLE [--detail TEXT] [--timebox TEXT] [--fallback TEXT] [--tags a,b]
 - Numbers: tracker.py metric. Bugs: tracker.py issue. Choices: tracker.py decision. Gates: tracker.py gate.
