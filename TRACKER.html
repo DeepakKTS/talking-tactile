@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 75,
- "updated_at": "2026-10-24T17:32:39.324Z",
+ "rev": 76,
+ "updated_at": "2026-10-24T17:50:26.770Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1057,13 +1057,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "S0 to S5 in order, content-hash cache per stage under data/figures/\u003csha256>/, job records in SQLite with stage timings, mock S1 and S2.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Commit 73687bf on early-start. app/pipeline/runner.py: submit runs S0 (bad upload makes no job), run takes S1 to S5 with mock S1 and S2. One file per stage s1_understand to s5_render, each with save and load for the cache. Cache under data/figures/\u003cfigure_id>/\u003cstage>/\u003ckey>/, key chain over the previous key: S1 and S2 on client mode, version, max_parts and text phrase (a code change never pays for a call again); S3 to S5 on the source hash, config and job options. Resumes after the latest cached stage, rebuilds an unreadable entry, writes through a temp dir and rename. S2 keeps to sam_concurrency (tested at 4). describe_only stops after S1. SQLite jobs and stage_runs (ran, cached, skipped; ms; cost). Mock synthetic figure: cold run S0 65, S1 47, S2 23, S3 106, S4 403, S5 65 ms (1.16 s process); same upload again 55 ms with zero Meta calls, same regions.json. 12 tests, 319 api tests pass. Live mode waits on d1-8. Numbered overlay Spark pass in S3 not built (needs the spike).",
+   "done_at": "2026-10-24T17:50:26.770Z",
    "tags": [
     "pipeline"
    ],
-   "changed_at": "2026-10-24T17:32:39.324Z"
+   "changed_at": "2026-10-24T17:50:26.770Z"
   },
   {
    "id": "d3-9",
@@ -1920,6 +1920,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [],
  "log": [
+  {
+   "ts": "2026-10-24T17:50:26.770Z",
+   "kind": "claude",
+   "text": "Task d3-8 \"Pipeline runner with stage cache and SQLite jobs\" is now done. Note: Commit 73687bf on early-start. app/pipeline/runner.py: submit runs S0 (bad upload makes no job), run takes S1 to S5 with mock S1 and S2. One file per stage s1_understand to s5_render, each with save and load for the cache. Cache under data/figures/\u003cfigure_id>/\u003cstage>/\u003ckey>/, key chain over the previous key: S1 and S2 on client mode, version, max_parts and text phrase (a code change never pays for a call again); S3 to S5 on the source hash, config and job options. Resumes after the latest cached stage, rebuilds an unreadable entry, writes through a temp dir and rename. S2 keeps to sam_concurrency (tested at 4). describe_only stops after S1. SQLite jobs and stage_runs (ran, cached, skipped; ms; cost). Mock synthetic figure: cold run S0 65, S1 47, S2 23, S3 106, S4 403, S5 65 ms (1.16 s process); same upload again 55 ms with zero Meta calls, same regions.json. 12 tests, 319 api tests pass. Live mode waits on d1-8. Numbered overlay Spark pass in S3 not built (needs the spike)."
+  },
   {
    "ts": "2026-10-24T17:32:39.324Z",
    "kind": "claude",

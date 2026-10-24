@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 75, updated 2026-10-24T17:32:39.324Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 76, updated 2026-10-24T17:50:26.770Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -115,8 +115,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d3-7 Vectorize masks and scale to page mm (1.5 h)
   - Contour tracing, simplification to at most 200 points, fit into the Letter or A4 figure area, pixel to mm. Property tests on random shapes.
   - Note: Commit c891307. PageFit (centered fit into the figure area, page mm and back) and mask_to_polygons_mm (contours, mitred half-pixel offset, per-piece polygons, Douglas-Peucker 0.1 mm doubled to the 200 point cap). 13 tests incl. 3 hypothesis properties. Synthetic: worst Hausdorff 0.081 mm, area error under 1 percent, 4 to 65 points per part, 7 ms for 8 parts.
-- [ ] d3-8 Pipeline runner with stage cache and SQLite jobs (2 h) [doing]
+- [x] d3-8 Pipeline runner with stage cache and SQLite jobs (2 h)
   - S0 to S5 in order, content-hash cache per stage under data/figures/<sha256>/, job records in SQLite with stage timings, mock S1 and S2.
+  - Note: Commit 73687bf on early-start. app/pipeline/runner.py: submit runs S0 (bad upload makes no job), run takes S1 to S5 with mock S1 and S2. One file per stage s1_understand to s5_render, each with save and load for the cache. Cache under data/figures/<figure_id>/<stage>/<key>/, key chain over the previous key: S1 and S2 on client mode, version, max_parts and text phrase (a code change never pays for a call again); S3 to S5 on the source hash, config and job options. Resumes after the latest cached stage, rebuilds an unreadable entry, writes through a temp dir and rename. S2 keeps to sam_concurrency (tested at 4). describe_only stops after S1. SQLite jobs and stage_runs (ran, cached, skipped; ms; cost). Mock synthetic figure: cold run S0 65, S1 47, S2 23, S3 106, S4 403, S5 65 ms (1.16 s process); same upload again 55 ms with zero Meta calls, same regions.json. 12 tests, 319 api tests pass. Live mode waits on d1-8. Numbered overlay Spark pass in S3 not built (needs the spike).
 - [ ] d3-9 Figure API routes and middleware (2 h)
   - POST /api/figures, GET status, regions.json, tactile.svg, print.pdf, PATCH a region, POST publish. Request id, JSON logs, error envelope, upload guard, CORS. API test runs the synthetic figure end to end.
 
