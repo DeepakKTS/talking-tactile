@@ -19,7 +19,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.models.regions import MAX_TEXTURES, PageSize
+from app.models.regions import MAX_TEXTURES, GradeBand, PageSize
 from app.paths import EXPLORE_YAML, TACTILE_RULES_YAML
 
 
@@ -53,6 +53,13 @@ class Spacing(_Section):
 class Textures(_Section):
     max_area_textures: PosInt
     max_area_textures_lower_grades: PosInt
+    lower_grade_bands: list[GradeBand]
+
+    def limit_for(self, grade_band: GradeBand | None) -> int:
+        """Area textures allowed for a grade band. No band given means the general limit."""
+        if grade_band in self.lower_grade_bands:
+            return self.max_area_textures_lower_grades
+        return self.max_area_textures
 
     @model_validator(mode="after")
     def _limits(self) -> Self:
@@ -83,7 +90,28 @@ class Braille(_Section):
 
 class PageRules(_Section):
     sizes: Annotated[list[PageSize], Field(min_length=1)]
+    dimensions_mm: dict[PageSize, tuple[PosFloat, PosFloat]]
+    margin_mm: PosFloat
     calibration_bar_mm: PosFloat
+
+    @model_validator(mode="after")
+    def _sizes_have_dimensions(self) -> Self:
+        for size in self.sizes:
+            if size not in self.dimensions_mm:
+                raise ValueError(f"dimensions_mm has no entry for page size {size}")
+            if 2 * self.margin_mm >= min(self.dimensions_mm[size]):
+                raise ValueError(f"margin_mm leaves no figure area on {size}")
+        return self
+
+    def figure_area_mm(self, size: PageSize) -> tuple[float, float, float, float]:
+        """The rectangle the figure is fitted into, as (x, y, width, height) in page mm."""
+        width, height = self.dimensions_mm[size]
+        m = self.margin_mm
+        return (m, m, width - 2 * m, height - 2 * m)
+
+
+class Pipeline(_Section):
+    normalize_max_side_px: PosInt
 
 
 class TactileRules(_Section):
@@ -91,6 +119,7 @@ class TactileRules(_Section):
     textures: Textures
     braille: Braille
     page: PageRules
+    pipeline: Pipeline
     principles: list[StrictStr]
 
 

@@ -9,6 +9,7 @@ spacing:
 textures:
   max_area_textures: 5           # APH handout, "limit of 5"
   max_area_textures_lower_grades: 3  # APH handout, "limit of 3 for lower grades"
+  lower_grade_bands: [k5]            # APH gives no cut-off for "lower grades"; we take K to 5
 
 braille:                     # BANA signage guideline values. Paper braille may differ.
   dot_base_diameter_mm: [1.5, 1.6]
@@ -20,7 +21,15 @@ braille:                     # BANA signage guideline values. Paper braille may 
 
 page:
   sizes: [letter, a4]
+  dimensions_mm:                   # width, height. ANSI Letter and ISO 216 A4
+    letter: [215.9, 279.4]
+    a4: [210.0, 297.0]
+  margin_mm: 25.4                  # 1 inch on every side; the figure is fitted inside it. Engineering choice:
+                                   # room for registration marks and the calibration bar. Check against BANA 2022
   calibration_bar_mm: 100          # printed on every sheet so scaling can be checked with a ruler
+
+pipeline:                          # engineering values, not design rules
+  normalize_max_side_px: 2048      # PLAN.md section 6, S0: longest side of the normalized image
 
 principles:
   - represent, not interpret       # APH handout

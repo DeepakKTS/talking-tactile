@@ -48,6 +48,23 @@ def test_real_tactile_rules_load() -> None:
     assert rules.textures.max_area_textures_lower_grades == 3
     assert rules.braille.cell_to_cell_mm == (6.1, 7.6)
     assert rules.page.calibration_bar_mm == 100
+    assert rules.page.dimensions_mm["letter"] == (215.9, 279.4)
+    assert rules.pipeline.normalize_max_side_px == 2048
+
+
+def test_texture_limit_depends_on_grade_band() -> None:
+    textures = load_tactile_rules(TACTILE_RULES_YAML).textures
+    assert textures.limit_for("k5") == 3
+    assert textures.limit_for("9_12") == 5
+    assert textures.limit_for(None) == 5
+
+
+def test_figure_area_is_the_page_inside_the_margin() -> None:
+    page = load_tactile_rules(TACTILE_RULES_YAML).page
+    x, y, w, h = page.figure_area_mm("letter")
+    assert (x, y) == (25.4, 25.4)
+    assert w == pytest.approx(215.9 - 50.8)
+    assert h == pytest.approx(279.4 - 50.8)
 
 
 def test_real_explore_config_loads() -> None:
@@ -87,6 +104,7 @@ TACTILE_BAD = [
     ("textures.max_area_textures", 2.5, "max_area_textures"),
     ("textures.max_area_textures", MAX_TEXTURES + 1, "regions.schema.json"),
     ("textures.max_area_textures_lower_grades", 6, "lower_grades"),
+    ("textures.lower_grade_bands", ["k3"], "lower_grade_bands"),
     ("braille.cell_to_cell_mm", [7.6, 6.1], "cell_to_cell_mm"),
     ("braille.cell_to_cell_mm", [6.1], "cell_to_cell_mm"),
     ("braille.dot_base_diameter_mm", [0, 1.6], "dot_base_diameter_mm"),
@@ -94,6 +112,13 @@ TACTILE_BAD = [
     ("page.sizes", ["letter", "legal"], "sizes"),
     ("page.sizes", [], "sizes"),
     ("page.calibration_bar_mm", -100, "calibration_bar_mm"),
+    ("page.dimensions_mm.a4", DELETE, "a4"),
+    ("page.dimensions_mm.legal", [216, 356], "legal"),
+    ("page.dimensions_mm.letter", [215.9], "letter"),
+    ("page.margin_mm", 105, "no figure area"),
+    ("page.margin_mm", 0, "margin_mm"),
+    ("pipeline", DELETE, "pipeline"),
+    ("pipeline.normalize_max_side_px", 2048.5, "normalize_max_side_px"),
     ("principles", "spacing", "principles"),
 ]
 
