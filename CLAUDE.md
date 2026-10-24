@@ -55,6 +55,7 @@ make dev          # api on :8000, web on :5173
 make test         # pytest + vitest
 make eval         # runs eval/ and writes eval/RESULTS.md
 MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
+sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests
 ```
 
 ## The contract
