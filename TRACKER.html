@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 103,
- "updated_at": "2026-10-24T23:42:07.164Z",
+ "rev": 105,
+ "updated_at": "2026-10-28T00:03:22.555Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -664,12 +664,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Write anything that changes the plan into PLAN.md section 17 and a decision here.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Deepak read and accepted the Official Rules on Oct 27. Pre-event work is allowed; see the decision Official Rules read by Deepak.",
+   "done_at": "2026-10-28T00:03:22.555Z",
    "tags": [
     "rules"
-   ]
+   ],
+   "changed_at": "2026-10-28T00:03:22.555Z"
   },
   {
    "id": "d1-2",
@@ -1958,6 +1959,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "The demo and the Gate B touch test run the page in the demo phone's own browser, not on a laptop with the phone as its webcam (Continuity Camera). The phone sits in a fixed mount for the whole run. This adds a step to the Gate B protocol decided earlier on Oct 24: the phone is mounted, and after calibration the drawn outline is checked against the printed corner marks and targets before the first touch. A run without both is a practice run.",
    "why": "The accuracy and latency numbers must come from the setup that ships: MediaPipe on the phone, the phone's camera and the phone's browser. Continuity Camera would measure the laptop's tracking instead. A fixed mount keeps the calibration valid for every touch, and checking the outline catches a bad corner tap before it reaches 45 touches.",
    "changed_at": "2026-10-24T23:42:07.164Z"
+  },
+  {
+   "id": "dec-mvrcpo8jnd22",
+   "date": "2026-10-27",
+   "title": "Official Rules read by Deepak; pre-event work allowed; early-start merges into main",
+   "decision": "Deepak read the Official Rules on Oct 27. Work done before Oct 26 is allowed. Branch early-start (product code from Oct 24) merges into main with a merge commit, no rebase or squash, so the Oct 24 commit dates stay as they are.",
+   "why": "The early-start split existed only to keep pre-event code reversible until the rules were read. The rules allow it, so one branch is simpler and the spikes can test the shipped code directly.",
+   "changed_at": "2026-10-28T00:03:22.499Z"
   }
  ],
  "risks": [
@@ -2030,6 +2039,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-28T00:03:22.555Z",
+   "kind": "claude",
+   "text": "Task d1-1 \"Watch kickoff, read and accept the Official Rules\" is now done. Note: Deepak read and accepted the Official Rules on Oct 27. Pre-event work is allowed; see the decision Official Rules read by Deepak."
+  },
+  {
+   "ts": "2026-10-28T00:03:22.499Z",
+   "kind": "claude",
+   "text": "Decision: Official Rules read by Deepak; pre-event work allowed; early-start merges into main."
+  },
   {
    "ts": "2026-10-24T23:42:07.164Z",
    "kind": "claude",
