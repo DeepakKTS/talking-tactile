@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Blocks the commit if the tracker tests, the tracking node tests or the product checks
-# (pytest, vitest, ruff, eslint, mypy, tsc via make check) fail on the STAGED content.
+# Blocks the commit if the staged content holds the Meta API key or assigns it outside
+# .env.example (scripts/check_secrets.py), or if the tracker tests, the tracking node tests or
+# the product checks (pytest, vitest, ruff, eslint, mypy, tsc via make check) fail on the
+# STAGED content.
 # Unstaged changes and untracked files are stashed first (git stash --keep-index) and always
 # restored on exit, pass or fail. Ignored files (such as services/api/.env) are never touched.
 # Install once with: sh scripts/install-hooks.sh
@@ -10,6 +12,9 @@ set -euo pipefail
 # change this file on disk (git runs the hook from the working tree).
 main() {
   cd "$(git rev-parse --show-toplevel)"
+
+  echo "pre-commit: secret check"
+  python3 scripts/check_secrets.py
 
   stashed=0
   restore() {
@@ -43,8 +48,8 @@ main() {
     fi
   fi
 
-  echo "pre-commit: tracker tests"
-  python3 -m unittest scripts/test_tracker.py
+  echo "pre-commit: tracker and secret check tests"
+  python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py
 
   echo "pre-commit: tracking node tests"
   (cd spikes/tracking && node --test --test-reporter=dot test/*.test.mjs)
