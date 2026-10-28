@@ -8,6 +8,7 @@ from typing import Literal, Protocol
 
 from app.config import Meta
 from app.meta.cost import CostMeter
+from app.meta.live import live_enabled
 from app.meta.mock import MockMetaClient
 from app.meta.types import Understanding
 from app.models.image import RGB
@@ -46,6 +47,11 @@ class MetaClient(Protocol):
 def make_client(mock: bool, rules: Meta) -> MetaClient:
     if mock:
         return MockMetaClient(rules)
+    if not live_enabled():
+        raise LiveClientUnavailableError(
+            "Live Meta calls need LIVE=1 in the environment. "
+            "Run with MOCK_META=1 for recorded responses."
+        )
     raise LiveClientUnavailableError(
         "The live Meta client is not built yet (tracker d1-8, after the spikes). "
         "Run with MOCK_META=1."

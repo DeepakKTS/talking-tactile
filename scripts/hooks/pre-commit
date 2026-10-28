@@ -12,6 +12,8 @@ set -euo pipefail
 # change this file on disk (git runs the hook from the working tree).
 main() {
   cd "$(git rev-parse --show-toplevel)"
+  # Live Meta calls cost money. Commits never make them.
+  unset LIVE
 
   echo "pre-commit: secret check"
   python3 scripts/check_secrets.py
