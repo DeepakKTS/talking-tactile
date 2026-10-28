@@ -1,0 +1,73 @@
+// Loads the sheet Explore runs on. Only published versions, which the API locks after the
+// tactile rules pass; a draft URL is never built here. The last good copy of each version
+// is kept in localStorage, so the page can reopen a sheet with the network down.
+import { RegionsError, type RegionsFile, parseRegions } from "../shared/regions";
+
+export class LoadError extends Error {
+  override name = "LoadError";
+}
+
+export type Version = number | "latest";
+
+interface LoaderDeps {
+  fetch: (url: string) => Promise<Response>;
+  storage: Pick<Storage, "getItem" | "setItem"> | null;
+}
+
+const FIGURE_ID = /^[0-9a-f]{64}$/;
+const NOT_FOUND = 404;
+
+export function publishedUrl(figureId: string, version: Version): string {
+  return `/api/figures/${figureId}/published/${String(version)}/regions.json`;
+}
+
+const key = (figureId: string, version: Version) => `tt-published-${figureId}-${String(version)}`;
+
+export async function loadPublished(
+  figureId: string,
+  version: Version,
+  deps: LoaderDeps,
+): Promise<{ file: RegionsFile; from: "network" | "saved" }> {
+  if (!FIGURE_ID.test(figureId)) throw new LoadError("That is not a figure id.");
+  if (version !== "latest" && !(Number.isInteger(version) && version >= 1)) {
+    throw new LoadError("That is not a published version.");
+  }
+  let res: Response;
+  try {
+    res = await deps.fetch(publishedUrl(figureId, version));
+  } catch {
+    const saved = read(deps.storage, key(figureId, version));
+    if (saved) return { file: saved, from: "saved" };
+    throw new LoadError("The sheet could not be loaded. Check the network.");
+  }
+  if (res.status === NOT_FOUND) throw new LoadError("This figure is not published yet.");
+  if (!res.ok) throw new LoadError(`The sheet could not be loaded (${res.status}).`);
+  const text = await res.text();
+  const file = parse(text);
+  try {
+    deps.storage?.setItem(key(figureId, version), text);
+  } catch {
+    // Storage full or blocked: the sheet still works, it just cannot reopen offline.
+  }
+  return { file, from: "network" };
+}
+
+function parse(text: string): RegionsFile {
+  try {
+    return parseRegions(JSON.parse(text));
+  } catch (err) {
+    if (err instanceof RegionsError || err instanceof SyntaxError) {
+      throw new LoadError(`The sheet is damaged: ${err.message}`);
+    }
+    throw err;
+  }
+}
+
+function read(storage: LoaderDeps["storage"], k: string): RegionsFile | null {
+  try {
+    const text = storage?.getItem(k);
+    return text ? parse(text) : null;
+  } catch {
+    return null;
+  }
+}

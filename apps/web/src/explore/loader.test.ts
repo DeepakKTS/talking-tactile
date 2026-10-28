@@ -1,0 +1,89 @@
+import { describe, expect, it } from "vitest";
+import synthetic from "../../../../fixtures/synthetic/regions.json";
+import { LoadError, loadPublished, publishedUrl } from "./loader";
+
+const ID = "a".repeat(64);
+const BODY = JSON.stringify(synthetic);
+
+class MemoryStorage {
+  data = new Map<string, string>();
+  getItem(k: string) {
+    return this.data.get(k) ?? null;
+  }
+  setItem(k: string, v: string) {
+    this.data.set(k, v);
+  }
+}
+
+function fetcher(answer: (url: string) => Response | Error) {
+  const urls: string[] = [];
+  const f = (url: string) => {
+    urls.push(url);
+    const a = answer(url);
+    return a instanceof Error ? Promise.reject(a) : Promise.resolve(a);
+  };
+  return { f, urls };
+}
+
+describe("published regions loader", () => {
+  it("builds only published URLs", () => {
+    expect(publishedUrl(ID, "latest")).toBe(`/api/figures/${ID}/published/latest/regions.json`);
+    expect(publishedUrl(ID, 3)).toBe(`/api/figures/${ID}/published/3/regions.json`);
+  });
+
+  it.each(["", "abc", "A".repeat(64), `${"a".repeat(63)}/`, "../".repeat(22)])(
+    "refuses the figure id %j before any request",
+    async (bad) => {
+      const { f, urls } = fetcher(() => new Response(BODY));
+      await expect(loadPublished(bad, "latest", { fetch: f, storage: null })).rejects.toThrow(LoadError);
+      expect(urls).toEqual([]);
+    },
+  );
+
+  it.each([0, -1, 1.5])("refuses version %s", async (v) => {
+    const { f, urls } = fetcher(() => new Response(BODY));
+    await expect(loadPublished(ID, v, { fetch: f, storage: null })).rejects.toThrow(LoadError);
+    expect(urls).toEqual([]);
+  });
+
+  it("loads and checks a published regions.json, and keeps a copy for offline use", async () => {
+    const storage = new MemoryStorage();
+    const { f, urls } = fetcher(() => new Response(BODY, { status: 200 }));
+    const got = await loadPublished(ID, "latest", { fetch: f, storage });
+    expect(urls).toEqual([publishedUrl(ID, "latest")]);
+    expect(got.from).toBe("network");
+    expect(got.file.title).toBe(synthetic.title);
+    expect(storage.data.size).toBe(1);
+  });
+
+  it("says when the figure is not published, and does not fall back to a draft", async () => {
+    const { f, urls } = fetcher(() => new Response("{}", { status: 404 }));
+    await expect(loadPublished(ID, "latest", { fetch: f, storage: new MemoryStorage() })).rejects.toThrow(
+      "This figure is not published yet.",
+    );
+    expect(urls.every((u) => u.includes("/published/"))).toBe(true);
+  });
+
+  it("uses the saved copy when the network is down", async () => {
+    const storage = new MemoryStorage();
+    await loadPublished(ID, "latest", { fetch: fetcher(() => new Response(BODY)).f, storage });
+    const down = fetcher(() => new TypeError("Failed to fetch"));
+    const got = await loadPublished(ID, "latest", { fetch: down.f, storage });
+    expect(got.from).toBe("saved");
+    expect(got.file.title).toBe(synthetic.title);
+  });
+
+  it("fails clearly offline with nothing saved", async () => {
+    const down = fetcher(() => new TypeError("Failed to fetch"));
+    await expect(loadPublished(ID, "latest", { fetch: down.f, storage: new MemoryStorage() })).rejects.toThrow(
+      "The sheet could not be loaded. Check the network.",
+    );
+  });
+
+  it("refuses a file that breaks the contract, and does not save it", async () => {
+    const storage = new MemoryStorage();
+    const { f } = fetcher(() => new Response(JSON.stringify({ ...synthetic, regions: "no" })));
+    await expect(loadPublished(ID, "latest", { fetch: f, storage })).rejects.toThrow(LoadError);
+    expect(storage.data.size).toBe(0);
+  });
+});

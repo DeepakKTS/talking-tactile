@@ -6,3 +6,9 @@ data/
 .DS_Store
 spikes/out/
 .worktrees/
+dist/
+*.tsbuildinfo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/

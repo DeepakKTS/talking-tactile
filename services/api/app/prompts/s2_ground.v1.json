@@ -1,0 +1,4 @@
+{
+ "text": "{phrase}",
+ "metadata": {"mask_encoding": "one_bit", "include_confidence": "true"}
+}
