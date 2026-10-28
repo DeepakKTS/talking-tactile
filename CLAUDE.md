@@ -14,7 +14,7 @@ Two users:
 
 - Meta Global AI Developer Hackathon, Indie track, solo. Build window Oct 26 to Nov 4, 2026. Submission due Nov 4, 9:00 PM ET. Our own deadline is Nov 4, 3:00 PM ET.
 - Budget: $150 of Meta Model API credits. Every call is metered by `services/api/app/meta/cost.py`.
-- No project code was written before Oct 26. Planning documents only.
+- Code was written before Oct 26, all of it on Oct 24. The Official Rules allow pre-event work (decision of Oct 27). On main: the planning documents, `scripts/tracker.py` with its tests, the Spark, SAM and Voice spike scripts in `spikes/` (written from the docs, dry runs only, no live call yet), and the tracking spike in `spikes/tracking/` (test sheet, touch-test page, `analyze_touch.py`, `e2e_check.py`, parity tests against the shipped code). On branch `early-start`, merged into main on Oct 27: the FastAPI backend (regions contract, config loaders, pipeline S0 to S5 with a per-stage cache and SQLite jobs, braille through `lou_translate`, the rules validator, the figure routes with publish refusing rule violations, a Meta client interface with a mock and a SAM adapter stub only) and the React app (Author upload, review, publish and print; Explore camera, hand worker, homography, 1 euro filter, region engine, audio, guidance and local intents). S1 and S2 have only run on mocks. The ask, register and voice routes do not exist yet.
 - Judging weights (from a guide quoting the event waiver, confirm in the Official Rules): Impact 30, Use of Meta tooling 25, Demo 25, Technical depth 20.
 
 ## Meta models we use, and why each one is here
