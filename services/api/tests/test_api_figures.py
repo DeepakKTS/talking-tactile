@@ -21,7 +21,7 @@ from shapely.geometry import Point
 from app.config import TactileRules, load_tactile_rules
 from app.figures import FigureService
 from app.geometry.sheet import Sheet
-from app.geometry.validate import Violation
+from app.geometry.validate import Violation, validate_sheet
 from app.logs import JsonFormatter, request_id
 from app.main import create_app
 from app.meta.mock import MockMetaClient
@@ -792,5 +792,31 @@ def test_draft_only_files_never_reach_a_published_version(tmp_path: Path) -> Non
             text = (await api.http.get(f"/api/figures/{fid}/published/{v}/regions.json")).text
             assert "source.png" not in text and "report.json" not in text
             assert "rules" not in json.loads(text) and "violations" not in text
+
+    run(tmp_path, body)
+
+
+def test_the_planted_violations_never_fire_in_production(tmp_path: Path) -> None:
+    """planted_violation and merge_violation are test fixtures that wrap S5's rules check.
+    Nothing outside this file defines them. Without them S5 runs the real check, and the
+    same merge and the same label give an empty report and a version that publishes."""
+    assert s5_render.validate_sheet is validate_sheet
+
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        await api.http.patch(f"/api/figures/{fid}/regions/r8", json={"op": "merge", "into": "r7"})
+        await api.wait(fid)
+        await api.http.patch(
+            f"/api/figures/{fid}/regions/r3", json={"op": "label", "label": PLANTED}
+        )
+        status = await api.wait(fid)
+        assert status["edit_version"] == 2
+        draft = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
+        labels = {x["id"]: x["label"] for x in draft["regions"]}
+        assert "r8" not in labels and labels["r3"] == PLANTED
+        assert (await api.http.get(f"/api/figures/{fid}/report.json")).json() == []
+        r = await api.http.post(f"/api/figures/{fid}/publish")
+        assert r.status_code == 201, r.text
 
     run(tmp_path, body)
