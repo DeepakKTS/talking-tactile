@@ -22,6 +22,7 @@ import httpx
 
 from app.config import Meta
 from app.meta.cost import CostMeter
+from app.meta.record import Files, Recorder
 from app.paths import ENV_FILE, LEDGER
 
 LIVE_ENV = "LIVE"
@@ -143,6 +144,7 @@ class LiveCaller:
         meter: CostMeter,
         cap: int,
         transport: httpx.MockTransport | None = None,
+        recorder: Recorder | None = None,
     ) -> None:
         self._key = key
         self.base_url = base_url
@@ -150,6 +152,7 @@ class LiveCaller:
         self.meter = meter
         self.cap = cap
         self._transport = transport
+        self.recorder = recorder
         self.calls = 0
 
     @classmethod
@@ -160,6 +163,7 @@ class LiveCaller:
         env_file: Path = ENV_FILE,
         ledger_path: Path = LEDGER,
         transport: httpx.MockTransport | None = None,
+        recorder: Recorder | None = None,
     ) -> "LiveCaller":
         env = read_env(env_file)
         return cls(
@@ -169,12 +173,17 @@ class LiveCaller:
             meter=CostMeter(rules),
             cap=rules.live_call_cap,
             transport=transport,
+            recorder=recorder,
         )
 
     def redact(self, text: str) -> str:
         return text.replace(self._key, REDACTED) if self._key else text
 
-    def _admit(self) -> None:
+    def _admit(self, record_as: str | None) -> None:
+        if record_as is not None:
+            if self.recorder is None:
+                raise ValueError("record_as needs a LiveCaller with a recorder")
+            self.recorder.check_free(record_as)
         if self._transport is None and not live_enabled():
             raise LiveDisabledError("Live Meta calls need LIVE=1 in the environment.")
         if self.calls >= self.cap:
@@ -218,6 +227,25 @@ class LiveCaller:
         self.ledger.append(full)
         return LiveResult(line["status"], line["latency_ms"], body, usage, full)
 
+    def _record(
+        self,
+        name: str | None,
+        model: str,
+        request: httpx.Request,
+        path: str,
+        response: dict[str, Any],
+    ) -> None:
+        if name is not None and self.recorder is not None:
+            request.read()
+            self.recorder.save(
+                name,
+                model=model,
+                request=request,
+                path=path,
+                response=response,
+                redact=self.redact,
+            )
+
     def _broken(self, line: dict[str, Any], exc: httpx.HTTPError) -> None:
         """A call that got no answer, such as a timeout, still counts and is logged."""
         error = self.redact(f"{type(exc).__name__}: {exc}")[:_ERROR_CHARS]
@@ -232,8 +260,9 @@ class LiveCaller:
         model: str,
         describe: str,
         units: Units | None = None,
+        record_as: str | None = None,
     ) -> LiveResult:
-        self._admit()
+        self._admit(record_as)
         t0 = time.perf_counter()
         try:
             async with self._client() as http:
@@ -246,7 +275,9 @@ class LiveCaller:
             raise self._fail(line, r.status_code, r.text)
         data = r.json()
         usage = data.get("usage") if isinstance(data, dict) else None
-        return self._done(line, model, data, usage, units)
+        result = self._done(line, model, data, usage, units)  # the ledger line comes first
+        self._record(record_as, model, r.request, path, {"status": r.status_code, "json": data})
+        return result
 
     async def post_sse(
         self,
@@ -257,9 +288,10 @@ class LiveCaller:
         model: str,
         describe: str,
         units: Units | None = None,
+        record_as: str | None = None,
     ) -> LiveResult:
         """A streamed Responses call. The result body is the list of events in order."""
-        self._admit()
+        self._admit(record_as)
         t0 = time.perf_counter()
         events: list[Any] = []
         try:
@@ -278,23 +310,27 @@ class LiveCaller:
                     if data == "[DONE]":
                         break
                     events.append(json.loads(data))
+                request = r.request
         except httpx.HTTPError as exc:
             self._broken(self._line(caller, model, describe, None, t0), exc)
             raise
         line = self._line(caller, model, describe, httpx.codes.OK, t0)
-        return self._done(line, model, events, completed_usage(events), units)
+        result = self._done(line, model, events, completed_usage(events), units)
+        self._record(record_as, model, request, path, {"status": httpx.codes.OK, "events": events})
+        return result
 
     async def post_multipart(
         self,
         path: str,
-        files: Mapping[str, tuple[str | None, bytes | str, str]],
+        files: Files,
         *,
         caller: str,
         model: str,
         describe: str,
         units: Units | None = None,
+        record_as: str | None = None,
     ) -> LiveResult:
-        self._admit()
+        self._admit(record_as)
         t0 = time.perf_counter()
         try:
             async with self._client() as http:
@@ -307,4 +343,6 @@ class LiveCaller:
             raise self._fail(line, r.status_code, r.text)
         data = r.json()
         usage = data.get("usage") if isinstance(data, dict) else None
-        return self._done(line, model, data, usage, units)
+        result = self._done(line, model, data, usage, units)  # the ledger line comes first
+        self._record(record_as, model, r.request, path, {"status": r.status_code, "json": data})
+        return result
