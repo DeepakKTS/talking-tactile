@@ -17,6 +17,16 @@ Credit line: "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commo
 
 **Share-alike applies to everything made from this figure.** A tactile SVG, print PDF or regions.json built from fixtures/heart.png is an adaptation. It carries the same license, CC BY-SA 3.0 (or a later version with the same terms, which the license allows), and must show the credit line above. That covers the printed and traced sheet in the demo, and the figure as it appears in the demo video and the README.
 
+## fixtures/audio/question_aorta_ventricle.wav
+
+| | |
+|---|---|
+| Content | The question "Where is the aorta? What does the left ventricle do?", 2.72 s, 16 kHz mono |
+| Made by | This project, on Oct 27, 2026, with the macOS `say` command (system default voice, rate 160) and ffmpeg |
+| Use | Test audio for the Muse Voice Transcribe smoke call and its replay test only |
+
+The voice is Apple's macOS speech synthesis, so Apple's terms for its system voices apply. Replace this clip with a recording of our own voice before anything built from it is shown publicly.
+
 ## Not stored here
 
 - The 20 eval figures in `spikes/eval-figures.md` are listed by URL, with their licenses, but not downloaded into the repository. Add each one here if it is ever committed.

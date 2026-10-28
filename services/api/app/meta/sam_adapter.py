@@ -18,11 +18,57 @@ What the docs say (read 2026-10-24; spikes/sam.md has the links):
 So to_masks will paste each box-local raster into a full-size bool array the size of the
 normalized image, label it with the phrase and give it the instance confidence.
 
-Not built yet: the format is confirmed only by a live call (tracker d1-6, the SAM spike),
-and we do not guess Meta's formats.
+The request body and stream parsing below were confirmed by one live call on Oct 27
+(fixtures/recorded/smoke_sam_heart_left_ventricle.json): HTTP 200, a completed stream, and
+zero instances, which parses to no records. to_masks is not built yet: no real answer with
+an instance has been seen (tracker d1-6, the SAM spike), and we do not guess Meta's formats.
 """
 
+import base64
+from collections.abc import AsyncIterator
+from typing import Any
+
+import meta_sam_parser as sam
+
 from app.models.mask import Mask
+
+
+def request_body(model: str, png: bytes, phrase: str) -> dict[str, Any]:
+    """One phrase on one image, streamed, one_bit masks with a confidence per instance."""
+    url = "data:image/png;base64," + base64.b64encode(png).decode()
+    content = [{"type": "input_text", "text": phrase}, {"type": "input_image", "image_url": url}]
+    return {
+        "model": model,
+        "input": [{"type": "message", "role": "user", "content": content}],
+        "stream": True,
+        "metadata": {"mask_encoding": "one_bit", "include_confidence": "true"},
+    }
+
+
+async def parse_events(events: list[Any]) -> sam.ImageSegmentationResult:
+    async def gen() -> AsyncIterator[Any]:
+        for ev in events:
+            yield ev
+
+    parsed = sam.parse_responses_stream(gen(), sam.image_segmentation_format())
+    return await parsed.final_result()
+
+
+def instances(result: sam.ImageSegmentationResult) -> list[dict[str, Any]]:
+    """Per instance: box, confidence and mask size, to show the shape of a real answer."""
+    out: dict[Any, dict[str, Any]] = {}
+    for rec in result.records:
+        if isinstance(rec, sam.SegmentationBoxRecord):
+            o = out.setdefault(rec.object_id, {})
+            o["box"] = [rec.left, rec.top, rec.right, rec.bottom]
+            o["confidence"] = rec.confidence
+        elif isinstance(rec, sam.SegmentationMaskRecord):
+            b = rec.bounds
+            o = out.setdefault(rec.object_id, {})
+            o["mask_hw"] = [rec.mask.height, rec.mask.width]
+            o["bounds"] = [b.left, b.top, b.right, b.bottom]
+            o["mask_px"] = sum(sam.decode_mask_to_raster(rec.mask))
+    return [{"object_id": str(k), **v} for k, v in out.items()]
 
 
 def to_masks(parsed: object, image_shape: tuple[int, int], phrase: str) -> list[Mask]:

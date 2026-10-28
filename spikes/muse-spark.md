@@ -29,4 +29,10 @@ Script: `uv run spikes/spark_spike.py` (Python 3.11, httpx). `--dry-run` prints 
 
 ## Results
 
-Not run yet. Waiting for the API key in services/api/.env.
+The full spike (10 runs, image understand case, streamed answers) has not run yet.
+
+Smoke call, Oct 27, one call through `app/meta/smoke.py` (ledger line in `eval/live/ledger.jsonl`, response in `fixtures/recorded/smoke_spark_text.json`):
+
+- Works: `POST /v1/chat/completions` with `muse-spark-1.3`, a one-line text prompt and `reasoning_effort: low`. HTTP 200 in 1858 ms. The body is OpenAI shaped: `choices[0].message.content`, `refusal`, `finish_reason: stop`. The answer named all four chambers. Cost $0.00166.
+- Surprised: 353 of the 384 completion tokens were reasoning, on a one-line prompt at `low`. Usage reports them at `usage.completion_tokens_details.reasoning_tokens`, inside `completion_tokens`. `cached_tokens` was 0 on a 22-token prompt.
+- The wrapper must: price reasoning tokens as output, since they are inside `completion_tokens`. Measure `minimal` effort against the 2 s answer budget before choosing `low` for answers.

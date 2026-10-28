@@ -29,4 +29,10 @@ The realtime client was checked against a local fake server: handshake, partial,
 
 ## Results
 
-Not run yet. Waiting for the API key in services/api/.env.
+The full spike (realtime WebSocket, three configs four times each, plus the file endpoint twice) has not run yet. The realtime endpoint is untested.
+
+Smoke call, Oct 27, one call to the file endpoint through `app/meta/smoke.py` (response in `fixtures/recorded/smoke_voice_transcribe.json`):
+
+- Works: `POST /v1/asr/transcribe`, multipart with the `request` JSON and a 16 kHz mono WAV, and a Bearer header. HTTP 200 in 1205 ms for 2.72 s of audio. Body: `sessionId`, `transcript`, `audioDurationMs`, `turns` (empty).
+- Surprised: with no keywords, "Where is the aorta?" came back as "Where is the order?". `audioDurationMs` was 2800 for a 2.72 s clip. There is no usage object.
+- The wrapper must: price voice from the audio duration, because the response has no usage. Send the region labels as `keywords`. The 6 term test in this spike measures how much that helps.

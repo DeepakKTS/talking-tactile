@@ -35,4 +35,10 @@ Five phrases on heart.png (left ventricle, right ventricle, left atrium, right a
 
 ## Results
 
-Not run yet. Waiting for the API key in services/api/.env.
+The full spike (5 phrases twice, plus "text") has not run yet.
+
+Smoke call, Oct 27, one call through `app/meta/smoke.py` (response in `fixtures/recorded/smoke_sam_heart_left_ventricle.json`):
+
+- Works: model id `sam-3.1` on `POST /v1/responses`, streamed, with the request shape above. HTTP 200 in 1269 ms, 8 events ending in `response.completed` with `status: completed`. That settles the model id question: `sam-3.1`. Usage is on `response.completed`: `{"images_processed": 1, "input_tokens": 0, ...}`. Cost $0.0025.
+- Surprised: "left ventricle" on heart.png found zero instances. There was no `output_text.delta` at all, and `output_text.done` had empty text. `meta_sam_parser` parses that to no records, with no error.
+- The wrapper must: treat zero deltas as a valid empty result. Decoding a real non-empty mask is still unchecked, so the adapter needs one real answer with instances before it is written. Whether SAM finds the chambers on this line art is the Day 1 risk in PLAN.md section 15, and it is still open.

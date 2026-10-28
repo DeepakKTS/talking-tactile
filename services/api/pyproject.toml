@@ -17,6 +17,7 @@ dependencies = [
   "cairosvg>=2.9.1",
   "pypdf>=6.21.2",
   "pypdfium2>=5.14.0",
+  "meta-sam-parser==0.1.0",
 ]
 
 [dependency-groups]

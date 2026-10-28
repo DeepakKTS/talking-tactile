@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 106,
- "updated_at": "2026-10-28T00:04:14.547Z",
+ "rev": 115,
+ "updated_at": "2026-10-28T00:30:58.093Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -694,12 +694,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Key goes only in services/api/.env.",
    "timebox": "20 min",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Key verified Oct 27: one live call per model through app/meta/smoke.py, all HTTP 200. Spark text 1858 ms, $0.00166 (353 of 384 completion tokens were reasoning). SAM sam-3.1 on heart.png 1269 ms, $0.0025, but zero instances of left ventricle (valid empty result; SAM quality on line art still open). Voice file endpoint 1205 ms, $0.00015, heard aorta as order without keywords. Total $0.00431, 3 lines in eval/live/ledger.jsonl. BUDGET_USD stays 150 (config meta.budget_usd). Credits balance not checked: no balance endpoint was called.",
+   "done_at": "2026-10-28T00:30:44.295Z",
    "tags": [
     "setup"
-   ]
+   ],
+   "changed_at": "2026-10-28T00:30:44.295Z"
   },
   {
    "id": "d1-4",
@@ -1759,6 +1760,45 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "measured_at": null,
    "source": "",
    "changed_at": "2026-10-24T22:43:54.162Z"
+  },
+  {
+   "id": "smoke-spark-ms",
+   "suite": "Latency",
+   "name": "Muse Spark smoke call, one short text prompt, reasoning low, one call (not a p50)",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 1858.1,
+   "measured_at": "2026-10-28T00:30:44.123Z",
+   "source": "live",
+   "changed_at": "2026-10-28T00:30:44.123Z"
+  },
+  {
+   "id": "smoke-sam-ms",
+   "suite": "Latency",
+   "name": "SAM 3.1 smoke call, heart.png 2048 px, one phrase, streamed to completed, one call (not a p50)",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 1269.1,
+   "measured_at": "2026-10-28T00:30:44.192Z",
+   "source": "live",
+   "changed_at": "2026-10-28T00:30:44.192Z"
+  },
+  {
+   "id": "smoke-voice-ms",
+   "suite": "Latency",
+   "name": "Muse Voice Transcribe smoke call, file endpoint, 2.72 s WAV, one call (not a p50)",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 1205.4,
+   "measured_at": "2026-10-28T00:30:44.260Z",
+   "source": "live",
+   "changed_at": "2026-10-28T00:30:44.260Z"
   }
  ],
  "costs": [],
@@ -1967,6 +2007,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Deepak read the Official Rules on Oct 27. Work done before Oct 26 is allowed. Branch early-start (product code from Oct 24) merges into main with a merge commit, no rebase or squash, so the Oct 24 commit dates stay as they are.",
    "why": "The early-start split existed only to keep pre-event code reversible until the rules were read. The rules allow it, so one branch is simpler and the spikes can test the shipped code directly.",
    "changed_at": "2026-10-28T00:03:22.499Z"
+  },
+  {
+   "id": "dec-mvrdp5pmxi6p",
+   "date": "2026-10-27",
+   "title": "Live Meta calls are opt-in with LIVE=1, never in the pre-commit hook",
+   "decision": "A live call needs LIVE=1 exactly in the process environment (never read from services/api/.env). LiveCaller refuses the real network without it and stops a run at meta.live_call_cap (25) calls. pytest installs a network guard for the whole session: any lookup or connection to a host other than loopback fails the test, even if the code swallows the error; tests marked live are skipped without LIVE=1. The pre-commit hook unsets LIVE. Commits 289758b and f70c179.",
+   "why": "Every live call spends credits and needs the network. Tests and commits must be free, offline and repeatable, and a key in .env must not turn spending on by itself.",
+   "changed_at": "2026-10-28T00:30:58.093Z"
   }
  ],
  "risks": [
@@ -2039,6 +2087,51 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-28T00:30:58.093Z",
+   "kind": "claude",
+   "text": "Decision: Live Meta calls are opt-in with LIVE=1, never in the pre-commit hook."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.329Z",
+   "kind": "claude",
+   "text": "Live smoke Oct 27: 3 calls, $0.00431 by the ledger (eval/live/ledger.jsonl). The tracker cost total is not updated: tracker.py has no command for costs."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.295Z",
+   "kind": "claude",
+   "text": "Task d1-3 \"Get the API key and credits, set BUDGET_USD\" is now done. Note: Key verified Oct 27: one live call per model through app/meta/smoke.py, all HTTP 200. Spark text 1858 ms, $0.00166 (353 of 384 completion tokens were reasoning). SAM sam-3.1 on heart.png 1269 ms, $0.0025, but zero instances of left ventricle (valid empty result; SAM quality on line art still open). Voice file endpoint 1205 ms, $0.00015, heard aorta as order without keywords. Total $0.00431, 3 lines in eval/live/ledger.jsonl. BUDGET_USD stays 150 (config meta.budget_usd). Credits balance not checked: no balance endpoint was called."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.260Z",
+   "kind": "claude",
+   "text": "Metric \"Muse Voice Transcribe smoke call, file endpoint, 2.72 s WAV, one call (not a p50)\" set to 1205.4 ms (live)."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.226Z",
+   "kind": "claude",
+   "text": "Metric added: \"Muse Voice Transcribe smoke call, file endpoint, 2.72 s WAV, one call (not a p50)\", not measured yet."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.192Z",
+   "kind": "claude",
+   "text": "Metric \"SAM 3.1 smoke call, heart.png 2048 px, one phrase, streamed to completed, one call (not a p50)\" set to 1269.1 ms (live)."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.157Z",
+   "kind": "claude",
+   "text": "Metric added: \"SAM 3.1 smoke call, heart.png 2048 px, one phrase, streamed to completed, one call (not a p50)\", not measured yet."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.123Z",
+   "kind": "claude",
+   "text": "Metric \"Muse Spark smoke call, one short text prompt, reasoning low, one call (not a p50)\" set to 1858.1 ms (live)."
+  },
+  {
+   "ts": "2026-10-28T00:30:44.086Z",
+   "kind": "claude",
+   "text": "Metric added: \"Muse Spark smoke call, one short text prompt, reasoning low, one call (not a p50)\", not measured yet."
+  },
   {
    "ts": "2026-10-28T00:04:14.547Z",
    "kind": "claude",

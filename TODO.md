@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 106, updated 2026-10-28T00:04:14.547Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 115, updated 2026-10-28T00:30:58.093Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -36,8 +36,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d1-2 Check what Muse Wonder is (20 min)
   - It is listed on the event page. Read its docs and decide if it has a real job here. Default answer: no.
   - Note: Read dev.meta.ai/docs/models and pricing-rate-limits. Wonder is muse-wonder-1.0, preview, 1M context, same request shape as Spark, 4.00/20.00 per 1M tokens. Decision: no job in the product; optional S1 comparison only if Spark recall misses 80 percent. Also noted: rate limit table says sam-3.1, models table says sam-3-1; SAM spike will confirm.
-- [ ] d1-3 Get the API key and credits, set BUDGET_USD (20 min)
+- [x] d1-3 Get the API key and credits, set BUDGET_USD (20 min)
   - Key goes only in services/api/.env.
+  - Note: Key verified Oct 27: one live call per model through app/meta/smoke.py, all HTTP 200. Spark text 1858 ms, $0.00166 (353 of 384 completion tokens were reasoning). SAM sam-3.1 on heart.png 1269 ms, $0.0025, but zero instances of left ventricle (valid empty result; SAM quality on line art still open). Voice file endpoint 1205 ms, $0.00015, heard aorta as order without keywords. Total $0.00431, 3 lines in eval/live/ledger.jsonl. BUDGET_USD stays 150 (config meta.budget_usd). Credits balance not checked: no balance endpoint was called.
 - [x] d1-4 Repo skeleton and kit (1.5 h)
   - apps/web, services/api, Makefile, CI with lint and tests. Copy the kit and this file into the root.
   - Note: Commit 3c3c1d4 on early-start. apps/web: Vite 8.3.5, React 19.3, TypeScript 6.0.3 strict (noUncheckedIndexedAccess, exactOptionalPropertyTypes), vitest 5, eslint strictTypeChecked, 2 tests. services/api: FastAPI 0.162 on Python 3.11.14 via uv, pytest with warnings as errors, ruff incl. PLR2004 magic-value check on app/, mypy strict, 1 test. make dev/test/lint/typecheck/eval/check. Hook runs make check; probe with a failing staged pytest and a passing unstaged copy: blocked, exit 1, unstaged copy restored.
