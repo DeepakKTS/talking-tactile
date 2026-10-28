@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 115,
- "updated_at": "2026-10-28T00:30:58.093Z",
+ "rev": 116,
+ "updated_at": "2026-10-28T00:33:21.782Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2015,6 +2015,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "A live call needs LIVE=1 exactly in the process environment (never read from services/api/.env). LiveCaller refuses the real network without it and stops a run at meta.live_call_cap (25) calls. pytest installs a network guard for the whole session: any lookup or connection to a host other than loopback fails the test, even if the code swallows the error; tests marked live are skipped without LIVE=1. The pre-commit hook unsets LIVE. Commits 289758b and f70c179.",
    "why": "Every live call spends credits and needs the network. Tests and commits must be free, offline and repeatable, and a key in .env must not turn spending on by itself.",
    "changed_at": "2026-10-28T00:30:58.093Z"
+  },
+  {
+   "id": "dec-mvrds8kz08ff",
+   "date": "2026-10-27",
+   "title": "Replay tests use recorded real responses; hand-written mocks stay for error cases",
+   "decision": "A successful live call can be saved to fixtures/recorded/ (no headers, key redacted, image and audio as sha256 and size) and served back by ReplayTransport through the same LiveCaller code. tests/test_live_replay.py replays the Oct 27 Spark, SAM and Voice smoke responses. Hand-written responses in test_live_ledger.py and test_live_record.py stay for errors (401, 500, missing usage, cap, no recording). MockMetaClient (synthetic figure) still feeds the pipeline tests: they get replay variants once real S1 and S2 answers for a figure are recorded.",
+   "why": "Real responses catch shape drift that a hand-written mock repeats. Errors are cheap and safe to fake, but costly or impossible to provoke live.",
+   "changed_at": "2026-10-28T00:33:21.782Z"
   }
  ],
  "risks": [
@@ -2087,6 +2095,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-28T00:33:21.782Z",
+   "kind": "claude",
+   "text": "Decision: Replay tests use recorded real responses; hand-written mocks stay for error cases."
+  },
   {
    "ts": "2026-10-28T00:30:58.093Z",
    "kind": "claude",
