@@ -33,15 +33,17 @@ import meta_sam_parser as sam
 from app.models.mask import Mask
 
 
-def request_body(model: str, png: bytes, phrase: str) -> dict[str, Any]:
-    """One phrase on one image, streamed, one_bit masks with a confidence per instance."""
+def request_body(model: str, png: bytes, template: dict[str, Any], phrase: str) -> dict[str, Any]:
+    """One phrase on one image, streamed. The text and the metadata (one_bit masks, a
+    confidence per instance) come from the S2 prompt file, app/prompts/s2_ground.v1.json."""
     url = "data:image/png;base64," + base64.b64encode(png).decode()
-    content = [{"type": "input_text", "text": phrase}, {"type": "input_image", "image_url": url}]
+    text = str(template["text"]).format(phrase=phrase)
+    content = [{"type": "input_text", "text": text}, {"type": "input_image", "image_url": url}]
     return {
         "model": model,
         "input": [{"type": "message", "role": "user", "content": content}],
         "stream": True,
-        "metadata": {"mask_encoding": "one_bit", "include_confidence": "true"},
+        "metadata": dict(template["metadata"]),
     }
 
 
@@ -71,8 +73,13 @@ def instances(result: sam.ImageSegmentationResult) -> list[dict[str, Any]]:
     return [{"object_id": str(k), **v} for k, v in out.items()]
 
 
-def to_masks(parsed: object, image_shape: tuple[int, int], phrase: str) -> list[Mask]:
-    """One Mask per instance in a parsed SAM response."""
+def to_masks(
+    parsed: sam.ImageSegmentationResult, image_shape: tuple[int, int], phrase: str
+) -> list[Mask]:
+    """One Mask per instance in a parsed SAM response. Zero instances is no masks."""
+    if not parsed.records:
+        return []
     raise NotImplementedError(
-        "The SAM adapter is written after the SAM spike runs with the API key (tracker d1-6)."
+        "Decoding SAM masks waits for a real answer with instances (tracker d1-6, the SAM "
+        "spike). The only live answer so far had none."
     )

@@ -21,6 +21,8 @@ from app.meta import sam_adapter
 from app.meta.live import LiveCaller, LiveCallError, LiveResult, spark_units
 from app.meta.record import Files, Recorder
 from app.paths import FIXTURES_DIR
+from app.pipeline import s2_ground
+from app.prompts import load_prompt
 
 HEART = FIXTURES_DIR / "heart.png"
 CLIP = FIXTURES_DIR / "audio" / "question_aorta_ventricle.wav"
@@ -82,7 +84,9 @@ async def spark_text(live: LiveCaller, models: MetaModels, record: bool) -> Live
 async def sam_segment(live: LiveCaller, models: MetaModels, record: bool) -> LiveResult:
     return await live.post_sse(
         "/responses",
-        sam_adapter.request_body(models.sam, HEART.read_bytes(), SAM_PHRASE),
+        sam_adapter.request_body(
+            models.sam, HEART.read_bytes(), load_prompt(s2_ground.PROMPT).template, SAM_PHRASE
+        ),
         caller=CALLER,
         model=models.sam,
         describe=f"fixtures/heart.png 2048x1612, phrase: {SAM_PHRASE}",

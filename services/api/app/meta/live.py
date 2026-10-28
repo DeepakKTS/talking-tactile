@@ -61,6 +61,10 @@ def live_enabled() -> bool:
     return os.environ.get(LIVE_ENV) == "1"
 
 
+def _now() -> str:
+    return dt.datetime.now(dt.UTC).isoformat(timespec="milliseconds")
+
+
 def read_env(env_file: Path = ENV_FILE) -> dict[str, str]:
     env: dict[str, str] = {}
     if not env_file.is_file():
@@ -118,6 +122,22 @@ class Ledger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(line, ensure_ascii=False) + "\n")
+
+    def hit(self, caller: str, model: str, describe: str) -> None:
+        """A model answer served from the stage cache: no call, no cost."""
+        self.append(
+            {
+                "ts": _now(),
+                "caller": caller,
+                "model": model,
+                "input": describe,
+                "cache": "hit",
+                "status": None,
+                "latency_ms": 0.0,
+                "usage": None,
+                "cost_usd": 0.0,
+            }
+        )
 
     def read(self) -> list[dict[str, Any]]:
         if not self.path.exists():
@@ -204,7 +224,7 @@ class LiveCaller:
         self, caller: str, model: str, describe: str, status: int | None, t0: float
     ) -> dict[str, Any]:
         return {
-            "ts": dt.datetime.now(dt.UTC).isoformat(timespec="milliseconds"),
+            "ts": _now(),
             "caller": caller,
             "model": model,
             "input": describe,

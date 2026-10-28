@@ -27,6 +27,7 @@ from app.geometry.reconcile import Reconciled, ReconciledPart
 from app.geometry.scale import PageFit, fit_to_page
 from app.meta.client import MetaClient, make_client
 from app.meta.cost import BudgetExceededError
+from app.meta.live import Ledger
 from app.meta.mock import MockFixtureMissingError
 from app.meta.types import Understanding
 from app.models.mask import Mask
@@ -81,6 +82,7 @@ _SAVE: dict[str, Callable[[Any, Path], None]] = {
     "s5": s5_render.save,
 }
 _ADDED = "added"  # cache stage for SAM answers to parts a teacher adds by name
+_META_STAGES = ("s1", "s2")  # stages whose cached output spares Meta calls
 _MS_PER_S = 1000
 _ERROR_CODES: dict[type[Exception], str] = {
     MockFixtureMissingError: "no_recording",
@@ -111,7 +113,7 @@ class _Walk:
 
 
 class Runner:
-    def __init__(
+    def __init__(  # noqa: PLR0913  keyword-only dependencies, each one injected by tests
         self,
         *,
         client: MetaClient,
@@ -122,8 +124,10 @@ class Runner:
         edits: EditStore,
         figures_dir: Path = FIGURES_DIR,
         prompts_dir: Path = PROMPTS_DIR,
+        ledger: Ledger | None = None,
     ) -> None:
         self.client = client
+        self.ledger = ledger  # given in live mode: a cache hit that spares a Meta call is logged
         self.rules = rules
         self.explore = explore
         self.translator = translator
@@ -238,13 +242,22 @@ class Runner:
         return self.jobs.must_get(job.id)
 
     async def _start(self, job: JobRecord) -> _Walk:
-        walk = _Walk(FigureCache(self.figures_dir, job.figure_id))
-        walk.keys["s0"] = self._key0(job.figure_id)
+        return await self._walk_s0(job.figure_id)
+
+    async def _walk_s0(self, figure_id: str) -> _Walk:
+        walk = _Walk(FigureCache(self.figures_dir, figure_id))
+        walk.keys["s0"] = self._key0(figure_id)
         digest = await asyncio.to_thread(walk.cache.digest, "s0", walk.keys["s0"])
         if digest is None:
             raise NotReadyError("The uploaded figure is missing from the cache. Upload it again.")
         walk.digests["s0"] = digest
         return walk
+
+    def _hit(self, caller: str, describe: str) -> None:
+        if self.ledger is None:
+            return
+        models = self.rules.meta.models
+        self.ledger.hit(caller, models.spark if caller == "s1" else models.sam, describe)
 
     async def _step(self, walk: _Walk, stage: str, job: JobRecord, edits: Sequence[Edit]) -> None:
         t0 = time.perf_counter()
@@ -254,6 +267,8 @@ class Runner:
         if digest is not None:
             walk.digests[stage] = digest
             self._record(job.id, stage, "cached", t0)
+            if stage in _META_STAGES:
+                self._hit(stage, f"{stage} stage output, figure {job.figure_id[:12]}")
             return
         self.jobs.set_stage(job.id, stage)
         spent = self.client.meter.spent_usd
@@ -320,22 +335,28 @@ class Runner:
 
     async def _added(self, walk: _Walk, names: Sequence[str]) -> dict[str, list[Mask]]:
         """SAM's answer for each part a teacher added by name, cached like S2's answers."""
-        out: dict[str, list[Mask]] = {}
-        for name in names:
-            sam = self._inputs("s2", JobOptions(), "")
-            key = stage_key(
-                _ADDED, walk.keys["s0"], upstream={"s0": walk.digests["s0"]}, name=name, **sam
-            )
-            if await asyncio.to_thread(walk.cache.digest, _ADDED, key) is not None:
-                found = await asyncio.to_thread(s2_ground.load, walk.cache.dir(_ADDED, key))
-            else:
-                ing: s0_ingest.Ingested = await walk.value("s0")
-                masks = await self.client.segment(ing.image, ing.figure_id, name, self.s2_prompt)
-                found = s2_ground.Grounded(parts=masks, text=[])
-                with walk.cache.write(_ADDED, key) as entry:
-                    await asyncio.to_thread(s2_ground.save, found, entry)
-            out[name] = found.parts
-        return out
+        return {name: (await self._added_one(walk, name))[0] for name in names}
+
+    async def _added_one(self, walk: _Walk, name: str) -> tuple[list[Mask], StageOutcome]:
+        sam = self._inputs("s2", JobOptions(), "")
+        key = stage_key(
+            _ADDED, walk.keys["s0"], upstream={"s0": walk.digests["s0"]}, name=name, **sam
+        )
+        if await asyncio.to_thread(walk.cache.digest, _ADDED, key) is not None:
+            found = await asyncio.to_thread(s2_ground.load, walk.cache.dir(_ADDED, key))
+            self._hit(_ADDED, f"part by name, figure {walk.cache.root.name[:12]}, phrase: {name}")
+            return found.parts, "cached"
+        ing: s0_ingest.Ingested = await walk.value("s0")
+        masks = await self.client.segment(ing.image, ing.figure_id, name, self.s2_prompt)
+        found = s2_ground.Grounded(parts=masks, text=[])
+        with walk.cache.write(_ADDED, key) as entry:
+            await asyncio.to_thread(s2_ground.save, found, entry)
+        return found.parts, "ran"
+
+    async def find_part(self, figure_id: str, name: str) -> tuple[list[Mask], StageOutcome]:
+        """SAM's answer for one part name on the figure's S0 image, through the same cache a
+        part added by a teacher uses. Says whether SAM ran or the cache answered."""
+        return await self._added_one(await self._walk_s0(figure_id), name)
 
     async def check_edits(self, job: JobRecord, edits: Sequence[Edit]) -> None:
         """Replays the edits on the S3 parts the job used. Raises EditError when one cannot

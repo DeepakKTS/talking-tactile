@@ -2,6 +2,7 @@
 boundary. No network and no key."""
 
 import asyncio
+import json
 import re
 from pathlib import Path
 
@@ -12,14 +13,16 @@ from app.config import load_tactile_rules
 from app.meta.client import LiveClientUnavailableError, MetaClient, make_client
 from app.meta.cost import BudgetExceededError, CostMeter
 from app.meta.mock import MockFixtureMissingError, MockMetaClient
-from app.meta.sam_adapter import to_masks
+from app.meta.sam_adapter import parse_events, to_masks
 from app.meta.types import Understanding
+from app.paths import RECORDED_DIR
 from app.pipeline import s1_understand, s2_ground
 from app.pipeline.s0_ingest import figure_id
 from app.prompts import load_prompt
 from app.synthetic.load import SyntheticFigure
 
 RULES = load_tactile_rules()
+SMOKE_SAM = json.loads((RECORDED_DIR / "smoke_sam_heart_left_ventricle.json").read_text())
 S1 = load_prompt(s1_understand.PROMPT)
 S2 = load_prompt(s2_ground.PROMPT)
 APP_DIR = Path(__file__).resolve().parents[1] / "app"
@@ -125,9 +128,17 @@ def test_cost_meter_refuses_unknown_models_and_units() -> None:
         meter.record("muse-spark-1.3", images=1)
 
 
-def test_the_sam_adapter_waits_for_the_spike() -> None:
+def test_zero_sam_instances_are_no_masks() -> None:
+    empty = asyncio.run(parse_events(SMOKE_SAM["response"]["events"]))
+    assert to_masks(empty, (10, 10), "pore") == []
+
+
+def test_decoding_real_sam_masks_waits_for_a_real_answer_with_instances() -> None:
+    class _WithRecords:
+        records = (object(),)
+
     with pytest.raises(NotImplementedError, match="d1-6"):
-        to_masks(object(), (10, 10), "pore")
+        to_masks(_WithRecords(), (10, 10), "pore")  # type: ignore[arg-type]
 
 
 SAM_WIRE_WORDS = re.compile(r"meta_sam_parser|one_bit|base85|<\|mask|box-local")
