@@ -154,18 +154,33 @@ class Prices(_Section):
     per_audio_hour: NonNegFloat | None = None
 
 
+class MetaModels(_Section):
+    spark: Annotated[StrictStr, Field(min_length=1)]
+    sam: Annotated[StrictStr, Field(min_length=1)]
+    voice: Annotated[StrictStr, Field(min_length=1)]
+
+
 class Meta(_Section):
     budget_usd: PosFloat
     warn_at_fractions: list[Annotated[StrictFloat, Field(gt=0, lt=1)]]
     max_parts: PosInt
     sam_concurrency: PosInt
     text_phrase: Annotated[StrictStr, Field(min_length=1)]
+    live_call_cap: PosInt
+    models: MetaModels
     prices_usd: dict[StrictStr, Prices]
 
     @model_validator(mode="after")
     def _ascending(self) -> Self:
         if self.warn_at_fractions != sorted(set(self.warn_at_fractions)):
             raise ValueError("warn_at_fractions must be ascending without repeats")
+        return self
+
+    @model_validator(mode="after")
+    def _priced(self) -> Self:
+        for model in (self.models.spark, self.models.sam, self.models.voice):
+            if model not in self.prices_usd:
+                raise ValueError(f"models: {model} has no entry in prices_usd")
         return self
 
 
