@@ -219,6 +219,12 @@ def spark_body(
     return body
 
 
+def s1_list_body(models: MetaModels, png: bytes) -> dict[str, Any]:
+    """The S1 listing call: the S1 prompt and schema on one figure."""
+    s1 = load_prompt("s1_understand.v1.json").template
+    return spark_body(models, s1["system"], s1["user"], [png], ("FigureUnderstanding", S1_SCHEMA))
+
+
 @dataclass(frozen=True)
 class Figure:
     name: str
@@ -358,15 +364,7 @@ class Bakeoff:
         }
 
     async def list_parts(self) -> tuple[list[dict[str, str]], dict[str, Any]]:
-        s1 = load_prompt("s1_understand.v1.json").template
-        body = spark_body(
-            self.models,
-            s1["system"],
-            s1["user"],
-            [self.fig.png],
-            ("FigureUnderstanding", S1_SCHEMA),
-        )
-        content, meta = await self._spark("list", body)
+        content, meta = await self._spark("list", s1_list_body(self.models, self.fig.png))
         understanding = json.loads(content)
         return understanding["parts"], meta | {"understanding": understanding}
 
