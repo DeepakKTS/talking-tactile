@@ -17,6 +17,20 @@ Credit line: "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commo
 
 **Share-alike applies to everything made from this figure.** A tactile SVG, print PDF or regions.json built from fixtures/heart.png is an adaptation. It carries the same license, CC BY-SA 3.0 (or a later version with the same terms, which the license allows), and must show the credit line above. That covers the printed and traced sheet in the demo, and the figure as it appears in the demo video and the README.
 
+## fixtures/control/banana.png
+
+| | |
+|---|---|
+| Title | Banana-Single.jpg |
+| Author | Evan-Amos |
+| Source | https://commons.wikimedia.org/wiki/File:Banana-Single.jpg |
+| License | Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0/ |
+| License checked | 2026-10-29, through the Wikimedia Commons API (LicenseShortName, Artist, Credit "Own work") |
+| Changes | The 1280 px rendering from Commons, resized to 1024 x 902 px and saved as PNG with no metadata |
+| Use | The control image for the SAM diagnostic (`services/api/app/meta/sam_diagnostic.py`) only |
+
+Credit line: "Banana-Single.jpg by Evan-Amos, CC BY-SA 3.0, via Wikimedia Commons. Resized."
+
 ## fixtures/audio/question_aorta_ventricle.wav
 
 | | |

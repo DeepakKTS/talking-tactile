@@ -26,11 +26,16 @@ an instance has been seen (tracker d1-6, the SAM spike), and we do not guess Met
 
 import base64
 from collections.abc import AsyncIterator
+from dataclasses import dataclass
 from typing import Any
 
 import meta_sam_parser as sam
+import numpy as np
+import numpy.typing as npt
 
 from app.models.mask import Mask
+
+ParseError = sam.ResponsesStreamError
 
 
 def request_body(model: str, png: bytes, template: dict[str, Any], phrase: str) -> dict[str, Any]:
@@ -71,6 +76,35 @@ def instances(result: sam.ImageSegmentationResult) -> list[dict[str, Any]]:
             o["bounds"] = [b.left, b.top, b.right, b.bottom]
             o["mask_px"] = sum(sam.decode_mask_to_raster(rec.mask))
     return [{"object_id": str(k), **v} for k, v in out.items()]
+
+
+@dataclass(frozen=True)
+class Decoded:
+    """One instance's mask as the wire gave it: a box-local raster and its half-open bounds
+    in source pixels, or the decoder's error. Pasting it into the image is to_masks' job."""
+
+    object_id: str
+    confidence: float | None
+    bounds: tuple[int, int, int, int]
+    raster: npt.NDArray[np.bool_] | None
+    error: str | None
+
+
+def decoded(result: sam.ImageSegmentationResult) -> list[Decoded]:
+    out = []
+    for rec in result.records:
+        if not isinstance(rec, sam.SegmentationMaskRecord):
+            continue
+        b = rec.bounds
+        bounds = (int(b.left), int(b.top), int(b.right), int(b.bottom))
+        raster, error = None, None
+        try:
+            flat = sam.decode_mask_to_raster(rec.mask)
+            raster = np.frombuffer(flat, np.uint8).reshape(rec.mask.height, rec.mask.width) > 0
+        except (sam.InvalidSegmentationMaskError, ValueError) as exc:
+            error = str(exc)
+        out.append(Decoded(str(rec.object_id), rec.confidence, bounds, raster, error))
+    return out
 
 
 def to_masks(
