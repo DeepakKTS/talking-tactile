@@ -1,0 +1,1200 @@
+{
+ "figure": "heart",
+ "image": "fixtures/heart.png",
+ "size": [
+  2048,
+  1612
+ ],
+ "parts": [
+  {
+   "phrase": "brachiocephalic artery",
+   "print_label": "Brachiocephalic artery"
+  },
+  {
+   "phrase": "superior vena cava",
+   "print_label": "Superior vena cava"
+  },
+  {
+   "phrase": "right pulmonary arteries",
+   "print_label": "Right pulmonary arteries"
+  },
+  {
+   "phrase": "right pulmonary veins",
+   "print_label": "Right pulmonary veins"
+  },
+  {
+   "phrase": "right atrium",
+   "print_label": "Right atrium"
+  },
+  {
+   "phrase": "tricuspid valve",
+   "print_label": "Atrioventricular (tricuspid) valve"
+  },
+  {
+   "phrase": "chordae tendineae",
+   "print_label": "Chordae tendineae"
+  },
+  {
+   "phrase": "right ventricle",
+   "print_label": "Right ventricle"
+  },
+  {
+   "phrase": "inferior vena cava",
+   "print_label": "Inferior vena cava"
+  },
+  {
+   "phrase": "left common carotid artery",
+   "print_label": "Left common carotid artery"
+  },
+  {
+   "phrase": "left subclavian artery",
+   "print_label": "Left subclavian artery"
+  },
+  {
+   "phrase": "aorta",
+   "print_label": "Aorta"
+  },
+  {
+   "phrase": "left pulmonary arteries",
+   "print_label": "Left pulmonary arteries"
+  },
+  {
+   "phrase": "left pulmonary veins",
+   "print_label": "Left pulmonary veins"
+  },
+  {
+   "phrase": "left atrium",
+   "print_label": "Left atrium"
+  },
+  {
+   "phrase": "semilunar valves",
+   "print_label": "Semilunar valves"
+  },
+  {
+   "phrase": "mitral valve",
+   "print_label": "Atrioventricular (mitral) valve"
+  },
+  {
+   "phrase": "left ventricle",
+   "print_label": "Left ventricle"
+  },
+  {
+   "phrase": "septum",
+   "print_label": "Septum"
+  }
+ ],
+ "listing": {
+  "latency_ms": 10599.2,
+  "cost_usd": 0.016311,
+  "usage": {
+   "completion_tokens": 2567,
+   "prompt_tokens": 4321,
+   "total_tokens": 6888,
+   "completion_tokens_details": {
+    "reasoning_tokens": 2093
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "understanding": {
+   "color_carries_meaning": true,
+   "figure_type": "labeled_diagram",
+   "parts": [
+    {
+     "phrase": "brachiocephalic artery",
+     "print_label": "Brachiocephalic artery"
+    },
+    {
+     "phrase": "superior vena cava",
+     "print_label": "Superior vena cava"
+    },
+    {
+     "phrase": "right pulmonary arteries",
+     "print_label": "Right pulmonary arteries"
+    },
+    {
+     "phrase": "right pulmonary veins",
+     "print_label": "Right pulmonary veins"
+    },
+    {
+     "phrase": "right atrium",
+     "print_label": "Right atrium"
+    },
+    {
+     "phrase": "tricuspid valve",
+     "print_label": "Atrioventricular (tricuspid) valve"
+    },
+    {
+     "phrase": "chordae tendineae",
+     "print_label": "Chordae tendineae"
+    },
+    {
+     "phrase": "right ventricle",
+     "print_label": "Right ventricle"
+    },
+    {
+     "phrase": "inferior vena cava",
+     "print_label": "Inferior vena cava"
+    },
+    {
+     "phrase": "left common carotid artery",
+     "print_label": "Left common carotid artery"
+    },
+    {
+     "phrase": "left subclavian artery",
+     "print_label": "Left subclavian artery"
+    },
+    {
+     "phrase": "aorta",
+     "print_label": "Aorta"
+    },
+    {
+     "phrase": "left pulmonary arteries",
+     "print_label": "Left pulmonary arteries"
+    },
+    {
+     "phrase": "left pulmonary veins",
+     "print_label": "Left pulmonary veins"
+    },
+    {
+     "phrase": "left atrium",
+     "print_label": "Left atrium"
+    },
+    {
+     "phrase": "semilunar valves",
+     "print_label": "Semilunar valves"
+    },
+    {
+     "phrase": "mitral valve",
+     "print_label": "Atrioventricular (mitral) valve"
+    },
+    {
+     "phrase": "left ventricle",
+     "print_label": "Left ventricle"
+    },
+    {
+     "phrase": "septum",
+     "print_label": "Septum"
+    }
+   ],
+   "summary": "Cross-section of human heart with chambers, valves, and major vessels labeled. Blue marks deoxygenated right-side flow and red marks oxygenated left-side flow.",
+   "title": "Human heart anatomy",
+   "verdict": "make_tactile",
+   "verdict_reason": "Large distinct chambers, vessels and valves with clear leader lines remain legible in raised lines despite many labels."
+  }
+ },
+ "calls_needed": 22,
+ "cap": 25,
+ "arm_a_rows": [
+  {
+   "part": "brachiocephalic artery",
+   "grid_point": [
+    456.0,
+    126.0
+   ],
+   "point_px": [
+    933,
+    203
+   ],
+   "latency_ms": 1425.6,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.8203125
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      917,
+      184,
+      950,
+      212
+     ],
+     "raster_hw": [
+      28,
+      33
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 529
+    }
+   ],
+   "mask_px": 529,
+   "point_in_mask": true
+  },
+  {
+   "part": "superior vena cava",
+   "grid_point": [
+    408.0,
+    344.0
+   ],
+   "point_px": [
+    835,
+    554
+   ],
+   "latency_ms": 2077.3,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.76171875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      684,
+      388,
+      924,
+      733
+     ],
+     "raster_hw": [
+      345,
+      240
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 42950
+    }
+   ],
+   "mask_px": 42950,
+   "point_in_mask": true
+  },
+  {
+   "part": "right pulmonary arteries",
+   "grid_point": [
+    351.0,
+    335.0
+   ],
+   "point_px": [
+    718,
+    540
+   ],
+   "latency_ms": 1687.9,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.6796875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      670,
+      500,
+      777,
+      594
+     ],
+     "raster_hw": [
+      94,
+      107
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 6789
+    }
+   ],
+   "mask_px": 6789,
+   "point_in_mask": true
+  },
+  {
+   "part": "right pulmonary veins",
+   "grid_point": [
+    333.0,
+    449.0
+   ],
+   "point_px": [
+    681,
+    723
+   ],
+   "latency_ms": 1712.2,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.671875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      652,
+      608,
+      769,
+      747
+     ],
+     "raster_hw": [
+      139,
+      117
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 8137
+    }
+   ],
+   "mask_px": 8137,
+   "point_in_mask": true
+  },
+  {
+   "part": "right atrium",
+   "grid_point": [
+    416.0,
+    528.0
+   ],
+   "point_px": [
+    851,
+    851
+   ],
+   "latency_ms": 2636.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.67578125
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      742,
+      700,
+      997,
+      967
+     ],
+     "raster_hw": [
+      267,
+      255
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 48475
+    }
+   ],
+   "mask_px": 48475,
+   "point_in_mask": true
+  },
+  {
+   "part": "tricuspid valve",
+   "grid_point": [
+    428.0,
+    612.0
+   ],
+   "point_px": [
+    876,
+    986
+   ],
+   "latency_ms": 2348.3,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.0888671875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      636,
+      703,
+      1191,
+      1261
+     ],
+     "raster_hw": [
+      558,
+      555
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 51250
+    }
+   ],
+   "mask_px": 51250,
+   "point_in_mask": true
+  },
+  {
+   "part": "chordae tendineae",
+   "grid_point": [
+    527.0,
+    689.0
+   ],
+   "point_px": [
+    1079,
+    1110
+   ],
+   "latency_ms": 1105.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.3671875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      750,
+      702,
+      1278,
+      1335
+     ],
+     "raster_hw": [
+      633,
+      528
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 138895
+    }
+   ],
+   "mask_px": 138895,
+   "point_in_mask": true
+  },
+  {
+   "part": "right ventricle",
+   "grid_point": [
+    508.0,
+    752.0
+   ],
+   "point_px": [
+    1040,
+    1212
+   ],
+   "latency_ms": 1048.7,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.486328125
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      747,
+      704,
+      1478,
+      1348
+     ],
+     "raster_hw": [
+      644,
+      731
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 147319
+    }
+   ],
+   "mask_px": 147319,
+   "point_in_mask": true
+  },
+  {
+   "part": "inferior vena cava",
+   "grid_point": [
+    443.0,
+    844.0
+   ],
+   "point_px": [
+    907,
+    1360
+   ],
+   "latency_ms": 3632.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.1826171875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      604,
+      1354,
+      936,
+      1422
+     ],
+     "raster_hw": [
+      68,
+      332
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 2235
+    }
+   ],
+   "mask_px": 2235,
+   "point_in_mask": true
+  },
+  {
+   "part": "left common carotid artery",
+   "grid_point": [
+    540.0,
+    105.0
+   ],
+   "point_px": [
+    1105,
+    169
+   ],
+   "latency_ms": 1264.3,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.6875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1041,
+      135,
+      1137,
+      312
+     ],
+     "raster_hw": [
+      177,
+      96
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 10962
+    }
+   ],
+   "mask_px": 10962,
+   "point_in_mask": true
+  },
+  {
+   "part": "left subclavian artery",
+   "grid_point": [
+    582.0,
+    119.0
+   ],
+   "point_px": [
+    1191,
+    191
+   ],
+   "latency_ms": 870.6,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.400390625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      895,
+      134,
+      1288,
+      773
+     ],
+     "raster_hw": [
+      639,
+      393
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 104735
+    }
+   ],
+   "mask_px": 104735,
+   "point_in_mask": true
+  },
+  {
+   "part": "aorta",
+   "grid_point": [
+    533.0,
+    285.0
+   ],
+   "point_px": [
+    1091,
+    459
+   ],
+   "latency_ms": 1130.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.94140625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      891,
+      134,
+      1284,
+      779
+     ],
+     "raster_hw": [
+      645,
+      393
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 136157
+    }
+   ],
+   "mask_px": 136157,
+   "point_in_mask": true
+  },
+  {
+   "part": "left pulmonary arteries",
+   "grid_point": [
+    650.0,
+    323.0
+   ],
+   "point_px": [
+    1331,
+    520
+   ],
+   "latency_ms": 1124.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.443359375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      949,
+      457,
+      1427,
+      822
+     ],
+     "raster_hw": [
+      365,
+      478
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 49838
+    }
+   ],
+   "mask_px": 49838,
+   "point_in_mask": true
+  },
+  {
+   "part": "left pulmonary veins",
+   "grid_point": [
+    714.0,
+    430.0
+   ],
+   "point_px": [
+    1462,
+    693
+   ],
+   "latency_ms": 1446.9,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1405,
+      668,
+      1495,
+      725
+     ],
+     "raster_hw": [
+      57,
+      90
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 3195
+    }
+   ],
+   "mask_px": 3195,
+   "point_in_mask": true
+  },
+  {
+   "part": "left atrium",
+   "grid_point": [
+    669.0,
+    473.0
+   ],
+   "point_px": [
+    1370,
+    762
+   ],
+   "latency_ms": 3690.3,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.734375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1293,
+      618,
+      1445,
+      829
+     ],
+     "raster_hw": [
+      211,
+      152
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 15840
+    }
+   ],
+   "mask_px": 15840,
+   "point_in_mask": true
+  },
+  {
+   "part": "semilunar valves",
+   "grid_point": [
+    615.0,
+    519.0
+   ],
+   "point_px": [
+    1259,
+    836
+   ],
+   "latency_ms": 1538.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.054931640625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1155,
+      812,
+      1298,
+      855
+     ],
+     "raster_hw": [
+      43,
+      143
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 2245
+    }
+   ],
+   "mask_px": 2245,
+   "point_in_mask": true
+  },
+  {
+   "part": "mitral valve",
+   "grid_point": [
+    672.0,
+    572.0
+   ],
+   "point_px": [
+    1376,
+    922
+   ],
+   "latency_ms": 1053.2,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.4296875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1203,
+      622,
+      1579,
+      1554
+     ],
+     "raster_hw": [
+      932,
+      376
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 117496
+    }
+   ],
+   "mask_px": 117496,
+   "point_in_mask": true
+  },
+  {
+   "part": "left ventricle",
+   "grid_point": [
+    709.0,
+    675.0
+   ],
+   "point_px": [
+    1452,
+    1088
+   ],
+   "latency_ms": 1120.8,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.2177734375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1219,
+      622,
+      1560,
+      1324
+     ],
+     "raster_hw": [
+      702,
+      341
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 105629
+    }
+   ],
+   "mask_px": 105629,
+   "point_in_mask": true
+  },
+  {
+   "part": "septum",
+   "grid_point": [
+    629.0,
+    714.0
+   ],
+   "point_px": [
+    1288,
+    1150
+   ],
+   "latency_ms": 1373.9,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.44140625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      732,
+      520,
+      1585,
+      1449
+     ],
+     "raster_hw": [
+      929,
+      853
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 152982
+    }
+   ],
+   "mask_px": 152982,
+   "point_in_mask": true
+  }
+ ],
+ "arm_a": {
+  "latency_ms": 6840.9,
+  "cost_usd": 0.01267975,
+  "usage": {
+   "completion_tokens": 1742,
+   "prompt_tokens": 4221,
+   "total_tokens": 5963,
+   "completion_tokens_details": {
+    "reasoning_tokens": 1322
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": "[{\"object_name\": \"brachiocephalic artery\", \"x\": 456, \"y\": 126}, {\"object_name\": \"superior vena cava\", \"x\": 408, \"y\": 344}, {\"object_name\": \"right pulmonary arteries\", \"x\": 351, \"y\": 335}, {\"object_name\": \"right pulmonary veins\", \"x\": 333, \"y\": 449}, {\"object_name\": \"right atrium\", \"x\": 416, \"y\": 528}, {\"object_name\": \"tricuspid valve\", \"x\": 428, \"y\": 612}, {\"object_name\": \"chordae tendineae\", \"x\": 527, \"y\": 689}, {\"object_name\": \"right ventricle\", \"x\": 508, \"y\": 752}, {\"object_name\": \"inferior vena cava\", \"x\": 443, \"y\": 844}, {\"object_name\": \"left common carotid artery\", \"x\": 540, \"y\": 105}, {\"object_name\": \"left subclavian artery\", \"x\": 582, \"y\": 119}, {\"object_name\": \"aorta\", \"x\": 533, \"y\": 285}, {\"object_name\": \"left pulmonary arteries\", \"x\": 650, \"y\": 323}, {\"object_name\": \"left pulmonary veins\", \"x\": 714, \"y\": 430}, {\"object_name\": \"left atrium\", \"x\": 669, \"y\": 473}, {\"object_name\": \"semilunar valves\", \"x\": 615, \"y\": 519}, {\"object_name\": \"mitral valve\", \"x\": 672, \"y\": 572}, {\"object_name\": \"left ventricle\", \"x\": 709, \"y\": 675}, {\"object_name\": \"septum\", \"x\": 629, \"y\": 714}]"
+ },
+ "arm_b_rows": [
+  {
+   "part": "brachiocephalic artery",
+   "region_ids": [
+    2
+   ],
+   "invalid_ids": [],
+   "mask_px": 322
+  },
+  {
+   "part": "superior vena cava",
+   "region_ids": [
+    3
+   ],
+   "invalid_ids": [],
+   "mask_px": 2104
+  },
+  {
+   "part": "right pulmonary arteries",
+   "region_ids": [
+    5
+   ],
+   "invalid_ids": [],
+   "mask_px": 4981
+  },
+  {
+   "part": "right pulmonary veins",
+   "region_ids": [
+    8
+   ],
+   "invalid_ids": [],
+   "mask_px": 5871
+  },
+  {
+   "part": "right atrium",
+   "region_ids": null
+  },
+  {
+   "part": "tricuspid valve",
+   "region_ids": null
+  },
+  {
+   "part": "chordae tendineae",
+   "region_ids": null
+  },
+  {
+   "part": "right ventricle",
+   "region_ids": null
+  },
+  {
+   "part": "inferior vena cava",
+   "region_ids": [
+    10
+   ],
+   "invalid_ids": [],
+   "mask_px": 15373
+  },
+  {
+   "part": "left common carotid artery",
+   "region_ids": [
+    1
+   ],
+   "invalid_ids": [],
+   "mask_px": 327
+  },
+  {
+   "part": "left subclavian artery",
+   "region_ids": null
+  },
+  {
+   "part": "aorta",
+   "region_ids": [
+    11
+   ],
+   "invalid_ids": [],
+   "mask_px": 14570
+  },
+  {
+   "part": "left pulmonary arteries",
+   "region_ids": null
+  },
+  {
+   "part": "left pulmonary veins",
+   "region_ids": [
+    7
+   ],
+   "invalid_ids": [],
+   "mask_px": 1838
+  },
+  {
+   "part": "left atrium",
+   "region_ids": null
+  },
+  {
+   "part": "semilunar valves",
+   "region_ids": [
+    9
+   ],
+   "invalid_ids": [],
+   "mask_px": 3089
+  },
+  {
+   "part": "mitral valve",
+   "region_ids": null
+  },
+  {
+   "part": "left ventricle",
+   "region_ids": null
+  },
+  {
+   "part": "septum",
+   "region_ids": null
+  }
+ ],
+ "arm_b": {
+  "latency_ms": 14532.9,
+  "cost_usd": 0.02522,
+  "usage": {
+   "completion_tokens": 3505,
+   "prompt_tokens": 8259,
+   "total_tokens": 11764,
+   "completion_tokens_details": {
+    "reasoning_tokens": 3350
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "ink_below": 64,
+  "close_px": 5,
+  "floor_px": 307.7,
+  "regions": 11,
+  "regions_assigned": 9,
+  "regions_unassigned": 2,
+  "answer": {
+   "parts": [
+    {
+     "part": "brachiocephalic artery",
+     "region_ids": [
+      2
+     ]
+    },
+    {
+     "part": "superior vena cava",
+     "region_ids": [
+      3
+     ]
+    },
+    {
+     "part": "right pulmonary arteries",
+     "region_ids": [
+      5
+     ]
+    },
+    {
+     "part": "right pulmonary veins",
+     "region_ids": [
+      8
+     ]
+    },
+    {
+     "part": "inferior vena cava",
+     "region_ids": [
+      10
+     ]
+    },
+    {
+     "part": "left common carotid artery",
+     "region_ids": [
+      1
+     ]
+    },
+    {
+     "part": "aorta",
+     "region_ids": [
+      11
+     ]
+    },
+    {
+     "part": "left pulmonary veins",
+     "region_ids": [
+      7
+     ]
+    },
+    {
+     "part": "semilunar valves",
+     "region_ids": [
+      9
+     ]
+    }
+   ]
+  }
+ },
+ "spent_usd": 0.101711,
+ "calls": 22
+}

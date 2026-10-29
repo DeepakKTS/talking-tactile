@@ -89,6 +89,12 @@ async def parse_events(events: list[Any]) -> sam.ImageSegmentationResult:
     return await parsed.final_result()
 
 
+def instance_count(result: sam.ImageSegmentationResult) -> int:
+    """How many objects an answer has, from its box and mask records, with no decoding."""
+    kinds = (sam.SegmentationBoxRecord, sam.SegmentationMaskRecord)
+    return len({rec.object_id for rec in result.records if isinstance(rec, kinds)})
+
+
 def instances(result: sam.ImageSegmentationResult) -> list[dict[str, Any]]:
     """Per instance: box, confidence and mask size, to show the shape of a real answer."""
     out: dict[Any, dict[str, Any]] = {}

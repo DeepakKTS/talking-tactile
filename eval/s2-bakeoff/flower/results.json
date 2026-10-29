@@ -1,0 +1,1140 @@
+{
+ "figure": "flower",
+ "image": "fixtures/eval/flower.png",
+ "size": [
+  2048,
+  1183
+ ],
+ "parts": [
+  {
+   "phrase": "ovules",
+   "print_label": "ovules"
+  },
+  {
+   "phrase": "pistil group",
+   "print_label": "pistil"
+  },
+  {
+   "phrase": "stigma",
+   "print_label": "stigma"
+  },
+  {
+   "phrase": "style",
+   "print_label": "style"
+  },
+  {
+   "phrase": "ovary",
+   "print_label": "ovary"
+  },
+  {
+   "phrase": "petal",
+   "print_label": "petal/corolla"
+  },
+  {
+   "phrase": "sepal",
+   "print_label": "sepal/calyx"
+  },
+  {
+   "phrase": "perianth group",
+   "print_label": "perianth"
+  },
+  {
+   "phrase": "nectary",
+   "print_label": "nectary"
+  },
+  {
+   "phrase": "floral axis",
+   "print_label": "floral axis"
+  },
+  {
+   "phrase": "pedicel",
+   "print_label": "pedicel"
+  },
+  {
+   "phrase": "connective",
+   "print_label": "connective"
+  },
+  {
+   "phrase": "pollen sac",
+   "print_label": "microsporangium"
+  },
+  {
+   "phrase": "anther",
+   "print_label": "anther"
+  },
+  {
+   "phrase": "filament stalk",
+   "print_label": "filament"
+  },
+  {
+   "phrase": "stamen group",
+   "print_label": "stamen"
+  }
+ ],
+ "listing": {
+  "latency_ms": 15352.0,
+  "cost_usd": 0.01745375,
+  "usage": {
+   "completion_tokens": 3120,
+   "prompt_tokens": 3355,
+   "total_tokens": 6475,
+   "completion_tokens_details": {
+    "reasoning_tokens": 2743
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "understanding": {
+   "color_carries_meaning": true,
+   "figure_type": "labeled_diagram",
+   "parts": [
+    {
+     "phrase": "ovules",
+     "print_label": "ovules"
+    },
+    {
+     "phrase": "pistil group",
+     "print_label": "pistil"
+    },
+    {
+     "phrase": "stigma",
+     "print_label": "stigma"
+    },
+    {
+     "phrase": "style",
+     "print_label": "style"
+    },
+    {
+     "phrase": "ovary",
+     "print_label": "ovary"
+    },
+    {
+     "phrase": "petal",
+     "print_label": "petal/corolla"
+    },
+    {
+     "phrase": "sepal",
+     "print_label": "sepal/calyx"
+    },
+    {
+     "phrase": "perianth group",
+     "print_label": "perianth"
+    },
+    {
+     "phrase": "nectary",
+     "print_label": "nectary"
+    },
+    {
+     "phrase": "floral axis",
+     "print_label": "floral axis"
+    },
+    {
+     "phrase": "pedicel",
+     "print_label": "pedicel"
+    },
+    {
+     "phrase": "connective",
+     "print_label": "connective"
+    },
+    {
+     "phrase": "pollen sac",
+     "print_label": "microsporangium"
+    },
+    {
+     "phrase": "anther",
+     "print_label": "anther"
+    },
+    {
+     "phrase": "filament stalk",
+     "print_label": "filament"
+    },
+    {
+     "phrase": "stamen group",
+     "print_label": "stamen"
+    }
+   ],
+   "summary": "Mature flower anatomy with pistil, perianth and stamen groupings around a central ovary and filament structures. Ovary detail contains ovules and anther detail contains microsporangium pollen.",
+   "title": "Mature flower",
+   "verdict": "make_tactile",
+   "verdict_reason": "16 distinct labeled structures with clear leader lines fit on one sheet with distinct textures replacing color grouping."
+  }
+ },
+ "calls_needed": 19,
+ "cap": 25,
+ "arm_a_rows": [
+  {
+   "part": "ovules",
+   "grid_point": [
+    80.0,
+    306.0
+   ],
+   "point_px": [
+    163,
+    361
+   ],
+   "latency_ms": 7738.2,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.5390625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      152,
+      343,
+      172,
+      365
+     ],
+     "raster_hw": [
+      22,
+      20
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 323
+    }
+   ],
+   "mask_px": 323,
+   "point_in_mask": true
+  },
+  {
+   "part": "pistil group",
+   "grid_point": [
+    207.0,
+    163.0
+   ],
+   "point_px": [
+    423,
+    192
+   ],
+   "latency_ms": 900.5,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.55859375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      408,
+      169,
+      439,
+      208
+     ],
+     "raster_hw": [
+      39,
+      31
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 711
+    }
+   ],
+   "mask_px": 711,
+   "point_in_mask": true
+  },
+  {
+   "part": "stigma",
+   "grid_point": [
+    521.0,
+    374.0
+   ],
+   "point_px": [
+    1067,
+    442
+   ],
+   "latency_ms": 2115.2,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.7109375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1056,
+      425,
+      1077,
+      442
+     ],
+     "raster_hw": [
+      17,
+      21
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 304
+    }
+   ],
+   "mask_px": 304,
+   "point_in_mask": false
+  },
+  {
+   "part": "style",
+   "grid_point": [
+    510.0,
+    440.0
+   ],
+   "point_px": [
+    1044,
+    520
+   ],
+   "latency_ms": 1708.7,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.359375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1033,
+      501,
+      1055,
+      519
+     ],
+     "raster_hw": [
+      18,
+      22
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 316
+    }
+   ],
+   "mask_px": 316,
+   "point_in_mask": false
+  },
+  {
+   "part": "ovary",
+   "grid_point": [
+    486.0,
+    601.0
+   ],
+   "point_px": [
+    995,
+    710
+   ],
+   "latency_ms": 1194.6,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.431640625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      878,
+      379,
+      1100,
+      805
+     ],
+     "raster_hw": [
+      426,
+      222
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 36381
+    }
+   ],
+   "mask_px": 36381,
+   "point_in_mask": true
+  },
+  {
+   "part": "petal",
+   "grid_point": [
+    399.0,
+    538.0
+   ],
+   "point_px": [
+    817,
+    636
+   ],
+   "latency_ms": 835.2,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.6953125
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      663,
+      625,
+      836,
+      730
+     ],
+     "raster_hw": [
+      105,
+      173
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 916
+    }
+   ],
+   "mask_px": 916,
+   "point_in_mask": true
+  },
+  {
+   "part": "sepal",
+   "grid_point": [
+    415.0,
+    677.0
+   ],
+   "point_px": [
+    849,
+    800
+   ],
+   "latency_ms": 992.9,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.3515625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      813,
+      682,
+      909,
+      1012
+     ],
+     "raster_hw": [
+      330,
+      96
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 3727
+    }
+   ],
+   "mask_px": 3727,
+   "point_in_mask": true
+  },
+  {
+   "part": "perianth group",
+   "grid_point": [
+    214.0,
+    796.0
+   ],
+   "point_px": [
+    438,
+    941
+   ],
+   "latency_ms": 1337.9,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.69921875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      145,
+      653,
+      852,
+      1036
+     ],
+     "raster_hw": [
+      383,
+      707
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 123752
+    }
+   ],
+   "mask_px": 123752,
+   "point_in_mask": true
+  },
+  {
+   "part": "nectary",
+   "grid_point": [
+    449.0,
+    739.0
+   ],
+   "point_px": [
+    919,
+    874
+   ],
+   "latency_ms": 1207.0,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.21484375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      804,
+      859,
+      924,
+      1026
+     ],
+     "raster_hw": [
+      167,
+      120
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 1358
+    }
+   ],
+   "mask_px": 1358,
+   "point_in_mask": false
+  },
+  {
+   "part": "floral axis",
+   "grid_point": [
+    469.0,
+    730.0
+   ],
+   "point_px": [
+    960,
+    863
+   ],
+   "latency_ms": 1750.0,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.2451171875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      948,
+      848,
+      959,
+      888
+     ],
+     "raster_hw": [
+      40,
+      11
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 185
+    }
+   ],
+   "mask_px": 185,
+   "point_in_mask": false
+  },
+  {
+   "part": "pedicel",
+   "grid_point": [
+    448.0,
+    872.0
+   ],
+   "point_px": [
+    917,
+    1031
+   ],
+   "latency_ms": 1044.0,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.439453125
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      832,
+      706,
+      1169,
+      1124
+     ],
+     "raster_hw": [
+      418,
+      337
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 24768
+    }
+   ],
+   "mask_px": 24768,
+   "point_in_mask": true
+  },
+  {
+   "part": "connective",
+   "grid_point": [
+    876.0,
+    541.0
+   ],
+   "point_px": [
+    1794,
+    640
+   ],
+   "latency_ms": 977.0,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.25
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1785,
+      614,
+      1804,
+      632
+     ],
+     "raster_hw": [
+      18,
+      19
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 245
+    }
+   ],
+   "mask_px": 245,
+   "point_in_mask": false
+  },
+  {
+   "part": "pollen sac",
+   "grid_point": [
+    830.0,
+    631.0
+   ],
+   "point_px": [
+    1699,
+    746
+   ],
+   "latency_ms": 1389.6,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.67578125
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1518,
+      554,
+      1871,
+      969
+     ],
+     "raster_hw": [
+      415,
+      353
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 44865
+    }
+   ],
+   "mask_px": 44865,
+   "point_in_mask": true
+  },
+  {
+   "part": "anther",
+   "grid_point": [
+    845.0,
+    579.0
+   ],
+   "point_px": [
+    1730,
+    684
+   ],
+   "latency_ms": 1110.5,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.49609375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1723,
+      680,
+      1748,
+      696
+     ],
+     "raster_hw": [
+      16,
+      25
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 281
+    }
+   ],
+   "mask_px": 281,
+   "point_in_mask": true
+  },
+  {
+   "part": "filament stalk",
+   "grid_point": [
+    742.0,
+    779.0
+   ],
+   "point_px": [
+    1519,
+    921
+   ],
+   "latency_ms": 1941.0,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.71875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1515,
+      689,
+      1690,
+      972
+     ],
+     "raster_hw": [
+      283,
+      175
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 10179
+    }
+   ],
+   "mask_px": 10179,
+   "point_in_mask": true
+  },
+  {
+   "part": "stamen group",
+   "grid_point": [
+    800.0,
+    894.0
+   ],
+   "point_px": [
+    1638,
+    1057
+   ],
+   "latency_ms": 1884.5,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.77734375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1522,
+      1008,
+      1755,
+      1059
+     ],
+     "raster_hw": [
+      51,
+      233
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 8498
+    }
+   ],
+   "mask_px": 8498,
+   "point_in_mask": false
+  }
+ ],
+ "arm_a": {
+  "latency_ms": 7528.1,
+  "cost_usd": 0.011627,
+  "usage": {
+   "completion_tokens": 1789,
+   "prompt_tokens": 3219,
+   "total_tokens": 5008,
+   "completion_tokens_details": {
+    "reasoning_tokens": 1453
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": "[{\"object_name\": \"ovules\", \"x\": 80, \"y\": 306}, {\"object_name\": \"pistil group\", \"x\": 207, \"y\": 163}, {\"object_name\": \"stigma\", \"x\": 521, \"y\": 374}, {\"object_name\": \"style\", \"x\": 510, \"y\": 440}, {\"object_name\": \"ovary\", \"x\": 486, \"y\": 601}, {\"object_name\": \"petal\", \"x\": 399, \"y\": 538}, {\"object_name\": \"sepal\", \"x\": 415, \"y\": 677}, {\"object_name\": \"perianth group\", \"x\": 214, \"y\": 796}, {\"object_name\": \"nectary\", \"x\": 449, \"y\": 739}, {\"object_name\": \"floral axis\", \"x\": 469, \"y\": 730}, {\"object_name\": \"pedicel\", \"x\": 448, \"y\": 872}, {\"object_name\": \"connective\", \"x\": 876, \"y\": 541}, {\"object_name\": \"pollen sac\", \"x\": 830, \"y\": 631}, {\"object_name\": \"anther\", \"x\": 845, \"y\": 579}, {\"object_name\": \"filament stalk\", \"x\": 742, \"y\": 779}, {\"object_name\": \"stamen group\", \"x\": 800, \"y\": 894}]"
+ },
+ "arm_b_rows": [
+  {
+   "part": "ovules",
+   "region_ids": [
+    28
+   ],
+   "invalid_ids": [],
+   "mask_px": 22843
+  },
+  {
+   "part": "pistil group",
+   "region_ids": [
+    21,
+    27,
+    28
+   ],
+   "invalid_ids": [],
+   "mask_px": 25381
+  },
+  {
+   "part": "stigma",
+   "region_ids": null
+  },
+  {
+   "part": "style",
+   "region_ids": null
+  },
+  {
+   "part": "ovary",
+   "region_ids": [
+    21,
+    27,
+    28
+   ],
+   "invalid_ids": [],
+   "mask_px": 25381
+  },
+  {
+   "part": "petal",
+   "region_ids": [
+    9,
+    11,
+    12,
+    13,
+    14,
+    17,
+    18,
+    24
+   ],
+   "invalid_ids": [],
+   "mask_px": 91042
+  },
+  {
+   "part": "sepal",
+   "region_ids": null
+  },
+  {
+   "part": "perianth group",
+   "region_ids": [
+    9,
+    11,
+    12,
+    13,
+    14,
+    17,
+    18,
+    24
+   ],
+   "invalid_ids": [],
+   "mask_px": 91042
+  },
+  {
+   "part": "nectary",
+   "region_ids": null
+  },
+  {
+   "part": "floral axis",
+   "region_ids": null
+  },
+  {
+   "part": "pedicel",
+   "region_ids": null
+  },
+  {
+   "part": "connective",
+   "region_ids": [
+    19
+   ],
+   "invalid_ids": [],
+   "mask_px": 1587
+  },
+  {
+   "part": "pollen sac",
+   "region_ids": [
+    20,
+    22,
+    23,
+    25,
+    26,
+    29
+   ],
+   "invalid_ids": [],
+   "mask_px": 10070
+  },
+  {
+   "part": "anther",
+   "region_ids": [
+    6,
+    7,
+    10,
+    15,
+    16,
+    19,
+    20,
+    22,
+    23,
+    25,
+    26,
+    29
+   ],
+   "invalid_ids": [],
+   "mask_px": 26511
+  },
+  {
+   "part": "filament stalk",
+   "region_ids": [
+    8
+   ],
+   "invalid_ids": [],
+   "mask_px": 557
+  },
+  {
+   "part": "stamen group",
+   "region_ids": [
+    6,
+    7,
+    8,
+    10,
+    15,
+    16,
+    19,
+    20,
+    22,
+    23,
+    25,
+    26,
+    29
+   ],
+   "invalid_ids": [],
+   "mask_px": 27068
+  }
+ ],
+ "arm_b": {
+  "latency_ms": 41701.9,
+  "cost_usd": 0.0410605,
+  "usage": {
+   "completion_tokens": 7811,
+   "prompt_tokens": 6291,
+   "total_tokens": 14102,
+   "completion_tokens_details": {
+    "reasoning_tokens": 7513
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "ink_below": 64,
+  "close_px": 5,
+  "floor_px": 307.7,
+  "regions": 30,
+  "regions_assigned": 24,
+  "regions_unassigned": 6,
+  "answer": {
+   "parts": [
+    {
+     "part": "ovules",
+     "region_ids": [
+      28
+     ]
+    },
+    {
+     "part": "pistil group",
+     "region_ids": [
+      21,
+      27,
+      28
+     ]
+    },
+    {
+     "part": "ovary",
+     "region_ids": [
+      21,
+      27,
+      28
+     ]
+    },
+    {
+     "part": "petal",
+     "region_ids": [
+      9,
+      11,
+      12,
+      13,
+      14,
+      17,
+      18,
+      24
+     ]
+    },
+    {
+     "part": "perianth group",
+     "region_ids": [
+      9,
+      11,
+      12,
+      13,
+      14,
+      17,
+      18,
+      24
+     ]
+    },
+    {
+     "part": "connective",
+     "region_ids": [
+      19
+     ]
+    },
+    {
+     "part": "pollen sac",
+     "region_ids": [
+      20,
+      22,
+      23,
+      25,
+      26,
+      29
+     ]
+    },
+    {
+     "part": "anther",
+     "region_ids": [
+      6,
+      7,
+      10,
+      15,
+      16,
+      19,
+      20,
+      22,
+      23,
+      25,
+      26,
+      29
+     ]
+    },
+    {
+     "part": "filament stalk",
+     "region_ids": [
+      8
+     ]
+    },
+    {
+     "part": "stamen group",
+     "region_ids": [
+      6,
+      7,
+      8,
+      10,
+      15,
+      16,
+      19,
+      20,
+      22,
+      23,
+      25,
+      26,
+      29
+     ]
+    }
+   ]
+  }
+ },
+ "spent_usd": 0.110141,
+ "calls": 19
+}

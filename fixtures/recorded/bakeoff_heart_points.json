@@ -1,0 +1,61 @@
+{
+ "recorded_at": "2026-10-29T18:30:51+00:00",
+ "model": "muse-spark-1.3",
+ "request": {
+  "method": "POST",
+  "path": "/chat/completions",
+  "json": {
+   "model": "muse-spark-1.3",
+   "reasoning_effort": "medium",
+   "messages": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "Point to each of the following objects in the image: \"brachiocephalic artery\", \"superior vena cava\", \"right pulmonary arteries\", \"right pulmonary veins\", \"right atrium\", \"tricuspid valve\", \"chordae tendineae\", \"right ventricle\", \"inferior vena cava\", \"left common carotid artery\", \"left subclavian artery\", \"aorta\", \"left pulmonary arteries\", \"left pulmonary veins\", \"left atrium\", \"semilunar valves\", \"mitral valve\", \"left ventricle\", \"septum\". For each object, answer in the format {\"object_name\": \"<name>\", \"x\": <int>, \"y\": <int>}. The coordinates should be in the 0-1000 range. Return a JSON array of results. If you cannot find an object, omit it from the results."
+      },
+      {
+       "type": "image_url",
+       "image_url": {
+        "url": "<data image/png sha256=4caad1dedd842523aede6ce3b18f1b8d978d118fa17be685d9755b44f8836569 bytes=977814>"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "id": "chatcmpl-01a188ed-d786-775d-a083-9b9884eebfa6",
+   "choices": [
+    {
+     "finish_reason": "stop",
+     "index": 0,
+     "message": {
+      "content": "[{\"object_name\": \"brachiocephalic artery\", \"x\": 456, \"y\": 126}, {\"object_name\": \"superior vena cava\", \"x\": 408, \"y\": 344}, {\"object_name\": \"right pulmonary arteries\", \"x\": 351, \"y\": 335}, {\"object_name\": \"right pulmonary veins\", \"x\": 333, \"y\": 449}, {\"object_name\": \"right atrium\", \"x\": 416, \"y\": 528}, {\"object_name\": \"tricuspid valve\", \"x\": 428, \"y\": 612}, {\"object_name\": \"chordae tendineae\", \"x\": 527, \"y\": 689}, {\"object_name\": \"right ventricle\", \"x\": 508, \"y\": 752}, {\"object_name\": \"inferior vena cava\", \"x\": 443, \"y\": 844}, {\"object_name\": \"left common carotid artery\", \"x\": 540, \"y\": 105}, {\"object_name\": \"left subclavian artery\", \"x\": 582, \"y\": 119}, {\"object_name\": \"aorta\", \"x\": 533, \"y\": 285}, {\"object_name\": \"left pulmonary arteries\", \"x\": 650, \"y\": 323}, {\"object_name\": \"left pulmonary veins\", \"x\": 714, \"y\": 430}, {\"object_name\": \"left atrium\", \"x\": 669, \"y\": 473}, {\"object_name\": \"semilunar valves\", \"x\": 615, \"y\": 519}, {\"object_name\": \"mitral valve\", \"x\": 672, \"y\": 572}, {\"object_name\": \"left ventricle\", \"x\": 709, \"y\": 675}, {\"object_name\": \"septum\", \"x\": 629, \"y\": 714}]",
+      "refusal": null,
+      "role": "assistant"
+     },
+     "logprobs": null
+    }
+   ],
+   "created": 1793298651,
+   "model": "muse-spark-1.3",
+   "object": "chat.completion",
+   "usage": {
+    "completion_tokens": 1742,
+    "prompt_tokens": 4221,
+    "total_tokens": 5963,
+    "completion_tokens_details": {
+     "reasoning_tokens": 1322
+    },
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   }
+  }
+ }
+}

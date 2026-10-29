@@ -159,3 +159,28 @@ def test_a_figure_with_too_many_parts_stops_after_the_listing(tmp_path: Path) ->
 @pytest.mark.parametrize("name", sorted(bake.FIGURES))
 def test_each_bakeoff_figure_is_in_the_repo(name: str) -> None:
     assert bake.FIGURES[name].is_file()
+
+
+LIVE_ONLY = {"latency_ms", "cost_usd", "usage"}
+
+
+def measured(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The rows as results.json holds them (tuples become lists), live timings left out."""
+    out: list[dict[str, Any]] = json.loads(json.dumps(rows))
+    return [{k: v for k, v in r.items() if k not in LIVE_ONLY} for r in out]
+
+
+@pytest.mark.parametrize("name", sorted(bake.FIGURES))
+def test_replay_of_the_live_bakeoff_gives_the_same_measurements(name: str, tmp_path: Path) -> None:
+    """The Oct 29 live runs, replayed: every request matches its recording (image digests
+    included), and the points, instances, masks and region ids come out as in results.json."""
+    live_result = json.loads((bake.OUT_ROOT / name / "results.json").read_text())
+    fig = bake.load_figure(name, bake.FIGURES[name])
+    result = asyncio.run(bake.bake(bake.replayer(name), fig, False, tmp_path, images_only=True))
+    assert result["calls"] == live_result["calls"]
+    assert result["parts"] == live_result["parts"]
+    assert measured(result["arm_a_rows"]) == measured(live_result["arm_a_rows"])
+    assert measured(result["arm_b_rows"]) == measured(live_result["arm_b_rows"])
+    for key in ("regions", "regions_assigned", "regions_unassigned", "floor_px"):
+        assert result["arm_b"][key] == live_result["arm_b"][key]
+    assert not (tmp_path / "results.json").exists()

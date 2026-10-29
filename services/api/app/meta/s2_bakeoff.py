@@ -28,10 +28,12 @@ import json
 import math
 import re
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import cv2
 import numpy as np
 import numpy.typing as npt
 from PIL import Image, ImageDraw, ImageFont
@@ -40,12 +42,13 @@ from app.config import MetaModels, load_tactile_rules
 from app.geometry.closed_regions import Region, closed_regions
 from app.geometry.scale import fit_to_page
 from app.meta import sam_adapter
-from app.meta.live import LiveCaller, LiveCallError, spark_units
-from app.meta.record import Recorder
+from app.meta.cost import CostMeter
+from app.meta.live import DEFAULT_BASE, Ledger, LiveCaller, LiveCallError, spark_units
+from app.meta.record import Recorder, ReplayTransport
 from app.meta.sam_diagnostic import checks
 from app.meta.smoke import HEART
 from app.models.regions import PageSize
-from app.paths import FIXTURES_DIR, REPO_ROOT
+from app.paths import FIXTURES_DIR, RECORDED_DIR, REPO_ROOT
 from app.pipeline import s2_ground
 from app.prompts import load_prompt
 
@@ -275,18 +278,23 @@ def numbered_overlay(
 def part_view(
     fig: Figure, mask: npt.NDArray[np.bool_] | None, point: tuple[int, int] | None
 ) -> Image.Image:
-    """The figure with one mask in red and, for Arm A, its prompt point in blue."""
+    """The figure with everything outside one mask faded, the mask's edge in cyan and, for
+    Arm A, its prompt point in magenta. Colors in the figure itself cannot hide the mask."""
     out = fig.image.astype(np.float32)
     if mask is not None:
-        out[mask] = out[mask] * 0.4 + np.array([255.0, 0.0, 0.0]) * 0.6
+        out[~mask] = out[~mask] * 0.3 + 255.0 * 0.7
+        k = 2 * max(2, fig.size[0] // 400) + 1
+        inner = cv2.erode(mask.astype(np.uint8), np.ones((k, k), np.uint8)).astype(bool)
+        out[mask & ~inner] = (0.0, 200.0, 255.0)
     img = Image.fromarray(out.astype(np.uint8))
     if point is not None:
         draw = ImageDraw.Draw(img)
         r = max(8, fig.size[0] // 120)
         x, y = point
-        draw.ellipse((x - r, y - r, x + r, y + r), outline=(0, 60, 255), width=max(3, r // 3))
-        draw.line((x - 2 * r, y, x + 2 * r, y), fill=(0, 60, 255), width=2)
-        draw.line((x, y - 2 * r, x, y + 2 * r), fill=(0, 60, 255), width=2)
+        pink = (230, 0, 200)
+        draw.ellipse((x - r, y - r, x + r, y + r), outline=pink, width=max(3, r // 3))
+        draw.line((x - 2 * r, y, x + 2 * r, y), fill=pink, width=3)
+        draw.line((x, y - 2 * r, x, y + 2 * r), fill=pink, width=3)
     scale = 720 / max(img.size)
     return img.resize(
         (round(img.width * scale), round(img.height * scale)), Image.Resampling.LANCZOS
@@ -404,7 +412,7 @@ class Bakeoff:
             for inst in insts:
                 mask |= full_mask(inst, (w, h))
             row |= {
-                "instances": len(sam_adapter.instances(parsed)),
+                "instances": sam_adapter.instance_count(parsed),
                 "confidences": [i.confidence for i in insts],
                 "masks": [checks(i, (h, w)) for i in insts],
                 "mask_px": int(mask.sum()),
@@ -497,7 +505,11 @@ def write_sheet(result: dict[str, Any], out_dir: Path) -> None:
     b_rows = {r["part"]: r for r in result.get("arm_b_rows", [])}
 
     def cell(img: str | None, facts: list[str]) -> str:
-        pic = f'<img src="img/{img}.jpg" alt="">' if img else "<p>no mask</p>"
+        pic = (
+            f'<a href="img/{img}.jpg"><img src="img/{img}.jpg" alt=""></a>'
+            if img
+            else "<p>no mask</p>"
+        )
         return f"<td>{pic}<ul>{''.join(f'<li>{esc(f)}</li>' for f in facts)}</ul></td>"
 
     rows = []
@@ -564,22 +576,48 @@ ul {{ margin: 4px 0; padding-left: 18px; font-size: 13px; }}
     (out_dir / "index.html").write_text(page, encoding="utf-8")
 
 
-async def bake(live: LiveCaller, fig: Figure, record: bool, out_dir: Path) -> dict[str, Any]:
+async def bake(
+    live: LiveCaller, fig: Figure, record: bool, out_dir: Path, images_only: bool = False
+) -> dict[str, Any]:
+    """One figure through both arms. images_only redraws img/ and leaves results.json and
+    index.html alone: a replay has its own latencies, not the live ones."""
     out_dir.mkdir(parents=True, exist_ok=True)
     result = await Bakeoff(live, fig, record, out_dir).run()
+    if images_only:
+        return result
     (out_dir / "results.json").write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8")
     if "stopped" not in result:
         write_sheet(result, out_dir)
     return result
 
 
+def replayer(figure: str) -> LiveCaller:
+    """A caller that answers from fixtures/recorded/bakeoff_FIGURE_*.json, never the network."""
+    rules = load_tactile_rules().meta
+    return LiveCaller(
+        key="unused-in-replay",
+        base_url=DEFAULT_BASE,
+        ledger=Ledger(Path(tempfile.mkdtemp()) / "ledger.jsonl"),
+        meter=CostMeter(rules),
+        cap=rules.live_call_cap,
+        transport=ReplayTransport.from_files(sorted(RECORDED_DIR.glob(f"bakeoff_{figure}_*.json"))),
+    )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("figure", choices=sorted(FIGURES))
     ap.add_argument("--record", action="store_true", help="save each call to fixtures/recorded/")
+    ap.add_argument(
+        "--replay", action="store_true", help="redraw the images from the recorded calls, offline"
+    )
     args = ap.parse_args()
-    live = LiveCaller.from_env(load_tactile_rules().meta, recorder=Recorder())
     fig = load_figure(args.figure, FIGURES[args.figure])
+    if args.replay:
+        asyncio.run(bake(replayer(args.figure), fig, False, OUT_ROOT / args.figure, True))
+        print(f"redrew {OUT_ROOT / args.figure / 'img'} from the recorded calls")
+        return
+    live = LiveCaller.from_env(load_tactile_rules().meta, recorder=Recorder())
     try:
         result = asyncio.run(bake(live, fig, args.record, OUT_ROOT / args.figure))
     except LiveCallError as exc:

@@ -180,3 +180,8 @@ def test_replay_of_the_live_diagnostic(tmp_path: Path) -> None:
     assert banana["bounds"] == [47, 44, 978, 855] and rows[0]["confidences"][0] > 0.95
     assert heart["decodes"] and not heart["raster_is_bounds_size"] and heart["inside_image"]
     assert (heart["bounds"], heart["raster_hw"]) == ([655, 136, 1583, 1559], [1024, 668])
+
+
+def test_instance_count_needs_no_decoding() -> None:
+    assert sam_adapter.instance_count(asyncio.run(sam_adapter.parse_events(answer(ONE)))) == 1
+    assert sam_adapter.instance_count(asyncio.run(sam_adapter.parse_events(ZERO))) == 0

@@ -123,7 +123,7 @@ async def one(live: LiveCaller, case: Case, record: bool, out_dir: Path | None) 
         return row | {"instances": None, "parse_error": str(exc)}
     insts = sam_adapter.decoded(parsed)
     row |= {
-        "instances": len(sam_adapter.instances(parsed)),
+        "instances": sam_adapter.instance_count(parsed),
         "confidences": [i.confidence for i in insts],
         "masks": [checks(i, (h, w)) for i in insts],
     }

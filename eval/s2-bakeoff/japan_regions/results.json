@@ -1,0 +1,736 @@
+{
+ "figure": "japan_regions",
+ "image": "fixtures/eval/japan_regions.png",
+ "size": [
+  1796,
+  2048
+ ],
+ "parts": [
+  {
+   "phrase": "Hokkaido region",
+   "print_label": "Hokkaid\u014d"
+  },
+  {
+   "phrase": "Tohoku region",
+   "print_label": "T\u014dhoku"
+  },
+  {
+   "phrase": "Kanto region",
+   "print_label": "Kant\u014d"
+  },
+  {
+   "phrase": "Chubu region",
+   "print_label": "Ch\u016bbu"
+  },
+  {
+   "phrase": "Kansai region",
+   "print_label": "Kansai"
+  },
+  {
+   "phrase": "Chugoku region",
+   "print_label": "Ch\u016bgoku"
+  },
+  {
+   "phrase": "Shikoku region",
+   "print_label": "Shikoku"
+  },
+  {
+   "phrase": "Kyushu region",
+   "print_label": "Ky\u016bsh\u016b"
+  },
+  {
+   "phrase": "Okinawa inset region",
+   "print_label": "(Okinawa)"
+  }
+ ],
+ "listing": {
+  "latency_ms": 5386.7,
+  "cost_usd": 0.01094375,
+  "usage": {
+   "completion_tokens": 1290,
+   "prompt_tokens": 4369,
+   "total_tokens": 5659,
+   "completion_tokens_details": {
+    "reasoning_tokens": 1021
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "understanding": {
+   "color_carries_meaning": true,
+   "figure_type": "map",
+   "parts": [
+    {
+     "phrase": "Hokkaido region",
+     "print_label": "Hokkaid\u014d"
+    },
+    {
+     "phrase": "Tohoku region",
+     "print_label": "T\u014dhoku"
+    },
+    {
+     "phrase": "Kanto region",
+     "print_label": "Kant\u014d"
+    },
+    {
+     "phrase": "Chubu region",
+     "print_label": "Ch\u016bbu"
+    },
+    {
+     "phrase": "Kansai region",
+     "print_label": "Kansai"
+    },
+    {
+     "phrase": "Chugoku region",
+     "print_label": "Ch\u016bgoku"
+    },
+    {
+     "phrase": "Shikoku region",
+     "print_label": "Shikoku"
+    },
+    {
+     "phrase": "Kyushu region",
+     "print_label": "Ky\u016bsh\u016b"
+    },
+    {
+     "phrase": "Okinawa inset region",
+     "print_label": "(Okinawa)"
+    }
+   ],
+   "summary": "Japan divided into eight regions ordered from north to south. Okinawa placed in inset box at lower right.",
+   "title": "Regions of Japan",
+   "verdict": "make_tactile",
+   "verdict_reason": "Nine large distinct regions with clear boundaries and labels suitable for tactile representation."
+  }
+ },
+ "calls_needed": 12,
+ "cap": 25,
+ "arm_a_rows": [
+  {
+   "part": "Hokkaido region",
+   "grid_point": [
+    755.0,
+    175.0
+   ],
+   "point_px": [
+    1355,
+    358
+   ],
+   "latency_ms": 890.2,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.9609375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1113,
+      169,
+      1565,
+      605
+     ],
+     "raster_hw": [
+      436,
+      452
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 74185
+    }
+   ],
+   "mask_px": 74185,
+   "point_in_mask": true
+  },
+  {
+   "part": "Tohoku region",
+   "grid_point": [
+    678.0,
+    405.0
+   ],
+   "point_px": [
+    1217,
+    829
+   ],
+   "latency_ms": 837.7,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.7109375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1193,
+      592,
+      1304,
+      920
+     ],
+     "raster_hw": [
+      328,
+      111
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 14966
+    }
+   ],
+   "mask_px": 14966,
+   "point_in_mask": true
+  },
+  {
+   "part": "Kanto region",
+   "grid_point": [
+    630.0,
+    565.0
+   ],
+   "point_px": [
+    1131,
+    1157
+   ],
+   "latency_ms": 1008.5,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.84765625
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1020,
+      1047,
+      1223,
+      1281
+     ],
+     "raster_hw": [
+      234,
+      203
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 28421
+    }
+   ],
+   "mask_px": 28421,
+   "point_in_mask": true
+  },
+  {
+   "part": "Chubu region",
+   "grid_point": [
+    535.0,
+    558.0
+   ],
+   "point_px": [
+    960,
+    1142
+   ],
+   "latency_ms": 1441.3,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.51171875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      784,
+      908,
+      1124,
+      1315
+     ],
+     "raster_hw": [
+      407,
+      340
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 55742
+    }
+   ],
+   "mask_px": 55742,
+   "point_in_mask": true
+  },
+  {
+   "part": "Kansai region",
+   "grid_point": [
+    444.0,
+    634.0
+   ],
+   "point_px": [
+    797,
+    1298
+   ],
+   "latency_ms": 1154.7,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.5234375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      392,
+      1195,
+      897,
+      1436
+     ],
+     "raster_hw": [
+      241,
+      505
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 30050
+    }
+   ],
+   "mask_px": 30050,
+   "point_in_mask": true
+  },
+  {
+   "part": "Chugoku region",
+   "grid_point": [
+    298.0,
+    622.0
+   ],
+   "point_px": [
+    535,
+    1273
+   ],
+   "latency_ms": 1170.8,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.80859375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      382,
+      1209,
+      691,
+      1386
+     ],
+     "raster_hw": [
+      177,
+      309
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 27887
+    }
+   ],
+   "mask_px": 27887,
+   "point_in_mask": true
+  },
+  {
+   "part": "Shikoku region",
+   "grid_point": [
+    331.0,
+    683.0
+   ],
+   "point_px": [
+    594,
+    1398
+   ],
+   "latency_ms": 1253.4,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.9375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      478,
+      1334,
+      709,
+      1504
+     ],
+     "raster_hw": [
+      170,
+      231
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 17392
+    }
+   ],
+   "mask_px": 17392,
+   "point_in_mask": true
+  },
+  {
+   "part": "Kyushu region",
+   "grid_point": [
+    203.0,
+    730.0
+   ],
+   "point_px": [
+    364,
+    1495
+   ],
+   "latency_ms": 740.1,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.87109375
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      251,
+      1368,
+      473,
+      1671
+     ],
+     "raster_hw": [
+      303,
+      222
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 34875
+    }
+   ],
+   "mask_px": 34875,
+   "point_in_mask": true
+  },
+  {
+   "part": "Okinawa inset region",
+   "grid_point": [
+    917.0,
+    824.0
+   ],
+   "point_px": [
+    1646,
+    1687
+   ],
+   "latency_ms": 916.4,
+   "cost_usd": 0.0025,
+   "instances": 1,
+   "confidences": [
+    0.85546875
+   ],
+   "masks": [
+    {
+     "object_id": "1",
+     "decodes": true,
+     "bounds": [
+      1617,
+      1656,
+      1684,
+      1743
+     ],
+     "raster_hw": [
+      87,
+      67
+     ],
+     "raster_is_bounds_size": true,
+     "raster_scale": [
+      1.0,
+      1.0
+     ],
+     "inside_image": true,
+     "px": 1948
+    }
+   ],
+   "mask_px": 1948,
+   "point_in_mask": true
+  }
+ ],
+ "arm_a": {
+  "latency_ms": 4499.6,
+  "cost_usd": 0.0094495,
+  "usage": {
+   "completion_tokens": 984,
+   "prompt_tokens": 4214,
+   "total_tokens": 5198,
+   "completion_tokens_details": {
+    "reasoning_tokens": 779
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": "[{\"object_name\": \"Hokkaido region\", \"x\": 755, \"y\": 175}, {\"object_name\": \"Tohoku region\", \"x\": 678, \"y\": 405}, {\"object_name\": \"Kanto region\", \"x\": 630, \"y\": 565}, {\"object_name\": \"Chubu region\", \"x\": 535, \"y\": 558}, {\"object_name\": \"Kansai region\", \"x\": 444, \"y\": 634}, {\"object_name\": \"Chugoku region\", \"x\": 298, \"y\": 622}, {\"object_name\": \"Shikoku region\", \"x\": 331, \"y\": 683}, {\"object_name\": \"Kyushu region\", \"x\": 203, \"y\": 730}, {\"object_name\": \"Okinawa inset region\", \"x\": 917, \"y\": 824}]"
+ },
+ "arm_b_rows": [
+  {
+   "part": "Hokkaido region",
+   "region_ids": [
+    1,
+    2,
+    3
+   ],
+   "invalid_ids": [],
+   "mask_px": 74903
+  },
+  {
+   "part": "Tohoku region",
+   "region_ids": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    10
+   ],
+   "invalid_ids": [],
+   "mask_px": 84961
+  },
+  {
+   "part": "Kanto region",
+   "region_ids": [
+    15,
+    19
+   ],
+   "invalid_ids": [],
+   "mask_px": 12223
+  },
+  {
+   "part": "Chubu region",
+   "region_ids": [
+    9,
+    11,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    24,
+    25
+   ],
+   "invalid_ids": [],
+   "mask_px": 44543
+  },
+  {
+   "part": "Kansai region",
+   "region_ids": [
+    22,
+    23,
+    29,
+    31
+   ],
+   "invalid_ids": [],
+   "mask_px": 30525
+  },
+  {
+   "part": "Chugoku region",
+   "region_ids": [
+    20,
+    21,
+    26,
+    28,
+    30
+   ],
+   "invalid_ids": [],
+   "mask_px": 26480
+  },
+  {
+   "part": "Shikoku region",
+   "region_ids": [
+    32,
+    33,
+    34,
+    35
+   ],
+   "invalid_ids": [],
+   "mask_px": 15752
+  },
+  {
+   "part": "Kyushu region",
+   "region_ids": [
+    27,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    47
+   ],
+   "invalid_ids": [],
+   "mask_px": 36568
+  },
+  {
+   "part": "Okinawa inset region",
+   "region_ids": [
+    46
+   ],
+   "invalid_ids": [],
+   "mask_px": 352526
+  }
+ ],
+ "arm_b": {
+  "latency_ms": 92202.0,
+  "cost_usd": 0.09984599999999999,
+  "usage": {
+   "completion_tokens": 21052,
+   "prompt_tokens": 8300,
+   "total_tokens": 29352,
+   "completion_tokens_details": {
+    "reasoning_tokens": 20783
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "ink_below": 64,
+  "close_px": 5,
+  "floor_px": 236.7,
+  "regions": 47,
+  "regions_assigned": 47,
+  "regions_unassigned": 0,
+  "answer": {
+   "parts": [
+    {
+     "part": "Hokkaido region",
+     "region_ids": [
+      1,
+      2,
+      3
+     ]
+    },
+    {
+     "part": "Tohoku region",
+     "region_ids": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      10
+     ]
+    },
+    {
+     "part": "Kanto region",
+     "region_ids": [
+      15,
+      19
+     ]
+    },
+    {
+     "part": "Chubu region",
+     "region_ids": [
+      9,
+      11,
+      12,
+      13,
+      14,
+      16,
+      17,
+      18,
+      24,
+      25
+     ]
+    },
+    {
+     "part": "Kansai region",
+     "region_ids": [
+      22,
+      23,
+      29,
+      31
+     ]
+    },
+    {
+     "part": "Chugoku region",
+     "region_ids": [
+      20,
+      21,
+      26,
+      28,
+      30
+     ]
+    },
+    {
+     "part": "Shikoku region",
+     "region_ids": [
+      32,
+      33,
+      34,
+      35
+     ]
+    },
+    {
+     "part": "Kyushu region",
+     "region_ids": [
+      27,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      47
+     ]
+    },
+    {
+     "part": "Okinawa inset region",
+     "region_ids": [
+      46
+     ]
+    }
+   ]
+  }
+ },
+ "spent_usd": 0.142739,
+ "calls": 12
+}
