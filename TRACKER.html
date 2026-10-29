@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 127,
- "updated_at": "2026-10-29T18:44:17.709Z",
+ "rev": 139,
+ "updated_at": "2026-10-29T20:35:16.196Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1799,6 +1799,84 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "measured_at": "2026-10-28T00:30:44.260Z",
    "source": "live",
    "changed_at": "2026-10-28T00:30:44.260Z"
+  },
+  {
+   "id": "spark-s1-p50",
+   "suite": "Latency",
+   "name": "Muse Spark S1 listing on heart.png, reasoning medium, p50 of 10 live calls",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 7701.9,
+   "measured_at": "2026-10-29T20:35:15.833Z",
+   "source": "live",
+   "changed_at": "2026-10-29T20:35:15.833Z"
+  },
+  {
+   "id": "spark-s1-p95",
+   "suite": "Latency",
+   "name": "Muse Spark S1 listing on heart.png, reasoning medium, p95 of 10 live calls (nearest rank: the slowest)",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 9478.8,
+   "measured_at": "2026-10-29T20:35:15.907Z",
+   "source": "live",
+   "changed_at": "2026-10-29T20:35:15.907Z"
+  },
+  {
+   "id": "voice-file-p50",
+   "suite": "Latency",
+   "name": "Muse Voice Transcribe file endpoint, 2.72 s synthetic WAV, no keywords, p50 of 10 live calls",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 957.3,
+   "measured_at": "2026-10-29T20:35:15.978Z",
+   "source": "live",
+   "changed_at": "2026-10-29T20:35:15.978Z"
+  },
+  {
+   "id": "voice-file-p95",
+   "suite": "Latency",
+   "name": "Muse Voice Transcribe file endpoint, 2.72 s synthetic WAV, no keywords, p95 of 10 live calls (nearest rank: the slowest)",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 1221.4,
+   "measured_at": "2026-10-29T20:35:16.048Z",
+   "source": "live",
+   "changed_at": "2026-10-29T20:35:16.048Z"
+  },
+  {
+   "id": "sam-point-p50",
+   "suite": "Latency",
+   "name": "SAM 3.1 point prompt, one point on a full figure, streamed to completed, p50 of the 44 S2 bake-off answers",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 1207,
+   "measured_at": "2026-10-29T20:35:16.124Z",
+   "source": "live",
+   "changed_at": "2026-10-29T20:35:16.124Z"
+  },
+  {
+   "id": "sam-point-p95",
+   "suite": "Latency",
+   "name": "SAM 3.1 point prompt, one point on a full figure, streamed to completed, p95 of the 44 S2 bake-off answers (nearest rank)",
+   "cmp": "\u003c=",
+   "target": 0,
+   "unit": "ms",
+   "report_only": true,
+   "value": 3632.1,
+   "measured_at": "2026-10-29T20:35:16.196Z",
+   "source": "live",
+   "changed_at": "2026-10-29T20:35:16.196Z"
   }
  ],
  "costs": [],
@@ -2137,6 +2215,66 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-29T20:35:16.196Z",
+   "kind": "claude",
+   "text": "Metric \"SAM 3.1 point prompt, one point on a full figure, streamed to completed, p95 of the 44 S2 bake-off answers (nearest rank)\" set to 3632.1 ms (live)."
+  },
+  {
+   "ts": "2026-10-29T20:35:16.161Z",
+   "kind": "claude",
+   "text": "Metric added: \"SAM 3.1 point prompt, one point on a full figure, streamed to completed, p95 of the 44 S2 bake-off answers (nearest rank)\", not measured yet."
+  },
+  {
+   "ts": "2026-10-29T20:35:16.124Z",
+   "kind": "claude",
+   "text": "Metric \"SAM 3.1 point prompt, one point on a full figure, streamed to completed, p50 of the 44 S2 bake-off answers\" set to 1207 ms (live)."
+  },
+  {
+   "ts": "2026-10-29T20:35:16.086Z",
+   "kind": "claude",
+   "text": "Metric added: \"SAM 3.1 point prompt, one point on a full figure, streamed to completed, p50 of the 44 S2 bake-off answers\", not measured yet."
+  },
+  {
+   "ts": "2026-10-29T20:35:16.048Z",
+   "kind": "claude",
+   "text": "Metric \"Muse Voice Transcribe file endpoint, 2.72 s synthetic WAV, no keywords, p95 of 10 live calls (nearest rank: the slowest)\" set to 1221.4 ms (live)."
+  },
+  {
+   "ts": "2026-10-29T20:35:16.012Z",
+   "kind": "claude",
+   "text": "Metric added: \"Muse Voice Transcribe file endpoint, 2.72 s synthetic WAV, no keywords, p95 of 10 live calls (nearest rank: the slowest)\", not measured yet."
+  },
+  {
+   "ts": "2026-10-29T20:35:15.978Z",
+   "kind": "claude",
+   "text": "Metric \"Muse Voice Transcribe file endpoint, 2.72 s synthetic WAV, no keywords, p50 of 10 live calls\" set to 957.3 ms (live)."
+  },
+  {
+   "ts": "2026-10-29T20:35:15.943Z",
+   "kind": "claude",
+   "text": "Metric added: \"Muse Voice Transcribe file endpoint, 2.72 s synthetic WAV, no keywords, p50 of 10 live calls\", not measured yet."
+  },
+  {
+   "ts": "2026-10-29T20:35:15.907Z",
+   "kind": "claude",
+   "text": "Metric \"Muse Spark S1 listing on heart.png, reasoning medium, p95 of 10 live calls (nearest rank: the slowest)\" set to 9478.8 ms (live)."
+  },
+  {
+   "ts": "2026-10-29T20:35:15.870Z",
+   "kind": "claude",
+   "text": "Metric added: \"Muse Spark S1 listing on heart.png, reasoning medium, p95 of 10 live calls (nearest rank: the slowest)\", not measured yet."
+  },
+  {
+   "ts": "2026-10-29T20:35:15.833Z",
+   "kind": "claude",
+   "text": "Metric \"Muse Spark S1 listing on heart.png, reasoning medium, p50 of 10 live calls\" set to 7701.9 ms (live)."
+  },
+  {
+   "ts": "2026-10-29T20:35:15.796Z",
+   "kind": "claude",
+   "text": "Metric added: \"Muse Spark S1 listing on heart.png, reasoning medium, p50 of 10 live calls\", not measured yet."
+  },
   {
    "ts": "2026-10-29T18:44:17.709Z",
    "kind": "claude",
