@@ -29,7 +29,17 @@ Script: `uv run spikes/spark_spike.py` (Python 3.11, httpx). `--dry-run` prints 
 
 ## Results
 
-The full spike (10 runs, image understand case, streamed answers) has not run yet.
+The streamed `answer` case has not run yet.
+
+S1 listing latency, Oct 29, 10 live calls through `app/meta/latency_spike.py spark` (per run in `spikes/results/latency_spark.json`, responses in `fixtures/recorded/latency_spark_list_*.json`, ledger lines in `eval/live/ledger.jsonl`). The request is the bake-off's S1 listing call: heart.png at 2048 px, the S1 prompt and schema, `reasoning_effort: medium`, not streamed. Timed from request to full answer. Nearest-rank percentiles, so p95 of 10 is the slowest run.
+
+| n | p50 | p95 | min | max | cost |
+|---|---|---|---|---|---|
+| 10 | 7702 ms | 9479 ms | 7411 ms | 9479 ms | $0.11546 |
+
+- Works: 10 of 10 HTTP 200, and every answer listed 19 parts. Prompt 4321 tokens each run; completion 1744 to 2498 tokens, of which 1276 to 2020 reasoning.
+- Surprised: the prompt cache hit on 5 of 10 identical calls (4209 cached tokens, at runs 3, 4, 7, 8, 10), not on every call after the first. A hit cut the cost (about $0.009 against $0.013) but not the latency: hits ran 7411 to 9479 ms, misses 7426 to 8979 ms. The bake-off's one heart listing call took 10599 ms.
+- The wrapper must: budget about 10 s for S1 on one figure, and not count on the prompt cache for speed.
 
 Smoke call, Oct 27, one call through `app/meta/smoke.py` (ledger line in `eval/live/ledger.jsonl`, response in `fixtures/recorded/smoke_spark_text.json`):
 
