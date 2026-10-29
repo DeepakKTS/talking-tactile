@@ -31,6 +31,34 @@ Credit line: "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commo
 
 Credit line: "Banana-Single.jpg by Evan-Amos, CC BY-SA 3.0, via Wikimedia Commons. Resized."
 
+## fixtures/eval/flower.png
+
+| | |
+|---|---|
+| Title | Mature flower diagram.svg |
+| Author | Mariana Ruiz (LadyofHats) |
+| Source | https://commons.wikimedia.org/wiki/File:Mature_flower_diagram.svg |
+| License | Public domain. Page statement: "This work has been released into the public domain by its author, LadyofHats" |
+| License checked | 2026-10-24 on the file page (spikes/eval-figures.md), again 2026-10-29 through the Wikimedia Commons API (LicenseShortName "Public domain") |
+| Changes | Rendered from the SVG by Commons at 3840 px, resized to 2048 x 1183 px, and flattened onto a white background |
+| Use | The S2 bake-off (Gate A step 4.1b): labels with leader lines |
+
+Credit line, not required: "Mature flower diagram.svg by Mariana Ruiz (LadyofHats), public domain, via Wikimedia Commons."
+
+## fixtures/eval/japan_regions.png
+
+| | |
+|---|---|
+| Title | Eight regions of Japan (en).svg |
+| Author | Bigmorr, derived from File:Japan large full.svg by Orange Wave |
+| Source | https://commons.wikimedia.org/wiki/File:Eight_regions_of_Japan_(en).svg |
+| License | Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/ |
+| License checked | 2026-10-24 on the file page (spikes/eval-figures.md), again 2026-10-29 through the Wikimedia Commons API (LicenseShortName "CC BY-SA 4.0") |
+| Changes | Rendered from the SVG by Commons at 3840 px, resized to 1796 x 2048 px |
+| Use | The S2 bake-off (Gate A step 4.1b): mostly closed outlines |
+
+Credit line: "Eight regions of Japan (en).svg by Bigmorr, derived from a map by Orange Wave, CC BY-SA 4.0, via Wikimedia Commons. Resized." Share-alike applies to anything made from it, as for heart.png.
+
 ## fixtures/audio/question_aorta_ventricle.wav
 
 | | |
@@ -68,5 +96,5 @@ The license text in both places is the Apache License 2.0 from https://www.apach
 
 ## Not stored here
 
-- The 20 eval figures in `spikes/eval-figures.md` are listed by URL, with their licenses, but not downloaded into the repository. Add each one here if it is ever committed.
+- The other 17 eval figures in `spikes/eval-figures.md` are listed by URL, with their licenses, but not downloaded into the repository. Add each one here if it is ever committed.
 - The fake camera clip for the tracking checks is built locally from File:Index finger 2.JPG by Than Ball (public domain, PD-user-en), https://commons.wikimedia.org/wiki/File:Index_finger_2.JPG. It is not committed.

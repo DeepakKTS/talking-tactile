@@ -55,6 +55,31 @@ def request_body(model: str, png: bytes, template: dict[str, Any], phrase: str) 
     }
 
 
+def point_request_body(
+    model: str, png: bytes, size: tuple[int, int], point: tuple[int, int], metadata: dict[str, Any]
+) -> dict[str, Any]:
+    """One object prompted by one positive point, instead of a phrase (the docs allow one or
+    the other, never both). size is the image's (width, height) and point is (x, y), both in
+    integer pixels of the image as sent, origin top left: the docs' coordinate space for
+    object prompts. Point prompts always return one_bit masks."""
+    text = sam.build_object_prompt(
+        size=size,
+        objects=[
+            sam.PromptObject(
+                id=1, prompts=[sam.FramePrompt(points=[sam.PromptPoint(x=point[0], y=point[1])])]
+            )
+        ],
+    )
+    url = "data:image/png;base64," + base64.b64encode(png).decode()
+    content = [{"type": "input_text", "text": text}, {"type": "input_image", "image_url": url}]
+    return {
+        "model": model,
+        "input": [{"type": "message", "role": "user", "content": content}],
+        "stream": True,
+        "metadata": dict(metadata),
+    }
+
+
 async def parse_events(events: list[Any]) -> sam.ImageSegmentationResult:
     async def gen() -> AsyncIterator[Any]:
         for ev in events:

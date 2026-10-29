@@ -1,0 +1,161 @@
+"""The S2 bake-off (Gate A step 4.1b) with no network: Spark's 0-1000 grid points mapped to
+source pixels, the SAM point prompt, the call budget, and a whole run on a small figure
+with answers from a mock transport."""
+
+import asyncio
+import json
+from pathlib import Path
+from typing import Any
+
+import httpx
+import numpy as np
+import pytest
+from PIL import Image
+
+from app.config import load_tactile_rules
+from app.meta import s2_bakeoff as bake
+from app.meta import sam_adapter
+from app.meta.cost import CostMeter
+from app.meta.live import Ledger, LiveCaller
+from tests.test_sam_diagnostic import ONE, answer, sse
+
+RULES = load_tactile_rules()
+
+
+def test_grid_values_map_to_integer_source_pixels() -> None:
+    assert bake.to_px(0, 2048) == 0
+    assert bake.to_px(500, 2048) == 1024
+    assert bake.to_px(333, 1183) == 393  # floor(333 * 1183 / 1000) = floor(393.9)
+    assert bake.to_px(1000, 2048) == 2047
+    assert bake.to_px(1001, 2048) == 2047
+    assert bake.to_px(-3, 2048) == 0
+
+
+def test_points_come_from_the_first_json_array_and_only_for_listed_parts() -> None:
+    content = (
+        "Here you go:\n```json\n"
+        '[{"object_name": "aorta", "x": 410, "y": 120},'
+        ' {"object_name": "moon", "x": 1, "y": 1},'
+        ' {"object_name": "aorta", "x": 9, "y": 9}]\n```'
+    )
+    assert bake.parse_points(content, ["aorta", "septum"]) == {"aorta": (410.0, 120.0)}
+    assert bake.parse_points("I cannot see it.", ["aorta"]) == {}
+
+
+def test_the_points_prompt_is_the_docs_point_mode() -> None:
+    text = bake.points_prompt(["left ventricle", "aorta"])
+    assert text.startswith('Point to each of the following objects in the image: "left ventricle"')
+    assert "0-1000 range" in text and "omit it" in text
+
+
+def test_a_point_prompt_names_one_object_in_source_pixels_and_no_phrase() -> None:
+    body = sam_adapter.point_request_body("sam-3.1", b"png", (2048, 1612), (1300, 1100), {"a": "b"})
+    text, image = body["input"][0]["content"]
+    assert text == {"type": "input_text", "text": "<0f>1<|point;x=1300;y=1100;w=2048;h=1612|>"}
+    assert image["image_url"].startswith("data:image/png;base64,")
+    assert body["stream"] is True and body["metadata"] == {"a": "b"}
+
+
+def test_a_run_needs_three_calls_plus_one_per_part() -> None:
+    assert bake.calls_needed(19) == 22
+    assert bake.calls_needed(23) > RULES.meta.live_call_cap
+
+
+def small_figure(tmp_path: Path) -> bake.Figure:
+    """Two outlined boxes on white, 200 x 120, saved as a PNG."""
+    img = np.full((120, 200, 3), 255, np.uint8)
+    for x0, x1 in ((10, 90), (110, 190)):
+        img[10:12, x0:x1] = img[98:100, x0:x1] = 0
+        img[10:100, x0 : x0 + 2] = img[10:100, x1 - 2 : x1] = 0
+    path = tmp_path / "boxes.png"
+    Image.fromarray(img).save(path)
+    return bake.load_figure("boxes", path)
+
+
+def chat(content: str) -> httpx.Response:
+    usage = {"prompt_tokens": 100, "completion_tokens": 10}
+    return httpx.Response(
+        200, json={"choices": [{"message": {"content": content}}], "usage": usage}
+    )
+
+
+def mock_caller(tmp_path: Path, parts: list[str], seen: list[str]) -> LiveCaller:
+    understanding = {
+        "figure_type": "labeled_diagram",
+        "title": "Boxes",
+        "summary": "Two boxes.",
+        "parts": [{"phrase": p, "print_label": p} for p in parts],
+        "color_carries_meaning": False,
+        "verdict": "make_tactile",
+        "verdict_reason": "ok",
+    }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body: dict[str, Any] = json.loads(request.content)
+        if request.url.path.endswith("/responses"):
+            seen.append(body["input"][0]["content"][0]["text"])
+            return sse(answer(ONE))
+        fmt = body.get("response_format", {}).get("json_schema", {}).get("name")
+        seen.append(fmt or "points")
+        if fmt == "FigureUnderstanding":
+            return chat(json.dumps(understanding))
+        if fmt == "RegionNames":
+            return chat(json.dumps({"parts": [{"part": "left box", "region_ids": [1, 99]}]}))
+        return chat(json.dumps([{"object_name": "left box", "x": 250, "y": 500}]))
+
+    return LiveCaller(
+        key="test-key",
+        base_url="https://api.meta.ai/v1",
+        ledger=Ledger(tmp_path / "ledger.jsonl"),
+        meter=CostMeter(RULES.meta),
+        cap=RULES.meta.live_call_cap,
+        transport=httpx.MockTransport(handler),
+    )
+
+
+def test_a_whole_run_measures_both_arms_and_writes_the_sheet(tmp_path: Path) -> None:
+    seen: list[str] = []
+    live = mock_caller(tmp_path, ["left box", "right box"], seen)
+    out = tmp_path / "out"
+    result = asyncio.run(bake.bake(live, small_figure(tmp_path), record=False, out_dir=out))
+    # list, points, one SAM call for the one part Spark pointed to, naming
+    assert seen == [
+        "FigureUnderstanding",
+        "points",
+        "<0f>1<|point;x=50;y=60;w=200;h=120|>",
+        "RegionNames",
+    ]
+    a = {r["part"]: r for r in result["arm_a_rows"]}
+    assert a["right box"] == {
+        "part": "right box",
+        "grid_point": None,
+        "point_px": None,
+        "instances": None,
+    }
+    assert a["left box"]["point_px"] == [50, 60] and a["left box"]["instances"] == 1
+    assert a["left box"]["masks"][0]["raster_is_bounds_size"] is True
+    b = {r["part"]: r for r in result["arm_b_rows"]}
+    assert b["left box"]["region_ids"] == [1, 99] and b["left box"]["invalid_ids"] == [99]
+    assert b["right box"]["region_ids"] is None
+    assert (result["arm_b"]["regions"], result["arm_b"]["regions_assigned"]) == (2, 1)
+    assert result["arm_b"]["regions_unassigned"] == 1
+    assert result["calls"] == 4
+    sheet = (out / "index.html").read_text()
+    assert "left box" in sheet and "pass/fail" in sheet and "—" not in sheet
+    for img in ("b_regions", "a_left_box", "b_left_box"):
+        assert (out / "img" / f"{img}.jpg").is_file()
+    assert json.loads((out / "results.json").read_text())["calls"] == 4
+
+
+def test_a_figure_with_too_many_parts_stops_after_the_listing(tmp_path: Path) -> None:
+    seen: list[str] = []
+    live = mock_caller(tmp_path, [f"part {i}" for i in range(23)], seen)
+    out = tmp_path / "out"
+    result = asyncio.run(bake.bake(live, small_figure(tmp_path), record=False, out_dir=out))
+    assert seen == ["FigureUnderstanding"] and "stopped" in result
+    assert not (out / "index.html").exists()
+
+
+@pytest.mark.parametrize("name", sorted(bake.FIGURES))
+def test_each_bakeoff_figure_is_in_the_repo(name: str) -> None:
+    assert bake.FIGURES[name].is_file()

@@ -15,3 +15,4 @@ dist/
 eval/**/*.mp4
 eval/**/*.mov
 eval/**/*.webm
+eval/s2-bakeoff/*/img/
