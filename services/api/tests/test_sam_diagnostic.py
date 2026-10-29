@@ -119,6 +119,7 @@ def test_every_case_with_instances_is_decoded_and_checked(tmp_path: Path) -> Non
             "bounds": [10, 20, 13, 22],
             "raster_hw": [2, 3],
             "raster_is_bounds_size": True,
+            "raster_scale": [1.0, 1.0],
             "inside_image": True,
             "px": 4,
         }
@@ -132,3 +133,23 @@ def test_overlay_marks_the_mask_pixels_at_their_bounds() -> None:
     out = sam_diagnostic.overlay(image, [inst])
     assert (out[20, 10] != 255).any() and (out[20, 11] == 255).all()
     assert (out[21, 10:13] != 255).any(axis=1).all()
+
+
+def test_a_raster_smaller_than_its_bounds_is_stretched_for_the_overlay() -> None:
+    """heart.png whole, Oct 29: bounds 928 x 1423, raster 668 x 1024. The overlay must not
+    assume the raster is the bounds size."""
+    small = sam_adapter.Decoded("0", 0.5, (4, 2, 10, 6), np.array([[True, False]] * 2), None)
+    out = sam_diagnostic.overlay(np.full((10, 12, 3), 255, np.uint8), [small])
+    painted = (out != 255).any(axis=2)
+    assert painted[2:6, 4:7].all() and not painted[2:6, 7:10].any()
+    assert painted.sum() == 12
+    [check] = [sam_diagnostic.checks(small, (10, 12))]
+    assert check["raster_is_bounds_size"] is False and check["raster_scale"] == [0.5, 0.3333]
+
+
+def test_a_subset_of_cases_runs_only_those(tmp_path: Path) -> None:
+    sent: list[str] = []
+    live = caller(tmp_path, answer(ONE), sent)
+    rest = sam_diagnostic.CASES[2:]
+    rows, stopped = asyncio.run(sam_diagnostic.run(live, record=False, out_dir=None, cases=rest))
+    assert not stopped and sent == [c.phrase for c in rest] and len(rows) == len(rest)

@@ -66,21 +66,30 @@ def checks(inst: sam_adapter.Decoded, image_hw: tuple[int, int]) -> dict[str, An
         "bounds": list(inst.bounds),
         "raster_hw": list(inst.raster.shape),
         "raster_is_bounds_size": inst.raster.shape == (bottom - top, right - left),
+        "raster_scale": [
+            round(inst.raster.shape[0] / (bottom - top), 4),
+            round(inst.raster.shape[1] / (right - left), 4),
+        ],
         "inside_image": 0 <= left < right <= w and 0 <= top < bottom <= h,
         "px": int(inst.raster.sum()),
     }
 
 
 def overlay(image: npt.NDArray[np.uint8], insts: list[sam_adapter.Decoded]) -> npt.NDArray[Any]:
-    """The image with each decoded raster painted red at its bounds, half transparent."""
+    """The image with each decoded raster painted red at its bounds, half transparent. A
+    raster smaller than its bounds (SAM sends one at most 1024 px on a side) is stretched to
+    them, nearest pixel, for viewing only."""
     out = image.astype(np.float32)
-    h, w = out.shape[:2]
     for inst in insts:
         if inst.raster is None:
             continue
         left, top, right, bottom = inst.bounds
+        rh, rw = inst.raster.shape
+        rows = np.arange(bottom - top) * rh // (bottom - top)
+        cols = np.arange(right - left) * rw // (right - left)
+        stretched = inst.raster[rows][:, cols]
         region = out[top:bottom, left:right]
-        mask = inst.raster[: min(bottom, h) - top, : min(right, w) - left]
+        mask = stretched[: region.shape[0], : region.shape[1]]
         region[mask] = region[mask] * 0.5 + np.array([255.0, 0.0, 0.0]) * 0.5
     return out.astype(np.uint8)
 
@@ -125,11 +134,11 @@ async def one(live: LiveCaller, case: Case, record: bool, out_dir: Path | None) 
 
 
 async def run(
-    live: LiveCaller, record: bool, out_dir: Path | None
+    live: LiveCaller, record: bool, out_dir: Path | None, cases: list[Case] = CASES
 ) -> tuple[list[dict[str, Any]], bool]:
-    """Every case in order. Returns the rows and whether the control stopped the run."""
+    """The cases in order. Returns the rows and whether the control stopped the run."""
     rows = []
-    for case in CASES:
+    for case in cases:
         row = await one(live, case, record, out_dir)
         rows.append(row)
         if case == CONTROL_CASE and not row["instances"]:
@@ -140,10 +149,18 @@ async def run(
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--record", action="store_true", help="save each call to fixtures/recorded/")
+    ap.add_argument("--cases", help="comma-separated case names, to run only those")
     args = ap.parse_args()
+    cases = CASES
+    if args.cases:
+        by_name = {c.name: c for c in CASES}
+        unknown = [n for n in args.cases.split(",") if n not in by_name]
+        if unknown:
+            ap.error(f"unknown cases {unknown}; known: {list(by_name)}")
+        cases = [by_name[n] for n in args.cases.split(",")]
     live = LiveCaller.from_env(load_tactile_rules().meta, recorder=Recorder())
     try:
-        rows, stopped = asyncio.run(run(live, args.record, OUT_DIR))
+        rows, stopped = asyncio.run(run(live, args.record, OUT_DIR, cases))
     except LiveCallError as exc:
         print(f"stopped: {exc}", file=sys.stderr)
         sys.exit(1)
