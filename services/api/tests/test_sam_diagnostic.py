@@ -17,6 +17,7 @@ from app.config import load_tactile_rules
 from app.meta import sam_adapter, sam_diagnostic
 from app.meta.cost import CostMeter
 from app.meta.live import Ledger, LiveCaller
+from app.meta.record import ReplayTransport
 from app.paths import RECORDED_DIR
 
 RULES = load_tactile_rules()
@@ -153,3 +154,29 @@ def test_a_subset_of_cases_runs_only_those(tmp_path: Path) -> None:
     rest = sam_diagnostic.CASES[2:]
     rows, stopped = asyncio.run(sam_diagnostic.run(live, record=False, out_dir=None, cases=rest))
     assert not stopped and sent == [c.phrase for c in rest] and len(rows) == len(rest)
+
+
+def test_replay_of_the_live_diagnostic(tmp_path: Path) -> None:
+    """The Oct 29 live run replayed through the same code. SAM finds the banana and the whole
+    heart, one instance each, and no part of the heart in either phrasing. The banana raster
+    is its bounds size; the heart raster is scaled to 1024 px on its longer side."""
+    live = LiveCaller(
+        key="unused-in-replay",
+        base_url="https://api.meta.ai/v1",
+        ledger=Ledger(tmp_path / "ledger.jsonl"),
+        meter=CostMeter(RULES.meta),
+        cap=RULES.meta.live_call_cap,
+        transport=ReplayTransport.from_files(
+            [RECORDED_DIR / f"sam_diag_{c.name}.json" for c in sam_diagnostic.CASES]
+        ),
+    )
+    rows, stopped = asyncio.run(sam_diagnostic.run(live, record=False, out_dir=None))
+    assert not stopped and live.calls == len(sam_diagnostic.CASES)
+    found = {r["case"]: r["instances"] for r in rows}
+    assert found.pop("control_banana") == 1 and found.pop("heart_whole") == 1
+    assert set(found.values()) == {0}
+    banana, heart = (r["masks"][0] for r in rows[:2])
+    assert banana["decodes"] and banana["raster_is_bounds_size"] and banana["inside_image"]
+    assert banana["bounds"] == [47, 44, 978, 855] and rows[0]["confidences"][0] > 0.95
+    assert heart["decodes"] and not heart["raster_is_bounds_size"] and heart["inside_image"]
+    assert (heart["bounds"], heart["raster_hw"]) == ([655, 136, 1583, 1559], [1024, 668])

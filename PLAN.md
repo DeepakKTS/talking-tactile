@@ -254,7 +254,7 @@ Stretch (after the hackathon unless everything is green)
 
 ## 17. Settle on Day 1
 
-- SAM 3.1 hosted request shape: one phrase or many per call, mask format returned. From the docs (Oct 24): model `sam-3.1` on `POST /v1/responses`, one concept per request, every instance returned as a box plus a box-local mask in special-token text, `one_bit` or `lossless` encoding, optional confidence. Confirm with the live spike
+- SAM 3.1 hosted request shape: one phrase or many per call, mask format returned. From the docs (Oct 24): model `sam-3.1` on `POST /v1/responses`, one concept per request, every instance returned as a box plus a box-local mask in special-token text, `one_bit` or `lossless` encoding, optional confidence. Confirm with the live spike. Live, Oct 29 (spikes/sam.md, SAM diagnostic): that shape holds, except that a mask raster can be smaller than its bounds (a 1423 px tall box came with a 1024 px tall raster), so masks are scaled to their bounds. Concept prompts found the whole heart on heart.png and none of its parts.
 - Voice realtime event names and the keyword hint parameter. From the docs (Oct 24): handshake JSON first with the key in `authorization.accessToken`, `keywords` and `languageBias` set only there, `transcript` events with `final: true` in `PUSH_TO_TALK`. `PCM_24KHZ` is native and `PCM_16KHZ` is resampled, so 5.1 and 8 may move to 24 kHz after the spike. A file endpoint, `POST /v1/asr/transcribe`, exists for the push-to-talk fallback
 - Whether Muse Spark 1.3 caches a repeated prompt prefix
 - Real latencies for each call

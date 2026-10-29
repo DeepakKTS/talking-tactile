@@ -7,7 +7,9 @@ What the docs say (read 2026-10-24; spikes/sam.md has the links):
 - Output is special-token text in the output_text lane, one entry per instance:
   `<0f>id<|box;...|><|mask;...;data=H,W,!payload|>`. The payload is base85.
 - Masks are box-local: each covers only its instance's box, with half-open bounds in
-  source image pixels, and the raster size equals the bounds size.
+  source image pixels, and the raster size equals the bounds size. Live, Oct 29, that held
+  for a 931 x 811 box but not for a 928 x 1423 one, which came with a 668 x 1024 raster:
+  the same shape, scaled so its longer side is 1024. One sample, so the rule is inferred.
 - `metadata.mask_encoding: "one_bit"` gives the smallest masks;
   `metadata.include_confidence: "true"` (a string) adds a score per instance.
 - The Python package meta_sam_parser 0.1.0 decodes the stream:
@@ -15,13 +17,14 @@ What the docs say (read 2026-10-24; spikes/sam.md has the links):
   `await .final_result()`. The events need output_text.delta with output_index,
   content_index and item_id, then output_text.done, then response.completed.
 
-So to_masks will paste each box-local raster into a full-size bool array the size of the
-normalized image, label it with the phrase and give it the instance confidence.
+So to_masks will scale each box-local raster to its bounds, paste it into a full-size bool
+array the size of the normalized image, label it with the phrase and give it the instance
+confidence.
 
-The request body and stream parsing below were confirmed by one live call on Oct 27
-(fixtures/recorded/smoke_sam_heart_left_ventricle.json): HTTP 200, a completed stream, and
-zero instances, which parses to no records. to_masks is not built yet: no real answer with
-an instance has been seen (tracker d1-6, the SAM spike), and we do not guess Meta's formats.
+The request body and stream parsing below were confirmed live on Oct 27 (zero instances,
+which parses to no records) and Oct 29 (fixtures/recorded/sam_diag_*.json: a banana photo
+and heart.png as a whole each gave one instance, and decoded() reads both masks). to_masks
+is not built yet: it waits for review of that diagnostic (tracker d1-6).
 """
 
 import base64
@@ -114,6 +117,6 @@ def to_masks(
     if not parsed.records:
         return []
     raise NotImplementedError(
-        "Decoding SAM masks waits for a real answer with instances (tracker d1-6, the SAM "
-        "spike). The only live answer so far had none."
+        "Turning SAM answers into Masks waits for review of the Oct 29 diagnostic (tracker "
+        "d1-6): rasters can be smaller than their bounds."
     )

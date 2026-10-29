@@ -18,7 +18,8 @@ Script: `uv run spikes/sam_spike.py` (Python 3.11, httpx, meta-sam-parser 0.1.0,
 - Every matching instance comes back, each as a box plus a mask. Zero matches is a valid result, not an error.
 - `stream: true` is recommended. Output is special-token text in the `output_text` lane: `<0f>id<|box;...|><|mask;...;data=H,W,!payload|>,...`
 - `metadata.mask_encoding: "one_bit"` gives the smallest masks. `metadata.include_confidence: "true"` is a string, not a boolean.
-- Masks are box-local. `meta_sam_parser` returns each mask with half-open bounds in source pixels, and the raster size equals the bounds size. This was checked offline with the docs example.
+- Masks are box-local. `meta_sam_parser` returns each mask with half-open bounds in source pixels, and the raster size equals the bounds size. This was checked offline with the docs example. Live on Oct 29 it held for a box under 1024 px, not for a larger one (see Results).
+- The docs list no confidence, score or threshold parameter, and no instance limit for images (segmenting and reading-segmentation pages, read Oct 29). The only metadata keys are `mask_encoding` (default `lossless`) and `include_confidence`. We send `one_bit` and `"true"`.
 - Python parser: `parse_responses_stream(events, image_segmentation_format())`, then `await .final_result()`. The events need the full Responses lane: `output_text.delta` with `output_index`, `content_index` and `item_id`, then `output_text.done`, then `response.completed`.
 - Price: $2.50 per 1,000 images. 3,000 RPM per team.
 
@@ -42,3 +43,20 @@ Smoke call, Oct 27, one call through `app/meta/smoke.py` (response in `fixtures/
 - Works: model id `sam-3.1` on `POST /v1/responses`, streamed, with the request shape above. HTTP 200 in 1269 ms, 8 events ending in `response.completed` with `status: completed`. That settles the model id question: `sam-3.1`. Usage is on `response.completed`: `{"images_processed": 1, "input_tokens": 0, ...}`. Cost $0.0025.
 - Surprised: "left ventricle" on heart.png found zero instances. There was no `output_text.delta` at all, and `output_text.done` had empty text. `meta_sam_parser` parses that to no records, with no error.
 - The wrapper must: treat zero deltas as a valid empty result. Decoding a real non-empty mask is still unchecked, so the adapter needs one real answer with instances before it is written. Whether SAM finds the chambers on this line art is the Day 1 risk in PLAN.md section 15, and it is still open.
+
+SAM diagnostic, Oct 29, 8 calls through `app/meta/sam_diagnostic.py` (Gate A step 4.1; responses in `fixtures/recorded/sam_diag_*.json`). Same request as S2: one phrase, `one_bit`, confidence on, the image file as it is.
+
+| Image | Prompt | Instances | Confidence | Latency ms | Cost |
+|---|---|---|---|---|---|
+| control/banana.png 1024x902 (photo) | banana | 1 | 0.977 | 1904 | $0.0025 |
+| heart.png 2048x1612 | heart | 1 | 0.570 | 1261 | $0.0025 |
+| heart.png | left ventricle | 0 | | 2441 | $0.0025 |
+| heart.png | left ventricle of the heart | 0 | | 2189 | $0.0025 |
+| heart.png | aorta | 0 | | 2159 | $0.0025 |
+| heart.png | aorta of the heart | 0 | | 2647 | $0.0025 |
+| heart.png | right atrium | 0 | | 1689 | $0.0025 |
+| heart.png | right atrium of the heart | 0 | | 1113 | $0.0025 |
+
+- Works: the request and the decoding. The banana mask decodes to the banana, row-major, on its box (bounds 47,44 to 978,855, raster 811x931, the bounds size). The heart mask decodes to the whole heart silhouette, vessels included, with gaps where label leader lines cross it. So the zero answers are SAM's answer, not our request.
+- Surprised: SAM finds the heart as one object and none of its parts, in either phrasing. The heart raster was 1024x668 for bounds 1423x928, the same shape scaled so its longer side is 1024. The docs say the raster equals the bounds size. One sample, so "at most 1024 px on a side" is inferred, not documented.
+- The wrapper must: scale each raster to its bounds before pasting it. Not decided here: how S2 gets parts when concept prompts find only the whole figure. Latency counts only on the two answers with instances (1261 and 1904 ms), too few for p50 and p95.
