@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 118, updated 2026-10-29T17:35:33.732Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 123, updated 2026-10-29T17:51:27.285Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -45,10 +45,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d1-5 Spike Muse Spark (1 h) [blocked]
   - One figure in, structured parts list out. Use the meta-api-spike skill.
   - Note: Script and notes written from the docs: spikes/spark_spike.py (understand case with heart.png and S1 schema, answer case streamed with TTFT and cache check), spikes/muse-spark.md. Dry run passes on Python 3.11 via uv. Blocked on the API key in services/api/.env.
-- [ ] d1-6 Spike SAM 3.1 (1.5 h) [blocked]
+- [ ] d1-6 Spike SAM 3.1 (1.5 h) [doing]
   - Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.
   - Fallback: Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.
-  - Note: Script and notes written from the docs: spikes/sam_spike.py (5 heart phrases x2 plus text, streamed, parsed with meta-sam-parser, overlays to spikes/out/sam/), spikes/sam.md. Parser wiring and mask placement checked offline with the docs example. Blocked on the API key.
+  - Note: Oct 29 SAM diagnostic (app/meta/sam_diagnostic.py, 8 live calls, $0.020, spikes/sam.md): banana control 1 instance at 0.977, heart.png whole 1 at 0.570, left ventricle, aorta and right atrium 0 in both phrasings. Request and mask decoding verified on both answers. A raster can be smaller than its bounds (668 x 1024 for 928 x 1423). Waiting for Deepak's review before 4.2. SAM p50 and p95 not measured: only 2 answers had instances.
 - [ ] d1-7 Spike Muse Voice Transcribe (1 h) [blocked]
   - Stream 10 seconds of audio. Get partial and final text. Try keyword hints.
   - Fallback: Use push-to-talk sync mode if realtime is awkward.
@@ -234,4 +234,5 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Open issues
 
-None. Add one with scripts/tracker.py issue.
+- (medium) ASR heard "aorta" as "order" on a synthetic clip with no hints
+- (high) SAM returned zero instances for "left ventricle" on heart.png in 2 of 2 live calls; diagnostic in progress

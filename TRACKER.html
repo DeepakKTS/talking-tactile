@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 118,
- "updated_at": "2026-10-29T17:35:33.732Z",
+ "rev": 123,
+ "updated_at": "2026-10-29T17:51:27.285Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -740,14 +740,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.",
    "timebox": "1.5 h",
    "fallback": "Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.",
-   "status": "blocked",
-   "note": "Script and notes written from the docs: spikes/sam_spike.py (5 heart phrases x2 plus text, streamed, parsed with meta-sam-parser, overlays to spikes/out/sam/), spikes/sam.md. Parser wiring and mask placement checked offline with the docs example. Blocked on the API key.",
+   "status": "doing",
+   "note": "Oct 29 SAM diagnostic (app/meta/sam_diagnostic.py, 8 live calls, $0.020, spikes/sam.md): banana control 1 instance at 0.977, heart.png whole 1 at 0.570, left ventricle, aorta and right atrium 0 in both phrasings. Request and mask decoding verified on both answers. A raster can be smaller than its bounds (668 x 1024 for 928 x 1423). Waiting for Deepak's review before 4.2. SAM p50 and p95 not measured: only 2 answers had instances.",
    "done_at": null,
    "tags": [
     "spike",
     "models"
    ],
-   "changed_at": "2026-10-24T06:37:11.217Z"
+   "changed_at": "2026-10-29T17:51:27.244Z"
   },
   {
    "id": "d1-7",
@@ -2031,6 +2031,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "origin is https://github.com/DeepakKTS/talking-tactile, created Oct 29 with gh repo create --private. main and early-start pushed; gh repo view reports visibility PRIVATE. Before the push: all-branch history grep found no credential (gitleaks and trufflehog not installed), nothing over 10 MB (largest hand_landmarker.task 7.46 MB), video under eval/ ignored. The repo becomes public only at submission.",
    "why": "Judges need a public repo at submission, but until then a remote is a backup, not a publication. Private keeps half-built code, recorded API responses and commit metadata off the open web until the submission check.",
    "changed_at": "2026-10-29T17:35:33.732Z"
+  },
+  {
+   "id": "dec-mvtub2x0b82f",
+   "date": "2026-10-29",
+   "title": "Gate A means the three spikes; zero SAM instances do not pass; SAM latency counts only on responses with instances",
+   "decision": "Gate A is d1-5 to d1-7 (Spark, SAM, Voice spikes) with p50 and p95 latency written to spikes/. It is not the 20-figure authoring eval, which comes after d1-8. A SAM response with zero instances is not a real result for the gate, and SAM latency is measured only on responses that return instances.",
+   "why": "Deepak's reading of the gate definition, Oct 29. A completed stream with nothing in it shows the endpoint answers, not that S2 can use it; counting fast empty answers would flatter both the gate and the latency numbers.",
+   "changed_at": "2026-10-29T17:51:27.113Z"
   }
  ],
  "risks": [
@@ -2093,6 +2101,24 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [
   {
+   "id": "i-mvtub2znb0gu",
+   "ts": "2026-10-29T17:51:27.203Z",
+   "title": "ASR heard \"aorta\" as \"order\" on a synthetic clip with no hints",
+   "severity": "medium",
+   "status": "open",
+   "note": "",
+   "changed_at": "2026-10-29T17:51:27.203Z"
+  },
+  {
+   "id": "i-mvtub2ye2qnc",
+   "ts": "2026-10-29T17:51:27.157Z",
+   "title": "SAM returned zero instances for \"left ventricle\" on heart.png in 2 of 2 live calls; diagnostic in progress",
+   "severity": "high",
+   "status": "open",
+   "note": "",
+   "changed_at": "2026-10-29T17:51:27.157Z"
+  },
+  {
    "id": "i-mvmvgtgm6qh2",
    "ts": "2026-10-24T20:49:31.174Z",
    "title": "Touch to earcon cannot meet the 100 ms budget (RULES 4) while explore.yaml enter_hold_ms is 120: headless enter to earcon is 141.6 ms p95 before any camera latency (code is 0.3 ms of it). Either the budget means code after the hold, or the hold must drop to about 60 ms and the border flicker property rechecked. Decide with the touch eval.",
@@ -2103,6 +2129,31 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-29T17:51:27.285Z",
+   "kind": "claude",
+   "text": "SAM diagnostic Oct 29: 8 live calls, $0.020, all HTTP 200. Instances: banana 1, heart 1, six heart-part prompts 0. Live spend so far $0.02681 over 12 calls (eval/live/ledger.jsonl)."
+  },
+  {
+   "ts": "2026-10-29T17:51:27.244Z",
+   "kind": "claude",
+   "text": "Task d1-6 \"Spike SAM 3.1\" is now doing. Note: Oct 29 SAM diagnostic (app/meta/sam_diagnostic.py, 8 live calls, $0.020, spikes/sam.md): banana control 1 instance at 0.977, heart.png whole 1 at 0.570, left ventricle, aorta and right atrium 0 in both phrasings. Request and mask decoding verified on both answers. A raster can be smaller than its bounds (668 x 1024 for 928 x 1423). Waiting for Deepak's review before 4.2. SAM p50 and p95 not measured: only 2 answers had instances."
+  },
+  {
+   "ts": "2026-10-29T17:51:27.203Z",
+   "kind": "claude",
+   "text": "Issue opened: ASR heard \"aorta\" as \"order\" on a synthetic clip with no hints."
+  },
+  {
+   "ts": "2026-10-29T17:51:27.157Z",
+   "kind": "claude",
+   "text": "Issue opened: SAM returned zero instances for \"left ventricle\" on heart.png in 2 of 2 live calls; diagnostic in progress."
+  },
+  {
+   "ts": "2026-10-29T17:51:27.113Z",
+   "kind": "claude",
+   "text": "Decision: Gate A means the three spikes; zero SAM instances do not pass; SAM latency counts only on responses with instances."
+  },
   {
    "ts": "2026-10-29T17:35:33.732Z",
    "kind": "claude",
