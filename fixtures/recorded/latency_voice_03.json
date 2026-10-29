@@ -1,0 +1,28 @@
+{
+ "recorded_at": "2026-10-29T20:30:43+00:00",
+ "model": "muse-voice-transcribe-1.0",
+ "request": {
+  "method": "POST",
+  "path": "/asr/transcribe",
+  "multipart": {
+   "request": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "PUSH_TO_TALK",
+    "languageBias": [
+     "English"
+    ]
+   },
+   "audio": "<data audio/wav sha256=a3e753e7956070cc532d4c6f67a690c3fc35810905b7f0988c472f12dd14213e bytes=87104>"
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "sessionId": "voyager/transcribe/0AA7F5CB3FBA4E91BCE955A28D09EF39",
+   "transcript": "Where is the order? What does the left ventricle do?",
+   "audioDurationMs": 2800,
+   "turns": []
+  }
+ }
+}

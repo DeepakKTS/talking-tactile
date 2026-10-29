@@ -1,0 +1,83 @@
+{
+ "model": "muse-voice-transcribe-1.0",
+ "latency": {
+  "n": 10,
+  "p50_ms": 957.3,
+  "p95_ms": 1221.4,
+  "min_ms": 839.4,
+  "max_ms": 1221.4
+ },
+ "request": "file endpoint, question_aorta_ventricle.wav, 2.72 s, no keywords",
+ "runs": [
+  {
+   "run": 1,
+   "status": 200,
+   "latency_ms": 1221.4,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 2,
+   "status": 200,
+   "latency_ms": 895.3,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 3,
+   "status": 200,
+   "latency_ms": 959.2,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 4,
+   "status": 200,
+   "latency_ms": 1070.6,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 5,
+   "status": 200,
+   "latency_ms": 957.3,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 6,
+   "status": 200,
+   "latency_ms": 922.6,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 7,
+   "status": 200,
+   "latency_ms": 924.7,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 8,
+   "status": 200,
+   "latency_ms": 1001.4,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 9,
+   "status": 200,
+   "latency_ms": 839.4,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  },
+  {
+   "run": 10,
+   "status": 200,
+   "latency_ms": 1137.7,
+   "cost_usd": 0.00015000000000000001,
+   "audio_duration_ms": 2800
+  }
+ ]
+}

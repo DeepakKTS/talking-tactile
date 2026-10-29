@@ -29,7 +29,17 @@ The realtime client was checked against a local fake server: handshake, partial,
 
 ## Results
 
-The full spike (realtime WebSocket, three configs four times each, plus the file endpoint twice) has not run yet. The realtime endpoint is untested.
+The realtime WebSocket configs have not run yet. The realtime endpoint is untested.
+
+Keyword hints, docs reread 2026-10-29 (speech-to-text and api-reference/voice/schemas): the transcribe endpoint takes them. The parameter is `keywords`, an array of strings, in the `request` JSON part (schema "Transcribe Request"), the same field as in the realtime handshake. Docs: "Terms to bias recognition toward ... Biasing does not guarantee an exact spelling." It is set once, at the start of a request or session. The docs give no limit on the number of keywords. Not yet sent live.
+
+File endpoint latency, Oct 29, 10 live calls through `app/meta/latency_spike.py voice` (per run in `spikes/results/latency_voice.json`, responses in `fixtures/recorded/latency_voice_*.json`). The request is the smoke call's: `fixtures/audio/question_aorta_ventricle.wav`, 2.72 s, 16 kHz mono, `PUSH_TO_TALK`, `languageBias: ["English"]`, no keywords. Timed from request to full answer. Nearest-rank percentiles, so p95 of 10 is the slowest run.
+
+| n | p50 | p95 | min | max | cost |
+|---|---|---|---|---|---|
+| 10 | 957 ms | 1221 ms | 839 ms | 1221 ms | $0.00150 |
+
+10 of 10 HTTP 200, `audioDurationMs` 2800 every run, billed as 3 s each. Word error is not measured here: it waits for real recordings of the 10 questions in `eval/voice/record-list.md`.
 
 Smoke call, Oct 27, one call to the file endpoint through `app/meta/smoke.py` (response in `fixtures/recorded/smoke_voice_transcribe.json`):
 
