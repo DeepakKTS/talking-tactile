@@ -68,3 +68,14 @@ S2 bake-off, Oct 29 (Gate A step 4.1b, `app/meta/s2_bakeoff.py`; sheets in `eval
 - Arm B regions (ink under luminance 64, 5 px square closing, 2 mm2 floor): heart 11, flower 30, Japan 47. Spark assigned 9, 24 and 47 of them. Luminance finds dark-line boundaries; heart.png's chamber walls are fills, not dark lines.
 - Spark: the list, points and naming calls took 5 to 15 s, 4.5 to 7.5 s and 14.5 to 92 s, at reasoning effort medium. The naming call on Japan cost $0.0998.
 - Decoding speed: `meta_sam_parser.decode_mask_to_raster` is pure Python and re-encodes each mask to check it, about 0.3 to 0.9 s for a mask of a few hundred px a side. S2 must decode each mask once.
+
+SAM latency for Gate A, Oct 29, no new calls (`app/meta/latency_spike.py sam`, per answer in `spikes/results/latency_sam.json`): the 44 point-prompt answers from the bake-off, all with 1 instance, so all count. Each is timed from request to the end of the stream, one point on the full figure (heart 2048x1612, flower 2048x1183, Japan 1796x2048). Nearest-rank percentiles.
+
+| Answers | n | p50 | p95 | min | max |
+|---|---|---|---|---|---|
+| All | 44 | 1207 ms | 3632 ms | 740 ms | 7738 ms |
+| heart | 19 | 1426 ms | 3690 ms | 871 ms | 3690 ms |
+| flower | 16 | 1207 ms | 7738 ms | 835 ms | 7738 ms |
+| japan_regions | 9 | 1009 ms | 1441 ms | 740 ms | 1441 ms |
+
+These are point prompts, not the phrase prompts S2 was first planned around. Phrase-prompt answers with instances are still only the 2 from the diagnostic. The slowest answer, 7738 ms for the flower's ovules, is one call; the next slowest are 3690 and 3632 ms on the heart. The p95 of 44 is the 42nd fastest.

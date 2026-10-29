@@ -1,0 +1,321 @@
+{
+ "model": "sam-3.1",
+ "latency": {
+  "n": 44,
+  "p50_ms": 1207.0,
+  "p95_ms": 3632.1,
+  "min_ms": 740.1,
+  "max_ms": 7738.2
+ },
+ "request": "point prompts from the Oct 29 S2 bake-off, answers with at least one instance",
+ "runs": [
+  {
+   "figure": "flower",
+   "part": "ovules",
+   "status": 200,
+   "latency_ms": 7738.2,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "pistil group",
+   "status": 200,
+   "latency_ms": 900.5,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "stigma",
+   "status": 200,
+   "latency_ms": 2115.2,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "style",
+   "status": 200,
+   "latency_ms": 1708.7,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "ovary",
+   "status": 200,
+   "latency_ms": 1194.6,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "petal",
+   "status": 200,
+   "latency_ms": 835.2,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "sepal",
+   "status": 200,
+   "latency_ms": 992.9,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "perianth group",
+   "status": 200,
+   "latency_ms": 1337.9,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "nectary",
+   "status": 200,
+   "latency_ms": 1207.0,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "floral axis",
+   "status": 200,
+   "latency_ms": 1750.0,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "pedicel",
+   "status": 200,
+   "latency_ms": 1044.0,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "connective",
+   "status": 200,
+   "latency_ms": 977.0,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "pollen sac",
+   "status": 200,
+   "latency_ms": 1389.6,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "anther",
+   "status": 200,
+   "latency_ms": 1110.5,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "filament stalk",
+   "status": 200,
+   "latency_ms": 1941.0,
+   "instances": 1
+  },
+  {
+   "figure": "flower",
+   "part": "stamen group",
+   "status": 200,
+   "latency_ms": 1884.5,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "brachiocephalic artery",
+   "status": 200,
+   "latency_ms": 1425.6,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "superior vena cava",
+   "status": 200,
+   "latency_ms": 2077.3,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "right pulmonary arteries",
+   "status": 200,
+   "latency_ms": 1687.9,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "right pulmonary veins",
+   "status": 200,
+   "latency_ms": 1712.2,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "right atrium",
+   "status": 200,
+   "latency_ms": 2636.1,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "tricuspid valve",
+   "status": 200,
+   "latency_ms": 2348.3,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "chordae tendineae",
+   "status": 200,
+   "latency_ms": 1105.1,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "right ventricle",
+   "status": 200,
+   "latency_ms": 1048.7,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "inferior vena cava",
+   "status": 200,
+   "latency_ms": 3632.1,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "left common carotid artery",
+   "status": 200,
+   "latency_ms": 1264.3,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "left subclavian artery",
+   "status": 200,
+   "latency_ms": 870.6,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "aorta",
+   "status": 200,
+   "latency_ms": 1130.1,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "left pulmonary arteries",
+   "status": 200,
+   "latency_ms": 1124.1,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "left pulmonary veins",
+   "status": 200,
+   "latency_ms": 1446.9,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "left atrium",
+   "status": 200,
+   "latency_ms": 3690.3,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "semilunar valves",
+   "status": 200,
+   "latency_ms": 1538.1,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "mitral valve",
+   "status": 200,
+   "latency_ms": 1053.2,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "left ventricle",
+   "status": 200,
+   "latency_ms": 1120.8,
+   "instances": 1
+  },
+  {
+   "figure": "heart",
+   "part": "septum",
+   "status": 200,
+   "latency_ms": 1373.9,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Hokkaido region",
+   "status": 200,
+   "latency_ms": 890.2,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Tohoku region",
+   "status": 200,
+   "latency_ms": 837.7,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Kanto region",
+   "status": 200,
+   "latency_ms": 1008.5,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Chubu region",
+   "status": 200,
+   "latency_ms": 1441.3,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Kansai region",
+   "status": 200,
+   "latency_ms": 1154.7,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Chugoku region",
+   "status": 200,
+   "latency_ms": 1170.8,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Shikoku region",
+   "status": 200,
+   "latency_ms": 1253.4,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Kyushu region",
+   "status": 200,
+   "latency_ms": 740.1,
+   "instances": 1
+  },
+  {
+   "figure": "japan_regions",
+   "part": "Okinawa inset region",
+   "status": 200,
+   "latency_ms": 916.4,
+   "instances": 1
+  }
+ ]
+}
