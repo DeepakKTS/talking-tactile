@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 123, updated 2026-10-29T17:51:27.285Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 126, updated 2026-10-29T18:19:33.377Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
