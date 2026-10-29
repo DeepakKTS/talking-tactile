@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 117,
- "updated_at": "2026-10-28T00:39:45.834Z",
+ "rev": 118,
+ "updated_at": "2026-10-29T17:35:33.732Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2023,6 +2023,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "A successful live call can be saved to fixtures/recorded/ (no headers, key redacted, image and audio as sha256 and size) and served back by ReplayTransport through the same LiveCaller code. tests/test_live_replay.py replays the Oct 27 Spark, SAM and Voice smoke responses. Hand-written responses in test_live_ledger.py and test_live_record.py stay for errors (401, 500, missing usage, cap, no recording). MockMetaClient (synthetic figure) still feeds the pipeline tests: they get replay variants once real S1 and S2 answers for a figure are recorded.",
    "why": "Real responses catch shape drift that a hand-written mock repeats. Errors are cheap and safe to fake, but costly or impossible to provoke live.",
    "changed_at": "2026-10-28T00:33:21.782Z"
+  },
+  {
+   "id": "dec-mvttqna87t6i",
+   "date": "2026-10-29",
+   "title": "Repo pushed to private GitHub remote; made public only at submission",
+   "decision": "origin is https://github.com/DeepakKTS/talking-tactile, created Oct 29 with gh repo create --private. main and early-start pushed; gh repo view reports visibility PRIVATE. Before the push: all-branch history grep found no credential (gitleaks and trufflehog not installed), nothing over 10 MB (largest hand_landmarker.task 7.46 MB), video under eval/ ignored. The repo becomes public only at submission.",
+   "why": "Judges need a public repo at submission, but until then a remote is a backup, not a publication. Private keeps half-built code, recorded API responses and commit metadata off the open web until the submission check.",
+   "changed_at": "2026-10-29T17:35:33.732Z"
   }
  ],
  "risks": [
@@ -2095,6 +2103,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-29T17:35:33.732Z",
+   "kind": "claude",
+   "text": "Decision: Repo pushed to private GitHub remote; made public only at submission."
+  },
   {
    "ts": "2026-10-28T00:39:45.834Z",
    "kind": "claude",
