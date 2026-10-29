@@ -41,6 +41,31 @@ Credit line: "Banana-Single.jpg by Evan-Amos, CC BY-SA 3.0, via Wikimedia Common
 
 The voice is Apple's macOS speech synthesis, so Apple's terms for its system voices apply. Replace this clip with a recording of our own voice before anything built from it is shown publicly.
 
+## apps/web/public/models/hand_landmarker.task
+
+| | |
+|---|---|
+| Title | MediaPipe Hand Landmarker, float16, version 1 |
+| Author | Google, The MediaPipe Authors |
+| Source | https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task |
+| License | Apache License 2.0. Full text next to the model: `apps/web/public/models/LICENSE` |
+| License checked | 2026-10-29, in the model card "Hand Tracking (Lite/Full) with Fairness, Oct 2021" ("Licensed under: Apache License, Version 2.0"), linked from the MediaPipe Hand Landmarker docs page |
+| Changes | None. sha256 fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1 |
+| Use | Served by the web app so hand tracking works with no network |
+
+## @mediapipe/tasks-vision 1.1.0 (npm), its wasm in the web build
+
+| | |
+|---|---|
+| Title | MediaPipe Tasks Vision |
+| Author | Google, The MediaPipe Authors ("Copyright 2022 The MediaPipe Authors" in the package's source headers) |
+| Source | https://www.npmjs.com/package/@mediapipe/tasks-vision, installed from `apps/web/package.json` |
+| License | Apache License 2.0 (`"license": "Apache-2.0"` in its package.json). The package ships no license file, so the full text is in `apps/web/public/licenses/mediapipe-tasks-vision-LICENSE` and goes into every build |
+| License checked | 2026-10-29, in node_modules/@mediapipe/tasks-vision/package.json |
+| Changes | None. The hand worker imports `vision_wasm_module_internal.js` and `.wasm` by URL, so the build copies them into `dist/assets/` |
+
+The license text in both places is the Apache License 2.0 from https://www.apache.org/licenses/LICENSE-2.0.txt (sha256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30).
+
 ## Not stored here
 
 - The 20 eval figures in `spikes/eval-figures.md` are listed by URL, with their licenses, but not downloaded into the repository. Add each one here if it is ever committed.
