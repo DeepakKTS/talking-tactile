@@ -12,3 +12,6 @@ dist/
 .mypy_cache/
 .ruff_cache/
 .hypothesis/
+eval/**/*.mp4
+eval/**/*.mov
+eval/**/*.webm
