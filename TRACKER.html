@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 149,
- "updated_at": "2026-10-30T03:14:13.225Z",
+ "rev": 151,
+ "updated_at": "2026-10-30T04:05:16.572Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1883,9 +1883,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-10-30T03:07:17.994Z",
-   "item": "Meta Model API, 131 live calls, from eval/live/ledger.jsonl (1 unpriced)",
-   "usd": 0.700338
+   "ts": "2026-10-30T04:05:16.572Z",
+   "item": "Meta Model API, 189 live calls, from eval/live/ledger.jsonl (1 unpriced)",
+   "usd": 0.924678
   }
  ],
  "outreach": [
@@ -2157,6 +2157,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Do not use SAM confidence to decide which masks a person reviews",
    "why": "v1 Arm A, graded Oct 29. Fails at 0.70 or higher: brachiocephalic artery (sliver) 0.820, stamen group (label) 0.777, stigma (sliver) 0.711, Tohoku (partial) 0.711. A pass at 0.443: left pulmonary arteries.",
    "changed_at": "2026-10-30T03:14:13.225Z"
+  },
+  {
+   "id": "dec-mvug8gojutyt",
+   "date": "2026-10-30",
+   "title": "S2 locked: Arm A v2f with flags. Spill masks are never touchable; they go to the teacher.",
+   "decision": "Arm A v2f (app/meta/s2_armav2.py --fixes): guarded points with 6 px clearance, SAM point prompts with negatives, one spill retry, oversize rule at 50%, smaller mask wins with ties to the nearer point; flags needs teacher (no mask, spill) and under point-symbol size",
+   "why": "Live v2f, Oct 30. References held at IoU 0.8: heart 3 of 4, Japan 6 of 7, flower 0 of 5. Needs teacher: heart 6, flower 7, Japan 0. This is the last S2 iteration; d1-8 starts next regardless of the flower result.",
+   "changed_at": "2026-10-30T04:05:16.534Z"
   }
  ],
  "risks": [
@@ -2247,6 +2255,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T04:05:16.572Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $0.924678 over 189 live calls, 1 of them unpriced."
+  },
+  {
+   "ts": "2026-10-30T04:05:16.534Z",
+   "kind": "claude",
+   "text": "Decision: S2 locked: Arm A v2f with flags. Spill masks are never touchable; they go to the teacher."
+  },
   {
    "ts": "2026-10-30T03:14:13.225Z",
    "kind": "claude",
