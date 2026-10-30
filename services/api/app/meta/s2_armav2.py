@@ -29,6 +29,15 @@ goes to the smallest mask claiming it; the pixels each part loses are recorded, 
 that leaves are dropped again. Parts of kind thin keep their result and are marked thin;
 how they appear on the sheet is decided later.
 
+v2f, with --fixes (recordings armav2f_*, files results_v2f.json and v2f.html):
+- Point clearance: a point must sit CLEARANCE_PX from any text, leader line or ink pixel,
+  not just off it; else the guard moves or drops it as above.
+- Empty-mask rule: a part whose mask ends empty stays in the results, flagged "needs
+  teacher". A failed SAM call is flagged the same way instead of stopping the run.
+- Spill retry: after every part's first call, a mask holding another part's prompt point
+  (not one of its children, by Spark's parent field) is asked for once more, with that point
+  added as a negative. Still holding one, the smaller of the two masks is kept, flagged spill.
+
 Writes eval/s2-bakeoff/FIGURE/results_v2.json and v2.html, a sheet with each part's v1 and
 v2 masks side by side and blank grade columns, and images under img/ (git-ignored)."""
 
@@ -43,6 +52,7 @@ from pathlib import Path
 from typing import Any
 
 import cv2
+import httpx
 import numpy as np
 import numpy.typing as npt
 from PIL import Image, ImageDraw
@@ -64,6 +74,12 @@ Point = tuple[int, int]
 
 CALLER = "s2_armav2"
 GUARD_PX = 15
+# v2f: a point must sit at least CLEARANCE_PX from any text, leader line or ink pixel. The
+# widest strokes measured on the three figures (90th percentile of twice the distance
+# transform on each stroke's ridge) were 6.0 px: the heart's leader lines and the heart's and
+# flower's ink outlines. So a point keeps one full line width, plus the anti-aliased edge,
+# between itself and the mark. 6 px is 0.48 mm on the printed flower.
+CLEARANCE_PX = 6
 MAX_OBJECTS = 16  # sam/segmenting: box and point prompts name up to 16 objects
 KINDS = ("area", "thin", "group")
 
@@ -152,11 +168,16 @@ class Scene:
     image: npt.NDArray[np.uint8]
     marks: print_marks.PrintMarks
     obj: Mask
+    clearance: int = 0
+    near: Mask = field(init=False)  # on a mark, or closer to one than clearance
     clean: Mask = field(init=False)
 
     def __post_init__(self) -> None:
         m = self.marks
-        self.clean = self.obj & ~(m.text | m.line | m.ink)
+        marks = m.text | m.line | m.ink
+        dist = cv2.distanceTransform((~marks).astype(np.uint8), cv2.DIST_L2, 5)
+        self.near = np.asarray(dist < max(self.clearance, 1))
+        self.clean = self.obj & ~self.near
 
     def on(self, p: Point) -> list[str]:
         x, y = p
@@ -164,8 +185,8 @@ class Scene:
         return [k for k, a in (("text", m.text), ("line", m.line), ("ink", m.ink)) if a[y, x]]
 
 
-def scene_of(image: npt.NDArray[np.uint8]) -> Scene:
-    return Scene(image, print_marks.find(image), grading.object_mask(image))
+def scene_of(image: npt.NDArray[np.uint8], clearance: int = 0) -> Scene:
+    return Scene(image, print_marks.find(image), grading.object_mask(image), clearance)
 
 
 def fill_delta() -> float:
@@ -196,9 +217,10 @@ def common_color(scene: Scene, p: Point) -> npt.NDArray[np.float64] | None:
 
 
 def guard(scene: Scene, p: Point, fill: npt.NDArray[np.float64] | None) -> dict[str, Any]:
-    """A point as sent: kept if clean, else moved to the nearest clean pixel of the fill
-    color within GUARD_PX, else dropped."""
-    on = scene.on(p)
+    """A point as sent: kept if no mark is under it or within the scene's clearance, else
+    moved to the nearest clean pixel of the fill color within GUARD_PX, else dropped."""
+    x, y = p
+    on = scene.on(p) or (["near a mark"] if scene.near[y, x] else [])
     if not on:
         return {"px": list(p), "on": [], "sent": list(p), "moved_px": 0.0, "dropped": False}
     ref = fill if fill is not None else common_color(scene, p)
@@ -216,7 +238,7 @@ def guard(scene: Scene, p: Point, fill: npt.NDArray[np.float64] | None) -> dict[
 
 
 def guard_instance(scene: Scene, points: list[Point]) -> list[dict[str, Any]]:
-    clean = [p for p in points if not scene.on(p)]
+    clean = [p for p in points if not scene.near[p[1], p[0]]]
     fill = (
         np.asarray(np.median([scene.image[y, x].astype(int) for x, y in clean], axis=0), float)
         if clean
@@ -282,6 +304,16 @@ def contest(
     return out, lost, respeck
 
 
+def where_on(on: list[str]) -> str:
+    marks = [m for m in on if m != "near a mark"]
+    return "on " + " and ".join(marks) if marks else "near a mark"
+
+
+def prefix(fixes: bool) -> str:
+    """Recording and file names: armav2 for v2, armav2f for v2 with the fixes."""
+    return "armav2f" if fixes else "armav2"
+
+
 def xy(p: list[int]) -> Point:
     return int(p[0]), int(p[1])
 
@@ -305,20 +337,22 @@ class ArmAv2:
         parts: list[dict[str, str]],
         v1: dict[str, Mask],
         record: bool,
+        fixes: bool = False,
     ) -> None:
         self.live = live
         self.fig = fig
         self.parts = parts
         self.v1 = v1
         self.record = record
+        self.fixes = fixes  # v2f: point clearance, the empty-mask rule and the spill retry
         self.models = load_tactile_rules().meta.models
-        self.scene = scene_of(fig.image)
+        self.scene = scene_of(fig.image, CLEARANCE_PX if fixes else 0)
         self.floor = bake.floor_px(fig)
         self.final: dict[str, Mask] = {}
         self.kept: dict[str, Mask] = {}  # before contested pixels are resolved
 
     def _name(self, what: str) -> str | None:
-        return f"armav2_{self.fig.name}_{what}" if self.record else None
+        return f"{prefix(self.fixes)}_{self.fig.name}_{what}" if self.record else None
 
     def to_px(self, pt: dict[str, Any]) -> Point:
         w, h = self.fig.size
@@ -350,21 +384,27 @@ class ArmAv2:
         return info, meta
 
     async def segment(
-        self, part: str, objects: list[tuple[list[Point], list[Point]]]
+        self, part: str, objects: list[tuple[list[Point], list[Point]]], what: str = ""
     ) -> tuple[list[sam_adapter.Decoded], dict[str, Any]]:
+        """One SAM call. A failed call, or one with no recording in a replay, is no answer
+        with an error, so the part is flagged rather than the run stopped."""
         w, h = self.fig.size
         metadata = load_prompt(s2_ground.PROMPT).template["metadata"]
-        res = await self.live.post_sse(
-            "/responses",
-            sam_adapter.objects_request_body(
-                self.models.sam, self.fig.png, (w, h), objects, metadata
-            ),
-            caller=CALLER,
-            model=self.models.sam,
-            describe=bake.shown(self.fig.path) + f", v2 {len(objects)} objects for {part}",
-            units=lambda _usage: {"images": 1},
-            record_as=self._name(f"sam_{bake.slug(part)}"),
-        )
+        try:
+            res = await self.live.post_sse(
+                "/responses",
+                sam_adapter.objects_request_body(
+                    self.models.sam, self.fig.png, (w, h), objects, metadata
+                ),
+                caller=CALLER,
+                model=self.models.sam,
+                describe=bake.shown(self.fig.path)
+                + f", {prefix(self.fixes)} {len(objects)} objects for {part}{what}",
+                units=lambda _usage: {"images": 1},
+                record_as=self._name(f"sam_{bake.slug(part)}{bake.slug(what)}"),
+            )
+        except (LiveCallError, httpx.HTTPError) as exc:
+            return [], {"error": f"{type(exc).__name__}: {exc}"}
         meta: dict[str, Any] = {
             "latency_ms": res.latency_ms,
             "cost_usd": res.ledger_line["cost_usd"],
@@ -396,53 +436,134 @@ class ArmAv2:
                     {"where": inst["where"], "grid": inst["points"], "points": guarded}
                 )
                 row["flags"] += [
-                    f"point {g['px']} on {' and '.join(g['on'])} dropped"
-                    for g in guarded
-                    if g["dropped"]
+                    f"point {g['px']} dropped: {where_on(g['on'])}" for g in guarded if g["dropped"]
                 ]
         return rows
+
+    async def ask_sam(
+        self, part: str, insts: list[dict[str, Any]], negs: list[Point], what: str = ""
+    ) -> tuple[Mask, list[dict[str, Any]], dict[str, Any]]:
+        """One SAM call, one object per instance with its sent points and negs. Returns the
+        instance pieces that hold a prompt point, less specks, as one mask, the facts per
+        instance, and the call's facts."""
+        objects = [([xy(g["sent"]) for g in i["points"] if g["sent"]], negs) for i in insts]
+        decoded, meta = await self.segment(part, objects, what)
+        by_id = {d.object_id: d for d in decoded}
+        mask = np.zeros(self.fig.image.shape[:2], bool)
+        facts: list[dict[str, Any]] = []
+        for k, (pos, _) in enumerate(objects, 1):
+            d = by_id.get(str(k))
+            if d is None:
+                facts.append({"object_id": k, "confidence": None, "raw_px": 0, "kept_px": 0})
+                continue
+            raw = bake.full_mask(d, self.fig.size)
+            piece, dropped = keep_pieces(raw, pos, self.floor)
+            facts.append(
+                {
+                    "object_id": k,
+                    "confidence": d.confidence,
+                    "raw_px": int(raw.sum()),
+                    "kept_px": int(piece.sum()),
+                    "pieces_dropped": dropped,
+                    "points_in_mask": [bool(raw[y, x]) for x, y in pos],
+                }
+            )
+            mask |= piece
+        return mask, facts, meta
+
+    def sent_instances(self, row: dict[str, Any]) -> list[dict[str, Any]]:
+        insts = [i for i in row["instances"] if any(g["sent"] for g in i["points"])]
+        if len(insts) > MAX_OBJECTS:
+            row["flags"].append(f"{len(insts)} instances, sent the first {MAX_OBJECTS}")
+        return insts[:MAX_OBJECTS]
 
     async def segment_part(self, row: dict[str, Any], sent: dict[str, list[Point]]) -> Mask | None:
         """One SAM call for a part, one object per instance; the instance pieces that hold
         a prompt point, less specks, as one mask."""
         part = row["part"]
-        insts = [i for i in row["instances"] if any(g["sent"] for g in i["points"])]
-        if len(insts) > MAX_OBJECTS:
-            row["flags"].append(f"{len(insts)} instances, sent the first {MAX_OBJECTS}")
-            insts = insts[:MAX_OBJECTS]
+        insts = self.sent_instances(row)
         if not insts:
             row["flags"].append("no point left to send")
             return None
         negs = negatives(part, sent[part], sent, self.v1.get(part))
         row["negatives"] = negs
-        objects = [
-            ([xy(g["sent"]) for g in i["points"] if g["sent"]], [xy(n["xy"]) for n in negs])
-            for i in insts
-        ]
-        decoded, row["sam"] = await self.segment(part, objects)
-        by_id = {d.object_id: d for d in decoded}
-        mask = np.zeros(self.fig.image.shape[:2], bool)
-        for k, (inst, (pos, _)) in enumerate(zip(insts, objects, strict=True), 1):
-            d = by_id.get(str(k))
-            inst["object_id"] = k
-            if d is None:
-                inst |= {"confidence": None, "raw_px": 0, "kept_px": 0}
+        mask, facts, row["sam"] = await self.ask_sam(part, insts, [xy(n["xy"]) for n in negs])
+        if "error" in row["sam"]:
+            row["flags"].append("SAM call failed: " + row["sam"]["error"])
+        for k, (inst, fact) in enumerate(zip(insts, facts, strict=True), 1):
+            inst.update(fact)
+            if not fact["raw_px"]:
                 row["flags"].append(f"no mask for instance {k}")
-                continue
-            raw = bake.full_mask(d, self.fig.size)
-            piece, dropped = keep_pieces(raw, pos, self.floor)
-            inst |= {
-                "confidence": d.confidence,
-                "raw_px": int(raw.sum()),
-                "kept_px": int(piece.sum()),
-                "pieces_dropped": dropped,
-                "points_in_mask": [bool(raw[y, x]) for x, y in pos],
-            }
-            if not all(inst["points_in_mask"]):
+            elif not all(fact["points_in_mask"]):
                 row["flags"].append(f"a point of instance {k} is outside its SAM mask")
-            mask |= piece
         row["kept_px"] = int(mask.sum())
         return mask if mask.any() else None
+
+    def spilled_onto(
+        self, part: str, mask: Mask, rows: dict[str, dict[str, Any]], sent: dict[str, list[Point]]
+    ) -> dict[str, Point]:
+        """Other parts, not this part's children, with a prompt point inside mask: the first
+        such point of each."""
+        out = {}
+        for q, pts in sent.items():
+            if q == part or rows[q]["parent"] == part:
+                continue
+            inside = [p for p in pts if mask[p[1], p[0]]]
+            if inside:
+                out[q] = inside[0]
+        return out
+
+    async def retry_spill(
+        self,
+        row: dict[str, Any],
+        mask: Mask,
+        rows: dict[str, dict[str, Any]],
+        sent: dict[str, list[Point]],
+    ) -> Mask:
+        """v2f. If the mask holds another part's prompt point, ask once more with those
+        points added as negatives. If the new mask is free of them, it is used. If it still
+        holds one, the smaller mask is kept and the part is flagged spill. A point within
+        GUARD_PX of the part's own points is not sent as a negative."""
+        part = row["part"]
+        spill = self.spilled_onto(part, mask, rows, sent)
+        if not spill:
+            return mask
+        own = sent[part]
+        add = {
+            q: p
+            for q, p in spill.items()
+            if all(np.hypot(p[0] - a, p[1] - b) > GUARD_PX for a, b in own)
+        }
+        retry: dict[str, Any] = {
+            "spilled_onto": sorted(spill),
+            "negatives_added": {q: list(p) for q, p in add.items()},
+        }
+        row["retry"] = retry
+        if not add or self.live.calls >= self.live.cap:
+            retry["sent"] = False
+            why = "the points are next to its own" if not add else "the call cap"
+            row["flags"].append(f"spill onto {', '.join(sorted(spill))}; no retry: {why}")
+            return mask
+        negs = [xy(n["xy"]) for n in row.get("negatives", [])] + list(add.values())
+        again, facts, retry["sam"] = await self.ask_sam(
+            part, self.sent_instances(row), negs, " retry"
+        )
+        still = self.spilled_onto(part, again, rows, sent)
+        retry |= {
+            "sent": True,
+            "instances": facts,
+            "kept_px": int(again.sum()),
+            "still_onto": sorted(still),
+        }
+        if again.any() and not still:
+            retry["used"] = True
+            row["flags"].append(f"spill onto {', '.join(sorted(spill))} cleared by a retry")
+            return again
+        use_again = again.any() and again.sum() < mask.sum()
+        retry["used"] = bool(use_again)
+        left = still if use_again else spill
+        row["flags"].append(f"spill onto {', '.join(sorted(left))}")
+        return again if use_again else mask
 
     def finish(
         self, rows: dict[str, dict[str, Any]], kept: dict[str, Mask], info: dict[str, Any]
@@ -471,7 +592,7 @@ class ArmAv2:
             if row["kind"] == "thin":
                 row["flags"].append("thin: kept for the record, sheet use decided later")
             if not row["final_px"]:
-                row["flags"].append("no mask")
+                row["flags"].append("needs teacher: no mask" if self.fixes else "no mask")
         return final
 
     async def run(self) -> dict[str, Any]:
@@ -480,7 +601,9 @@ class ArmAv2:
             "image": bake.shown(self.fig.path),
             "size": list(self.fig.size),
             "cap": self.live.cap,
+            "version": prefix(self.fixes),
             "guard_px": GUARD_PX,
+            "clearance_px": self.scene.clearance,
             "fill_delta": fill_delta(),
             "floor_px": round(self.floor, 1),
             "print_marks": {
@@ -504,6 +627,9 @@ class ArmAv2:
             mask = await self.segment_part(row, sent)
             if mask is not None:
                 kept[part] = mask
+        if self.fixes:  # retries after every part's first call, so the cap never cuts one
+            for part in list(kept):
+                kept[part] = await self.retry_spill(rows[part], kept[part], rows, sent)
         self.kept = kept
         self.final = self.finish(rows, kept, info)
         result["rows"] = list(rows.values())
@@ -512,8 +638,9 @@ class ArmAv2:
         return result
 
 
-def replayer(figure: str) -> LiveCaller:
-    """A caller that answers from fixtures/recorded/armav2_FIGURE_*.json, never the network."""
+def replayer(figure: str, recordings: str = "armav2") -> LiveCaller:
+    """A caller that answers from fixtures/recorded/RECORDINGS_FIGURE_*.json, never the
+    network. A request with no recording gets an error answer."""
     rules = load_tactile_rules().meta
     return LiveCaller(
         key="unused-in-replay",
@@ -521,7 +648,9 @@ def replayer(figure: str) -> LiveCaller:
         ledger=Ledger(Path(tempfile.mkdtemp()) / "ledger.jsonl"),
         meter=CostMeter(rules),
         cap=rules.live_call_cap,
-        transport=ReplayTransport.from_files(sorted(RECORDED_DIR.glob(f"armav2_{figure}_*.json"))),
+        transport=ReplayTransport.from_files(
+            sorted(RECORDED_DIR.glob(f"{recordings}_{figure}_*.json"))
+        ),
     )
 
 
@@ -582,9 +711,20 @@ def v2_facts(row: dict[str, Any]) -> list[str]:
     return out + [f"FLAG: {f}" for f in row["flags"]]
 
 
+def tag(result: dict[str, Any]) -> str:
+    """v2, or v2f for v2 with the fixes: the name in file names and on the sheet."""
+    return "v2f" if result.get("version") == "armav2f" else "v2"
+
+
 def write_sheet(result: dict[str, Any], v1_rows: dict[str, dict[str, Any]], out_dir: Path) -> None:
-    """v2.html: one part at a time with the v1 and v2 masks side by side, then a table with
-    blank v2 grade columns."""
+    """v2.html (v2f.html for v2 with the fixes): one part at a time with the v1 and new
+    masks side by side, then a table with blank grade columns."""
+    t = tag(result)
+    what = (
+        "guarded points with clearance, SAM, spill retry, post-processed"
+        if t == "v2f"
+        else "guarded points, SAM, post-processed"
+    )
     esc = html.escape
     steps, rows = [], []
     for row in result["rows"]:
@@ -599,8 +739,8 @@ def write_sheet(result: dict[str, Any], v1_rows: dict[str, dict[str, Any]], out_
             {
                 "part": row["part"],
                 "label": row["print_label"] or "none",
-                "a": f"img/v2sheet_v1_{s}.jpg",
-                "b": f"img/v2sheet_v2_{s}.jpg",
+                "a": f"img/{t}sheet_v1_{s}.jpg",
+                "b": f"img/{t}sheet_{t}_{s}.jpg",
                 "a_facts": v1_facts,
                 "b_facts": v2_facts(row),
             }
@@ -611,8 +751,8 @@ def write_sheet(result: dict[str, Any], v1_rows: dict[str, dict[str, Any]], out_
         )
         rows.append(
             f"<tr><th>{esc(row['part'])}<br><small>label: {esc(row['print_label'] or 'none')}"
-            f"</small></th><td><img src='img/v2sheet_v1_{s}.jpg' alt=''></td>"
-            f"<td><img src='img/v2sheet_v2_{s}.jpg' alt=''><ul>{facts}</ul></td>"
+            f"</small></th><td><img src='img/{t}sheet_v1_{s}.jpg' alt=''></td>"
+            f"<td><img src='img/{t}sheet_{t}_{s}.jpg' alt=''><ul>{facts}</ul></td>"
             "<td></td><td></td></tr>"
         )
     sp = result["spark"]
@@ -625,14 +765,14 @@ def write_sheet(result: dict[str, Any], v1_rows: dict[str, dict[str, Any]], out_
     ]
     view = bake.step_view(
         steps,
-        ("v1: one Spark point, SAM mask", "v2: guarded points, SAM, post-processed"),
-        "The figure is at 30% and the mask at full strength. In v2, crosshairs are the "
+        ("v1: one Spark point, SAM mask", f"{t}: {what}"),
+        f"The figure is at 30% and the mask at full strength. In {t}, crosshairs are the "
         "points sent, an X is a negative point and a red ring is a dropped point.",
-        ("v1", "v2"),
+        ("v1", t),
     )
     page = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>S2 Arm A v2: {esc(result["figure"])}</title>
+<title>S2 Arm A {t}: {esc(result["figure"])}</title>
 <style>
 body {{ font: 15px/1.4 system-ui, sans-serif; margin: 16px; background: #fff; color: #111; }}
 table {{ border-collapse: collapse; }}
@@ -649,16 +789,16 @@ ul {{ margin: 4px 0; padding-left: 18px; font-size: 13px; }}
 .pair figure {{ margin: 0; flex: 1 1 420px; }}
 .pair img {{ width: 100%; border: 1px solid #999; }}
 </style></head><body>
-<h1>S2 Arm A v2: {esc(result["figure"])}</h1>
+<h1>S2 Arm A {t}: {esc(result["figure"])}</h1>
 <ul>{"".join(f"<li>{esc(s)}</li>" for s in summary)}</ul>
 {view}
 <h2>Parts</h2>
-<table><thead><tr><th>Part</th><th>v1</th><th>v2</th><th>v2 grade</th><th>Reason</th></tr>
+<table><thead><tr><th>Part</th><th>v1</th><th>{t}</th><th>{t} grade</th><th>Reason</th></tr>
 </thead><tbody>
 {"".join(rows)}
 </tbody></table></body></html>
 """
-    (out_dir / "v2.html").write_text(page, encoding="utf-8")
+    (out_dir / f"{t}.html").write_text(page, encoding="utf-8")
 
 
 def save_views(
@@ -675,29 +815,30 @@ def save_views(
         s = bake.slug(row["part"])
         point = v1_rows.get(row["part"], {}).get("point_px")
         grading.focus_view(fig.image, v1_masks.get(row["part"]), point).save(
-            d / f"v2sheet_v1_{s}.jpg", quality=85
+            d / f"{tag(result)}sheet_v1_{s}.jpg", quality=85
         )
         marked_view(fig.image, final.get(row["part"]), row).save(
-            d / f"v2sheet_v2_{s}.jpg", quality=85
+            d / f"{tag(result)}sheet_{tag(result)}_{s}.jpg", quality=85
         )
 
 
 async def run_figure(
-    live: LiveCaller, name: str, record: bool, write: str
+    live: LiveCaller, name: str, record: bool, write: str, fixes: bool = False
 ) -> tuple[ArmAv2, dict[str, Any]]:
-    """write is "all" for a live run (results_v2.json, v2.html and img/), "images" to redraw
-    img/ from a replay, or "none"."""
+    """write is "all" for a live run (results_v2.json, v2.html and img/; _v2f and v2f with
+    the fixes), "images" to redraw img/ from a replay, or "none"."""
     out_dir = bake.OUT_ROOT / name
     v1_result = json.loads((out_dir / "results.json").read_text(encoding="utf-8"))
     fig, v1 = await grading.replay_masks(name)
-    run = ArmAv2(live, fig, v1_result["parts"], v1["a"], record)
+    run = ArmAv2(live, fig, v1_result["parts"], v1["a"], record, fixes)
     result = await run.run()
     if write == "none" or "stopped" in result:
         return run, result
     v1_rows = {r["part"]: r for r in v1_result["arm_a_rows"]}
     save_views(fig, result, run.final, v1["a"], v1_rows, out_dir)
     if write == "all":
-        (out_dir / "results_v2.json").write_text(json.dumps(result, indent=1) + "\n", "utf-8")
+        path = out_dir / f"results_{tag(result)}.json"
+        path.write_text(json.dumps(result, indent=1) + "\n", "utf-8")
         write_sheet(result, v1_rows, out_dir)
     return run, result
 
@@ -707,14 +848,20 @@ def main() -> None:
     ap.add_argument("figure", choices=sorted(bake.FIGURES))
     ap.add_argument("--record", action="store_true", help="save each call to fixtures/recorded/")
     ap.add_argument("--replay", action="store_true", help="redraw from the recorded calls, offline")
+    ap.add_argument(
+        "--fixes", action="store_true", help="v2f: point clearance, empty-mask rule, spill retry"
+    )
     args = ap.parse_args()
     if args.replay:
-        _, result = asyncio.run(run_figure(replayer(args.figure), args.figure, False, "images"))
+        rec = prefix(args.fixes)
+        _, result = asyncio.run(
+            run_figure(replayer(args.figure, rec), args.figure, False, "images", args.fixes)
+        )
         print(f"redrew {bake.OUT_ROOT / args.figure / 'img'} from {result.get('calls')} calls")
         return
     live = LiveCaller.from_env(load_tactile_rules().meta, recorder=Recorder())
     try:
-        _, result = asyncio.run(run_figure(live, args.figure, args.record, "all"))
+        _, result = asyncio.run(run_figure(live, args.figure, args.record, "all", args.fixes))
     except LiveCallError as exc:
         print(f"stopped: {exc}", file=sys.stderr)
         sys.exit(1)

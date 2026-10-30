@@ -1,17 +1,21 @@
 """S2 mask scorer: numbers per part from a run's masks, with no live calls.
 
-    uv run python -m app.meta.s2_score v1|v2
+    uv run python -m app.meta.s2_score v1|v2|v2f
 
 v1 is the bake-off's Arm A, its masks replayed from fixtures/recorded/bakeoff_*.json; v2 is
-Arm A v2 (app/meta/s2_armav2.py), replayed from fixtures/recorded/armav2_*.json. Writes
+Arm A v2 (app/meta/s2_armav2.py), replayed from fixtures/recorded/armav2_*.json; v2f is
+v2 with the fixes (point clearance, empty-mask rule, spill retry), replayed from
+armav2f_*.json, for the figures it ran on. Writes
 eval/s2-bakeoff/scores_RUN.json and scores_RUN.md. Nothing here grades a mask.
 
 Per part:
 - reference: for a part graded pass in the review, the IoU of this run's mask with the
   passing mask (Arm A's if A passed, else Arm B's); under REGRESSION_IOU is a regression.
-- too small: under S3's speck floor (reconcile.speck_max_area_mm2, 2 mm2) is a speck; under
-  the area of a point symbol (a disk spacing.point_symbol_min_mm wide, 32.2 mm2) is too small
-  to feel as an area, because S4 could only draw it as a point symbol.
+- too small: under S3's speck floor (reconcile.speck_max_area_mm2, 2 mm2) is a speck. Under
+  the area of a point symbol is a proposal: a disk spacing.point_symbol_min_mm wide, 32.2 mm2.
+  That 6.4 mm is sourced in the spacing rules (1/4 inch, APH "Planning and Designing Quality
+  Tactile Graphics"; RULES.md 3.4), not in S3's rules, which have no area floor but the
+  speck. PLAN.md S4 turns parts under the point symbol size into point symbols.
 - text and line: the share of the mask on label text and on leader lines, found in code
   (app/geometry/print_marks.py). Over ON_MARKS is flagged.
 - fragments: 8-connected pieces at or over the speck floor; flagged when there are more
@@ -328,21 +332,28 @@ def v2_run(
 
 async def v2_runs(
     v1: dict[str, tuple[npt.NDArray[np.uint8], dict[str, Any], dict[str, dict[str, Mask]]]],
+    fixes: bool = False,
 ) -> dict[str, tuple[npt.NDArray[np.uint8], dict[str, Any], dict[str, dict[str, Mask]]]]:
+    """v2, or with fixes v2f, replayed: v2f only for the figures it ran live on."""
     out = {}
     for name, (image, _, masks) in v1.items():
-        run, result = await s2_armav2.run_figure(s2_armav2.replayer(name), name, False, "none")
+        rec = s2_armav2.prefix(fixes)
+        if fixes and not (bake.OUT_ROOT / name / "results_v2f.json").exists():
+            continue
+        run, result = await s2_armav2.run_figure(
+            s2_armav2.replayer(name, rec), name, False, "none", fixes
+        )
         out[name] = (image, v2_run(name, result, run.final, run.kept), masks)
     return out
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("run", choices=["v1", "v2"])
+    ap.add_argument("run", choices=["v1", "v2", "v2f"])
     args = ap.parse_args()
     runs = asyncio.run(v1_runs())
-    if args.run == "v2":
-        runs = asyncio.run(v2_runs(runs))
+    if args.run != "v1":
+        runs = asyncio.run(v2_runs(runs, fixes=args.run == "v2f"))
     scored, tables = {}, [f"# S2 scores, {args.run}\n"]
     for name, (image, run, v1) in runs.items():
         g = grades.load(bake.OUT_ROOT / name)

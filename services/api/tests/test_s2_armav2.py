@@ -210,3 +210,113 @@ def test_each_v2_figure_fits_under_the_cap() -> None:
     for name in bake.FIGURES:
         result = json.loads((bake.OUT_ROOT / name / "results.json").read_text())
         assert 1 + len(result["parts"]) <= RULES.meta.live_call_cap
+
+
+def test_with_clearance_a_point_beside_an_outline_moves_away_from_it(tmp_path: Path) -> None:
+    image = small_figure(tmp_path).image.copy()  # black outlines 2 px wide at x 10 to 11
+    image[12:98, 12:88] = (200, 200, 60)  # a filled part, so it is figure and not page
+    plain, cleared = v2.scene_of(image), v2.scene_of(image, v2.CLEARANCE_PX)
+    assert v2.guard_instance(plain, [(14, 60)])[0]["sent"] == [14, 60]
+    g = v2.guard_instance(cleared, [(14, 60)])[0]
+    assert g["on"] == ["near a mark"] and g["sent"] == [17, 60] and g["moved_px"] == 3.0
+    assert (
+        v2.where_on(g["on"]) == "near a mark" and v2.where_on(["text", "ink"]) == "on text and ink"
+    )
+
+
+def box_mask(x0: int, x1: int) -> tuple[int, int, int, int, npt.NDArray[np.bool_]]:
+    return (x0, 12, x1, 98, np.ones((86, x1 - x0), bool))
+
+
+def fixes_caller(tmp_path: Path, sent: list[str], answers: dict[str, httpx.Response]) -> LiveCaller:
+    """SAM answers chosen by the prompt text: "left retry" when the left box's prompt has a
+    negative point at the right box's point, else "left" or "right"."""
+    spark = {
+        "parts": [
+            {
+                "part": "left box",
+                "kind": "area",
+                "members": [],
+                "parent": "",
+                "instances": [{"where": "main", "points": [{"x": 150, "y": 500}]}],
+            },
+            {
+                "part": "right box",
+                "kind": "area",
+                "members": [],
+                "parent": answers.get("parent", ""),
+                "instances": [{"where": "main", "points": [{"x": 750, "y": 500}]}],
+            },
+        ]
+    }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body: dict[str, Any] = json.loads(request.content)
+        if not request.url.path.endswith("/responses"):
+            sent.append("spark")
+            return chat(json.dumps(spark))
+        text = body["input"][0]["content"][0]["text"]
+        sent.append(text)
+        if "x=30;" in text:
+            return answers["left retry" if "-<|point;x=150" in text else "left"]
+        return answers["right"]
+
+    return LiveCaller(
+        key="test-key",
+        base_url="https://api.meta.ai/v1",
+        ledger=Ledger(tmp_path / "ledger.jsonl"),
+        meter=CostMeter(RULES.meta),
+        cap=RULES.meta.live_call_cap,
+        transport=httpx.MockTransport(handler),
+    )
+
+
+def fixes_run(tmp_path: Path, answers: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+    fig = small_figure(tmp_path)
+    parts = [{"phrase": p, "print_label": ""} for p in ("left box", "right box")]
+    sent: list[str] = []
+    run = v2.ArmAv2(fixes_caller(tmp_path, sent, answers), fig, parts, {}, False, fixes=True)
+    result = asyncio.run(run.run())
+    return sent, {r["part"]: r for r in result["rows"]}
+
+
+def test_a_spill_is_retried_once_with_the_other_parts_point_as_a_negative(tmp_path: Path) -> None:
+    both, left, right = (sam_answer([box_mask(*b)]) for b in ((12, 188), (12, 88), (112, 188)))
+    sent, rows = fixes_run(tmp_path, {"left": both, "left retry": left, "right": right})
+    assert len(sent) == 4 and sent[-1].endswith("-<|point;x=150;y=60;w=200;h=120|>")
+    assert rows["left box"]["retry"]["used"] and rows["left box"]["final_px"] == 76 * 86
+    assert "spill onto right box cleared by a retry" in rows["left box"]["flags"]
+    assert "retry" not in rows["right box"]
+
+
+def test_a_spill_that_survives_the_retry_keeps_the_smaller_mask(tmp_path: Path) -> None:
+    both, less, right = (sam_answer([box_mask(*b)]) for b in ((12, 188), (12, 170), (112, 188)))
+    _, rows = fixes_run(tmp_path, {"left": both, "left retry": less, "right": right})
+    left = rows["left box"]
+    assert left["retry"]["used"] and left["retry"]["still_onto"] == ["right box"]
+    assert left["kept_px"] == 176 * 86 and left["retry"]["kept_px"] == 158 * 86
+    assert "spill onto right box" in left["flags"]
+
+
+def test_a_child_inside_the_mask_is_not_a_spill(tmp_path: Path) -> None:
+    both, right = sam_answer([box_mask(12, 188)]), sam_answer([box_mask(112, 188)])
+    sent, rows = fixes_run(tmp_path, {"left": both, "right": right, "parent": "left box"})
+    assert len(sent) == 3 and "retry" not in rows["left box"]
+
+
+def test_a_mask_without_the_parts_points_leaves_the_part_for_the_teacher(tmp_path: Path) -> None:
+    left, away = sam_answer([box_mask(12, 88)]), sam_answer([box_mask(160, 188)])
+    _, rows = fixes_run(tmp_path, {"left": left, "right": away})
+    right = rows["right box"]
+    assert right["final_px"] == 0 and "needs teacher: no mask" in right["flags"]
+    assert "a point of instance 1 is outside its SAM mask" in right["flags"]
+
+
+def test_a_failed_sam_call_is_flagged_and_the_run_goes_on(tmp_path: Path) -> None:
+    left = sam_answer([box_mask(12, 88)])
+    _, rows = fixes_run(tmp_path, {"left": left, "right": httpx.Response(500, text="boom")})
+    assert rows["left box"]["final_px"] == 76 * 86
+    flags = rows["right box"]["flags"]
+    assert (
+        flags[0].startswith("SAM call failed: LiveCallError") and "needs teacher: no mask" in flags
+    )
