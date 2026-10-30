@@ -102,7 +102,13 @@ class MetaClient(Protocol):
         ...
 
     async def answer(
-        self, figure_id: str, png: bytes, system: str, user: str, schema: dict[str, Any], what: str
+        self,
+        figure_id: str,
+        png: bytes | None,
+        system: str,
+        user: str,
+        schema: dict[str, Any],
+        what: str,
     ) -> dict[str, Any]:
         """Muse Spark's structured answer to one question about the figure."""
         ...

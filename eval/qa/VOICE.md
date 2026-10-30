@@ -29,3 +29,29 @@ Headless Chrome on this Mac, against the API with live calls, on the published h
 | On the device: encoding, then speech starting | 12 | 6 | 10 |
 
 Spark is most of it. The phone, VoiceOver and a real network are for the iPhone test.
+
+## Latency experiment: the answer prompt without the figure image (Oct 30)
+
+The full eval (61 questions, published version 4) run live twice: (a) ask_answer.v1 with the figure image, as /api/ask does (eval/qa/RESULTS.md); (b) ask_answer_text.v1, the same rules without the image, and no image sent (eval/qa/RESULTS_no_image.md, recorded as qa3_ask_*, not replayed).
+
+| Variant, figure | Source correct | Citations correct | Outside words | Spark p50 ms | Spark p95 ms |
+|---|---|---|---|---|---|
+| (a) with image, heart | 30 of 32 | 28 | 0 | 3314 | 5288 |
+| (a) with image, brain_lobes | 29 of 29 | 28 | 0 | 2923 | 4688 |
+| (b) no image, heart | 31 of 32 | 30 | 0 | 2409 | 4286 |
+| (b) no image, brain_lobes | 29 of 29 | 28 | 0 | 2374 | 3824 |
+
+(b) is about 0.9 s faster at p50 and 1 s at p95, and scores better on the heart, not the same: its misses differ (h01 "What is this?" on the right atrium answered from its teacher description, source teacher_description where figure was expected; h20 and h60 right, h30 deflected where (a) answered it from the left ventricle's description). The rule was to keep (b) only if its scores equal (a)'s, so (a) stays; the comparison is the user's to decide.
+
+### Release to first spoken word, the kept variant (a)
+
+As above (headless Chrome, fake microphone, live API), on published version 4, with the 250 ms post-roll: 12 holds.
+
+| Part | Runs | p50 ms | p95 ms |
+|---|---|---|---|
+| Release to first spoken word (with the 250 ms post-roll) | 12 | 4510 | 5935 |
+| Transcribe (server) | 12 | 974 | 1244 |
+| Spark (server) | 12 | 3052 | 4441 |
+| Network and server code | 12 | 15 | 23 |
+| WAV encoding (device) | 12 | 3 | 5 |
+| On the device: encoding, then speech starting | 12 | 8 | 10 |

@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 224,
- "updated_at": "2026-10-30T21:00:07.121Z",
+ "rev": 227,
+ "updated_at": "2026-10-30T21:30:44.583Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1666,6 +1666,23 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-30T21:00:07.121Z"
   },
   {
+   "id": "d5-30",
+   "day": 5,
+   "title": "Latency experiment: the answer prompt with and without the figure image",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Full eval live twice on published version 4: (a) ask_answer.v1 with the image (task 5's run, qa2) and (b) ask_answer_text.v1 with no image sent (qa3, recorded, not replayed). Heart: (a) source 30/32, citations 28/32; (b) 31/32, 30/32. Brain: both 29/29 and 28/29. No outside words in either. Spark heart p50/p95 (a) 3314/5288 ms, (b) 2409/4286; brain (a) 2923/4688, (b) 2374/3824. Scores not equal ((b) better on the heart; misses differ: (b) h01 answered from the right atrium's description; (b) right on h20 and h60, deflects h30), so by the rule (a) stays; the no-image prompt and the Asker image option stay for the experiment only. Release to first spoken word for (a), version 4, 250 ms post-roll included, 12 holds, headless with a fake microphone: p50 4510 ms, p95 5935; transcribe 974/1244, Spark 3052/4441, network and server code 15/23, device 8/10 (encode 3/5). eval/qa/VOICE.md.",
+   "done_at": "2026-10-30T21:30:44.541Z",
+   "tags": [
+    "eval",
+    "live",
+    "latency"
+   ],
+   "changed_at": "2026-10-30T21:30:44.541Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -2266,9 +2283,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-10-30T19:46:18.002Z",
-   "item": "Meta Model API, 491 live calls, from eval/live/ledger.jsonl (1 unpriced)",
-   "usd": 2.369785
+   "ts": "2026-10-30T21:30:44.583Z",
+   "item": "Meta Model API, 637 live calls, from eval/live/ledger.jsonl (1 unpriced)",
+   "usd": 3.193007
   }
  ],
  "outreach": [
@@ -2750,6 +2767,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T21:30:44.583Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $3.193007 over 637 live calls, 1 of them unpriced."
+  },
+  {
+   "ts": "2026-10-30T21:30:44.541Z",
+   "kind": "claude",
+   "text": "Task d5-30 \"Latency experiment: the answer prompt with and without the figure image\" is now done. Note: Full eval live twice on published version 4: (a) ask_answer.v1 with the image (task 5's run, qa2) and (b) ask_answer_text.v1 with no image sent (qa3, recorded, not replayed). Heart: (a) source 30/32, citations 28/32; (b) 31/32, 30/32. Brain: both 29/29 and 28/29. No outside words in either. Spark heart p50/p95 (a) 3314/5288 ms, (b) 2409/4286; brain (a) 2923/4688, (b) 2374/3824. Scores not equal ((b) better on the heart; misses differ: (b) h01 answered from the right atrium's description; (b) right on h20 and h60, deflects h30), so by the rule (a) stays; the no-image prompt and the Asker image option stay for the experiment only. Release to first spoken word for (a), version 4, 250 ms post-roll included, 12 holds, headless with a fake microphone: p50 4510 ms, p95 5935; transcribe 974/1244, Spark 3052/4441, network and server code 15/23, device 8/10 (encode 3/5). eval/qa/VOICE.md."
+  },
+  {
+   "ts": "2026-10-30T21:30:44.499Z",
+   "kind": "claude",
+   "text": "Task d5-30 \"Latency experiment: the answer prompt with and without the figure image\" added to day 5."
+  },
   {
    "ts": "2026-10-30T21:00:07.121Z",
    "kind": "claude",

@@ -63,12 +63,15 @@ def spark_body(
     model: str,
     system: str | None,
     text: str,
-    png: bytes,
+    png: bytes | None,
     schema: tuple[str, dict[str, Any]],
     effort: str = SPARK_EFFORT,
 ) -> dict[str, Any]:
-    url = "data:image/png;base64," + base64.b64encode(png).decode()
-    content = [{"type": "text", "text": text}, {"type": "image_url", "image_url": {"url": url}}]
+    """A Spark chat request; png None sends the text alone."""
+    content: list[dict[str, Any]] = [{"type": "text", "text": text}]
+    if png is not None:
+        url = "data:image/png;base64," + base64.b64encode(png).decode()
+        content.append({"type": "image_url", "image_url": {"url": url}})
     messages: list[dict[str, Any]] = [{"role": "user", "content": content}]
     if system is not None:
         messages.insert(0, {"role": "system", "content": system})
@@ -324,9 +327,16 @@ class LiveMetaClient:
         return str(res.body.get("transcript", "")).strip()
 
     async def answer(
-        self, figure_id: str, png: bytes, system: str, user: str, schema: dict[str, Any], what: str
+        self,
+        figure_id: str,
+        png: bytes | None,
+        system: str,
+        user: str,
+        schema: dict[str, Any],
+        what: str,
     ) -> dict[str, Any]:
-        """Muse Spark answers one question about the figure, at low reasoning effort."""
+        """Muse Spark answers one question about the figure, at low reasoning effort; with
+        png None, from the text alone."""
         body = spark_body(
             self._models.spark, system, user, png, ("FigureAnswer", schema), effort=ASK_EFFORT
         )

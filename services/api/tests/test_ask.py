@@ -196,3 +196,27 @@ def test_the_route_answers_typed_and_spoken_questions_and_says_what_went_wrong(
             assert empty.status_code == 422
 
     asyncio.run(body())
+
+
+def test_without_the_image_spark_gets_the_figure_in_words_alone() -> None:
+    """The latency experiment's variant (b): no image in the request."""
+    from app.meta.live_client import spark_body  # noqa: PLC0415
+
+    body = spark_body("m", "s", "u", None, ("FigureAnswer", ask.ANSWER_SCHEMA), effort="low")
+    content = body["messages"][1]["content"]
+    assert [c["type"] for c in content] == ["text"]
+    with_image = spark_body("m", "s", "u", b"png", ("FigureAnswer", ask.ANSWER_SCHEMA))
+    assert [c["type"] for c in with_image["messages"][1]["content"]] == ["text", "image_url"]
+
+    class NoImage(FakeClient):
+        async def answer(self, figure_id: str, png: bytes | None, system: str, user: str,
+                         schema: dict[str, Any], what: str) -> dict[str, Any]:  # fmt: skip
+            assert png is None
+            return await super().answer(figure_id, b"", system, user, schema, what)
+
+    client = NoImage({"answer_text": "Yes.", "source": "figure", "cited_part_ids": []})
+    text = load_prompt(ask.TEXT_PROMPT)
+    a = Asker(client, text.template["system"], text.template["user"],
+              lambda fid, v: (GOLDEN, b"png"), image=False)  # fmt: skip
+    assert asyncio.run(a.ask(req(), None)).answer == "Yes."
+    assert "image" not in text.template["system"].lower()

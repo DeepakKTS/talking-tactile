@@ -24,12 +24,13 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from app.ask import AskRequest, prompt_text
+from app.ask import TEXT_PROMPT, Asker, AskRequest, prompt_text
 from app.config import load_tactile_rules
 from app.main import create_app
 from app.meta.client import make_client
 from app.meta.mock import MockMetaClient
 from app.paths import DATA_DIR, REPO_ROOT
+from app.prompts import load_prompt
 
 OUT = REPO_ROOT / "eval" / "qa"
 QUESTIONS = OUT / "questions.jsonl"
@@ -78,12 +79,21 @@ def load_questions(path: Path = QUESTIONS) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text("utf-8").splitlines() if line.strip()]
 
 
-async def run(live: bool, names: list[str]) -> list[dict[str, Any]]:
+async def run(live: bool, names: list[str], image: bool = True) -> list[dict[str, Any]]:
     rules = load_tactile_rules()
     client = make_client(False, rules.meta) if live else MockMetaClient(rules.meta)
     app = create_app(data_dir=DATA_DIR, client=client)
     service = app.state.figure_service()
     asker = service.asker()
+    if not image:  # the latency experiment: the figure data in words, no image
+        text = load_prompt(TEXT_PROMPT)
+        asker = Asker(
+            service.runner.client,
+            str(text.template["system"]),
+            str(text.template["user"]),
+            service._published_figure,
+            image=False,
+        )
     rows = []
     for q in load_questions():
         if q["figure"] not in names:
@@ -153,8 +163,9 @@ def summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return out
 
 
-def markdown(rows: list[dict[str, Any]], s: dict[str, Any], live: bool) -> str:
-    out = ["# Explore question eval", "",
+def markdown(rows: list[dict[str, Any]], s: dict[str, Any], live: bool, image: bool = True) -> str:
+    variant = "" if image else " (no figure image: ask_answer_text.v1)"
+    out = [f"# Explore question eval{variant}", "",
            f"{'Live' if live else 'Replay of the live recordings'}; "
            f"published version {VERSION} of each "
            "figure. Written by app/meta/qa_eval.py from eval/qa/questions.jsonl.", ""]  # fmt: skip
@@ -201,16 +212,19 @@ def markdown(rows: list[dict[str, Any]], s: dict[str, Any], live: bool) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--live", action="store_true", help="live calls (LIVE=1); default: replay")
+    ap.add_argument("--no-image", action="store_true", help="no figure image; *_no_image files")
     ap.add_argument("figures", nargs="*", choices=[[], *FIGURES], help="default: both")
     args = ap.parse_args()
     names = args.figures or list(FIGURES)
-    rows = asyncio.run(run(args.live, names))
+    image = not args.no_image
+    rows = asyncio.run(run(args.live, names, image))
     s = summary(rows)
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "scores.json").write_text(
+    tail = "" if image else "_no_image"
+    (OUT / f"scores{tail}.json").write_text(
         json.dumps({"summary": s, "rows": rows}, indent=1) + "\n", "utf-8"
     )
-    (OUT / "RESULTS.md").write_text(markdown(rows, s, args.live) + "\n", "utf-8")
+    (OUT / f"RESULTS{tail}.md").write_text(markdown(rows, s, args.live, image) + "\n", "utf-8")
     print(json.dumps(s, indent=1))
 
 

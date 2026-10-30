@@ -212,7 +212,13 @@ class MockMetaClient:
         return text
 
     async def answer(
-        self, figure_id: str, png: bytes, system: str, user: str, schema: dict[str, Any], what: str
+        self,
+        figure_id: str,
+        png: bytes | None,
+        system: str,
+        user: str,
+        schema: dict[str, Any],
+        what: str,
     ) -> dict[str, Any]:
         replay = self._replay(figure_id)
         if replay is None:

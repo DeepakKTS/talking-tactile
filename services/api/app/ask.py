@@ -29,6 +29,7 @@ from app.models.regions import Region, RegionsFile
 
 Source = Literal["figure", "teacher_description", "off_figure", "unsure"]
 PROMPT = "ask_answer.v1.json"
+TEXT_PROMPT = "ask_answer_text.v1.json"  # the latency experiment's variant: no figure image
 SESSION_QUESTIONS = 50
 CALLS_PER_QUESTION = 2  # transcribe, then Spark
 MAX_SENTENCES = 2
@@ -249,9 +250,11 @@ class Asker:
         user: str,
         figure: Any,  # Callable[[str, int | None], tuple[RegionsFile, bytes]]
         cap: SessionCap | None = None,
+        image: bool = True,
     ) -> None:
         self.client, self.system, self.user, self.figure = client, system, user, figure
         self.cap = cap or SessionCap()
+        self.image = image  # False: Spark gets the figure data in words only
 
     async def ask(self, req: AskRequest, audio: bytes | None) -> Answer:
         """Raises WavError for bad audio and QuestionCapError past the session's cap; a Meta
@@ -276,7 +279,8 @@ class Asker:
                           cited_part_ids=[], spark=None, timings_ms=timings)  # fmt: skip
         user = prompt_text(self.user, f, req, question)
         t = time.perf_counter()
-        raw = await client.answer(req.figure_id, png, self.system, user, ANSWER_SCHEMA, question)
+        image = png if self.image else None
+        raw = await client.answer(req.figure_id, image, self.system, user, ANSWER_SCHEMA, question)
         timings["spark"] = ms_since(t)
         spark = SparkAnswer.model_validate(raw)
         text, source, cited = final(spark, f)
