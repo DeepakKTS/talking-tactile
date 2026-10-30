@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 181, updated 2026-10-30T17:48:24.916Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 184, updated 2026-10-30T17:52:27.847Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -181,6 +181,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Runner.pipeline_version(options); jobs.pipeline (db schema 3, migrated from 2 in place: tables, rows and publications kept; checked on a copy of the dev database: 2 publications kept, old jobs pipeline None). FigureService.submit and JobStore.find_live match on it; edit runs record it. Tests: an upload after a code change is a new job with S0 to S2 cached, S3 to S5 run, no Meta call, and a third upload returns that job; a version 2 database migrates and its jobs are not reused. No hand edit to the dev database.
 - [x] d5-11 Flower: the 3 unrecorded SAM retries live (this phase)
   - Note: Phase A captured the exact requests S2 sends for the flower with no recording (mock run, nothing sent): stigma, style and ovary retries. Phase B sent only those live under caffeinate -i, META_RECORD=plan3_flower: 3 SAM calls, $0.0075. plan_eval replays them with the rest. Flower: 7 of 13 areas touchable (was 6; stigma cleared by its retry), rule violations 0; still needs you: style and ovary spill after their retries, ovules, connective, filament same outline, floral axis no mask. Reference verdicts unchanged (all 5 still below 0.8). Heart, Japan, both brains unchanged.
+- [ ] d5-12 Touch-safety invariant: clip touchable masks to their drawn regions; overlaps go to the teacher (this phase) [blocked]
+  - Note: Stopped at the replay, before any commit: graded references regress. Literal clip (own regions only): Japan regions lose 51 to 69% (prefecture lines cut each region into drawn sub-regions), Kanto IoU 0.974 to 0.391, Kyushu 0.985 to 0.339; heart right pulmonary arteries 0.947 to 0.646. Minimal clip (remove only regions holding another part's point) keeps Japan and the heart's references, but under both the 4 aortic arch members share one drawn region and all overlap (left common carotid artery 0.927 to 0, a graded reference), and the 4 Blausen lobes are one drawn region at step 14 (shaded into each other), so none stays touchable. Uploaded brain, minimal: postcentral gyrus clipped to its own red region (minus 60%, so parietal lobe is no longer covered), cerebellum still overlaps pons through region 32 it gets from medulla and spinal cord, which S2 nested in its oversized mask; spinal cord overlaps pons. Waiting on the user's call: minimal clip, an exemption for merge-proposal mates, and fill-aware drawn regions for shaded figures.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
