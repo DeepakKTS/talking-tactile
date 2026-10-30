@@ -1,6 +1,7 @@
 """The SAM diagnostic (Gate A step 4.1): a control photo first, then heart.png whole and by
 part in two phrasings. A control with no instances stops the run, because then the request
-or the decoding is wrong, not the line art. Answers with instances are decoded and checked
+or the decoding is wrong, not the figure. heart.png is a colored
+illustration without dark outlines. Answers with instances are decoded and checked
 against what the docs say: the raster is the size of its bounds and inside the image."""
 
 import asyncio

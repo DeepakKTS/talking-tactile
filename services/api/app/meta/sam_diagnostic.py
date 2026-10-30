@@ -4,7 +4,8 @@ find nothing?
     LIVE=1 uv run python -m app.meta.sam_diagnostic [--record]
 
 A control photo of a banana runs first. If SAM finds no banana, the run stops: the request
-or the decoding is wrong, not the line art. Then heart.png as a whole, and three parts in two
+or the decoding is wrong, not the figure. heart.png is a colored
+illustration without dark outlines. Then heart.png as a whole, and three parts in two
 phrasings each. Every answer with instances is decoded and checked against the docs (the
 raster is the size of its bounds, the bounds are inside the image), and an overlay PNG goes
 to data/sam_diagnostic/ (git-ignored) for a look by eye. The request is the S2 one: one

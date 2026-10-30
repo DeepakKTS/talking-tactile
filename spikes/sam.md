@@ -32,7 +32,7 @@ Five phrases on heart.png (left ventricle, right ventricle, left atrium, right a
 - Which model id works: `sam-3.1` or `sam-3-1`.
 - The exact event sequence for zero matches. The script records parse errors instead of crashing.
 - Whether `usage` appears on `response.completed` for images.
-- How well SAM separates chambers on line art with text labels.
+- How well SAM separates the chambers of heart.png, a colored illustration with filled, shaded chambers and vessels and no dark outlines, labeled in black text with black leader lines.
 
 ## Results
 
@@ -42,7 +42,7 @@ Smoke call, Oct 27, one call through `app/meta/smoke.py` (response in `fixtures/
 
 - Works: model id `sam-3.1` on `POST /v1/responses`, streamed, with the request shape above. HTTP 200 in 1269 ms, 8 events ending in `response.completed` with `status: completed`. That settles the model id question: `sam-3.1`. Usage is on `response.completed`: `{"images_processed": 1, "input_tokens": 0, ...}`. Cost $0.0025.
 - Surprised: "left ventricle" on heart.png found zero instances. There was no `output_text.delta` at all, and `output_text.done` had empty text. `meta_sam_parser` parses that to no records, with no error.
-- The wrapper must: treat zero deltas as a valid empty result. Decoding a real non-empty mask is still unchecked, so the adapter needs one real answer with instances before it is written. Whether SAM finds the chambers on this line art is the Day 1 risk in PLAN.md section 15, and it is still open.
+- The wrapper must: treat zero deltas as a valid empty result. Decoding a real non-empty mask is still unchecked, so the adapter needs one real answer with instances before it is written. Whether SAM finds the chambers on heart.png, a colored illustration without dark outlines, is the Day 1 risk in PLAN.md section 15, and it is still open.
 
 SAM diagnostic, Oct 29, 8 calls through `app/meta/sam_diagnostic.py` (Gate A step 4.1; responses in `fixtures/recorded/sam_diag_*.json`). Same request as S2: one phrase, `one_bit`, confidence on, the image file as it is.
 
@@ -60,6 +60,11 @@ SAM diagnostic, Oct 29, 8 calls through `app/meta/sam_diagnostic.py` (Gate A ste
 - Works: the request and the decoding. The banana mask decodes to the banana, row-major, on its box (bounds 47,44 to 978,855, raster 811x931, the bounds size). The heart mask decodes to the whole heart silhouette, vessels included, with gaps where label leader lines cross it. So the zero answers are SAM's answer, not our request.
 - Surprised: SAM finds the heart as one object and none of its parts, in either phrasing. The heart raster was 1024x668 for bounds 1423x928, the same shape scaled so its longer side is 1024. The docs say the raster equals the bounds size. One sample, so "at most 1024 px on a side" is inferred, not documented.
 - The wrapper must: scale each raster to its bounds before pasting it. Not decided here: how S2 gets parts when concept prompts find only the whole figure. Latency counts only on the two answers with instances (1261 and 1904 ms), too few for p50 and p95.
+
+The three bake-off figures:
+- heart.png (2048 x 1612): a colored anatomical illustration. Chambers and vessels are filled red, blue and cream with soft shading and no dark outlines. Black labels sit on the white page, joined to the parts by thin black leader lines.
+- flower.png (2048 x 1183): a colored diagram with thin dark outlines. Red leader lines end in red dots on the parts. Two enlarged insets, the pistil and the stamen, sit on pale tinted ellipses, and black arrows and circles tie them to the main drawing.
+- japan_regions.png (1796 x 2048): a map of 9 regions in flat colors on a blue sea, with black coastlines and prefecture borders, white labels, and an Okinawa inset in a thin-lined box.
 
 S2 bake-off, Oct 29 (Gate A step 4.1b, `app/meta/s2_bakeoff.py`; sheets in `eval/s2-bakeoff/FIGURE/index.html`, numbers in `results.json`, responses in `fixtures/recorded/bakeoff_*.json`). Counts only; Deepak grades the sheets.
 
