@@ -295,7 +295,7 @@ def markdown(rows: list[dict[str, Any]]) -> str:
             out += [f"| {c['part']} | {c['now'] or ''} | {c['match']} | {c['v2f_iou']} | "
                     f"{c['iou']} | {c['verdict']} |" for c in sc["references"]]  # fmt: skip
     out += ["", "## First-mask pairs, for NEST_INSIDE", "", nesting_table(rows), ""]
-    return "\n".join(out)
+    return "\n".join(line.rstrip() for line in out)
 
 
 async def main_async(names: list[str]) -> list[dict[str, Any]]:

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 159, updated 2026-10-30T06:29:43.730Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 167, updated 2026-10-30T10:11:52.256Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -168,6 +168,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d5-5 Gate C check (30 min)
   - The heart figure works end to end on the real traced sheet.
   - Fallback: Cut Plus features, spend Day 6 on the loop.
+- [x] d5-6 Tactile-aware part planning: S1 plans areas, lines, groups, parents, shared regions and subject; S2, sheet, Explore and Author use the plan (this phase)
+  - Live brain run fa460241: 5 of 12 touchable; sulci got points, gyri nested in lobes read as spill, pons, medulla and spinal cord one shape. Re-run heart, flower, Japan against graded references; brain uploaded and an openly licensed brain from Commons.
+  - Note: S1 locate v2 plans for touch (grade band, printed size, minimum part and gap): area, line, group, parent, separates, shares_region, subject; S1 key holds the job options. S2: lines get no call and never need the teacher; spill excuses Spark's children, parts nested in the checked mask (NEST_INSIDE 0.95 from the eval masks, not 0.9) and shared regions (IoU 0.8 or Spark); nesting re-tested on kept masks; near-identical masks split by the nearer point; merge proposals; silhouette by one SAM phrase call. S4: lines in the key, silhouette contour raised clear of every outline and braille, checked by the validator. regions.json v3 (subject, lines, merge_proposals; PLAN.md migration). Explore: crossing a line says 'line, part' with the earcon (enter hold and earcon cap kept), code path 0.8 ms headless (plan_e2e, frameToBoundaryMs); resting on the silhouette on no part says the subject once per entry. Author: Needs you, For your information, one merge button per proposal. Live, replayed in app/meta/plan_eval.py (eval/plan/RESULTS.md): heart 14 of 15 areas touchable, needs you 1 (septum spill), references 3 held, 1 improved (left common carotid 0.0 to 0.927), 0 regressed; Japan 9 of 9, 6 held, 1 improved (Kansai 0.612 to 0.804); flower 12 of 13, needs you 1, its 5 references all below 0.8 as in v2f (ovary 0.245 to 0.0, pollen sac 0.476 to 0.367: Spark's points moved); uploaded brain 10 of 10 areas (was 5 of 12 parts), needs you 0, 2 lines, 2 merge proposals, silhouette in regions.json with 0 raised pieces; Commons brain (Blausen 0111, CC BY 3.0) 5 of 6, olfactory bulb no points. 107 live calls, $0.476566. Rules: heart 1 point-symbol violation (clears with the aortic arch merge), flower 31 from its groups' nesting in S3/S4, none from the silhouette.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

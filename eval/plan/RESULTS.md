@@ -50,10 +50,10 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Subject: Japan. Grade band: none.
 - Listed 9: areas 9, lines 0, groups 0, not located 0.
 - Touchable areas: 9 of 9. Touchable parts in regions.json: 9.
-- Needs you: 0. 
+- Needs you: 0.
 - Lines: none.
 - Nested by geometry: none.
-- Merge proposals: 0. 
+- Merge proposals: 0.
 - Silhouette: SAM 0 instance(s), 0 px; in regions.json: False, 0 raised contour piece(s).
 - Rules report: 0 violation(s). Replayed calls: 12.
 
@@ -74,7 +74,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Subject: human brain. Grade band: 6_8.
 - Listed 12: areas 10, lines 2, groups 0, not located 0.
 - Touchable areas: 10 of 10. Touchable parts in regions.json: 10.
-- Needs you: 0. 
+- Needs you: 0.
 - Lines: central sulcus between precentral gyrus and postcentral gyrus; lateral sulcus between frontal lobe and temporal lobe.
 - Nested by geometry: none.
 - Merge proposals: 2. postcentral gyrus, parietal lobe as 'postcentral gyrus and parietal lobe' (their outlines overlap almost entirely); pons, medulla, cerebellum, spinal cord as 'brainstem' (Spark marked them as one unbroken shape)
@@ -89,7 +89,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Needs you: 1. olfactory bulb (no_points: every point was dropped by the guard)
 - Lines: none.
 - Nested by geometry: none.
-- Merge proposals: 0. 
+- Merge proposals: 0.
 - Silhouette: SAM 1 instance(s), 1035244 px; in regions.json: True, 1 raised contour piece(s).
 - Rules report: 0 violation(s). Replayed calls: 8.
 

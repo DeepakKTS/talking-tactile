@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 159,
- "updated_at": "2026-10-30T06:29:43.730Z",
+ "rev": 167,
+ "updated_at": "2026-10-30T10:11:52.256Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1284,6 +1284,24 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    ]
   },
   {
+   "id": "d5-6",
+   "day": 5,
+   "title": "Tactile-aware part planning: S1 plans areas, lines, groups, parents, shared regions and subject; S2, sheet, Explore and Author use the plan",
+   "detail": "Live brain run fa460241: 5 of 12 touchable; sulci got points, gyri nested in lobes read as spill, pons, medulla and spinal cord one shape. Re-run heart, flower, Japan against graded references; brain uploaded and an openly licensed brain from Commons.",
+   "timebox": "this phase",
+   "fallback": "",
+   "status": "done",
+   "note": "S1 locate v2 plans for touch (grade band, printed size, minimum part and gap): area, line, group, parent, separates, shares_region, subject; S1 key holds the job options. S2: lines get no call and never need the teacher; spill excuses Spark's children, parts nested in the checked mask (NEST_INSIDE 0.95 from the eval masks, not 0.9) and shared regions (IoU 0.8 or Spark); nesting re-tested on kept masks; near-identical masks split by the nearer point; merge proposals; silhouette by one SAM phrase call. S4: lines in the key, silhouette contour raised clear of every outline and braille, checked by the validator. regions.json v3 (subject, lines, merge_proposals; PLAN.md migration). Explore: crossing a line says 'line, part' with the earcon (enter hold and earcon cap kept), code path 0.8 ms headless (plan_e2e, frameToBoundaryMs); resting on the silhouette on no part says the subject once per entry. Author: Needs you, For your information, one merge button per proposal. Live, replayed in app/meta/plan_eval.py (eval/plan/RESULTS.md): heart 14 of 15 areas touchable, needs you 1 (septum spill), references 3 held, 1 improved (left common carotid 0.0 to 0.927), 0 regressed; Japan 9 of 9, 6 held, 1 improved (Kansai 0.612 to 0.804); flower 12 of 13, needs you 1, its 5 references all below 0.8 as in v2f (ovary 0.245 to 0.0, pollen sac 0.476 to 0.367: Spark's points moved); uploaded brain 10 of 10 areas (was 5 of 12 parts), needs you 0, 2 lines, 2 merge proposals, silhouette in regions.json with 0 raised pieces; Commons brain (Blausen 0111, CC BY 3.0) 5 of 6, olfactory bulb no points. 107 live calls, $0.476566. Rules: heart 1 point-symbol violation (clears with the aortic arch merge), flower 31 from its groups' nesting in S3/S4, none from the silhouette.",
+   "done_at": "2026-10-30T10:11:52.216Z",
+   "tags": [
+    "s1",
+    "s2",
+    "explore",
+    "author"
+   ],
+   "changed_at": "2026-10-30T10:11:52.216Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -1884,9 +1902,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-10-30T06:29:43.730Z",
-   "item": "Meta Model API, 246 live calls, from eval/live/ledger.jsonl (1 unpriced)",
-   "usd": 1.100995
+   "ts": "2026-10-30T10:11:52.256Z",
+   "item": "Meta Model API, 376 live calls, from eval/live/ledger.jsonl (1 unpriced)",
+   "usd": 1.670909
   }
  ],
  "outreach": [
@@ -2190,6 +2208,38 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Live pipeline jobs get min(60, 2 + 2 x parts) calls",
    "why": "The live heart run (19 parts) hit the 25-call cap and 3 of 7 spill retries were refused.",
    "changed_at": "2026-10-30T05:34:26.050Z"
+  },
+  {
+   "id": "dec-mvutbhtxq3qt",
+   "date": "2026-10-30",
+   "title": "S1 plans for touch: areas, lines (boundaries), groups, parents, shared regions, subject",
+   "decision": "Locate prompt v2 (s1_locate.v2.json) told the grade band, printed size, smallest part and gap. Each listed part comes back once as area, line or group; areas may have a parent; a line separates two listed areas or has a parent; shares_region with a combined name; subject. Names checked in code against the listing. S1's key holds the job options.",
+   "why": "The uploaded brain (fa460241) had 5 of 12 parts touchable: sulci got points, gyri inside lobes read as spill, and the brainstem was one shape. Planned, the same figure has 10 of 10 areas touchable and nothing needing the teacher.",
+   "changed_at": "2026-10-30T10:11:33.005Z"
+  },
+  {
+   "id": "dec-mvutbhv55g6j",
+   "date": "2026-10-30",
+   "title": "Nesting inferred from geometry",
+   "decision": "A part 95% or more inside a larger mask, by its first mask, is nested in it whatever Spark said: its points are no spill for that mask. Tested against each mask the spill check reads (first or retry); the nesting S2 records and S3 uses is tested again on the masks kept. NEST_INSIDE 0.95, not the proposed 0.9.",
+   "why": "First masks of the five eval figures (eval/plan/RESULTS.md): parts Spark gave a parent sat at 0.893 to 1.0, and the one under 0.9 is excused by Spark's parent anyway. From 0.90 to 0.95 every non-shared pair was a mask running over its neighbour (left atrium in the septum 0.906, style and pedicel in the filament 0.919 and 0.906). The heart's septum first mask nested all four chambers; its retry kept 2 to 76% of each, so nesting is re-tested on the kept mask.",
+   "changed_at": "2026-10-30T10:11:33.044Z"
+  },
+  {
+   "id": "dec-mvutbhw82463",
+   "date": "2026-10-30",
+   "title": "Silhouette drawn as outer contour",
+   "decision": "One SAM phrase call for S1's subject, largest piece kept; raised untextured on the contour only where every outline is min_gap_mm from the line and braille its clearance, pieces under point_symbol_min_mm dropped; checked by the rules validator; in regions.json as subject. A failed call leaves no silhouette.",
+   "why": "Gives the student the whole object's edge without touching any rule: heart 3 pieces, flower 1, Commons brain 1, uploaded brain 0 (its lobes run to the edge), Japan none (SAM found no instance of Japan). 0 violations from it on all five.",
+   "changed_at": "2026-10-30T10:11:33.082Z"
+  },
+  {
+   "id": "dec-mvutbhxbug0x",
+   "date": "2026-10-30",
+   "title": "Line features are spoken at boundaries, never touch areas",
+   "decision": "Lines get no SAM call, no mask, no spill check and never need the teacher. Explore says the line and the part together (Tricuspid valve, right ventricle) when the finger enters a part from the part across a line, directly or within dwell.hold_ms; it rides on the earcon, so the enter hold and the earcon cap apply, and the part counts as labelled. The key lists each line; Author lists it under For your information.",
+   "why": "A sulcus is a border, not a place to rest a finger; given points it poisoned its lobes' spill checks. Spoken at the crossing, it is heard where it is.",
+   "changed_at": "2026-10-30T10:11:33.122Z"
   }
  ],
  "risks": [
@@ -2280,6 +2330,46 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T10:11:52.256Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $1.670909 over 376 live calls, 1 of them unpriced."
+  },
+  {
+   "ts": "2026-10-30T10:11:52.216Z",
+   "kind": "claude",
+   "text": "Task d5-6 \"Tactile-aware part planning: S1 plans areas, lines, groups, parents, shared regions and subject; S2, sheet, Explore and Author use the plan\" is now done. Note: S1 locate v2 plans for touch (grade band, printed size, minimum part and gap): area, line, group, parent, separates, shares_region, subject; S1 key holds the job options. S2: lines get no call and never need the teacher; spill excuses Spark's children, parts nested in the checked mask (NEST_INSIDE 0.95 from the eval masks, not 0.9) and shared regions (IoU 0.8 or Spark); nesting re-tested on kept masks; near-identical masks split by the nearer point; merge proposals; silhouette by one SAM phrase call. S4: lines in the key, silhouette contour raised clear of every outline and braille, checked by the validator. regions.json v3 (subject, lines, merge_proposals; PLAN.md migration). Explore: crossing a line says 'line, part' with the earcon (enter hold and earcon cap kept), code path 0.8 ms headless (plan_e2e, frameToBoundaryMs); resting on the silhouette on no part says the subject once per entry. Author: Needs you, For your information, one merge button per proposal. Live, replayed in app/meta/plan_eval.py (eval/plan/RESULTS.md): heart 14 of 15 areas touchable, needs you 1 (septum spill), references 3 held, 1 improved (left common carotid 0.0 to 0.927), 0 regressed; Japan 9 of 9, 6 held, 1 improved (Kansai 0.612 to 0.804); flower 12 of 13, needs you 1, its 5 references all below 0.8 as in v2f (ovary 0.245 to 0.0, pollen sac 0.476 to 0.367: Spark's points moved); uploaded brain 10 of 10 areas (was 5 of 12 parts), needs you 0, 2 lines, 2 merge proposals, silhouette in regions.json with 0 raised pieces; Commons brain (Blausen 0111, CC BY 3.0) 5 of 6, olfactory bulb no points. 107 live calls, $0.476566. Rules: heart 1 point-symbol violation (clears with the aortic arch merge), flower 31 from its groups' nesting in S3/S4, none from the silhouette."
+  },
+  {
+   "ts": "2026-10-30T10:11:33.122Z",
+   "kind": "claude",
+   "text": "Decision: Line features are spoken at boundaries, never touch areas."
+  },
+  {
+   "ts": "2026-10-30T10:11:33.082Z",
+   "kind": "claude",
+   "text": "Decision: Silhouette drawn as outer contour."
+  },
+  {
+   "ts": "2026-10-30T10:11:33.044Z",
+   "kind": "claude",
+   "text": "Decision: Nesting inferred from geometry."
+  },
+  {
+   "ts": "2026-10-30T10:11:33.005Z",
+   "kind": "claude",
+   "text": "Decision: S1 plans for touch: areas, lines (boundaries), groups, parents, shared regions, subject."
+  },
+  {
+   "ts": "2026-10-30T09:08:40.942Z",
+   "kind": "claude",
+   "text": "Task d5-6 \"Tactile-aware part planning: S1 plans areas, lines, groups, parents, shared regions and subject; S2, sheet, Explore and Author use the plan\" is now doing."
+  },
+  {
+   "ts": "2026-10-30T09:08:37.328Z",
+   "kind": "claude",
+   "text": "Task d5-6 \"Tactile-aware part planning: S1 plans areas, lines, groups, parents, shared regions and subject; S2, sheet, Explore and Author use the plan\" added to day 5."
+  },
   {
    "ts": "2026-10-30T06:29:43.730Z",
    "kind": "claude",
