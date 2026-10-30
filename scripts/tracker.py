@@ -380,6 +380,57 @@ def cmd_gate(state: dict, args: argparse.Namespace) -> str | None:
     return text
 
 
+def read_ledger(path: Path) -> tuple[float, int, int]:
+    """Totals of eval/live/ledger.jsonl: (USD, live calls, live calls with no price).
+    Cache hits are not calls; a failed call has cost_usd null and counts as unpriced."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError as e:
+        raise TrackerError(f"Cannot read the ledger {path}: {e}. Nothing written.") from e
+    usd, calls, unpriced = 0.0, 0, 0
+    for n, raw in enumerate(lines, 1):
+        if not raw.strip():
+            continue
+        try:
+            line = json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise TrackerError(f"{path} line {n} does not parse: {e}. Nothing written.") from e
+        cost = line.get("cost_usd") if isinstance(line, dict) else None
+        if not isinstance(line, dict) or (cost is not None and not isinstance(cost, (int, float))):
+            raise TrackerError(f"{path} line {n} has no usable cost_usd. Nothing written.")
+        if line.get("cache") == "hit":
+            continue
+        calls += 1
+        if cost is None:
+            unpriced += 1
+        else:
+            usd += cost
+    return round(usd, 6), calls, unpriced
+
+
+def cmd_spend(state: dict, args: argparse.Namespace) -> str | None:
+    """Keep one cost entry, marked source "ledger", equal to the ledger's total. Costs added
+    by hand in the page stay as they are and add to it."""
+    ledger = args.ledger or args.file.parent / "eval" / "live" / "ledger.jsonl"
+    usd, calls, unpriced = read_ledger(ledger)
+    item = f"Meta Model API, {calls} live calls, from eval/live/ledger.jsonl"
+    if unpriced:
+        item += f" ({unpriced} unpriced)"
+    entry = next((c for c in state["costs"] if c.get("source") == "ledger"), None)
+    if entry is not None and (entry.get("usd"), entry.get("item")) == (usd, item):
+        print(f"Spend is already ${usd} from the ledger. Nothing written.")
+        return None
+    ts = now_iso()
+    if entry is None:
+        entry = {"source": "ledger"}
+        state["costs"].insert(0, entry)
+    entry.update(ts=ts, item=item, usd=usd)
+    text = f"Spend set from the ledger: ${usd} over {calls} live calls"
+    text += f", {unpriced} of them unpriced." if unpriced else "."
+    commit(state, None, text, ts)
+    return text
+
+
 def render_todo(state: dict) -> str:
     """TODO.md as a pure function of the tracker state."""
     tasks, gates = state["tasks"], state["gates"]
@@ -526,6 +577,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("status", choices=GATE_STATUSES)
     s.add_argument("--evidence")
     s.set_defaults(func=cmd_gate)
+
+    s = sub.add_parser("spend", help="set the spend from eval/live/ledger.jsonl totals")
+    s.add_argument("--ledger", type=Path, help="ledger file (default: eval/live/ledger.jsonl next to the tracker)")
+    s.set_defaults(func=cmd_spend)
     return p
 
 

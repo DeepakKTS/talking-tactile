@@ -338,6 +338,70 @@ class TestGate(TrackerTestCase):
         self.assert_fails_unchanged("gate", "A", "maybe")
 
 
+class TestSpend(TrackerTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        # Outside self.dir, which must hold only the tracker after each write.
+        self.ledger_dir = tempfile.TemporaryDirectory()
+        self.ledger = Path(self.ledger_dir.name) / "ledger.jsonl"
+
+    def tearDown(self) -> None:
+        self.ledger_dir.cleanup()
+        super().tearDown()
+
+    def write_ledger(self, *lines: dict) -> None:
+        self.ledger.write_text("".join(json.dumps(x) + "\n" for x in lines), encoding="utf-8")
+
+    def spend(self) -> dict:
+        return self.assert_ok_write("spend", "--ledger", str(self.ledger))
+
+    def test_spend_totals_live_calls_and_skips_cache_hits(self) -> None:
+        self.write_ledger(
+            {"cache": "miss", "status": 200, "cost_usd": 0.1},
+            {"cache": "hit", "status": None, "cost_usd": 0.0},
+            {"cache": "miss", "status": 200, "cost_usd": 0.25},
+            {"cache": "miss", "status": 500, "cost_usd": None, "error": "busy"},
+        )
+        s = self.spend()
+        [entry] = [c for c in s["costs"] if c.get("source") == "ledger"]
+        self.assertEqual(entry["usd"], 0.35)
+        self.assertEqual(entry["item"], "Meta Model API, 3 live calls, from eval/live/ledger.jsonl (1 unpriced)")
+        self.assertEqual(entry["ts"], s["updated_at"])
+        self.assertEqual(s["log"][0]["text"], "Spend set from the ledger: $0.35 over 3 live calls, 1 of them unpriced.")
+        self.assertIn("Spent $0.35 of $", self.run_cli("show").stdout)
+
+    def test_a_second_run_updates_the_same_entry_and_keeps_hand_costs(self) -> None:
+        self.write_ledger({"cache": "miss", "cost_usd": 0.5})
+        self.spend()
+        state = self.state()
+        state["costs"].append({"ts": "2026-10-28T00:00:00.000Z", "item": "printer paper", "usd": 2})
+        pre, _, post = split(self.read_text())
+        self.file.write_text(pre + tracker.serialize(state) + post, encoding="utf-8")
+        self.before_text, self.before = self.read_text(), self.state()
+        self.write_ledger({"cache": "miss", "cost_usd": 0.5}, {"cache": "miss", "cost_usd": 0.75})
+        s = self.spend()
+        self.assertEqual(len([c for c in s["costs"] if c.get("source") == "ledger"]), 1)
+        self.assertEqual(sum(c["usd"] for c in s["costs"]), 3.25)
+        self.assertIn("2 live calls", s["costs"][0]["item"])
+
+    def test_an_unchanged_ledger_writes_nothing(self) -> None:
+        self.write_ledger({"cache": "miss", "cost_usd": 0.5})
+        self.spend()
+        r = self.run_cli("spend", "--ledger", str(self.ledger))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("Nothing written", r.stdout)
+        self.assertEqual(self.read_text(), self.before_text)
+
+    def test_a_missing_or_broken_ledger_fails_unchanged(self) -> None:
+        r = self.assert_fails_unchanged("spend", "--ledger", str(self.ledger))
+        self.assertIn("Cannot read the ledger", r.stderr)
+        self.ledger.write_text('{"cache": "miss", "cost_usd": 0.1}\n{not json\n', encoding="utf-8")
+        r = self.assert_fails_unchanged("spend", "--ledger", str(self.ledger))
+        self.assertIn("line 2 does not parse", r.stderr)
+        self.write_ledger({"cache": "miss", "cost_usd": "free"})
+        self.assert_fails_unchanged("spend", "--ledger", str(self.ledger))
+
+
 class TestTodo(TrackerTestCase):
     def todo(self, *extra: str) -> str:
         r = self.run_cli("todo", *extra)
