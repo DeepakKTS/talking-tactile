@@ -1,7 +1,7 @@
-"""POST /api/ask on replay of the live run of Oct 30 (fixtures/recorded/qa_ask_*): the
-question eval's 58 answers on published version 3 of the heart and the Commons brain
-(fixtures/qa/*_v3_regions.json), the transcribe clips, and the route. Nothing reaches the
-network: a request the recordings do not hold fails."""
+"""POST /api/ask on replay of the live runs of Oct 30 (fixtures/recorded/qa2_ask_* and
+qa_ask_transcribe_*): the question eval's 61 answers on published version 4 of the heart and
+the Commons brain (fixtures/qa/*_v4_regions.json), the transcribe clips, and the route. Nothing
+reaches the network: a request the recordings do not hold fails."""
 
 import asyncio
 import json
@@ -37,10 +37,10 @@ NAMES = {fid: name for name, fid in qa_eval.FIGURES.items()}
 
 @cache
 def figure(fid: str) -> tuple[RegionsFile, bytes]:
-    """Published version 3 and the image S0 makes, byte for byte what the live run sent."""
+    """Published version 4 and the image S0 makes, byte for byte what the live run sent."""
     name = NAMES[fid]
     regions = RegionsFile.from_json_obj(
-        json.loads((FIXTURES_DIR / "qa" / f"{name}_v3_regions.json").read_text("utf-8"))
+        json.loads((FIXTURES_DIR / "qa" / f"{name}_v4_regions.json").read_text("utf-8"))
     )
     out = Path(tempfile.mkdtemp())
     s0_ingest.save(s0_ingest.ingest(IMAGES[name].read_bytes(), 0, RULES.pipeline), out)

@@ -7,11 +7,11 @@
   uv run apps/web/e2e/ask_e2e.py
 
 Mock mode answers the heart from its live recordings (fixtures/recorded/replays.json), the
-questions included (qa_ask_*, the question eval of Oct 30), so no request reaches the network.
+questions included (qa2_ask_* and qa_ask_transcribe_*, the question eval of Oct 30), so no request reaches the network.
 
 1. /author: upload heart.png; press the aortic arch merge; Mark all parts checked; describe
    the left ventricle and the right atrium as the eval did. Publish. The published
-   regions.json must equal fixtures/qa/heart_v3_regions.json, the version the answers were
+   regions.json must equal fixtures/qa/heart_v4_regions.json, the version the answers were
    recorded on.
 2. /explore: type "What does the left ventricle do?". The answer comes from the teacher's
    description, as recorded. Type "What does the right ventricle do?": the off-figure
@@ -51,8 +51,8 @@ from fix_e2e import enabled  # noqa: E402
 from plan_e2e import MERGE  # noqa: E402
 
 HEART = ROOT / "fixtures" / "heart.png"
-V3 = json.loads((ROOT / "fixtures" / "qa" / "heart_v3_regions.json").read_text("utf-8"))
-DESCRIPTIONS = {  # as the eval's version 3 has them
+V4 = json.loads((ROOT / "fixtures" / "qa" / "heart_v4_regions.json").read_text("utf-8"))
+DESCRIPTIONS = {  # as the eval's version 4 has them
     "left ventricle": "The left ventricle pumps blood out to the whole body through the aortic arch.",
     "right atrium": "The right atrium collects blood coming back from the body.",
 }
@@ -108,8 +108,8 @@ def main() -> None:
             page.get_by_role("button", name="Publish for students").click()
             page.get_by_role("link", name="Open version 1 in Explore").wait_for(timeout=60000)
             published = json.loads(urllib.request.urlopen(f"{api}/api/figures/{fid}/published/1/regions.json").read())
-            result["published_equals_v3"] = published == V3
-            if published != V3:
+            result["published_equals_v4"] = published == V4
+            if published != V4:
                 fail.append("the published regions.json is not the version the answers were recorded on")
 
             ex = browser.new_context()

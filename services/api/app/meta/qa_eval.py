@@ -37,7 +37,9 @@ FIGURES = {
     "heart": "913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada",
     "brain_lobes": "046e94d4f0b53298900ab96754caeb348dbc624b35841512d4e5b1198a36a699",
 }
-VERSION = 3  # published Oct 30: every part checked, two teacher descriptions each
+# Published Oct 30 on the point symbol floor of d5-23: every part checked, two teacher
+# descriptions each.
+VERSION = 4
 _WORD = re.compile(r"[a-z]+")
 # Words an answer may use whatever the figure: function words, positions, counting, and
 # the words of the fixed sentences.

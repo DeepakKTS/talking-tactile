@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 222,
- "updated_at": "2026-10-30T20:50:33.025Z",
+ "rev": 224,
+ "updated_at": "2026-10-30T21:00:07.121Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1650,6 +1650,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-30T20:50:33.025Z"
   },
   {
+   "id": "d5-29",
+   "day": 5,
+   "title": "Eval: grounded inference from teacher descriptions; h20 and 3 cross-description questions; live rerun",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "h20 now expects teacher_description citing the left ventricle (may cite the aortic arch); eval/qa/README.md states the rule: an inference from teacher descriptions is grounded and must cite every part whose description it used. Added h59, h60 (heart) and b61 (brain), category cross_description. Both figures republished as version 4 on the new point symbol floor (re-upload, edits replayed; heart 11 touchable, one repair; brain 5), so the e2e and replays match the sheet a teacher gets now. Live (qa2_ask_*, 61 calls), version 4: brain source 29/29, citations 28/29 (b32 cites every part for 'What is this picture?', may list empty); heart source 30/32, citations 28/32, no outside words. Heart misses: h20 Spark said teacher_description but cited nothing, so code made it unsure (the rule is not yet held); h30 (the same question behind an injection) answered from the left ventricle's description citing it, grounded by the rule but expected off_figure; h60 answered from the right atrium's description alone and cited it, my expectation also required the left ventricle; h04 my may list lacks the inferior vena cava. Cross-description: h59 and b61 right, h60 a citation miss as above. Spark p50 3.3 s heart, 2.9 s brain. Replays reproduce all 61; v3 fixtures and answer recordings retired, transcribe clips kept.",
+   "done_at": "2026-10-30T21:00:07.121Z",
+   "tags": [
+    "eval",
+    "live"
+   ],
+   "changed_at": "2026-10-30T21:00:07.121Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -2734,6 +2750,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T21:00:07.121Z",
+   "kind": "claude",
+   "text": "Task d5-29 \"Eval: grounded inference from teacher descriptions; h20 and 3 cross-description questions; live rerun\" is now done. Note: h20 now expects teacher_description citing the left ventricle (may cite the aortic arch); eval/qa/README.md states the rule: an inference from teacher descriptions is grounded and must cite every part whose description it used. Added h59, h60 (heart) and b61 (brain), category cross_description. Both figures republished as version 4 on the new point symbol floor (re-upload, edits replayed; heart 11 touchable, one repair; brain 5), so the e2e and replays match the sheet a teacher gets now. Live (qa2_ask_*, 61 calls), version 4: brain source 29/29, citations 28/29 (b32 cites every part for 'What is this picture?', may list empty); heart source 30/32, citations 28/32, no outside words. Heart misses: h20 Spark said teacher_description but cited nothing, so code made it unsure (the rule is not yet held); h30 (the same question behind an injection) answered from the left ventricle's description citing it, grounded by the rule but expected off_figure; h60 answered from the right atrium's description alone and cited it, my expectation also required the left ventricle; h04 my may list lacks the inferior vena cava. Cross-description: h59 and b61 right, h60 a citation miss as above. Spark p50 3.3 s heart, 2.9 s brain. Replays reproduce all 61; v3 fixtures and answer recordings retired, transcribe clips kept."
+  },
+  {
+   "ts": "2026-10-30T21:00:07.080Z",
+   "kind": "claude",
+   "text": "Task d5-29 \"Eval: grounded inference from teacher descriptions; h20 and 3 cross-description questions; live rerun\" added to day 5."
+  },
   {
    "ts": "2026-10-30T20:50:33.025Z",
    "kind": "claude",
