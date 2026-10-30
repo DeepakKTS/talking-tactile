@@ -1,0 +1,234 @@
+{
+ "recorded_at": "2026-10-30T02:40:24+00:00",
+ "model": "sam-3.1",
+ "request": {
+  "method": "POST",
+  "path": "/responses",
+  "json": {
+   "model": "sam-3.1",
+   "input": [
+    {
+     "type": "message",
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "<0f>1<|point;x=1150;y=419;w=2048;h=1612|><|point;x=1009;y=610;w=2048;h=1612|>-<|point;x=964;y=216;w=2048;h=1612|>-<|point;x=1116;y=201;w=2048;h=1612|>"
+      },
+      {
+       "type": "input_image",
+       "image_url": "<data image/png sha256=4caad1dedd842523aede6ce3b18f1b8d978d118fa17be685d9755b44f8836569 bytes=977814>"
+      }
+     ]
+    }
+   ],
+   "stream": true,
+   "metadata": {
+    "mask_encoding": "one_bit",
+    "include_confidence": "true"
+   }
+  }
+ },
+ "response": {
+  "status": 200,
+  "events": [
+   {
+    "response": {
+     "background": false,
+     "created_at": 1793328024.0,
+     "error": null,
+     "id": "resp_6ae40398b29d0550579048c6",
+     "incomplete_details": null,
+     "instructions": null,
+     "metadata": {
+      "include_confidence": "true",
+      "mask_encoding": "one_bit"
+     },
+     "model": "sam-3.1",
+     "object": "response",
+     "output": [],
+     "parallel_tool_calls": true,
+     "service_tier": "auto",
+     "status": "in_progress",
+     "store": true,
+     "temperature": 1.0,
+     "tool_choice": "auto",
+     "tools": [],
+     "top_logprobs": 0,
+     "top_p": 1.0,
+     "truncation": "disabled"
+    },
+    "sequence_number": 0,
+    "type": "response.created"
+   },
+   {
+    "response": {
+     "background": false,
+     "created_at": 1793328024.0,
+     "error": null,
+     "id": "resp_6ae40398b29d0550579048c6",
+     "incomplete_details": null,
+     "instructions": null,
+     "metadata": {
+      "include_confidence": "true",
+      "mask_encoding": "one_bit"
+     },
+     "model": "sam-3.1",
+     "object": "response",
+     "output": [],
+     "parallel_tool_calls": true,
+     "service_tier": "auto",
+     "status": "in_progress",
+     "store": true,
+     "temperature": 1.0,
+     "tool_choice": "auto",
+     "tools": [],
+     "top_logprobs": 0,
+     "top_p": 1.0,
+     "truncation": "disabled"
+    },
+    "sequence_number": 1,
+    "type": "response.in_progress"
+   },
+   {
+    "item": {
+     "content": [
+      {
+       "annotations": [],
+       "logprobs": [],
+       "text": "",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+     "role": "assistant",
+     "status": "in_progress",
+     "type": "message"
+    },
+    "output_index": 0,
+    "sequence_number": 2,
+    "type": "response.output_item.added"
+   },
+   {
+    "content_index": 0,
+    "item_id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+    "output_index": 0,
+    "part": {
+     "annotations": [],
+     "logprobs": [],
+     "text": "",
+     "type": "output_text"
+    },
+    "sequence_number": 3,
+    "type": "response.content_part.added"
+   },
+   {
+    "content_index": 0,
+    "delta": "<0f>1<|box;x1=776;y1=158;x2=1300;y2=777;w=2048;h=1612;c=0.9296875|><|mask;x=0;y=0;c=0.9296875;data=620,525,!!!!)`@5YcU[NYMS8veC?r4TzBlD*U$MFNM)-=M)BM{kYIxNd(5A[G6MlP8l6G8_mS?7B21XKI?`hsZLimI3w(ukpyPVP{RMCe{6x%B7jD=Vr4=+ca+/q/{2.]`jmwZKT1WWqgJ&_DjatF4(v?Zgb@pYIl3Ho2PLA[t!9jSA*MfRniVd0i(0&l5S*(FfT2TI@NNwcACwRndq!x3L4PtE=gbkn[ZZ%3/Vy11qt`EVB?8VUVk``Rp=-m1-i'a!1u+2[?fleQzdDAUeJ3q#RVjR(b^fQehw]OZ?KPWw-?0lio/y/cfq(4T/rYIw7fIrV&Rg2031OXeCc/[06pI-2GO[a'GL6E31Grukmg/d5.v$JxIDc6kPQUEk(/-i?5Pxs4+57/RsLHj!:lx(fwP'W_):-EU?x=JDzC$V%LMGT_zD?&KmNeTO9?{9Rmh6MAEvk2Sjg%.UoE8bd0g([:CNnz4S@hB]5?L/BH`]1JUXC&+D*bi_]-L@b_j+uoVOfm1f&Bi4ibMtfYeQ718'8[v9S-zhK)AX+qyxSM^G&sAUU20ILuExCKI`W)!mSr:$0pa0kSW+O$=kZ2zZ]BW3NRTCF3)3i7qnwK#-p5vbx85vdQ1OMZqmcSgY*Sx2SEC83O&mxBJ#)XWz9)76.Ugfk5D*oWqkhRVs])a*Yjna:gZSi{pfZR-cJQW+6SMmhLsg2bu'Z+7So$L^C!#xn1U?Lj@.Q!X+bz=Yzx:p#vSH^V9@'PGb@fF.P_CV&'=.9WO#)manu']Yrh@bfPxySv{?ZkO9?%i`)u*6R$5U[hc{`F]E(^:8nNOq`M8#i-9fr|>\n",
+    "item_id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+    "logprobs": [],
+    "output_index": 0,
+    "sequence_number": 4,
+    "type": "response.output_text.delta"
+   },
+   {
+    "content_index": 0,
+    "item_id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+    "logprobs": [],
+    "output_index": 0,
+    "sequence_number": 5,
+    "text": "<0f>1<|box;x1=776;y1=158;x2=1300;y2=777;w=2048;h=1612;c=0.9296875|><|mask;x=0;y=0;c=0.9296875;data=620,525,!!!!)`@5YcU[NYMS8veC?r4TzBlD*U$MFNM)-=M)BM{kYIxNd(5A[G6MlP8l6G8_mS?7B21XKI?`hsZLimI3w(ukpyPVP{RMCe{6x%B7jD=Vr4=+ca+/q/{2.]`jmwZKT1WWqgJ&_DjatF4(v?Zgb@pYIl3Ho2PLA[t!9jSA*MfRniVd0i(0&l5S*(FfT2TI@NNwcACwRndq!x3L4PtE=gbkn[ZZ%3/Vy11qt`EVB?8VUVk``Rp=-m1-i'a!1u+2[?fleQzdDAUeJ3q#RVjR(b^fQehw]OZ?KPWw-?0lio/y/cfq(4T/rYIw7fIrV&Rg2031OXeCc/[06pI-2GO[a'GL6E31Grukmg/d5.v$JxIDc6kPQUEk(/-i?5Pxs4+57/RsLHj!:lx(fwP'W_):-EU?x=JDzC$V%LMGT_zD?&KmNeTO9?{9Rmh6MAEvk2Sjg%.UoE8bd0g([:CNnz4S@hB]5?L/BH`]1JUXC&+D*bi_]-L@b_j+uoVOfm1f&Bi4ibMtfYeQ718'8[v9S-zhK)AX+qyxSM^G&sAUU20ILuExCKI`W)!mSr:$0pa0kSW+O$=kZ2zZ]BW3NRTCF3)3i7qnwK#-p5vbx85vdQ1OMZqmcSgY*Sx2SEC83O&mxBJ#)XWz9)76.Ugfk5D*oWqkhRVs])a*Yjna:gZSi{pfZR-cJQW+6SMmhLsg2bu'Z+7So$L^C!#xn1U?Lj@.Q!X+bz=Yzx:p#vSH^V9@'PGb@fF.P_CV&'=.9WO#)manu']Yrh@bfPxySv{?ZkO9?%i`)u*6R$5U[hc{`F]E(^:8nNOq`M8#i-9fr|>\n",
+    "type": "response.output_text.done"
+   },
+   {
+    "content_index": 0,
+    "item_id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+    "output_index": 0,
+    "part": {
+     "annotations": [],
+     "logprobs": [],
+     "text": "<0f>1<|box;x1=776;y1=158;x2=1300;y2=777;w=2048;h=1612;c=0.9296875|><|mask;x=0;y=0;c=0.9296875;data=620,525,!!!!)`@5YcU[NYMS8veC?r4TzBlD*U$MFNM)-=M)BM{kYIxNd(5A[G6MlP8l6G8_mS?7B21XKI?`hsZLimI3w(ukpyPVP{RMCe{6x%B7jD=Vr4=+ca+/q/{2.]`jmwZKT1WWqgJ&_DjatF4(v?Zgb@pYIl3Ho2PLA[t!9jSA*MfRniVd0i(0&l5S*(FfT2TI@NNwcACwRndq!x3L4PtE=gbkn[ZZ%3/Vy11qt`EVB?8VUVk``Rp=-m1-i'a!1u+2[?fleQzdDAUeJ3q#RVjR(b^fQehw]OZ?KPWw-?0lio/y/cfq(4T/rYIw7fIrV&Rg2031OXeCc/[06pI-2GO[a'GL6E31Grukmg/d5.v$JxIDc6kPQUEk(/-i?5Pxs4+57/RsLHj!:lx(fwP'W_):-EU?x=JDzC$V%LMGT_zD?&KmNeTO9?{9Rmh6MAEvk2Sjg%.UoE8bd0g([:CNnz4S@hB]5?L/BH`]1JUXC&+D*bi_]-L@b_j+uoVOfm1f&Bi4ibMtfYeQ718'8[v9S-zhK)AX+qyxSM^G&sAUU20ILuExCKI`W)!mSr:$0pa0kSW+O$=kZ2zZ]BW3NRTCF3)3i7qnwK#-p5vbx85vdQ1OMZqmcSgY*Sx2SEC83O&mxBJ#)XWz9)76.Ugfk5D*oWqkhRVs])a*Yjna:gZSi{pfZR-cJQW+6SMmhLsg2bu'Z+7So$L^C!#xn1U?Lj@.Q!X+bz=Yzx:p#vSH^V9@'PGb@fF.P_CV&'=.9WO#)manu']Yrh@bfPxySv{?ZkO9?%i`)u*6R$5U[hc{`F]E(^:8nNOq`M8#i-9fr|>\n",
+     "type": "output_text"
+    },
+    "sequence_number": 6,
+    "type": "response.content_part.done"
+   },
+   {
+    "item": {
+     "content": [
+      {
+       "annotations": [],
+       "logprobs": [],
+       "text": "<0f>1<|box;x1=776;y1=158;x2=1300;y2=777;w=2048;h=1612;c=0.9296875|><|mask;x=0;y=0;c=0.9296875;data=620,525,!!!!)`@5YcU[NYMS8veC?r4TzBlD*U$MFNM)-=M)BM{kYIxNd(5A[G6MlP8l6G8_mS?7B21XKI?`hsZLimI3w(ukpyPVP{RMCe{6x%B7jD=Vr4=+ca+/q/{2.]`jmwZKT1WWqgJ&_DjatF4(v?Zgb@pYIl3Ho2PLA[t!9jSA*MfRniVd0i(0&l5S*(FfT2TI@NNwcACwRndq!x3L4PtE=gbkn[ZZ%3/Vy11qt`EVB?8VUVk``Rp=-m1-i'a!1u+2[?fleQzdDAUeJ3q#RVjR(b^fQehw]OZ?KPWw-?0lio/y/cfq(4T/rYIw7fIrV&Rg2031OXeCc/[06pI-2GO[a'GL6E31Grukmg/d5.v$JxIDc6kPQUEk(/-i?5Pxs4+57/RsLHj!:lx(fwP'W_):-EU?x=JDzC$V%LMGT_zD?&KmNeTO9?{9Rmh6MAEvk2Sjg%.UoE8bd0g([:CNnz4S@hB]5?L/BH`]1JUXC&+D*bi_]-L@b_j+uoVOfm1f&Bi4ibMtfYeQ718'8[v9S-zhK)AX+qyxSM^G&sAUU20ILuExCKI`W)!mSr:$0pa0kSW+O$=kZ2zZ]BW3NRTCF3)3i7qnwK#-p5vbx85vdQ1OMZqmcSgY*Sx2SEC83O&mxBJ#)XWz9)76.Ugfk5D*oWqkhRVs])a*Yjna:gZSi{pfZR-cJQW+6SMmhLsg2bu'Z+7So$L^C!#xn1U?Lj@.Q!X+bz=Yzx:p#vSH^V9@'PGb@fF.P_CV&'=.9WO#)manu']Yrh@bfPxySv{?ZkO9?%i`)u*6R$5U[hc{`F]E(^:8nNOq`M8#i-9fr|>\n",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    },
+    "output_index": 0,
+    "sequence_number": 7,
+    "type": "response.output_item.done"
+   },
+   {
+    "response": {
+     "background": false,
+     "completed_at": 1793328024.0,
+     "created_at": 1793328024.0,
+     "error": null,
+     "id": "resp_6ae40398b29d0550579048c6",
+     "incomplete_details": null,
+     "instructions": null,
+     "metadata": {
+      "include_confidence": "true",
+      "mask_encoding": "one_bit"
+     },
+     "model": "sam-3.1",
+     "object": "response",
+     "output": [
+      {
+       "content": [
+        {
+         "annotations": [],
+         "logprobs": [],
+         "text": "<0f>1<|box;x1=776;y1=158;x2=1300;y2=777;w=2048;h=1612;c=0.9296875|><|mask;x=0;y=0;c=0.9296875;data=620,525,!!!!)`@5YcU[NYMS8veC?r4TzBlD*U$MFNM)-=M)BM{kYIxNd(5A[G6MlP8l6G8_mS?7B21XKI?`hsZLimI3w(ukpyPVP{RMCe{6x%B7jD=Vr4=+ca+/q/{2.]`jmwZKT1WWqgJ&_DjatF4(v?Zgb@pYIl3Ho2PLA[t!9jSA*MfRniVd0i(0&l5S*(FfT2TI@NNwcACwRndq!x3L4PtE=gbkn[ZZ%3/Vy11qt`EVB?8VUVk``Rp=-m1-i'a!1u+2[?fleQzdDAUeJ3q#RVjR(b^fQehw]OZ?KPWw-?0lio/y/cfq(4T/rYIw7fIrV&Rg2031OXeCc/[06pI-2GO[a'GL6E31Grukmg/d5.v$JxIDc6kPQUEk(/-i?5Pxs4+57/RsLHj!:lx(fwP'W_):-EU?x=JDzC$V%LMGT_zD?&KmNeTO9?{9Rmh6MAEvk2Sjg%.UoE8bd0g([:CNnz4S@hB]5?L/BH`]1JUXC&+D*bi_]-L@b_j+uoVOfm1f&Bi4ibMtfYeQ718'8[v9S-zhK)AX+qyxSM^G&sAUU20ILuExCKI`W)!mSr:$0pa0kSW+O$=kZ2zZ]BW3NRTCF3)3i7qnwK#-p5vbx85vdQ1OMZqmcSgY*Sx2SEC83O&mxBJ#)XWz9)76.Ugfk5D*oWqkhRVs])a*Yjna:gZSi{pfZR-cJQW+6SMmhLsg2bu'Z+7So$L^C!#xn1U?Lj@.Q!X+bz=Yzx:p#vSH^V9@'PGb@fF.P_CV&'=.9WO#)manu']Yrh@bfPxySv{?ZkO9?%i`)u*6R$5U[hc{`F]E(^:8nNOq`M8#i-9fr|>\n",
+         "type": "output_text"
+        }
+       ],
+       "id": "msg_72b63dee-8381-420c-ac44-d53f588d93ac",
+       "role": "assistant",
+       "status": "completed",
+       "type": "message"
+      }
+     ],
+     "parallel_tool_calls": true,
+     "service_tier": "auto",
+     "status": "completed",
+     "store": true,
+     "temperature": 1.0,
+     "tool_choice": "auto",
+     "tools": [],
+     "top_logprobs": 0,
+     "top_p": 1.0,
+     "truncation": "disabled",
+     "usage": {
+      "images_processed": 1,
+      "input_tokens": 0,
+      "input_tokens_details": {
+       "cached_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+       "reasoning_tokens": 0
+      },
+      "total_tokens": 0
+     }
+    },
+    "sequence_number": 8,
+    "type": "response.completed"
+   }
+  ]
+ }
+}

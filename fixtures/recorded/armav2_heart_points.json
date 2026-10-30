@@ -1,0 +1,148 @@
+{
+ "recorded_at": "2026-10-30T02:39:58+00:00",
+ "model": "muse-spark-1.3",
+ "request": {
+  "method": "POST",
+  "path": "/chat/completions",
+  "json": {
+   "model": "muse-spark-1.3",
+   "reasoning_effort": "medium",
+   "messages": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "The image is a science figure. Its parts are: \"brachiocephalic artery\" (printed label \"Brachiocephalic artery\"); \"superior vena cava\" (printed label \"Superior vena cava\"); \"right pulmonary arteries\" (printed label \"Right pulmonary arteries\"); \"right pulmonary veins\" (printed label \"Right pulmonary veins\"); \"right atrium\" (printed label \"Right atrium\"); \"tricuspid valve\" (printed label \"Atrioventricular (tricuspid) valve\"); \"chordae tendineae\" (printed label \"Chordae tendineae\"); \"right ventricle\" (printed label \"Right ventricle\"); \"inferior vena cava\" (printed label \"Inferior vena cava\"); \"left common carotid artery\" (printed label \"Left common carotid artery\"); \"left subclavian artery\" (printed label \"Left subclavian artery\"); \"aorta\" (printed label \"Aorta\"); \"left pulmonary arteries\" (printed label \"Left pulmonary arteries\"); \"left pulmonary veins\" (printed label \"Left pulmonary veins\"); \"left atrium\" (printed label \"Left atrium\"); \"semilunar valves\" (printed label \"Semilunar valves\"); \"mitral valve\" (printed label \"Atrioventricular (mitral) valve\"); \"left ventricle\" (printed label \"Left ventricle\"); \"septum\" (printed label \"Septum\"). For each part, using the part name exactly as given, return:\n- kind: \"area\" for a part with a filled interior; \"thin\" for a part drawn as a line or a strip too narrow to hold a fingertip; \"group\" for a part made of other listed parts.\n- members: for a group, the listed parts it is made of; otherwise empty.\n- parent: the listed part this part sits inside, or empty.\n- instances: every place the part appears, in the main drawing and in any inset or enlarged view. A group has no instances. For each instance, 1 to 3 points spread across its filled interior, each as far as possible from the part's edges. For an elongated part such as a vessel or a stalk, put the points on its midline along its length. Never put a point on label text, a leader line or an outline, or on the part's tip or edge.\nCoordinates are on a 0 to 1000 grid of this image: x from the left edge, y from the top edge."
+      },
+      {
+       "type": "image_url",
+       "image_url": {
+        "url": "<data image/png sha256=4caad1dedd842523aede6ce3b18f1b8d978d118fa17be685d9755b44f8836569 bytes=977814>"
+       }
+      }
+     ]
+    }
+   ],
+   "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+     "name": "PartPoints",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "parts": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "properties": {
+          "part": {
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "area",
+            "thin",
+            "group"
+           ]
+          },
+          "members": {
+           "type": "array",
+           "items": {
+            "type": "string"
+           }
+          },
+          "parent": {
+           "type": "string"
+          },
+          "instances": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "properties": {
+             "where": {
+              "type": "string"
+             },
+             "points": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+               "type": "object",
+               "properties": {
+                "x": {
+                 "type": "integer"
+                },
+                "y": {
+                 "type": "integer"
+                }
+               },
+               "required": [
+                "x",
+                "y"
+               ],
+               "additionalProperties": false
+              }
+             }
+            },
+            "required": [
+             "where",
+             "points"
+            ],
+            "additionalProperties": false
+           }
+          }
+         },
+         "required": [
+          "part",
+          "kind",
+          "members",
+          "parent",
+          "instances"
+         ],
+         "additionalProperties": false
+        }
+       }
+      },
+      "required": [
+       "parts"
+      ],
+      "additionalProperties": false
+     }
+    }
+   }
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "id": "chatcmpl-01a18aad-a51e-71e6-b527-f36fcddc0292",
+   "choices": [
+    {
+     "finish_reason": "stop",
+     "index": 0,
+     "message": {
+      "content": "{\"parts\": [{\"instances\": [{\"points\": [{\"x\": 471, \"y\": 134}, {\"x\": 490, \"y\": 182}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"brachiocephalic artery\"}, {\"instances\": [{\"points\": [{\"x\": 410, \"y\": 300}, {\"x\": 415, \"y\": 380}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"superior vena cava\"}, {\"instances\": [{\"points\": [{\"x\": 347, \"y\": 328}, {\"x\": 340, \"y\": 361}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"right pulmonary arteries\"}, {\"instances\": [{\"points\": [{\"x\": 340, \"y\": 403}, {\"x\": 332, \"y\": 449}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"right pulmonary veins\"}, {\"instances\": [{\"points\": [{\"x\": 422, \"y\": 520}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"right atrium\"}, {\"instances\": [{\"points\": [{\"x\": 415, \"y\": 613}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"tricuspid valve\"}, {\"instances\": [{\"points\": [{\"x\": 520, \"y\": 656}, {\"x\": 549, \"y\": 709}], \"where\": \"main drawing\"}], \"kind\": \"thin\", \"members\": [], \"parent\": \"right ventricle\", \"part\": \"chordae tendineae\"}, {\"instances\": [{\"points\": [{\"x\": 449, \"y\": 718}, {\"x\": 545, \"y\": 770}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"right ventricle\"}, {\"instances\": [{\"points\": [{\"x\": 444, \"y\": 820}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"inferior vena cava\"}, {\"instances\": [{\"points\": [{\"x\": 545, \"y\": 125}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"left common carotid artery\"}, {\"instances\": [{\"points\": [{\"x\": 592, \"y\": 145}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"left subclavian artery\"}, {\"instances\": [{\"points\": [{\"x\": 562, \"y\": 260}, {\"x\": 493, \"y\": 379}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"aorta\"}, {\"instances\": [{\"points\": [{\"x\": 671, \"y\": 300}, {\"x\": 668, \"y\": 354}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"left pulmonary arteries\"}, {\"instances\": [{\"points\": [{\"x\": 682, \"y\": 406}, {\"x\": 712, \"y\": 434}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"left pulmonary veins\"}, {\"instances\": [{\"points\": [{\"x\": 660, \"y\": 466}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"left atrium\"}, {\"instances\": [{\"points\": [{\"x\": 587, \"y\": 511}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"semilunar valves\"}, {\"instances\": [{\"points\": [{\"x\": 667, \"y\": 556}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"mitral valve\"}, {\"instances\": [{\"points\": [{\"x\": 674, \"y\": 642}, {\"x\": 683, \"y\": 725}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"left ventricle\"}, {\"instances\": [{\"points\": [{\"x\": 621, \"y\": 619}, {\"x\": 640, \"y\": 718}, {\"x\": 670, \"y\": 814}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"septum\"}]}",
+      "refusal": null,
+      "role": "assistant"
+     },
+     "logprobs": null
+    }
+   ],
+   "created": 1793327998,
+   "model": "muse-spark-1.3",
+   "object": "chat.completion",
+   "usage": {
+    "completion_tokens": 3934,
+    "prompt_tokens": 4558,
+    "total_tokens": 8492,
+    "completion_tokens_details": {
+     "reasoning_tokens": 2868
+    },
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   }
+  }
+ }
+}
