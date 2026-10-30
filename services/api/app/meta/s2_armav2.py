@@ -80,6 +80,14 @@ GUARD_PX = 15
 # flower's ink outlines. So a point keeps one full line width, plus the anti-aliased edge,
 # between itself and the mark. 6 px is 0.48 mm on the printed flower.
 CLEARANCE_PX = 6
+# v2f oversize rule. A mask holding prompt points of this many other parts, not its
+# children, is spill. So is one over OVERSIZE_SHARE of the object area for a part Spark
+# marked thin or gave a parent. 25% was proposed; measured on v1 and v2 it would mark the
+# flower's petal, whose v2 mask is 48.5% of the object area against 43.8% for the petals'
+# yellow fill (IoU 0.72), and whose parent is the perianth group. At 50% the rule catches
+# v2's filament (112%) and no mask that looked right.
+OVERSIZE_POINTS = 2
+OVERSIZE_SHARE = 0.5
 MAX_OBJECTS = 16  # sam/segmenting: box and point prompts name up to 16 objects
 KINDS = ("area", "thin", "group")
 
@@ -314,6 +322,46 @@ def prefix(fixes: bool) -> str:
     return "armav2f" if fixes else "armav2"
 
 
+def contest_nearest(
+    masks: dict[str, Mask], points: dict[str, list[Point]], floor_px: float
+) -> tuple[dict[str, Mask], dict[str, dict[str, int]], dict[str, int], dict[str, dict[str, int]]]:
+    """v2f: each pixel claimed by several masks goes to the smallest; between masks of equal
+    size, to the part whose nearest prompt point is closer. Returns the masks, the pixels
+    each part lost to and won from each other part, and the pixels lost to specks after."""
+    if not masks:
+        return {}, {}, {}, {}
+    order = list(masks)
+    shape = masks[order[0]].shape
+    span = float(np.hypot(*shape)) + 1  # a distance never outweighs one pixel of size
+    best = np.full(shape, np.inf, np.float64)
+    owner = np.full(shape, -1, np.int32)
+    for i, p in enumerate(order):
+        seeds = np.ones(shape, np.uint8)
+        for x, y in points.get(p, []):
+            seeds[y, x] = 0
+        dist = cv2.distanceTransform(seeds, cv2.DIST_L2, 5) if not seeds.all() else span
+        cost = int(masks[p].sum()) + np.asarray(dist) / span
+        take = masks[p] & (cost < best)
+        owner[take] = i
+        best[take] = np.broadcast_to(cost, shape)[take]
+    out: dict[str, Mask] = {}
+    lost: dict[str, dict[str, int]] = {}
+    won: dict[str, dict[str, int]] = {}
+    respeck: dict[str, int] = {}
+    for i, p in enumerate(order):
+        mine = owner == i
+        ids, counts = np.unique(owner[masks[p] & ~mine], return_counts=True)
+        lost[p] = {order[int(j)]: int(c) for j, c in zip(ids, counts, strict=True)}
+        won[p] = {}
+        for j, q in enumerate(order):
+            if j != i and (c := int((mine & masks[q]).sum())):
+                won[p][q] = c
+        cleaned = drop_specks(mine, floor_px)
+        respeck[p] = int(mine.sum() - cleaned.sum())
+        out[p] = cleaned
+    return out, lost, respeck, won
+
+
 def xy(p: list[int]) -> Point:
     return int(p[0]), int(p[1])
 
@@ -350,6 +398,7 @@ class ArmAv2:
         self.floor = bake.floor_px(fig)
         self.final: dict[str, Mask] = {}
         self.kept: dict[str, Mask] = {}  # before contested pixels are resolved
+        self.suggested: dict[str, Mask] = {}  # v2f spill masks, for the teacher only
 
     def _name(self, what: str) -> str | None:
         return f"{prefix(self.fixes)}_{self.fig.name}_{what}" if self.record else None
@@ -543,6 +592,7 @@ class ArmAv2:
             retry["sent"] = False
             why = "the points are next to its own" if not add else "the call cap"
             row["flags"].append(f"spill onto {', '.join(sorted(spill))}; no retry: {why}")
+            row["spill"] = f"holds points of {', '.join(sorted(spill))}; no retry: {why}"
             return mask
         negs = [xy(n["xy"]) for n in row.get("negatives", [])] + list(add.values())
         again, facts, retry["sam"] = await self.ask_sam(
@@ -563,13 +613,45 @@ class ArmAv2:
         retry["used"] = bool(use_again)
         left = still if use_again else spill
         row["flags"].append(f"spill onto {', '.join(sorted(left))}")
+        after = "the retry call failed" if "error" in retry["sam"] else "after a retry"
+        row["spill"] = f"holds points of {', '.join(sorted(left))}; {after}"
         return again if use_again else mask
 
+    def oversize(
+        self,
+        row: dict[str, Any],
+        mask: Mask,
+        rows: dict[str, dict[str, Any]],
+        sent: dict[str, list[Point]],
+    ) -> str | None:
+        """v2f, before resolution: why a mask counts as spill though no retry flagged it,
+        or None. It holds prompt points of OVERSIZE_POINTS or more other parts that are not
+        its children, or it covers more than OVERSIZE_SHARE of the object area while Spark
+        marked the part thin or gave it a parent."""
+        held = self.spilled_onto(row["part"], mask, rows, sent)
+        if len(held) >= OVERSIZE_POINTS:
+            return f"holds points of {len(held)} other parts: {', '.join(sorted(held))}"
+        share = mask.sum() / max(1, int(self.scene.obj.sum()))
+        if share > OVERSIZE_SHARE and (row["kind"] == "thin" or row["parent"]):
+            why = "thin" if row["kind"] == "thin" else f"inside {row['parent']}"
+            return f"covers {share:.0%} of the object area, and the part is {why}"
+        return None
+
     def finish(
-        self, rows: dict[str, dict[str, Any]], kept: dict[str, Mask], info: dict[str, Any]
+        self,
+        rows: dict[str, dict[str, Any]],
+        kept: dict[str, Mask],
+        info: dict[str, Any],
+        sent: dict[str, list[Point]],
     ) -> dict[str, Mask]:
-        """Contested pixels to the smaller mask, then group unions, then the flags."""
-        final, lost, respeck = contest(kept, self.floor)
+        """Contested pixels to the smaller mask (v2f: ties to the nearer prompt point), then
+        group unions, then the flags."""
+        if self.fixes:
+            final, lost, respeck, won = contest_nearest(kept, sent, self.floor)
+            for part in final:
+                rows[part] |= {"won_from": won[part], "won_px": sum(won[part].values())}
+        else:
+            final, lost, respeck = contest(kept, self.floor)
         for part in final:
             rows[part] |= {
                 "lost_to": lost[part],
@@ -591,7 +673,7 @@ class ArmAv2:
             row["final_px"] = int(final[part].sum()) if part in final else 0
             if row["kind"] == "thin":
                 row["flags"].append("thin: kept for the record, sheet use decided later")
-            if not row["final_px"]:
+            if not row["final_px"] and part not in self.suggested:
                 row["flags"].append("needs teacher: no mask" if self.fixes else "no mask")
         return final
 
@@ -630,8 +712,20 @@ class ArmAv2:
         if self.fixes:  # retries after every part's first call, so the cap never cuts one
             for part in list(kept):
                 kept[part] = await self.retry_spill(rows[part], kept[part], rows, sent)
+            for part in list(kept):
+                row = rows[part]
+                if "spill" not in row:
+                    why = self.oversize(row, kept[part], rows, sent)
+                    if why is not None:
+                        row["spill"] = why
+            # A spill mask takes no part in resolution and is not touchable: it is kept
+            # as a suggestion for the teacher.
+            self.suggested = {p: m for p, m in kept.items() if "spill" in rows[p]}
+            for part in self.suggested:
+                rows[part]["flags"] += ["needs teacher: spill", f"spill: {rows[part]['spill']}"]
         self.kept = kept
-        self.final = self.finish(rows, kept, info)
+        touch = {p: m for p, m in kept.items() if p not in self.suggested}
+        self.final = self.finish(rows, touch, info, sent)
         result["rows"] = list(rows.values())
         result["calls"] = self.live.calls
         result["spent_usd"] = round(self.live.meter.spent_usd, 6)
@@ -707,6 +801,8 @@ def v2_facts(row: dict[str, Any]) -> list[str]:
         out.append("negative points at " + ", ".join(n["of"] for n in row["negatives"]))
     if row.get("lost_px"):
         out.append(f"lost {row['lost_px']} px to smaller masks")
+    if "spill" in row:
+        out.append(f"teacher suggestion only, not touchable: {row.get('kept_px', 0)} px")
     out.append(f"final mask {row['final_px']} px")
     return out + [f"FLAG: {f}" for f in row["flags"]]
 
@@ -835,7 +931,7 @@ async def run_figure(
     if write == "none" or "stopped" in result:
         return run, result
     v1_rows = {r["part"]: r for r in v1_result["arm_a_rows"]}
-    save_views(fig, result, run.final, v1["a"], v1_rows, out_dir)
+    save_views(fig, result, run.suggested | run.final, v1["a"], v1_rows, out_dir)
     if write == "all":
         path = out_dir / f"results_{tag(result)}.json"
         path.write_text(json.dumps(result, indent=1) + "\n", "utf-8")

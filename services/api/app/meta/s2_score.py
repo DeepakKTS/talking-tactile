@@ -137,12 +137,14 @@ def score(
             "overlaps": partners(pairs, part),
             "overlaps_before": partners(pairs_before, part),
             "points": [point_on(p, marks) for p in run["points"].get(part, [])],
+            "teacher": run.get("teacher", {}).get(part),
         }
         row["flags"] = flags(row)
         rows.append(row)
     counts = {
         "parts": len(rows),
         "no_mask": sum(1 for r in rows if not r["area_px"]),
+        "needs_teacher": sum(1 for r in rows if r["teacher"]),
         "regression": sum(1 for r in rows if r["reference"] and r["reference"]["regression"]),
         "references": sum(1 for r in rows if r["reference"]),
         "speck": sum(r["speck"] for r in rows),
@@ -191,7 +193,9 @@ def fragmented(row: dict[str, Any]) -> bool:
 
 def flags(row: dict[str, Any]) -> list[str]:
     out = []
-    if not row["area_px"]:
+    if row.get("teacher"):
+        out.append("needs teacher: " + row["teacher"])
+    elif not row["area_px"]:
         out.append("no mask")
     ref = row["reference"]
     if ref and ref["regression"]:
@@ -306,6 +310,14 @@ def write(run_name: str, scored: dict[str, dict[str, Any]], tables: list[str]) -
     return path
 
 
+def teacher(flags: list[str]) -> str | None:
+    """Why a v2f part needs the teacher: "spill" with its reason, or "no mask"."""
+    for f in flags:
+        if f.startswith("spill: "):
+            return "spill, " + f.removeprefix("spill: ")
+    return "no mask" if "needs teacher: no mask" in flags else None
+
+
 def v2_run(
     name: str, result: dict[str, Any], final: dict[str, Mask], kept: dict[str, Mask]
 ) -> dict[str, Any]:
@@ -327,6 +339,7 @@ def v2_run(
         "kind": {r["part"]: r["kind"] for r in rows},
         "instances": {r["part"]: sum(1 for i in r["instances"] if i.get("kept_px")) for r in rows},
         "masks_before": kept,
+        "teacher": {r["part"]: teacher(r["flags"]) for r in rows if teacher(r["flags"])},
     }
 
 
@@ -373,7 +386,8 @@ def summary(s: dict[str, Any]) -> str:
         "" if fails is None else f" Graded fail at confidence {CONFIDENT} or higher: {len(fails)}."
     )
     return (
-        f"{c['parts']} parts, no mask {c['no_mask']}, regressions {c['regression']} of "
+        f"{c['parts']} parts, no mask {c['no_mask']}, needs teacher {c['needs_teacher']}, "
+        f"regressions {c['regression']} of "
         f"{c['references']} references, specks {c['speck']}, under a point symbol "
         f"{c['under_point_symbol']}, on text {c['on_text']}, on leader lines {c['on_line']}, "
         f"fragmented {c['fragmented']}, overlapping pairs {c['overlap_pairs_before']} before "

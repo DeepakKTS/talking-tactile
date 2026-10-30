@@ -89,6 +89,7 @@ def test_each_number_comes_from_the_masks() -> None:
     assert s["counts"] == {
         "parts": 5,
         "no_mask": 1,
+        "needs_teacher": 0,
         "regression": 0,
         "references": 1,
         "speck": 1,
@@ -173,3 +174,16 @@ def test_overlap_is_reported_before_and_after_resolution() -> None:
     assert by["label"]["overlaps_before"] == ["chamber"] and by["label"]["overlaps"] == []
     assert (s["counts"]["overlap_pairs_before"], s["counts"]["overlap_pairs"]) == (1, 0)
     assert "overlapped before resolution chamber" in by["label"]["flags"]
+
+
+def test_a_part_left_for_the_teacher_says_why() -> None:
+    assert score.teacher(["x", "needs teacher: spill", "spill: covers 112% of it"]) == (
+        "spill, covers 112% of it"
+    )
+    assert score.teacher(["needs teacher: no mask"]) == "no mask"
+    assert score.teacher(["thin"]) is None
+    r = run() | {"teacher": {"missing": "spill, holds points of a, b"}}
+    s = score.score(r, np.zeros((H, W, 3), np.uint8), marks(), {})
+    by = {x["part"]: x for x in s["parts"]}
+    assert by["missing"]["flags"] == ["needs teacher: spill, holds points of a, b"]
+    assert s["counts"]["needs_teacher"] == 1

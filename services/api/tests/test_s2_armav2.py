@@ -320,3 +320,62 @@ def test_a_failed_sam_call_is_flagged_and_the_run_goes_on(tmp_path: Path) -> Non
     assert (
         flags[0].startswith("SAM call failed: LiveCallError") and "needs teacher: no mask" in flags
     )
+
+
+def test_equal_masks_split_by_the_nearer_prompt_point() -> None:
+    a = np.zeros((20, 40), bool)
+    a[:, 0:30] = True
+    b = np.zeros((20, 40), bool)
+    b[:, 10:40] = True  # the same size as a; columns 10 to 29 are contested
+    small = np.zeros((20, 40), bool)
+    small[0:5, 12:16] = True  # smaller than both: wins its 20 px outright
+    final, lost, respeck, won = v2.contest_nearest(
+        {"a": a, "b": b, "small": small}, {"a": [(5, 10)], "b": [(34, 10)], "small": [(13, 2)]}, 1
+    )
+    assert final["small"].sum() == 20
+    assert final["a"][10, 19] and final["b"][10, 20]  # the midpoint of the points is 19.5
+    assert won["a"] == {"b": 180} and won["b"] == {"a": 200}
+    assert lost["a"] == {"b": 200, "small": 20} and lost["b"] == {"a": 180, "small": 20}
+    assert won["small"] == {"a": 20, "b": 20} and respeck == {"a": 0, "b": 0, "small": 0}
+
+
+def test_a_spill_after_the_retry_goes_to_the_teacher_untouchable(tmp_path: Path) -> None:
+    both, less, right = (sam_answer([box_mask(*b)]) for b in ((12, 188), (12, 170), (112, 188)))
+    fig = small_figure(tmp_path)
+    parts = [{"phrase": p, "print_label": ""} for p in ("left box", "right box")]
+    answers = {"left": both, "left retry": less, "right": right}
+    run = v2.ArmAv2(fixes_caller(tmp_path, [], answers), fig, parts, {}, False, fixes=True)
+    rows = {r["part"]: r for r in asyncio.run(run.run())["rows"]}
+    left = rows["left box"]
+    assert left["final_px"] == 0 and "left box" not in run.final
+    assert run.suggested["left box"].sum() == 158 * 86
+    assert "needs teacher: spill" in left["flags"]
+    assert "spill: holds points of right box; after a retry" in left["flags"]
+    assert rows["right box"]["final_px"] == 76 * 86 and rows["right box"]["lost_px"] == 0
+
+
+def test_oversize_masks_are_spill() -> None:
+    run = v2.ArmAv2.__new__(v2.ArmAv2)
+    obj = np.zeros((100, 100), bool)
+    obj[:, :50] = True  # 5000 px of object
+    none = np.zeros((100, 100), bool)
+    marks = PrintMarks(text=none, line=none, ink=none, words=[], segments=[])
+    run.scene = v2.Scene(np.zeros((100, 100, 3), np.uint8), marks, obj)
+    rows: dict[str, Any] = {
+        "p": {"part": "p", "kind": "thin", "parent": ""},
+        "q": {"part": "q", "kind": "area", "parent": ""},
+        "r": {"part": "r", "kind": "area", "parent": ""},
+        "c": {"part": "c", "kind": "area", "parent": "p"},
+    }
+    sent = {"p": [(1, 1)], "q": [(40, 40)], "r": [(45, 45)], "c": [(30, 30)]}
+    big = np.zeros((100, 100), bool)
+    big[:, :52] = True  # 5200 px, 104% of the object, holds q, r and its child c
+    assert run.oversize(rows["p"], big, rows, sent) == ("holds points of 2 other parts: q, r")
+    one = big.copy()
+    one[44:, 44:] = False  # now holds q only
+    assert run.oversize(rows["p"], one, rows, sent) == (
+        "covers 95% of the object area, and the part is thin"  # 4752 px
+    )
+    wide = np.zeros((100, 100), bool)
+    wide[35:, :50] = True  # 65% of the object, holding r's point only
+    assert run.oversize(rows["q"], wide, rows, sent) is None  # an area part with no parent
