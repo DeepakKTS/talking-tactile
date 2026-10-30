@@ -59,7 +59,8 @@ make check        # test + lint + typecheck, what the pre-commit hook runs
 make eval         # runs eval/ and writes eval/RESULTS.md
 uv run spikes/tracking/e2e_check.py session   # the whole touch test through the spike page, scripted hands, about 50 s. Run before Gate B
 uv run apps/web/e2e/explore_e2e.py   # headless Chrome on a mock API: author flow, Explore online and offline, no local voice, camera with MediaPipe. Prints JSON, exits non-zero on a failed check
-MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
+uv run apps/web/e2e/fix_e2e.py   # headless Chrome on the mock API: Fix outline of the heart's aorta from recorded clicks, publish, Explore touches it
+MOCK_META=1 make dev   # no network, uses fixtures/ and the recordings in fixtures/recorded/replays.json, costs nothing
 sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests and make check on the staged content
 ```
 

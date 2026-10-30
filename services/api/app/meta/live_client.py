@@ -136,6 +136,10 @@ class LiveMetaClient:
         return self._caller.calls
 
     @property
+    def live_calls(self) -> int | None:
+        return self._caller.calls
+
+    @property
     def cache_tag(self) -> str:
         """Live answers depend on the model ids, so a model change re-runs S1 and S2."""
         return f"live:{self._models.spark}:{self._models.sam}"

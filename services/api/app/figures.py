@@ -309,7 +309,7 @@ class FixMixin:
             "area_px": 0 if mask is None else int(mask.sum()),
             "outcome": outcome,
             "latency_ms": None if ms is None else round(ms, 1),
-            "calls": getattr(client, "calls", None),
+            "calls": getattr(client, "live_calls", None),
             "call_cap": self.runner.rules.meta.fix_call_cap,
         }
 

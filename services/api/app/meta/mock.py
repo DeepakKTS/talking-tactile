@@ -127,6 +127,12 @@ class MockMetaClient:
         self._cap = self._rules.live_call_cap
         return self
 
+    @property
+    def live_calls(self) -> int | None:
+        """A replayed figure's calls under its cap, as live; synthetic answers are not counted."""
+        counts = [c.calls for c in self._replay_clients.values()]
+        return sum(counts) if counts else None
+
     def cap_calls(self, cap: int) -> None:
         """Synthetic answers are unlimited; a replayed figure keeps the live cap, since the
         cap decides which retries the recordings hold."""

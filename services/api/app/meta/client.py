@@ -64,6 +64,11 @@ class MetaClient(Protocol):
         """Set this job's live call cap, once the number of parts is known."""
         ...
 
+    @property
+    def live_calls(self) -> int | None:
+        """Calls this job's client made under its cap, or None when nothing is counted."""
+        ...
+
     async def understand(
         self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
     ) -> Understanding:
