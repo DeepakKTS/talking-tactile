@@ -1,0 +1,108 @@
+{
+ "what": "heart.png through the app's own API, live, Oct 30 (d1-8). LIVE=1, caffeinate -i, a separate API instance on port 8010; recordings fixtures/recorded/pipeline_heart_*.json.",
+ "figure_id": "913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada",
+ "attempt_1": {
+  "wall_s_upload_to_failure": 61.11,
+  "failed_at": "s5",
+  "error": {
+   "code": "stage_failed",
+   "message": "cannot convert float NaN to integer",
+   "retryable": true
+  },
+  "stages": [
+   {
+    "stage": "s0",
+    "outcome": "ran",
+    "ms": 154.7,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s1",
+    "outcome": "ran",
+    "ms": 30566.7,
+    "cost_usd": 0.03881725
+   },
+   {
+    "stage": "s2",
+    "outcome": "ran",
+    "ms": 28879.6,
+    "cost_usd": 0.05750000000000005
+   },
+   {
+    "stage": "s3",
+    "outcome": "ran",
+    "ms": 199.6,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s4",
+    "outcome": "ran",
+    "ms": 1167.4,
+    "cost_usd": 0.0
+   }
+  ]
+ },
+ "fix": "72ee37b: a region thinner than one texture line gets no lines instead of failing",
+ "attempt_2_from_cache": {
+  "wall_s": 2.17,
+  "live_calls": 0,
+  "stages": [
+   {
+    "stage": "s0",
+    "outcome": "cached",
+    "ms": 92.1,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s1",
+    "outcome": "cached",
+    "ms": 0.5,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s2",
+    "outcome": "cached",
+    "ms": 2.3,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s3",
+    "outcome": "ran",
+    "ms": 254.3,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s4",
+    "outcome": "ran",
+    "ms": 1136.0,
+    "cost_usd": 0.0
+   },
+   {
+    "stage": "s5",
+    "outcome": "ran",
+    "ms": 201.1,
+    "cost_usd": 0.0
+   }
+  ]
+ },
+ "calls": {
+  "total": 25,
+  "spark": 2,
+  "sam_first": 19,
+  "sam_retries": 4,
+  "retries_refused_by_cap": 3
+ },
+ "cost_usd": 0.096317,
+ "latency_s": {
+  "spark": [
+   9.5,
+   21.0
+  ],
+  "sam_first_sum": 41.5,
+  "sam_retries_sum": 8.0
+ },
+ "s2_local_work_s_on_replay": [
+  22.89,
+  23.19
+ ]
+}

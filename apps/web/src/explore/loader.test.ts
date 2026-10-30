@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import heart from "../../../../fixtures/pipeline/heart_regions.json";
 import synthetic from "../../../../fixtures/synthetic/regions.json";
 import { LoadError, loadPublished, publishedUrl } from "./loader";
 
@@ -68,6 +69,18 @@ describe("published regions loader", () => {
     const saved = await loadPublished(ID, "latest", { fetch: fetcher(() => new TypeError("down")).f, storage });
     expect(saved.from).toBe("saved");
     expect(saved.file.regions.some((r) => r.id === "s1")).toBe(false);
+  });
+
+  it("loads the live heart with its spill suggestions left out", async () => {
+    // fixtures/pipeline/heart_regions.json: published through the API from the live run of
+    // Oct 30, and replayed in services/api/tests/test_e2e_heart_replay.py.
+    const { f } = fetcher(() => new Response(JSON.stringify(heart)));
+    const got = await loadPublished(ID, 1, { fetch: f, storage: null });
+    expect(heart.regions).toHaveLength(22);
+    expect(got.file.regions).toHaveLength(17);
+    expect(got.file.regions.every((r) => r.touchable)).toBe(true);
+    const labels = new Set(got.file.regions.map((r) => r.label));
+    for (const spill of ["aorta", "mitral valve", "left ventricle", "septum"]) expect(labels.has(spill)).toBe(false);
   });
 
   it("says when the figure is not published, and does not fall back to a draft", async () => {

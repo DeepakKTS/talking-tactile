@@ -118,7 +118,7 @@ export function Review({ api, id, status, onEdited }: Props) {
                 {flagged.map((f) => (
                   <li key={f.id} style={{ borderLeft: "0.4rem solid #c62828", padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
                     <strong>{f.label}</strong> <span>Not touchable yet.</span> {f.reason}{" "}
-                    {f.region && (
+                    {f.outlines.length > 0 && (
                       <button type="button" onClick={() => { setSelected(selected === f.id ? null : f.id); }} aria-pressed={selected === f.id}>
                         Show the suggested outline of {f.label}
                       </button>
@@ -132,7 +132,7 @@ export function Review({ api, id, status, onEdited }: Props) {
         </div>
         <figure style={{ position: "relative", margin: 0 }}>
           <img src={api.draftUrl(id, "tactile.svg", version)} alt="Preview of the tactile sheet" style={{ width: "100%", display: "block" }} />
-          {selected && <Highlight file={file} id={selected} />}
+          {selected && <Highlight file={file} ids={flagged.find((f) => f.id === selected)?.outlines ?? [selected]} />}
           <figcaption>Tactile sheet{selected ? `, ${labelOf(selected)} outlined` : ""}</figcaption>
         </figure>
       </div>
@@ -175,7 +175,7 @@ interface Flagged {
   id: string;
   label: string;
   reason: string;
-  region: boolean; // has a suggested outline to show
+  outlines: string[]; // ids of the suggested outline pieces, if any
 }
 
 const REASONS: Record<string, string> = {
@@ -190,12 +190,17 @@ export function notTouchable(file: RegionsFile): Flagged[] {
   const out: Flagged[] = [];
   for (const r of file.regions) {
     if (r.touchable) continue;
+    const same = out.find((f) => f.label === r.label && f.outlines.length > 0);
+    if (same) {
+      same.outlines.push(r.id); // another piece of the same suggestion
+      continue;
+    }
     const spill = r.flags?.find((f) => f.reason === "spill");
-    out.push({ id: r.id, label: r.label, region: true,
+    out.push({ id: r.id, label: r.label, outlines: [r.id],
       reason: `${REASONS.spill}${spill ? ` (${spill.detail})` : ""}.` });
   }
   for (const t of file.needs_teacher ?? []) {
-    out.push({ id: t.id, label: t.label, region: false, reason: `${REASONS[t.reason] ?? t.reason} (${t.detail}).` });
+    out.push({ id: t.id, label: t.label, outlines: [], reason: `${REASONS[t.reason] ?? t.reason} (${t.detail}).` });
   }
   return out;
 }
@@ -285,14 +290,17 @@ function AddPart({ busy, onAdd }: { busy: boolean; onAdd: (name: string) => Prom
 }
 
 // The selected part's outline drawn over the preview, from regions.json polygons in page mm.
-function Highlight({ file, id }: { file: RegionsFile; id: string }) {
-  const r = file.regions.find((x) => x.id === id);
-  if (!r) return null;
-  const points = r.polygon_mm.map(([x, y]) => `${x},${y}`).join(" ");
+// A suggestion may have several pieces; each is drawn.
+function Highlight({ file, ids }: { file: RegionsFile; ids: string[] }) {
+  const shown = file.regions.filter((x) => ids.includes(x.id));
+  if (shown.length === 0) return null;
   return (
     <svg viewBox={`0 0 ${file.page.width_mm} ${file.page.height_mm}`} aria-hidden="true"
       style={{ position: "absolute", left: 0, top: 0, width: "100%", pointerEvents: "none" }}>
-      <polygon points={points} fill="none" stroke="#d500f9" strokeWidth={1.5} strokeDasharray="3 1.5" />
+      {shown.map((r) => (
+        <polygon key={r.id} points={r.polygon_mm.map(([x, y]) => `${x},${y}`).join(" ")}
+          fill="none" stroke="#d500f9" strokeWidth={1.5} strokeDasharray="3 1.5" />
+      ))}
     </svg>
   );
 }

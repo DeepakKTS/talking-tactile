@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import heart from "../../../../fixtures/pipeline/heart_regions.json";
 import synthetic from "../../../../fixtures/synthetic/regions.json";
 import type { RegionsFile } from "../shared/regions";
 import { FigureApi, type Violation, describeViolation } from "./api";
@@ -151,6 +152,23 @@ describe("author page", () => {
     const atPublish = screen.getByRole("list", { name: "Not touchable when published" });
     expect(within(atPublish).getAllByRole("listitem").map((li) => li.textContent.split(":")[0])).toEqual(["septum", "okinawa"]);
     expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet.`)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
+    expect(await screen.findByText("Published as version 1.")).toBeTruthy();
+  });
+
+  it("shows the live heart's spill parts as not touchable and still publishes", async () => {
+    server.regions = structuredClone(heart) as unknown as RegionsFile;
+    page();
+    const input = screen.getByLabelText(/Figure \(PNG, JPEG or a PDF page\)/);
+    fireEvent.change(input, { target: { files: [new File([new Uint8Array([137, 80])], "heart.png", { type: "image/png" })] } });
+    fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
+    await screen.findByRole("heading", { name: heart.title });
+    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(17);
+    const flagged = within(screen.getByRole("list", { name: "Not touchable yet" })).getAllByRole("listitem");
+    expect(flagged.map((li) => li.querySelector("strong")?.textContent)).toEqual(["aorta", "mitral valve", "left ventricle", "septum"]);
+    expect(within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem")).toHaveLength(4);
+    fireEvent.click(screen.getByRole("button", { name: "Show the suggested outline of aorta" }));
+    expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // both pieces
     fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
   });

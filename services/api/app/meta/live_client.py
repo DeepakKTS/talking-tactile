@@ -9,6 +9,7 @@ kind, members, parent, and instances with their points on the 0-1000 grid.
 S2 sends point prompts, several objects per call (sam_adapter.objects_request_body).
 segment sends a phrase, for a part a teacher adds by name."""
 
+import asyncio
 import base64
 import io
 import json
@@ -67,6 +68,15 @@ def spark_body(
         "messages": messages,
         "response_format": {"type": "json_schema", "json_schema": {"name": name, "schema": js}},
     }
+
+
+def object_masks(parsed: Any, size: tuple[int, int]) -> list[ObjectMask]:
+    """Each numbered object's mask, full size."""
+    return [
+        ObjectMask(int(d.object_id), d.confidence, sam_adapter.full_mask(d, size))
+        for d in sam_adapter.decoded(parsed)
+        if d.object_id.isdigit()
+    ]
 
 
 def locate_text(locate: Prompt, parts: Sequence[PartPhrase]) -> str:
@@ -189,7 +199,7 @@ class LiveMetaClient:
             record_as=self._name(slug(phrase)),
         )
         parsed = await sam_adapter.parse_events(res.body)
-        return sam_adapter.to_masks(parsed, (h, w), phrase)
+        return await asyncio.to_thread(sam_adapter.to_masks, parsed, (h, w), phrase)
 
     async def segment_points(
         self,
@@ -219,10 +229,6 @@ class LiveMetaClient:
             record_as=self._name(f"s2_{slug(part)}{'_retry' if retry else ''}"),
         )
         parsed = await sam_adapter.parse_events(res.body)
-        out = []
-        for d in sam_adapter.decoded(parsed):
-            if d.object_id.isdigit():
-                out.append(
-                    ObjectMask(int(d.object_id), d.confidence, sam_adapter.full_mask(d, (w, h)))
-                )
-        return out
+        # Decoding is pure Python, about 1 s a mask: off the event loop, so the API answers
+        # other requests meanwhile.
+        return await asyncio.to_thread(object_masks, parsed, (w, h))
