@@ -1,0 +1,914 @@
+{
+ "figure": "japan_regions",
+ "image": "fixtures/eval/japan_regions.png",
+ "size": [
+  1796,
+  2048
+ ],
+ "cap": 25,
+ "version": "armav2f",
+ "guard_px": 15,
+ "clearance_px": 6,
+ "fill_delta": 40.0,
+ "floor_px": 236.7,
+ "print_marks": {
+  "words": 19,
+  "leader_segments": 0
+ },
+ "spark": {
+  "latency_ms": 17113.8,
+  "cost_usd": 0.02005925,
+  "usage": {
+   "completion_tokens": 3411,
+   "prompt_tokens": 4450,
+   "total_tokens": 7861,
+   "completion_tokens_details": {
+    "reasoning_tokens": 2860
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": {
+   "parts": [
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 760,
+         "y": 170
+        },
+        {
+         "x": 740,
+         "y": 220
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Hokkaido region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 698,
+         "y": 375
+        },
+        {
+         "x": 652,
+         "y": 462
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Tohoku region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 639,
+         "y": 538
+        },
+        {
+         "x": 627,
+         "y": 576
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Kanto region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 521,
+         "y": 586
+        },
+        {
+         "x": 578,
+         "y": 500
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Chubu region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 411,
+         "y": 606
+        },
+        {
+         "x": 440,
+         "y": 668
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Kansai region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 289,
+         "y": 621
+        },
+        {
+         "x": 349,
+         "y": 601
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Chugoku region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 322,
+         "y": 677
+        },
+        {
+         "x": 367,
+         "y": 663
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Shikoku region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 208,
+         "y": 699
+        },
+        {
+         "x": 194,
+         "y": 769
+        }
+       ],
+       "where": "main drawing"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Kyushu region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 922,
+         "y": 818
+        },
+        {
+         "x": 698,
+         "y": 924
+        }
+       ],
+       "where": "inset"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Okinawa inset region"
+    }
+   ]
+  }
+ },
+ "rows": [
+  {
+   "part": "Hokkaido region",
+   "print_label": "Hokkaid\u014d",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 760,
+       "y": 170
+      },
+      {
+       "x": 740,
+       "y": 220
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1364,
+        348
+       ],
+       "on": [],
+       "sent": [
+        1364,
+        348
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1329,
+        450
+       ],
+       "on": [],
+       "sent": [
+        1329,
+        450
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.9609375,
+     "raw_px": 73262,
+     "kept_px": 73197,
+     "pieces_dropped": 1,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1240.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 73197,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 73197
+  },
+  {
+   "part": "Tohoku region",
+   "print_label": "T\u014dhoku",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 698,
+       "y": 375
+      },
+      {
+       "x": 652,
+       "y": 462
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1253,
+        768
+       ],
+       "on": [],
+       "sent": [
+        1253,
+        768
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1170,
+        946
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1170,
+        941
+       ],
+       "moved_px": 5.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.87890625,
+     "raw_px": 62836,
+     "kept_px": 61146,
+     "pieces_dropped": 12,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2268.9,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 61146,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {
+    "Kanto region": 404,
+    "Chubu region": 110
+   },
+   "lost_px": 514,
+   "respeck_px": 0,
+   "final_px": 60632
+  },
+  {
+   "part": "Kanto region",
+   "print_label": "Kant\u014d",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 639,
+       "y": 538
+      },
+      {
+       "x": 627,
+       "y": 576
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1147,
+        1101
+       ],
+       "on": [],
+       "sent": [
+        1147,
+        1101
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1126,
+        1179
+       ],
+       "on": [],
+       "sent": [
+        1126,
+        1179
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.8984375,
+     "raw_px": 28539,
+     "kept_px": 28539,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 878.2,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 28539,
+   "won_from": {
+    "Tohoku region": 404,
+    "Chubu region": 9
+   },
+   "won_px": 413,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 28539
+  },
+  {
+   "part": "Chubu region",
+   "print_label": "Ch\u016bbu",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 521,
+       "y": 586
+      },
+      {
+       "x": 578,
+       "y": 500
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        935,
+        1200
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        934,
+        1200
+       ],
+       "moved_px": 1.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1038,
+        1024
+       ],
+       "on": [],
+       "sent": [
+        1038,
+        1024
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.80859375,
+     "raw_px": 58074,
+     "kept_px": 58074,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2273.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 58074,
+   "won_from": {
+    "Tohoku region": 110
+   },
+   "won_px": 110,
+   "lost_to": {
+    "Kanto region": 9,
+    "Kansai region": 3
+   },
+   "lost_px": 12,
+   "respeck_px": 0,
+   "final_px": 58062
+  },
+  {
+   "part": "Kansai region",
+   "print_label": "Kansai",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 411,
+       "y": 606
+      },
+      {
+       "x": 440,
+       "y": 668
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        738,
+        1241
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        738,
+        1247
+       ],
+       "moved_px": 6.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        790,
+        1368
+       ],
+       "on": [],
+       "sent": [
+        790,
+        1368
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.71484375,
+     "raw_px": 22875,
+     "kept_px": 20225,
+     "pieces_dropped": 4,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1070.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 20225,
+   "won_from": {
+    "Chubu region": 3
+   },
+   "won_px": 3,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 20225
+  },
+  {
+   "part": "Chugoku region",
+   "print_label": "Ch\u016bgoku",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 289,
+       "y": 621
+      },
+      {
+       "x": 349,
+       "y": 601
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        519,
+        1271
+       ],
+       "on": [],
+       "sent": [
+        519,
+        1271
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        626,
+        1230
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        626,
+        1229
+       ],
+       "moved_px": 1.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.8828125,
+     "raw_px": 27859,
+     "kept_px": 27859,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 613.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 27859,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 27859
+  },
+  {
+   "part": "Shikoku region",
+   "print_label": "Shikoku",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 322,
+       "y": 677
+      },
+      {
+       "x": 367,
+       "y": 663
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        578,
+        1386
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        577,
+        1385
+       ],
+       "moved_px": 1.4,
+       "dropped": false
+      },
+      {
+       "px": [
+        659,
+        1357
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        661,
+        1362
+       ],
+       "moved_px": 5.4,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.92578125,
+     "raw_px": 17439,
+     "kept_px": 17439,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 775.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 17439,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 17439
+  },
+  {
+   "part": "Kyushu region",
+   "print_label": "Ky\u016bsh\u016b",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main drawing",
+     "grid": [
+      {
+       "x": 208,
+       "y": 699
+      },
+      {
+       "x": 194,
+       "y": 769
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        373,
+        1431
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        377,
+        1431
+       ],
+       "moved_px": 4.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        348,
+        1574
+       ],
+       "on": [],
+       "sent": [
+        348,
+        1574
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.921875,
+     "raw_px": 34785,
+     "kept_px": 34785,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2401.9,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 34785,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 34785
+  },
+  {
+   "part": "Okinawa inset region",
+   "print_label": "(Okinawa)",
+   "flags": [
+    "point [1655, 1675] dropped: near a mark"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "inset",
+     "grid": [
+      {
+       "x": 922,
+       "y": 818
+      },
+      {
+       "x": 698,
+       "y": 924
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1655,
+        1675
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": null,
+       "moved_px": null,
+       "dropped": true
+      },
+      {
+       "px": [
+        1253,
+        1892
+       ],
+       "on": [],
+       "sent": [
+        1253,
+        1892
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.75390625,
+     "raw_px": 371305,
+     "kept_px": 345681,
+     "pieces_dropped": 107,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1872.4,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 345681,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 345681
+  }
+ ],
+ "calls": 10,
+ "spent_usd": 0.042559
+}

@@ -1,0 +1,148 @@
+{
+ "recorded_at": "2026-10-30T03:58:42+00:00",
+ "model": "muse-spark-1.3",
+ "request": {
+  "method": "POST",
+  "path": "/chat/completions",
+  "json": {
+   "model": "muse-spark-1.3",
+   "reasoning_effort": "medium",
+   "messages": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "The image is a science figure. Its parts are: \"Hokkaido region\" (printed label \"Hokkaidō\"); \"Tohoku region\" (printed label \"Tōhoku\"); \"Kanto region\" (printed label \"Kantō\"); \"Chubu region\" (printed label \"Chūbu\"); \"Kansai region\" (printed label \"Kansai\"); \"Chugoku region\" (printed label \"Chūgoku\"); \"Shikoku region\" (printed label \"Shikoku\"); \"Kyushu region\" (printed label \"Kyūshū\"); \"Okinawa inset region\" (printed label \"(Okinawa)\"). For each part, using the part name exactly as given, return:\n- kind: \"area\" for a part with a filled interior; \"thin\" for a part drawn as a line or a strip too narrow to hold a fingertip; \"group\" for a part made of other listed parts.\n- members: for a group, the listed parts it is made of; otherwise empty.\n- parent: the listed part this part sits inside, or empty.\n- instances: every place the part appears, in the main drawing and in any inset or enlarged view. A group has no instances. For each instance, 1 to 3 points spread across its filled interior, each as far as possible from the part's edges. For an elongated part such as a vessel or a stalk, put the points on its midline along its length. Never put a point on label text, a leader line or an outline, or on the part's tip or edge.\nCoordinates are on a 0 to 1000 grid of this image: x from the left edge, y from the top edge."
+      },
+      {
+       "type": "image_url",
+       "image_url": {
+        "url": "<data image/png sha256=c896258e228ec4ab205af44634da92d187bda3b20660fe1756091fffb794a980 bytes=434582>"
+       }
+      }
+     ]
+    }
+   ],
+   "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+     "name": "PartPoints",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "parts": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "properties": {
+          "part": {
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "area",
+            "thin",
+            "group"
+           ]
+          },
+          "members": {
+           "type": "array",
+           "items": {
+            "type": "string"
+           }
+          },
+          "parent": {
+           "type": "string"
+          },
+          "instances": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "properties": {
+             "where": {
+              "type": "string"
+             },
+             "points": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+               "type": "object",
+               "properties": {
+                "x": {
+                 "type": "integer"
+                },
+                "y": {
+                 "type": "integer"
+                }
+               },
+               "required": [
+                "x",
+                "y"
+               ],
+               "additionalProperties": false
+              }
+             }
+            },
+            "required": [
+             "where",
+             "points"
+            ],
+            "additionalProperties": false
+           }
+          }
+         },
+         "required": [
+          "part",
+          "kind",
+          "members",
+          "parent",
+          "instances"
+         ],
+         "additionalProperties": false
+        }
+       }
+      },
+      "required": [
+       "parts"
+      ],
+      "additionalProperties": false
+     }
+    }
+   }
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "id": "chatcmpl-01a18af5-bc83-72a6-be85-6f389d79e82d",
+   "choices": [
+    {
+     "finish_reason": "stop",
+     "index": 0,
+     "message": {
+      "content": "{\"parts\": [{\"instances\": [{\"points\": [{\"x\": 760, \"y\": 170}, {\"x\": 740, \"y\": 220}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Hokkaido region\"}, {\"instances\": [{\"points\": [{\"x\": 698, \"y\": 375}, {\"x\": 652, \"y\": 462}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Tohoku region\"}, {\"instances\": [{\"points\": [{\"x\": 639, \"y\": 538}, {\"x\": 627, \"y\": 576}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Kanto region\"}, {\"instances\": [{\"points\": [{\"x\": 521, \"y\": 586}, {\"x\": 578, \"y\": 500}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Chubu region\"}, {\"instances\": [{\"points\": [{\"x\": 411, \"y\": 606}, {\"x\": 440, \"y\": 668}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Kansai region\"}, {\"instances\": [{\"points\": [{\"x\": 289, \"y\": 621}, {\"x\": 349, \"y\": 601}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Chugoku region\"}, {\"instances\": [{\"points\": [{\"x\": 322, \"y\": 677}, {\"x\": 367, \"y\": 663}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Shikoku region\"}, {\"instances\": [{\"points\": [{\"x\": 208, \"y\": 699}, {\"x\": 194, \"y\": 769}], \"where\": \"main drawing\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Kyushu region\"}, {\"instances\": [{\"points\": [{\"x\": 922, \"y\": 818}, {\"x\": 698, \"y\": 924}], \"where\": \"inset\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"Okinawa inset region\"}]}",
+      "refusal": null,
+      "role": "assistant"
+     },
+     "logprobs": null
+    }
+   ],
+   "created": 1793332722,
+   "model": "muse-spark-1.3",
+   "object": "chat.completion",
+   "usage": {
+    "completion_tokens": 3411,
+    "prompt_tokens": 4450,
+    "total_tokens": 7861,
+    "completion_tokens_details": {
+     "reasoning_tokens": 2860
+    },
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   }
+  }
+ }
+}

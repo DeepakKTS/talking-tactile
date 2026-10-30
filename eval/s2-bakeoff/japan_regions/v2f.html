@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>S2 Arm A v2f: japan_regions</title>
+<style>
+body { font: 15px/1.4 system-ui, sans-serif; margin: 16px; background: #fff; color: #111; }
+table { border-collapse: collapse; }
+th, td { border: 1px solid #999; padding: 6px; vertical-align: top; }
+td img { width: 360px; display: block; }
+ul { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+.flag { color: #a00; font-weight: 600; }
+#step { border: 2px solid #333; padding: 12px; margin-bottom: 24px; }
+#name { font-size: 40px; font-weight: 700; margin: 8px 0 0; }
+#label { margin: 0 0 8px; color: #444; }
+.nav { display: flex; gap: 12px; align-items: center; }
+.nav button { font-size: 18px; padding: 6px 16px; }
+.pair { display: flex; gap: 16px; flex-wrap: wrap; }
+.pair figure { margin: 0; flex: 1 1 420px; }
+.pair img { width: 100%; border: 1px solid #999; }
+</style></head><body>
+<h1>S2 Arm A v2f: japan_regions</h1>
+<ul><li>Image fixtures/eval/japan_regions.png, 1796 x 2048 px</li><li>Calls 10, spent $0.042559. Spark call 17113.8 ms, $0.02005925</li><li>Guard: 15 px, fill color within 40.0. Speck floor 236.7 px</li></ul>
+<section id="step" aria-label="One part at a time">
+<h2>One part at a time</h2>
+<p>Left and right arrow keys, or the buttons. The figure is at 30% and the mask at full strength. In v2f, crosshairs are the points sent, an X is a negative point and a red ring is a dropped point.</p>
+<div class="nav"><button id="prev" type="button">Previous</button>
+<span id="count"></span><button id="next" type="button">Next</button></div>
+<p id="name" aria-live="polite"></p><p id="label"></p>
+<div class="pair"><figure><figcaption>v1: one Spark point, SAM mask</figcaption>
+<img id="ia" alt=""><ul id="fa"></ul></figure>
+<figure><figcaption>v2f: guarded points with clearance, SAM, spill retry, post-processed</figcaption>
+<img id="ib" alt=""><ul id="fb"></ul></figure></div>
+</section>
+<script>
+const STEPS = [{"part": "Hokkaido region", "label": "Hokkaid\u014d", "a": "img/v2fsheet_v1_hokkaido_region.jpg", "b": "img/v2fsheet_v2f_hokkaido_region.jpg", "a_facts": ["v1 point [1355, 358]", "confidence 0.961"], "b_facts": ["kind area", "main drawing: 2 points sent, confidence 0.961", "final mask 73197 px"]}, {"part": "Tohoku region", "label": "T\u014dhoku", "a": "img/v2fsheet_v1_tohoku_region.jpg", "b": "img/v2fsheet_v2f_tohoku_region.jpg", "a_facts": ["v1 point [1217, 829]", "confidence 0.711"], "b_facts": ["kind area", "main drawing: 2 points sent, 1 moved, confidence 0.879", "lost 514 px to smaller masks", "final mask 60632 px"]}, {"part": "Kanto region", "label": "Kant\u014d", "a": "img/v2fsheet_v1_kanto_region.jpg", "b": "img/v2fsheet_v2f_kanto_region.jpg", "a_facts": ["v1 point [1131, 1157]", "confidence 0.848"], "b_facts": ["kind area", "main drawing: 2 points sent, confidence 0.898", "final mask 28539 px"]}, {"part": "Chubu region", "label": "Ch\u016bbu", "a": "img/v2fsheet_v1_chubu_region.jpg", "b": "img/v2fsheet_v2f_chubu_region.jpg", "a_facts": ["v1 point [960, 1142]", "confidence 0.512"], "b_facts": ["kind area", "main drawing: 2 points sent, 1 moved, confidence 0.809", "lost 12 px to smaller masks", "final mask 58062 px"]}, {"part": "Kansai region", "label": "Kansai", "a": "img/v2fsheet_v1_kansai_region.jpg", "b": "img/v2fsheet_v2f_kansai_region.jpg", "a_facts": ["v1 point [797, 1298]", "confidence 0.523"], "b_facts": ["kind area", "main drawing: 2 points sent, 1 moved, confidence 0.715", "final mask 20225 px"]}, {"part": "Chugoku region", "label": "Ch\u016bgoku", "a": "img/v2fsheet_v1_chugoku_region.jpg", "b": "img/v2fsheet_v2f_chugoku_region.jpg", "a_facts": ["v1 point [535, 1273]", "confidence 0.809"], "b_facts": ["kind area", "main drawing: 2 points sent, 1 moved, confidence 0.883", "final mask 27859 px"]}, {"part": "Shikoku region", "label": "Shikoku", "a": "img/v2fsheet_v1_shikoku_region.jpg", "b": "img/v2fsheet_v2f_shikoku_region.jpg", "a_facts": ["v1 point [594, 1398]", "confidence 0.938"], "b_facts": ["kind area", "main drawing: 2 points sent, 2 moved, confidence 0.926", "final mask 17439 px"]}, {"part": "Kyushu region", "label": "Ky\u016bsh\u016b", "a": "img/v2fsheet_v1_kyushu_region.jpg", "b": "img/v2fsheet_v2f_kyushu_region.jpg", "a_facts": ["v1 point [364, 1495]", "confidence 0.871"], "b_facts": ["kind area", "main drawing: 2 points sent, 1 moved, confidence 0.922", "final mask 34785 px"]}, {"part": "Okinawa inset region", "label": "(Okinawa)", "a": "img/v2fsheet_v1_okinawa_inset_region.jpg", "b": "img/v2fsheet_v2f_okinawa_inset_region.jpg", "a_facts": ["v1 point [1646, 1687]", "confidence 0.855"], "b_facts": ["kind area", "inset: 1 point sent, confidence 0.754", "final mask 345681 px", "FLAG: point [1655, 1675] dropped: near a mark"]}];
+let at = 0;
+function list(id, items) {
+  const ul = document.getElementById(id);
+  ul.replaceChildren(...items.map(t => {
+    const li = document.createElement("li");
+    li.textContent = t;
+    if (t.startsWith("FLAG")) li.className = "flag";
+    return li;
+  }));
+}
+function show(i) {
+  at = (i + STEPS.length) % STEPS.length;
+  const s = STEPS[at];
+  document.getElementById("count").textContent = (at + 1) + " of " + STEPS.length;
+  document.getElementById("name").textContent = s.part;
+  document.getElementById("label").textContent = "label: " + s.label;
+  document.getElementById("ia").src = s.a;
+  document.getElementById("ia").alt = "v1 mask for " + s.part;
+  document.getElementById("ib").src = s.b;
+  document.getElementById("ib").alt = "v2f mask for " + s.part;
+  list("fa", s.a_facts);
+  list("fb", s.b_facts);
+}
+document.getElementById("prev").onclick = () => show(at - 1);
+document.getElementById("next").onclick = () => show(at + 1);
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") show(at - 1);
+  if (e.key === "ArrowRight") show(at + 1);
+});
+show(0);
+</script>
+<h2>Parts</h2>
+<table><thead><tr><th>Part</th><th>v1</th><th>v2f</th><th>v2f grade</th><th>Reason</th></tr>
+</thead><tbody>
+<tr><th>Hokkaido region<br><small>label: Hokkaidō</small></th><td><img src='img/v2fsheet_v1_hokkaido_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_hokkaido_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, confidence 0.961</li><li>final mask 73197 px</li></ul></td><td></td><td></td></tr><tr><th>Tohoku region<br><small>label: Tōhoku</small></th><td><img src='img/v2fsheet_v1_tohoku_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_tohoku_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, 1 moved, confidence 0.879</li><li>lost 514 px to smaller masks</li><li>final mask 60632 px</li></ul></td><td></td><td></td></tr><tr><th>Kanto region<br><small>label: Kantō</small></th><td><img src='img/v2fsheet_v1_kanto_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_kanto_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, confidence 0.898</li><li>final mask 28539 px</li></ul></td><td></td><td></td></tr><tr><th>Chubu region<br><small>label: Chūbu</small></th><td><img src='img/v2fsheet_v1_chubu_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_chubu_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, 1 moved, confidence 0.809</li><li>lost 12 px to smaller masks</li><li>final mask 58062 px</li></ul></td><td></td><td></td></tr><tr><th>Kansai region<br><small>label: Kansai</small></th><td><img src='img/v2fsheet_v1_kansai_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_kansai_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, 1 moved, confidence 0.715</li><li>final mask 20225 px</li></ul></td><td></td><td></td></tr><tr><th>Chugoku region<br><small>label: Chūgoku</small></th><td><img src='img/v2fsheet_v1_chugoku_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_chugoku_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, 1 moved, confidence 0.883</li><li>final mask 27859 px</li></ul></td><td></td><td></td></tr><tr><th>Shikoku region<br><small>label: Shikoku</small></th><td><img src='img/v2fsheet_v1_shikoku_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_shikoku_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, 2 moved, confidence 0.926</li><li>final mask 17439 px</li></ul></td><td></td><td></td></tr><tr><th>Kyushu region<br><small>label: Kyūshū</small></th><td><img src='img/v2fsheet_v1_kyushu_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_kyushu_region.jpg' alt=''><ul><li>kind area</li><li>main drawing: 2 points sent, 1 moved, confidence 0.922</li><li>final mask 34785 px</li></ul></td><td></td><td></td></tr><tr><th>Okinawa inset region<br><small>label: (Okinawa)</small></th><td><img src='img/v2fsheet_v1_okinawa_inset_region.jpg' alt=''></td><td><img src='img/v2fsheet_v2f_okinawa_inset_region.jpg' alt=''><ul><li>kind area</li><li>inset: 1 point sent, confidence 0.754</li><li>final mask 345681 px</li><li class=flag>FLAG: point [1655, 1675] dropped: near a mark</li></ul></td><td></td><td></td></tr>
+</tbody></table></body></html>
