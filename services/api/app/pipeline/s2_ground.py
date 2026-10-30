@@ -1,5 +1,6 @@
-"""S2 ground: one SAM call per proposed phrase, sam_concurrency at a time, plus one for
-print text so it can be cut out of the raised layer."""
+"""S2 ground. When S1 located the parts (live), by points: app/pipeline/s2_points.py. Else
+(mock mode), one SAM call per proposed phrase, sam_concurrency at a time, plus one for print
+text so it can be cut out of the raised layer."""
 
 import asyncio
 import json
@@ -8,16 +9,21 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from app.config import Meta
+from app.config import TactileRules
 from app.meta.client import MetaClient
 from app.meta.types import Understanding
 from app.models.mask import Mask, MaskSource
+from app.pipeline import s2_points
 from app.pipeline.cache import load_mask, save_mask
 from app.pipeline.s0_ingest import Ingested
+from app.pipeline.s2_types import Grounded, TeacherPart
 from app.prompts import Prompt, schema_digest
+
+__all__ = ["PROMPT", "SCHEMA_DIGEST", "Grounded", "TeacherPart", "ground", "load", "save"]
 
 PROMPT = "s2_ground.v1.json"
 _FILE = "grounded.json"
+_NOTES = "teacher.json"
 
 
 class MaskEntry(BaseModel):
@@ -35,16 +41,12 @@ class MaskEntry(BaseModel):
 SCHEMA_DIGEST = schema_digest(MaskEntry.model_json_schema())
 
 
-class Grounded(BaseModel):
-    model_config = ConfigDict(frozen=True)
-
-    parts: list[Mask]  # in phrase order, then SAM's instance order
-    text: list[Mask]
-
-
 async def ground(
-    client: MetaClient, ing: Ingested, u: Understanding, prompt: Prompt, rules: Meta
+    client: MetaClient, ing: Ingested, u: Understanding, prompt: Prompt, all_rules: TactileRules
 ) -> Grounded:
+    if u.located:
+        return await s2_points.ground_points(client, ing, u, prompt, all_rules)
+    rules = all_rules.meta
     phrases = [p for p in dict.fromkeys(p.phrase for p in u.parts) if p != rules.text_phrase]
     gate = asyncio.Semaphore(rules.sam_concurrency)
 
@@ -66,6 +68,15 @@ def save(g: Grounded, out: Path) -> None:
                 MaskEntry(kind=kind, file=name, label=m.label, score=m.score, source=m.source)
             )
     (out / _FILE).write_text(json.dumps([e.model_dump() for e in entries], indent=1), "utf-8")
+    teacher = []
+    for i, t in enumerate(g.teacher):
+        obj = t.model_dump(exclude={"suggestion"})
+        if t.suggestion is not None:
+            obj["file"] = f"suggestion{i:03d}.png"
+            save_mask(out / obj["file"], t.suggestion)
+        teacher.append(obj)
+    notes = {"flags": g.flags, "teacher": teacher, "facts": g.facts}
+    (out / _NOTES).write_text(json.dumps(notes, indent=1), "utf-8")
 
 
 def load(src: Path) -> Grounded:
@@ -74,4 +85,15 @@ def load(src: Path) -> Grounded:
         e = MaskEntry.model_validate(obj)
         mask = Mask(data=load_mask(src / e.file), label=e.label, score=e.score, source=e.source)
         masks[e.kind].append(mask)
-    return Grounded(parts=masks["part"], text=masks["text"])
+    notes = json.loads((src / _NOTES).read_text("utf-8")) if (src / _NOTES).exists() else {}
+    teacher = []
+    for t in notes.get("teacher", []):
+        file = t.pop("file", None)
+        teacher.append(TeacherPart(**t, suggestion=None if file is None else load_mask(src / file)))
+    return Grounded(
+        parts=masks["part"],
+        text=masks["text"],
+        flags=notes.get("flags", {}),
+        teacher=teacher,
+        facts=notes.get("facts", {}),
+    )

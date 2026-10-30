@@ -17,14 +17,14 @@ What the docs say (read 2026-10-24; spikes/sam.md has the links):
   `await .final_result()`. The events need output_text.delta with output_index,
   content_index and item_id, then output_text.done, then response.completed.
 
-So to_masks will scale each box-local raster to its bounds, paste it into a full-size bool
-array the size of the normalized image, label it with the phrase and give it the instance
+So to_masks scales each box-local raster to its bounds, pastes it into a full-size bool
+array the size of the normalized image, labels it with the phrase and gives it the instance
 confidence.
 
 The request body and stream parsing below were confirmed live on Oct 27 (zero instances,
 which parses to no records) and Oct 29 (fixtures/recorded/sam_diag_*.json: a banana photo
-and heart.png as a whole each gave one instance, and decoded() reads both masks). to_masks
-is not built yet: it waits for review of that diagnostic (tracker d1-6).
+and heart.png as a whole each gave one instance, and decoded() reads both masks). Point
+prompts with several objects were confirmed in the S2 bake-off (Oct 29 and 30).
 """
 
 import base64
@@ -160,6 +160,28 @@ class Decoded:
     error: str | None
 
 
+# Decoding is pure Python and re-encodes each mask to check it, about 0.3 to 0.9 s for a
+# mask a few hundred px a side. The test session turns this cache on (tests/conftest.py), so a
+# recorded mask replayed by several tests is decoded once. Off in the app.
+_decode_cache: dict[tuple[int, int, str], npt.NDArray[np.bool_]] | None = None
+
+
+def cache_decodes(on: bool) -> None:
+    global _decode_cache  # noqa: PLW0603 - one switch for the test session
+    _decode_cache = {} if on else None
+
+
+def _raster(mask: Any) -> npt.NDArray[np.bool_]:
+    key = (mask.height, mask.width, str(mask.data)) if _decode_cache is not None else None
+    if key is not None and key in _decode_cache:  # type: ignore[operator]
+        return _decode_cache[key]  # type: ignore[index]
+    flat = sam.decode_mask_to_raster(mask)
+    raster = np.frombuffer(flat, np.uint8).reshape(mask.height, mask.width) > 0
+    if key is not None:
+        _decode_cache[key] = raster  # type: ignore[index]
+    return raster
+
+
 def decoded(result: sam.ImageSegmentationResult) -> list[Decoded]:
     out = []
     for rec in result.records:
@@ -169,21 +191,39 @@ def decoded(result: sam.ImageSegmentationResult) -> list[Decoded]:
         bounds = (int(b.left), int(b.top), int(b.right), int(b.bottom))
         raster, error = None, None
         try:
-            flat = sam.decode_mask_to_raster(rec.mask)
-            raster = np.frombuffer(flat, np.uint8).reshape(rec.mask.height, rec.mask.width) > 0
+            raster = _raster(rec.mask)
         except (sam.InvalidSegmentationMaskError, ValueError) as exc:
             error = str(exc)
         out.append(Decoded(str(rec.object_id), rec.confidence, bounds, raster, error))
     return out
 
 
+def full_mask(inst: Decoded, size: tuple[int, int]) -> npt.NDArray[np.bool_]:
+    """A decoded raster scaled to its bounds, nearest pixel, on a full-size array. size is
+    (width, height). A raster can be smaller than its bounds (live, Oct 29)."""
+    w, h = size
+    out = np.zeros((h, w), bool)
+    if inst.raster is None:
+        return out
+    left, top, right, bottom = inst.bounds
+    rh, rw = inst.raster.shape
+    rows = np.arange(bottom - top) * rh // (bottom - top)
+    cols = np.arange(right - left) * rw // (right - left)
+    out[top:bottom, left:right] = inst.raster[rows][:, cols][: h - top, : w - left]
+    return out
+
+
 def to_masks(
     parsed: sam.ImageSegmentationResult, image_shape: tuple[int, int], phrase: str
 ) -> list[Mask]:
-    """One Mask per instance in a parsed SAM response. Zero instances is no masks."""
-    if not parsed.records:
-        return []
-    raise NotImplementedError(
-        "Turning SAM answers into Masks waits for review of the Oct 29 diagnostic (tracker "
-        "d1-6): rasters can be smaller than their bounds."
-    )
+    """One Mask per instance in a parsed SAM response, scaled to its bounds and pasted into
+    a full-size image. Zero instances is no masks; an instance that does not decode or is
+    empty is left out."""
+    h, w = image_shape
+    out = []
+    for d in decoded(parsed):
+        data = full_mask(d, (w, h))
+        if data.any():
+            score = 0.0 if d.confidence is None else min(1.0, max(0.0, float(d.confidence)))
+            out.append(Mask(data=data, label=phrase, score=score, source="sam"))
+    return out

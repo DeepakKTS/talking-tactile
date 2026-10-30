@@ -1,7 +1,9 @@
 // The teacher's review: the figure as uploaded, the parts found, and the tactile sheet.
 // Each part can be marked checked, renamed, described, merged into another or deleted, and
-// a missing part added by name. The rules report is shown before publishing; a publish the
-// rules refuse lists every violation in words. After publishing: print and explore.
+// a missing part added by name. Parts the system could not make touchable are listed apart,
+// with the reason; publishing does not wait for them, and the publish area names each one.
+// The rules report is shown before publishing; a publish the rules refuse lists every
+// violation in words. After publishing: print and explore.
 import { useEffect, useState } from "react";
 import type { Region, RegionsFile } from "../shared/regions";
 import { ApiError, type Edit, type FigureApi, type Publication, type Status, type Violation, describeViolation } from "./api";
@@ -82,7 +84,9 @@ export function Review({ api, id, status, onEdited }: Props) {
   };
 
   if (!file) return <p role="status">{message || "Loading the review."}</p>;
-  const unchecked = file.regions.filter((r) => !r.verified_by_teacher).length;
+  const touchable = file.regions.filter((r) => r.touchable);
+  const unchecked = touchable.filter((r) => !r.verified_by_teacher).length;
+  const flagged = notTouchable(file);
 
   return (
     <section aria-label="Review">
@@ -97,15 +101,33 @@ export function Review({ api, id, status, onEdited }: Props) {
         <div>
           <h3>Parts</h3>
           <p>
-            {unchecked === 0 ? "Every part is checked." : `${unchecked} of ${file.regions.length} parts not checked yet.`}
+            {unchecked === 0 ? "Every part is checked." : `${unchecked} of ${touchable.length} parts not checked yet.`}
           </p>
           <ul aria-label="Parts" style={{ listStyle: "none", padding: 0 }}>
-            {file.regions.map((r) => (
+            {touchable.map((r) => (
               // Keyed on the saved text too, so the fields start over after an edit lands.
-              <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={file.regions} busy={busy || !settled} selected={selected === r.id}
+              <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={touchable} busy={busy || !settled} selected={selected === r.id}
                 onSelect={() => { setSelected(selected === r.id ? null : r.id); }} onEdit={edit} />
             ))}
           </ul>
+          {flagged.length > 0 && (
+            <>
+              <h3>Not touchable yet</h3>
+              <p>A student cannot touch these parts. Each needs you; the reason is given.</p>
+              <ul aria-label="Not touchable yet" style={{ listStyle: "none", padding: 0 }}>
+                {flagged.map((f) => (
+                  <li key={f.id} style={{ borderLeft: "0.4rem solid #c62828", padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
+                    <strong>{f.label}</strong> <span>Not touchable yet.</span> {f.reason}{" "}
+                    {f.region && (
+                      <button type="button" onClick={() => { setSelected(selected === f.id ? null : f.id); }} aria-pressed={selected === f.id}>
+                        Show the suggested outline of {f.label}
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
           <AddPart busy={busy || !settled} onAdd={(name) => send(`Looking for ${name}`, () => api.add(id, name))} />
         </div>
         <figure style={{ position: "relative", margin: 0 }}>
@@ -124,6 +146,14 @@ export function Review({ api, id, status, onEdited }: Props) {
         </ul>
       )}
 
+      {flagged.length > 0 && (
+        <div>
+          <p>Publishing does not wait for these. When published, these parts are not touchable:</p>
+          <ul aria-label="Not touchable when published">
+            {flagged.map((f) => <li key={f.id}>{f.label}: {f.reason}</li>)}
+          </ul>
+        </div>
+      )}
       <p>
         <button type="button" onClick={() => void publish()} disabled={busy || !settled}>Publish for students</button>{" "}
         <a href={api.draftUrl(id, "print.pdf", version)}>Download the draft print PDF</a>
@@ -140,6 +170,40 @@ export function Review({ api, id, status, onEdited }: Props) {
     </section>
   );
 }
+
+interface Flagged {
+  id: string;
+  label: string;
+  reason: string;
+  region: boolean; // has a suggested outline to show
+}
+
+const REASONS: Record<string, string> = {
+  spill: "Its outline spilled onto other parts, so it is only a suggestion",
+  no_points: "No usable point was found on it",
+  no_mask: "No outline was found for it",
+  dropped: "It was dropped as too small or too thin",
+};
+
+// Every part a student cannot touch: suggestion regions, then parts with no shape.
+export function notTouchable(file: RegionsFile): Flagged[] {
+  const out: Flagged[] = [];
+  for (const r of file.regions) {
+    if (r.touchable) continue;
+    const spill = r.flags?.find((f) => f.reason === "spill");
+    out.push({ id: r.id, label: r.label, region: true,
+      reason: `${REASONS.spill}${spill ? ` (${spill.detail})` : ""}.` });
+  }
+  for (const t of file.needs_teacher ?? []) {
+    out.push({ id: t.id, label: t.label, region: false, reason: `${REASONS[t.reason] ?? t.reason} (${t.detail}).` });
+  }
+  return out;
+}
+
+const NOTES: Record<string, string> = {
+  thin: "Thin: how the sheet shows it is decided later.",
+  under_point_symbol: "Smaller than a point symbol, so the sheet shows it as one.",
+};
 
 function PartRow(props: {
   region: Region;
@@ -162,6 +226,7 @@ function PartRow(props: {
     <li style={{ borderLeft: `0.4rem solid ${r.verified_by_teacher ? "#2e7d32" : "#f0a000"}`, padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
       <strong>{r.label}</strong>
       {r.abbrev ? ` (braille ${r.abbrev})` : ""} <span>{r.verified_by_teacher ? "✓ " : "! "}{flag}</span>{" "}
+      {(r.flags ?? []).map((f) => <span key={f.reason}>{NOTES[f.reason] ?? f.detail} </span>)}
       <button type="button" onClick={onSelect} aria-pressed={selected}>Show on sheet</button>{" "}
       {!r.verified_by_teacher && (
         <button type="button" disabled={busy} onClick={() => void onEdit(r, { op: "label", label: r.label }, `Marking ${r.label} checked`)}>

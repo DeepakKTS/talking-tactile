@@ -56,6 +56,20 @@ describe("published regions loader", () => {
     expect(storage.data.size).toBe(1);
   });
 
+  it("hands Explore touchable regions only, online and from the saved copy", async () => {
+    const file = structuredClone(synthetic) as { regions: { id: string; touchable: boolean }[] };
+    const first = file.regions[0];
+    if (!first) throw new Error("the fixture has regions");
+    file.regions.push({ ...first, id: "s1", touchable: false });
+    const body = JSON.stringify(file);
+    const storage = new MemoryStorage();
+    const got = await loadPublished(ID, "latest", { fetch: fetcher(() => new Response(body)).f, storage });
+    expect(got.file.regions.map((r) => r.id)).toEqual(synthetic.regions.map((r) => r.id));
+    const saved = await loadPublished(ID, "latest", { fetch: fetcher(() => new TypeError("down")).f, storage });
+    expect(saved.from).toBe("saved");
+    expect(saved.file.regions.some((r) => r.id === "s1")).toBe(false);
+  });
+
   it("says when the figure is not published, and does not fall back to a draft", async () => {
     const { f, urls } = fetcher(() => new Response("{}", { status: 404 }));
     await expect(loadPublished(ID, "latest", { fetch: f, storage: new MemoryStorage() })).rejects.toThrow(

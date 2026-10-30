@@ -17,7 +17,7 @@ export function sheet(
   regions: { id: string; poly: Pt[]; label?: string; texture?: string; centroid?: Pt }[],
 ): RegionsFile {
   return parseRegions({
-    schema_version: 1,
+    schema_version: 2,
     figure_id: "test",
     title: "Test",
     figure_type: "labeled_diagram",
@@ -30,6 +30,7 @@ export function sheet(
       polygon_mm: r.poly,
       source: "teacher",
       verified_by_teacher: true,
+      touchable: true,
       ...(r.texture ? { texture: r.texture } : {}),
       ...(r.centroid ? { centroid_mm: r.centroid } : {}),
     })),

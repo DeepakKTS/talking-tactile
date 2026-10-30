@@ -17,7 +17,7 @@ interface Call {
 /** The figure API in memory: jobs finish on the second status poll after they start. */
 class FakeServer {
   calls: Call[] = [];
-  regions: RegionsFile = structuredClone(synthetic) as RegionsFile;
+  regions: RegionsFile = structuredClone(synthetic) as unknown as RegionsFile;
   report: Violation[] = [];
   refuse: Violation[] | null = null;
   editVersion = 0;
@@ -129,6 +129,30 @@ describe("author page", () => {
     const parts = screen.getByRole("list", { name: "Parts" });
     expect(within(parts).getAllByText(/Not checked/)).toHaveLength(synthetic.regions.length);
     expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet.`)).toBeTruthy();
+  });
+
+  it("lists parts that are not touchable apart, with the reason, and publish still goes ahead", async () => {
+    const first = server.regions.regions[0];
+    if (!first) throw new Error("the fixture has regions");
+    server.regions.regions.push({ ...structuredClone(first), id: "s1", label: "septum", touchable: false,
+      verified_by_teacher: false, flags: [{ reason: "spill", detail: "holds points of mitral valve after a retry" }] });
+    server.regions.needs_teacher = [{ id: "n1", label: "okinawa", reason: "no_points", detail: "every point was dropped by the guard" }];
+    first.flags = [{ reason: "thin", detail: "Spark marked it thin" }];
+    await upload();
+    const parts = screen.getByRole("list", { name: "Parts" });
+    expect(within(parts).queryByText("septum")).toBeNull();
+    expect(within(parts).getByText("Thin: how the sheet shows it is decided later.")).toBeTruthy();
+    const flagged = screen.getByRole("list", { name: "Not touchable yet" });
+    expect(within(flagged).getAllByText("Not touchable yet.")).toHaveLength(2);
+    expect(within(flagged).getByText(/spilled onto other parts, so it is only a suggestion \(holds points of mitral valve after a retry\)/)).toBeTruthy();
+    expect(within(flagged).getByText(/No usable point was found on it \(every point was dropped by the guard\)/)).toBeTruthy();
+    expect(within(flagged).getByRole("button", { name: "Show the suggested outline of septum" })).toBeTruthy();
+    expect(within(flagged).queryByRole("button", { name: /Edit/ })).toBeNull();
+    const atPublish = screen.getByRole("list", { name: "Not touchable when published" });
+    expect(within(atPublish).getAllByRole("listitem").map((li) => li.textContent.split(":")[0])).toEqual(["septum", "okinawa"]);
+    expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet.`)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
+    expect(await screen.findByText("Published as version 1.")).toBeTruthy();
   });
 
   it("marks a part checked, renames one and describes one, each as an edit", async () => {

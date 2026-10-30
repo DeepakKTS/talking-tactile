@@ -1,7 +1,7 @@
 // Loads the sheet Explore runs on. Only published versions, which the API locks after the
 // tactile rules pass; a draft URL is never built here. The last good copy of each version
 // is kept in localStorage, so the page can reopen a sheet with the network down.
-import { RegionsError, type RegionsFile, parseRegions } from "../shared/regions";
+import { RegionsError, type RegionsFile, parseRegions, touchableOnly } from "../shared/regions";
 
 export class LoadError extends Error {
   override name = "LoadError";
@@ -52,9 +52,10 @@ export async function loadPublished(
   return { file, from: "network" };
 }
 
+// The file as Explore uses it: valid, and touchable regions only.
 function parse(text: string): RegionsFile {
   try {
-    return parseRegions(JSON.parse(text));
+    return touchableOnly(parseRegions(JSON.parse(text)));
   } catch (err) {
     if (err instanceof RegionsError || err instanceof SyntaxError) {
       throw new LoadError(`The sheet is damaged: ${err.message}`);

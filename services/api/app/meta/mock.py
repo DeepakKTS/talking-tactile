@@ -6,10 +6,11 @@ after the spikes. An image with no recording is refused rather than guessed."""
 
 import asyncio
 import hashlib
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from app.config import Meta
 from app.meta.cost import CostMeter
@@ -65,7 +66,13 @@ class MockMetaClient:
             )
         return fig
 
-    async def understand(self, image: RGB, figure_id: str, prompt: Prompt) -> Understanding:
+    def for_job(self) -> "MockMetaClient":
+        return self
+
+    async def understand(
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+    ) -> Understanding:
+        """The listing only: the parts have no points, so S2 finds them by phrase."""
         fig = self._figure(figure_id)
         self.calls.append(CallRecord(call="understand", figure_id=figure_id, phrase=None))
         printed = {t.text for t in fig.truth.text_labels}
@@ -90,3 +97,16 @@ class MockMetaClient:
         self.calls.append(CallRecord(call="segment", figure_id=figure_id, phrase=phrase))
         await asyncio.sleep(0)
         return [m for m in fig.raw_masks.values() if m.label == phrase]
+
+    async def segment_points(
+        self,
+        image: RGB,
+        figure_id: str,
+        part: str,
+        objects: Sequence[tuple[Sequence[tuple[int, int]], Sequence[tuple[int, int]]]],
+        prompt: Prompt,
+        retry: bool = False,
+    ) -> list[Any]:
+        raise MockFixtureMissingError(
+            "Mock mode has no recorded point prompts; its parts are found by phrase."
+        )

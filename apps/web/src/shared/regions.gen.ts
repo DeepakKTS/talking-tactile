@@ -5,7 +5,7 @@
  * The contract between Author and Explore. Explore must run from this file alone for labels, earcons and guidance.
  */
 export interface TalkingTactileRegionsFile {
-  schema_version: 1;
+  schema_version: 2;
   /**
    * sha256 of the normalized source image
    */
@@ -76,5 +76,25 @@ export interface TalkingTactileRegionsFile {
     source: "sam" | "teacher";
     confidence?: number;
     verified_by_teacher: boolean;
+    /**
+     * False for a teacher suggestion: not raised on the sheet, and Explore never speaks it or guides to it.
+     */
+    touchable: boolean;
+    /**
+     * Why the region needs a look. spill: SAM's mask held another part's prompt point; it is a suggestion and never touchable. thin and under_point_symbol leave the region touchable.
+     */
+    flags?: {
+      reason: "spill" | "thin" | "under_point_symbol";
+      detail: string;
+    }[];
+  }[];
+  /**
+   * Listed parts with no shape to touch: no prompt point survived, SAM gave no mask, or S3 dropped the part.
+   */
+  needs_teacher?: {
+    id: string;
+    label: string;
+    reason: "no_points" | "no_mask" | "dropped";
+    detail: string;
   }[];
 }

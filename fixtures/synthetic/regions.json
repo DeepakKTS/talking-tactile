@@ -1,5 +1,5 @@
 {
- "schema_version": 1,
+ "schema_version": 2,
  "figure_id": "synthetic",
  "title": "Synthetic test figure",
  "figure_type": "labeled_diagram",
@@ -316,6 +316,7 @@
    "source": "sam",
    "confidence": 0.93,
    "verified_by_teacher": false,
+   "touchable": true,
    "parent": null
   },
   {
@@ -473,7 +474,8 @@
    ],
    "source": "sam",
    "confidence": 0.88,
-   "verified_by_teacher": false
+   "verified_by_teacher": false,
+   "touchable": true
   },
   {
    "id": "r3",
@@ -603,6 +605,7 @@
    "source": "sam",
    "confidence": 0.95,
    "verified_by_teacher": false,
+   "touchable": true,
    "parent": null
   },
   {
@@ -653,6 +656,7 @@
    "source": "sam",
    "confidence": 0.9,
    "verified_by_teacher": false,
+   "touchable": true,
    "parent": null
   },
   {
@@ -698,6 +702,7 @@
    "source": "sam",
    "confidence": 0.87,
    "verified_by_teacher": false,
+   "touchable": true,
    "parent": null
   },
   {
@@ -743,6 +748,7 @@
    "source": "sam",
    "confidence": 0.86,
    "verified_by_teacher": false,
+   "touchable": true,
    "parent": null
   },
   {
@@ -892,6 +898,13 @@
    "source": "sam",
    "confidence": 0.74,
    "verified_by_teacher": false,
+   "touchable": true,
+   "flags": [
+    {
+     "reason": "under_point_symbol",
+     "detail": "smaller than a point symbol, so the sheet shows it as one"
+    }
+   ],
    "parent": null
   },
   {
@@ -930,7 +943,9 @@
    "source": "sam",
    "confidence": 0.81,
    "verified_by_teacher": false,
+   "touchable": true,
    "parent": null
   }
- ]
+ ],
+ "needs_teacher": []
 }

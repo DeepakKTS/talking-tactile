@@ -40,7 +40,7 @@ def test_the_mock_is_a_meta_client(mock: MockMetaClient) -> None:
 
 def test_understand_returns_the_synthetic_parts(mock: MockMetaClient,
                                                synthetic: SyntheticFigure) -> None:  # fmt: skip
-    u = asyncio.run(mock.understand(synthetic.image, figure_id(synthetic.image), S1))
+    u = asyncio.run(mock.understand(synthetic.image, figure_id(synthetic.image), S1, S1))
     assert isinstance(u, Understanding)
     assert u.title == synthetic.truth.title
     assert u.color_carries_meaning is True
@@ -72,13 +72,13 @@ def test_zero_matches_is_a_result_not_an_error(mock: MockMetaClient,
 def test_an_image_without_fixtures_is_refused(mock: MockMetaClient) -> None:
     other = np.full((10, 10, 3), 255, np.uint8)
     with pytest.raises(MockFixtureMissingError, match="mock mode"):
-        asyncio.run(mock.understand(other, figure_id(other), S1))
+        asyncio.run(mock.understand(other, figure_id(other), S1, S1))
 
 
 def test_mock_calls_cost_nothing_and_are_logged(mock: MockMetaClient,
                                                 synthetic: SyntheticFigure) -> None:  # fmt: skip
     fid = figure_id(synthetic.image)
-    asyncio.run(mock.understand(synthetic.image, fid, S1))
+    asyncio.run(mock.understand(synthetic.image, fid, S1, S1))
     asyncio.run(mock.segment(synthetic.image, fid, "pore", S2))
     assert [c.call for c in mock.calls] == ["understand", "segment"]
     assert mock.meter.spent_usd == 0
@@ -133,12 +133,14 @@ def test_zero_sam_instances_are_no_masks() -> None:
     assert to_masks(empty, (10, 10), "pore") == []
 
 
-def test_decoding_real_sam_masks_waits_for_a_real_answer_with_instances() -> None:
-    class _WithRecords:
-        records = (object(),)
-
-    with pytest.raises(NotImplementedError, match="d1-6"):
-        to_masks(_WithRecords(), (10, 10), "pore")  # type: ignore[arg-type]
+def test_a_recorded_answer_becomes_one_full_size_mask_per_instance() -> None:
+    rec = json.loads((RECORDED_DIR / "sam_diag_control_banana.json").read_text())
+    parsed = asyncio.run(parse_events(rec["response"]["events"]))
+    (mask,) = to_masks(parsed, (902, 1024), "banana")
+    assert mask.data.shape == (902, 1024) and mask.label == "banana"
+    assert mask.score == pytest.approx(0.977, abs=0.001)
+    rows, cols = np.nonzero(mask.data)  # inside the bounds 47,44 to 978,855
+    assert (cols.min(), rows.min()) >= (47, 44) and (cols.max(), rows.max()) < (978, 855)
 
 
 SAM_WIRE_WORDS = re.compile(r"meta_sam_parser|one_bit|base85|<\|mask|box-local")

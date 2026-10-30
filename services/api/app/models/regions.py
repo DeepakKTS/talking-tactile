@@ -44,6 +44,8 @@ Direction = Literal[
     "inside", "around",
 ]  # fmt: skip
 RegionSource = Literal["sam", "teacher"]
+FlagReason = Literal["spill", "thin", "under_point_symbol"]
+TeacherReason = Literal["no_points", "no_mask", "dropped"]
 
 PointMm = tuple[StrictFloat, StrictFloat]
 
@@ -89,6 +91,20 @@ class Neighbor(ContractModel):
     direction: Direction
 
 
+class Flag(ContractModel):
+    reason: FlagReason
+    detail: StrictStr
+
+
+class TeacherEntry(ContractModel):
+    """A listed part with no shape to touch."""
+
+    id: StrictStr
+    label: StrictStr
+    reason: TeacherReason
+    detail: StrictStr
+
+
 class Region(ContractModel):
     _nullable: ClassVar[frozenset[str]] = frozenset({"parent"})
 
@@ -106,10 +122,12 @@ class Region(ContractModel):
     source: RegionSource
     confidence: Annotated[StrictFloat, Field(ge=_CONFIDENCE_MIN, le=_CONFIDENCE_MAX)] | None = None
     verified_by_teacher: StrictBool
+    touchable: StrictBool
+    flags: list[Flag] | None = None
 
 
 class RegionsFile(ContractModel):
-    schema_version: Annotated[Literal[1], BeforeValidator(_not_bool)]
+    schema_version: Annotated[Literal[2], BeforeValidator(_not_bool)]
     figure_id: StrictStr
     title: StrictStr
     figure_type: FigureType
@@ -118,6 +136,7 @@ class RegionsFile(ContractModel):
     summary: StrictStr
     textures: Annotated[list[Texture], Field(max_length=MAX_TEXTURES)]
     regions: list[Region]
+    needs_teacher: list[TeacherEntry] | None = None
 
     @classmethod
     def from_json_obj(cls, obj: Any) -> Self:
@@ -133,14 +152,17 @@ class RegionsFile(ContractModel):
 
 
 def check_references(regions_file: RegionsFile) -> list[str]:
-    """Problems the schema cannot express: duplicate ids, and parents or neighbors that
-    point at a region that does not exist. Empty when the file is consistent."""
+    """Problems the schema cannot express: duplicate ids (regions and needs_teacher share
+    them), parents that do not exist, and neighbors that are not touchable regions. Empty
+    when the file is consistent."""
     problems: list[str] = []
     seen: set[str] = set()
-    for region in regions_file.regions:
-        if region.id in seen:
-            problems.append(f"duplicate region id {region.id}")
-        seen.add(region.id)
+    ids = [r.id for r in regions_file.regions] + [t.id for t in regions_file.needs_teacher or []]
+    for rid in ids:
+        if rid in seen:
+            problems.append(f"duplicate region id {rid}")
+        seen.add(rid)
+    touchable = {r.id for r in regions_file.regions if r.touchable}
     for region in regions_file.regions:
         if region.parent is not None and region.parent not in seen:
             problems.append(f"{region.id}: parent {region.parent} does not exist")
@@ -149,4 +171,6 @@ def check_references(regions_file: RegionsFile) -> list[str]:
         for neighbor in region.neighbors or []:
             if neighbor.id not in seen:
                 problems.append(f"{region.id}: neighbor {neighbor.id} does not exist")
+            elif neighbor.id not in touchable:
+                problems.append(f"{region.id}: neighbor {neighbor.id} is not touchable")
     return problems

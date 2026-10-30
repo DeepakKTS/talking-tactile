@@ -26,3 +26,9 @@ export function parseRegions(data: unknown): RegionsFile {
   );
   throw new RegionsError(`regions.json is invalid: ${problems.join("; ")}`);
 }
+
+// Explore runs on touchable regions only. A teacher suggestion (touchable false) is never
+// spoken, hit or guided to; parts in needs_teacher have no shape at all.
+export function touchableOnly(file: RegionsFile): RegionsFile {
+  return { ...file, regions: file.regions.filter((r) => r.touchable) };
+}

@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "figure_id": "4f2a9c0d1b7e3a5f6c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
   "title": "Golden contract figure",
   "figure_type": "labeled_diagram",
@@ -26,7 +26,8 @@
       ],
       "source": "sam",
       "confidence": 0.91,
-      "verified_by_teacher": true
+      "verified_by_teacher": true,
+      "touchable": true
     },
     {
       "id": "r2",
@@ -38,7 +39,8 @@
       "neighbors": [{ "id": "r1", "direction": "around" }],
       "source": "sam",
       "confidence": 0.84,
-      "verified_by_teacher": false
+      "verified_by_teacher": false,
+      "touchable": true
     },
     {
       "id": "r3",
@@ -53,7 +55,8 @@
         { "id": "r4", "direction": "down_left" }
       ],
       "source": "teacher",
-      "verified_by_teacher": true
+      "verified_by_teacher": true,
+      "touchable": true
     },
     {
       "id": "r4",
@@ -62,7 +65,8 @@
       "parent": null,
       "source": "sam",
       "confidence": 0.5,
-      "verified_by_teacher": false
+      "verified_by_teacher": false,
+      "touchable": true
     }
   ]
 }

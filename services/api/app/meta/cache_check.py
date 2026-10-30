@@ -76,7 +76,7 @@ def main() -> None:
     args = ap.parse_args()
     rules = load_tactile_rules()
     live = LiveCaller.from_env(rules.meta, recorder=Recorder())
-    client = LiveMetaClient(rules.meta, live, "cache_check" if args.record else None)
+    client = LiveMetaClient(rules.meta, lambda: live, "cache_check" if args.record else None)
     with tempfile.TemporaryDirectory() as tmp:
         runner = make_runner(Path(tmp), client, live.ledger)
         figure_id = runner.ingest(HEART.read_bytes(), 0)[0].figure_id

@@ -100,7 +100,9 @@ S0 Ingest. Validate type and size. Render the PDF page. Deskew a photographed pa
 
 S1 Understand (Muse Spark). Returns figure type, title, a one paragraph summary, up to 25 parts as short noun phrases, which print labels point to which part, whether color carries meaning, and a verdict: make tactile, split into two sheets, or describe in words only. BANA Unit 1 is about whether a tactile graphic should be made at all, so this verdict is a real step, not a formality.
 
-S2 Ground (SAM 3.1). One call per phrase, four at a time. Also a call for "text label" so print text can be removed from the raised layer. Keep masks with their scores.
+S1, live since d1-8 (Oct 30): a second Muse Spark call locates each listed part: kind (area, thin or group), a group's members, the part it sits inside, and every instance with 1 to 3 points (app/prompts/s1_locate.v1.json).
+
+S2 Ground (SAM 3.1). Live since d1-8, Arm A v2f, locked Oct 30 (section 17): point prompts, one call per located part, four at a time; the points guarded in code, a spill retry, the oversize rule, and contested pixels to the smaller mask (app/pipeline/s2_points.py). Print text is found in code. Mock mode keeps the original path: one call per phrase, four at a time, and a call for "text label" so print text can be removed from the raised layer. Keep masks with their scores.
 
 S3 Reconcile (code first, then Muse Spark). Code merges near duplicates (overlap above 0.8), turns full containment into parent and child, assigns partial overlaps to the smaller part, and drops slivers. Then Muse Spark sees the figure with each mask outlined and numbered, and returns which number is which label plus a short description from the caption. This numbered overlay is how we stop the model guessing coordinates.
 
@@ -109,6 +111,12 @@ S4 Layout (code only). Masks to polygons with contour tracing, simplified to 200
 S5 Render. tactile.svg with layers (outlines, textures, braille, key), print.pdf at exact scale with a 100 mm calibration bar, regions.json, and a validation report from the rules check.
 
 S6 Review (teacher). Approve, edit, merge, delete or add. Publishing writes a locked version that Explore loads.
+
+regions.json schema version 2 (Oct 30, d1-8). Migration from version 1:
+- Each region has `touchable` (required). False marks a teacher suggestion: a spill mask kept for the teacher, not raised on the sheet and never used by Explore. Version 1 regions were all touchable.
+- Each region may have `flags`: `spill` (only on untouchable regions), `thin` and `under_point_symbol` (both stay touchable).
+- `needs_teacher` lists the parts with no shape at all: `no_points`, `no_mask` or `dropped` by S3.
+- Explore accepts version 2 only and drops untouchable regions at load. A version 1 file is refused as damaged: publish the figure again to make a version 2 file. Neighbors only name touchable regions.
 
 Target: under 90 seconds from upload to review screen.
 

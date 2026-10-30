@@ -9,12 +9,17 @@ from pydantic import BaseModel, ConfigDict
 
 from app.config import ExploreConfig, TactileRules
 from app.geometry.compose import ComposedSheet
+from app.geometry.reconcile import Reconciled
+from app.geometry.scale import PageFit
 from app.geometry.validate import Violation, check_svg_ids, validate_sheet
+from app.geometry.vectorize import mask_to_polygons_mm
 from app.meta.types import Understanding
-from app.models.regions import RegionsFile
+from app.models.mask import Mask
+from app.models.regions import Flag, RegionsFile, TeacherEntry, TeacherReason
 from app.pipeline.edits import Annotations
+from app.pipeline.s2_types import Grounded
 from app.render.pdf import render_pdf
-from app.render.regions_json import FigureInfo, build_regions_file
+from app.render.regions_json import FigureInfo, Suggestion, TeacherInfo, build_regions_file
 from app.render.svg import render_key_svgs, render_sheet_svg
 
 SVG_FILE = "tactile.svg"
@@ -32,6 +37,37 @@ class Rendered(BaseModel):
     report: list[Violation]
 
 
+THIN = "Spark marked it thin; how the sheet shows it is decided later"
+
+
+def teacher_info(g: Grounded, rec: Reconciled, fit: PageFit, rules: TactileRules) -> TeacherInfo:
+    """S2's flags on the touchable parts, its spill masks outlined as suggestions, and every
+    listed part with no shape: S2's, and S3's dropped parts."""
+    flags = {
+        p.id: [Flag(reason="thin", detail=THIN)]
+        for p in rec.parts
+        if "thin" in g.flags.get(p.mask.label, [])
+    }
+    suggestions: list[Suggestion] = []
+    needs: list[tuple[str, TeacherReason, str]] = []
+    for t in g.teacher:
+        polys = []
+        if t.suggestion is not None:
+            mask = Mask(data=t.suggestion, label=t.phrase, score=1.0, source="sam")
+            polys = mask_to_polygons_mm(mask, fit, rules.vectorize)
+        if polys:
+            outlines = [[(x, y) for x, y in list(p.exterior.coords)[:-1]] for p in polys]
+            suggestions.append(Suggestion(label=t.phrase, polygons_mm=outlines, detail=t.detail))
+            continue
+        needs.append((t.phrase, "no_mask" if t.reason == "spill" else t.reason, t.detail))
+    needs += [(d.label, "dropped", d.reason) for d in rec.dropped]
+    entries = [
+        TeacherEntry(id=f"n{i}", label=label, reason=reason, detail=detail)
+        for i, (label, reason, detail) in enumerate(needs, 1)
+    ]
+    return TeacherInfo(flags=flags, suggestions=suggestions, needs_teacher=entries)
+
+
 def render(
     c: ComposedSheet,
     u: Understanding,
@@ -39,6 +75,7 @@ def render(
     notes: Annotations,
     rules: TactileRules,
     explore: ExploreConfig,
+    teacher: TeacherInfo | None = None,
 ) -> Rendered:
     svg = render_sheet_svg(c.sheet, u.title, rules, explore)
     keys = render_key_svgs(c.sheet, c.braille, c.translations, rules)
@@ -46,7 +83,7 @@ def render(
         figure_id=figure_id, title=u.title, figure_type=u.figure_type, summary=u.summary
     )
     regions = build_regions_file(
-        c.sheet, c.braille, info, rules, notes.descriptions, notes.verified
+        c.sheet, c.braille, info, rules, notes.descriptions, notes.verified, teacher
     )
     report = validate_sheet(c.sheet, rules) + check_svg_ids(svg, regions)
     return Rendered(svg=svg, pdf=render_pdf([svg, *keys]), regions=regions, report=report)

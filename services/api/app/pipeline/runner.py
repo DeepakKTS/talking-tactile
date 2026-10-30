@@ -28,6 +28,7 @@ from app.geometry.scale import PageFit, fit_to_page
 from app.meta.client import MetaClient, make_client
 from app.meta.cost import BudgetExceededError
 from app.meta.live import Ledger
+from app.meta.live_client import SPARK_EFFORT
 from app.meta.mock import MockFixtureMissingError
 from app.meta.types import Understanding
 from app.models.mask import Mask
@@ -37,6 +38,7 @@ from app.pipeline import (
     s0_ingest,
     s1_understand,
     s2_ground,
+    s2_points,
     s3_reconcile,
     s4_layout,
     s5_render,
@@ -64,7 +66,7 @@ _CONSUMES: dict[str, tuple[str, ...]] = {
     "s2": ("s0", "s1"),
     "s3": ("s0", "s2"),
     "s4": ("s0", "s1", "s3"),
-    "s5": ("s1", "s4"),
+    "s5": ("s0", "s1", "s2", "s3", "s4"),  # S2 and S3 for the parts left to the teacher
 }
 _LOAD: dict[str, Callable[[Path], Any]] = {
     "s0": s0_ingest.load,
@@ -135,6 +137,7 @@ class Runner:
         self.edits = edits
         self.figures_dir = figures_dir
         self.s1_prompt = load_prompt(s1_understand.PROMPT, prompts_dir)
+        self.s1_locate = load_prompt(s1_understand.LOCATE_PROMPT, prompts_dir)
         self.s2_prompt = load_prompt(s2_ground.PROMPT, prompts_dir)
 
     # Keys
@@ -145,7 +148,9 @@ class Runner:
             return {
                 "client": self.client.cache_tag,
                 "prompt": self.s1_prompt.digest,
+                "locate": self.s1_locate.digest,
                 "schema": s1_understand.SCHEMA_DIGEST,
+                "effort": SPARK_EFFORT,
                 "max_parts": meta.max_parts,
             }
         sam = {
@@ -154,7 +159,14 @@ class Runner:
             "schema": s2_ground.SCHEMA_DIGEST,
         }
         if stage == "s2":
-            return {**sam, "text_phrase": meta.text_phrase}
+            return {
+                **sam,
+                "text_phrase": meta.text_phrase,
+                "points": s2_points.SETTINGS,
+                "fill_delta": self.rules.layout.color_group_max_delta,
+                "speck_mm2": self.rules.reconcile.speck_max_area_mm2,
+                "page": self.rules.page.model_dump(mode="json"),
+            }
         free: dict[str, object] = {
             "code": code_digest(),
             "rules": self.rules.model_dump(mode="json"),
@@ -216,6 +228,7 @@ class Runner:
 
     async def run(self, job_id: str) -> JobRecord:
         job = self.jobs.must_get(job_id)
+        client = self.client.for_job()  # live: the call cap counts per job
         stage = "s0"
         try:
             edits = self.edits.list(job.figure_id, job.edit_version)
@@ -224,7 +237,7 @@ class Runner:
             if not any(s.stage == "s0" for s in job.stages):
                 self._record(job.id, "s0", "cached", t0)
             for stage in STAGES[1:]:
-                await self._step(walk, stage, job, edits)
+                await self._step(walk, stage, job, edits, client)
                 if stage == "s1":
                     u: Understanding = await walk.value("s1")
                     if u.verdict == "describe_only":
@@ -259,7 +272,9 @@ class Runner:
         models = self.rules.meta.models
         self.ledger.hit(caller, models.spark if caller == "s1" else models.sam, describe)
 
-    async def _step(self, walk: _Walk, stage: str, job: JobRecord, edits: Sequence[Edit]) -> None:
+    async def _step(
+        self, walk: _Walk, stage: str, job: JobRecord, edits: Sequence[Edit], client: MetaClient
+    ) -> None:
         t0 = time.perf_counter()
         key = self._key(walk, stage, job.options, edits_digest(edits))
         walk.keys[stage] = key
@@ -271,8 +286,8 @@ class Runner:
                 self._hit(stage, f"{stage} stage output, figure {job.figure_id[:12]}")
             return
         self.jobs.set_stage(job.id, stage)
-        spent = self.client.meter.spent_usd
-        value = await self._make(walk, stage, job, edits)
+        spent = client.meter.spent_usd
+        value = await self._make(walk, stage, job, edits, client)
         with walk.cache.write(stage, key) as out:
             await asyncio.to_thread(_SAVE[stage], value, out)
         digest = await asyncio.to_thread(walk.cache.digest, stage, key)
@@ -280,22 +295,24 @@ class Runner:
             raise RuntimeError(f"the {stage} cache entry is unreadable right after writing")
         walk.digests[stage] = digest
         walk.values[stage] = value
-        self._record(job.id, stage, "ran", t0, self.client.meter.spent_usd - spent)
+        self._record(job.id, stage, "ran", t0, client.meter.spent_usd - spent)
 
     async def _fit(self, walk: _Walk, options: JobOptions) -> PageFit:
         ing: s0_ingest.Ingested = await walk.value("s0")
         h, w = ing.image.shape[:2]
         return fit_to_page(w, h, options.page, self.rules.page)
 
-    async def _make(self, walk: _Walk, stage: str, job: JobRecord, edits: Sequence[Edit]) -> Any:
+    async def _make(
+        self, walk: _Walk, stage: str, job: JobRecord, edits: Sequence[Edit], client: MetaClient
+    ) -> Any:
         v = walk.value
         if stage == "s1":
             return await s1_understand.understand(
-                self.client, await v("s0"), self.s1_prompt, self.rules.meta
+                client, await v("s0"), self.s1_prompt, self.s1_locate, self.rules.meta
             )
         if stage == "s2":
             return await s2_ground.ground(
-                self.client, await v("s0"), await v("s1"), self.s2_prompt, self.rules.meta
+                client, await v("s0"), await v("s1"), self.s2_prompt, self.rules
             )
         if stage == "s3":
             fit = await self._fit(walk, job.options)
@@ -304,7 +321,7 @@ class Runner:
             )
         if stage == "s4":
             fit = await self._fit(walk, job.options)
-            parts = await self._edited_parts(walk, edits)
+            parts = await self._edited_parts(walk, edits, client)
             return await asyncio.to_thread(
                 s4_layout.layout,
                 parts,
@@ -316,6 +333,10 @@ class Runner:
                 self.explore.earcons,
                 self.translator,
             )
+        fit = await self._fit(walk, job.options)
+        teacher = await asyncio.to_thread(
+            s5_render.teacher_info, await v("s2"), await v("s3"), fit, self.rules
+        )
         return await asyncio.to_thread(
             s5_render.render,
             await v("s4"),
@@ -324,21 +345,33 @@ class Runner:
             annotations(edits),
             self.rules,
             self.explore,
+            teacher,
         )
 
     # Teacher edits
 
-    async def _edited_parts(self, walk: _Walk, edits: Sequence[Edit]) -> list[ReconciledPart]:
+    async def _edited_parts(
+        self, walk: _Walk, edits: Sequence[Edit], client: MetaClient
+    ) -> list[ReconciledPart]:
         rec: Reconciled = await walk.value("s3")
-        added = await self._added(walk, added_names(edits))
+        added = await self._added(walk, added_names(edits), client)
         return apply_edits(rec.parts, edits, added, self.rules.reconcile.contain_fraction)
 
-    async def _added(self, walk: _Walk, names: Sequence[str]) -> dict[str, list[Mask]]:
+    async def _added(
+        self, walk: _Walk, names: Sequence[str], client: MetaClient
+    ) -> dict[str, list[Mask]]:
         """SAM's answer for each part a teacher added by name, cached like S2's answers."""
-        return {name: (await self._added_one(walk, name))[0] for name in names}
+        return {name: (await self._added_one(walk, name, client))[0] for name in names}
 
-    async def _added_one(self, walk: _Walk, name: str) -> tuple[list[Mask], StageOutcome]:
-        sam = self._inputs("s2", JobOptions(), "")
+    async def _added_one(
+        self, walk: _Walk, name: str, client: MetaClient
+    ) -> tuple[list[Mask], StageOutcome]:
+        sam = {
+            "client": self.client.cache_tag,
+            "prompt": self.s2_prompt.digest,
+            "schema": s2_ground.SCHEMA_DIGEST,
+            "text_phrase": self.rules.meta.text_phrase,
+        }
         key = stage_key(
             _ADDED, walk.keys["s0"], upstream={"s0": walk.digests["s0"]}, name=name, **sam
         )
@@ -347,7 +380,7 @@ class Runner:
             self._hit(_ADDED, f"part by name, figure {walk.cache.root.name[:12]}, phrase: {name}")
             return found.parts, "cached"
         ing: s0_ingest.Ingested = await walk.value("s0")
-        masks = await self.client.segment(ing.image, ing.figure_id, name, self.s2_prompt)
+        masks = await client.segment(ing.image, ing.figure_id, name, self.s2_prompt)
         found = s2_ground.Grounded(parts=masks, text=[])
         with walk.cache.write(_ADDED, key) as entry:
             await asyncio.to_thread(s2_ground.save, found, entry)
@@ -356,7 +389,7 @@ class Runner:
     async def find_part(self, figure_id: str, name: str) -> tuple[list[Mask], StageOutcome]:
         """SAM's answer for one part name on the figure's S0 image, through the same cache a
         part added by a teacher uses. Says whether SAM ran or the cache answered."""
-        return await self._added_one(await self._walk_s0(figure_id), name)
+        return await self._added_one(await self._walk_s0(figure_id), name, self.client.for_job())
 
     async def check_edits(self, job: JobRecord, edits: Sequence[Edit]) -> None:
         """Replays the edits on the S3 parts the job used. Raises EditError when one cannot
@@ -368,7 +401,7 @@ class Runner:
             if digest is None:
                 raise NotReadyError("The figure is still being processed. Try again shortly.")
             walk.digests[stage] = digest
-        await self._edited_parts(walk, edits)
+        await self._edited_parts(walk, edits, self.client.for_job())
 
     def _record(
         self, job_id: str, stage: str, outcome: StageOutcome, t0: float, cost_usd: float = 0.0

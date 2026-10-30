@@ -208,8 +208,10 @@ def test_editing_the_s2_request_runs_s2_and_not_s1(
 
 
 class _Retitled(MockMetaClient):
-    async def understand(self, image: RGB, figure_id: str, prompt: Prompt) -> Understanding:
-        u = await super().understand(image, figure_id, prompt)
+    async def understand(
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+    ) -> Understanding:
+        u = await super().understand(image, figure_id, prompt, locate)
         return u.model_copy(update={"title": "A different title"})
 
 
@@ -297,8 +299,10 @@ def test_an_image_with_no_recording_fails_at_s1(tmp_path: Path) -> None:
 
 
 class _DescribeOnly(MockMetaClient):
-    async def understand(self, image: RGB, figure_id: str, prompt: Prompt) -> Understanding:
-        u = await super().understand(image, figure_id, prompt)
+    async def understand(
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+    ) -> Understanding:
+        u = await super().understand(image, figure_id, prompt, locate)
         return u.model_copy(update={"verdict": "describe_only"})
 
 

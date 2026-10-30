@@ -263,9 +263,10 @@ def _braille(sheet: Sheet, rules: TactileRules) -> list[Violation]:
 
 
 def check_svg_ids(svg: str, regions_file: RegionsFile) -> list[Violation]:
-    """Every region drawn in tactile.svg is in regions.json, and the reverse."""
+    """Every touchable region in regions.json is drawn in tactile.svg, and the reverse. A
+    teacher suggestion (touchable false) is not raised, so it is not drawn."""
     drawn = set(sheet_ids(svg))
-    listed = {r.id for r in regions_file.regions}
+    listed = {r.id for r in regions_file.regions if r.touchable}
     out: list[Violation] = []
     for rid in sorted(listed - drawn):
         out.append(

@@ -15,7 +15,8 @@ from app.models.regions import RegionSource
 
 # "synthetic" marks masks drawn by the synthetic test figure, which stands in for SAM in
 # mock mode. In regions.json both count as found by segmentation.
-MaskSource = Literal["sam", "teacher", "synthetic"]
+# "code" marks print text found in code (app/geometry/print_marks.py) for S3 to cut out.
+MaskSource = Literal["sam", "teacher", "synthetic", "code"]
 
 BoolImage = NDArray[np.bool_]
 _IMAGE_NDIM = 2  # rows and columns

@@ -40,7 +40,7 @@ describe("parseRegions", () => {
 
   it("types a hand-written file the same way the schema does", () => {
     const sample = {
-      schema_version: 1,
+      schema_version: 2,
       figure_id: "abc",
       title: "t",
       figure_type: "other",
@@ -56,6 +56,7 @@ describe("parseRegions", () => {
           neighbors: [{ id: "a", direction: "inside" }],
           source: "teacher",
           verified_by_teacher: true,
+          touchable: true,
         },
       ],
     } satisfies RegionsFile;

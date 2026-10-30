@@ -112,7 +112,7 @@ def test_replay_of_the_live_cache_check(tmp_path: Path) -> None:
         cap=RULES.meta.live_call_cap,
         transport=ReplayTransport.from_files([RECORDED_DIR / "cache_check_left_ventricle.json"]),
     )
-    runner = make_runner(tmp_path, LiveMetaClient(RULES.meta, caller), ledger)
+    runner = make_runner(tmp_path, LiveMetaClient(RULES.meta, lambda: caller), ledger)
     fid = runner.ingest(HEART.read_bytes(), 0)[0].figure_id
     runs: list[Run] = asyncio.run(twice(runner, ledger, fid))
     assert [(r.outcome, r.masks, r.caches) for r in runs] == [
