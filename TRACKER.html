@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 214,
- "updated_at": "2026-10-30T20:23:37.992Z",
+ "rev": 216,
+ "updated_at": "2026-10-30T20:29:54.649Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1584,6 +1584,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "docs"
    ],
    "changed_at": "2026-10-30T20:23:37.992Z"
+  },
+  {
+   "id": "d5-25",
+   "day": 5,
+   "title": "iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), Zedlers-MacBook-Pro.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://Zedlers-MacBook-Pro.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.",
+   "done_at": "2026-10-30T20:29:54.649Z",
+   "tags": [
+    "explore",
+    "phone"
+   ],
+   "changed_at": "2026-10-30T20:29:54.649Z"
   },
   {
    "id": "d6-1",
@@ -2670,6 +2686,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T20:29:54.649Z",
+   "kind": "claude",
+   "text": "Task d5-25 \"iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check\" is now done. Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), Zedlers-MacBook-Pro.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://Zedlers-MacBook-Pro.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts."
+  },
+  {
+   "ts": "2026-10-30T20:29:42.512Z",
+   "kind": "claude",
+   "text": "Task d5-25 \"iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check\" added to day 5."
+  },
   {
    "ts": "2026-10-30T20:23:37.992Z",
    "kind": "claude",

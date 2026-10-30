@@ -54,7 +54,12 @@ export class CameraLoop {
     const v = this.o.video;
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
-      video: { ...(deviceId ? { deviceId } : {}), width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+      // The rear camera on a phone, which looks down at the sheet; a laptop's one camera
+      // ignores the ideal.
+      video: {
+        ...(deviceId ? { deviceId } : { facingMode: { ideal: "environment" } }),
+        width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 },
+      },
     });
     v.srcObject = stream;
     v.muted = true;

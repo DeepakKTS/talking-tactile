@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "cert:phone": "sh scripts/phone-cert.sh",
+    "dev:phone": "HTTPS=1 vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "lint": "eslint . --max-warnings 0",

@@ -65,6 +65,8 @@ cd services/api && uv run python -m app.meta.plan_eval   # S1's plan on every ev
 uv run apps/web/e2e/ask_e2e.py   # headless Chrome on the mock API: publish the heart as the question eval did, then a typed question answered from the figure and an off-figure one deflected
 cd services/api && uv run python -m app.meta.qa_eval   # Explore's question eval on replay, no calls; --live with LIVE=1 META_RECORD=qa for a live run; writes eval/qa/RESULTS.md
 MOCK_META=1 make dev   # no network, uses fixtures/ and the recordings in fixtures/recorded/replays.json, costs nothing
+cd apps/web && npm run cert:phone   # once per LAN address: an mkcert server certificate for the iPhone into apps/web/.certs/ (git-ignored); the mkcert root must be trusted on the phone
+cd apps/web && npm run dev:phone    # Vite over HTTPS on the LAN (API proxied as usual); on the iPhone open https://<LAN address>:5173/explore?check=1 for the device check
 sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests and make check on the staged content
 ```
 

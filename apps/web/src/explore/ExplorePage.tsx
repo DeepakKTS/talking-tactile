@@ -16,6 +16,7 @@ import { type Mat3, type Pt, type Quad, applyHomography, invertHomography, markC
 import { LoadError, type Version, loadPublished } from "./loader";
 import { Metrics } from "./metrics";
 import type { PumpStats } from "./pump";
+import { DeviceCheck } from "./DeviceCheck";
 import { ExploreSession, keyAction } from "./session";
 import { VoiceAsk, WebAudioMic } from "./voice";
 
@@ -132,10 +133,16 @@ function readParams() {
     scripted: q.get("source") === "script",
     stubMs: Number(q.get("stub") ?? 0) || undefined,
     corners: parseQuad(q.get("corners")),
+    check: q.get("check") === "1",
   };
 }
 
 export function ExplorePage() {
+  const [{ check }] = useState(readParams);
+  return check ? <DeviceCheck /> : <ExploreSheet />;
+}
+
+function ExploreSheet() {
   const [{ figure, version, scripted, stubMs, corners: given }] = useState(readParams);
 
   const [file, setFile] = useState<RegionsFile | null>(null);

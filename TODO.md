@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 214, updated 2026-10-30T20:23:37.992Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 216, updated 2026-10-30T20:29:54.649Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -207,6 +207,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Status check first: not landed before (S4 point symbols by longest side only since 4a8e2e3; no piece repair). Now: under the floor = longest side under 6.4 mm OR enterable area (polygon less half the 1.0 mm outline) under a 6.4 mm 32-gon's (22.98 mm2), from config; the validator checks the same. A part keeping one piece at or above the floor drops its pieces under it; a part's point symbols closer than 3.2 mm become one (two side-by-side vein pieces both fell under the floor). Both recorded as repairs: a note on the part's first piece, repairs.json (draft only), Author's For your information. Heart on replay: the aorta's speck and the second left pulmonary vein symbol are repairs, left pulmonary veins one point symbol; rules report empty (was the left subclavian point symbol, 409 until the aortic arch merge), so the draft publishes. Synthetic sheet unchanged. Tests: layout (sliver, pieces, one symbol per spot, validator), heart replay, Author repairs. ask_e2e fails until the eval is re-recorded on the new layout (d5 task 5).
 - [x] d5-24 PLAN.md known limitation: continuous vessels and branches are merged by the teacher
   - Note: Status check first: not there before. PLAN.md section 11 now names it: one unbroken drawn shape (aorta and its three branches) has no drawn boundary, so code proposes the merge and the teacher accepts it or fixes each outline.
+- [x] d5-25 iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check
+  - Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), Zedlers-MacBook-Pro.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://Zedlers-MacBook-Pro.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
