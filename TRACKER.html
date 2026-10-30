@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 141,
- "updated_at": "2026-10-30T00:05:20.703Z",
+ "rev": 148,
+ "updated_at": "2026-10-30T03:07:17.994Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1883,9 +1883,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-10-30T00:05:20.703Z",
-   "item": "Meta Model API, 85 live calls, from eval/live/ledger.jsonl",
-   "usd": 0.49836
+   "ts": "2026-10-30T03:07:17.994Z",
+   "item": "Meta Model API, 131 live calls, from eval/live/ledger.jsonl (1 unpriced)",
+   "usd": 0.700338
   }
  ],
  "outreach": [
@@ -2133,6 +2133,30 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "No S2 approach is chosen yet. Step 4.1b runs both arms on heart.png and 2 eval figures of different styles, renders a contact sheet per figure under eval/s2-bakeoff/, and Deepak grades it. Arm A: Spark gives one point inside each part, SAM segments from the point. Arm B: code finds closed regions, Spark maps part names to region ids, no SAM.",
    "why": "The Oct 29 SAM diagnostic found the whole heart but no part of it with concept prompts in either phrasing, so S2 as planned (one SAM concept call per part) does not find parts on this figure.",
    "changed_at": "2026-10-29T18:19:33.305Z"
+  },
+  {
+   "id": "dec-mvue5wjblttb",
+   "date": "2026-10-29",
+   "title": "Arm B is not the general S2 method: it fails on figures without dark outlines",
+   "decision": "Arm B (code regions named by Spark) is not the general S2 method",
+   "why": "heart.png is a colored illustration without dark outlines; Arm B's ink threshold found label text and leader lines, not anatomy. Heart Arm B: 1 pass of 14 graded.",
+   "changed_at": "2026-10-30T03:07:17.882Z"
+  },
+  {
+   "id": "dec-mvue5wkdd7am",
+   "date": "2026-10-29",
+   "title": "S2 direction: Arm A v2 (Spark points with guards, SAM, group unions); Arm B set aside pending v2 results",
+   "decision": "Arm A v2, app/meta/s2_armav2.py; Arm B set aside",
+   "why": "Arm B fails without dark outlines (heart), misassigned numbered regions on the map (Tohoku took Kanto, Kanto took a Chubu prefecture), and its naming calls took 42 s on the flower and 92 s on the map (14.5 s on the heart). Revisit only if Arm A v2 fails the flower's small parts.",
+   "changed_at": "2026-10-30T03:07:17.919Z"
+  },
+  {
+   "id": "dec-mvue5wlfpemk",
+   "date": "2026-10-29",
+   "title": "SAM confidence is not a review trigger: label and line masks scored 0.70 to 0.78",
+   "decision": "Do not use SAM confidence to decide which masks a person reviews",
+   "why": "v1 Arm A masks graded fail: stamen group (label) 0.777, perianth group (label) 0.699, petal (line) 0.695, stigma (sliver) 0.711, brachiocephalic artery (sliver) 0.820, Tohoku (partial) 0.711. Other label and line fails scored low (pistil group 0.559, nectary 0.215, semilunar valves 0.055), so confidence neither finds nor clears them.",
+   "changed_at": "2026-10-30T03:07:17.958Z"
   }
  ],
  "risks": [
@@ -2223,6 +2247,41 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T03:07:17.994Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $0.700338 over 131 live calls, 1 of them unpriced."
+  },
+  {
+   "ts": "2026-10-30T03:07:17.958Z",
+   "kind": "claude",
+   "text": "Decision: SAM confidence is not a review trigger: label and line masks scored 0.70 to 0.78."
+  },
+  {
+   "ts": "2026-10-30T03:07:17.919Z",
+   "kind": "claude",
+   "text": "Decision: S2 direction: Arm A v2 (Spark points with guards, SAM, group unions); Arm B set aside pending v2 results."
+  },
+  {
+   "ts": "2026-10-30T03:07:17.882Z",
+   "kind": "claude",
+   "text": "Decision: Arm B is not the general S2 method: it fails on figures without dark outlines."
+  },
+  {
+   "ts": "2026-10-30T03:07:17.844Z",
+   "kind": "claude",
+   "text": "S2 bake-off Japan final tally (eval/s2-bakeoff/japan_regions/grades.json), 9 regions. A: 6 pass, 2 conditional, 1 fail. B: 3 pass, 3 conditional, 3 fail. Four-way strict: both 2, A only 4, B only 1, neither 2."
+  },
+  {
+   "ts": "2026-10-30T03:07:17.808Z",
+   "kind": "claude",
+   "text": "S2 bake-off flower grades (eval/s2-bakeoff/flower/grades.json), 16 parts. A: 1 pass, 3 conditional, 12 fail. B: 4 pass, 3 conditional, 9 fail. Four-way strict: both 0, A only 1, B only 4, neither 11."
+  },
+  {
+   "ts": "2026-10-30T03:07:17.770Z",
+   "kind": "claude",
+   "text": "S2 bake-off heart grades (eval/s2-bakeoff/heart/grades.json), 14 of 19 parts shown: both 1, A only 3 plus 3 conditional, B only 0, neither 7."
+  },
   {
    "ts": "2026-10-30T00:05:20.703Z",
    "kind": "claude",
