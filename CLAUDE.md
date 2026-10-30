@@ -63,6 +63,8 @@ MOCK_META=1 make dev   # no network, uses fixtures/, costs nothing
 sh scripts/install-hooks.sh   # once per clone: pre-commit runs the tracker and tracking tests and make check on the staged content
 ```
 
+Wrap every live run (LIVE=1) in `caffeinate -i`, so the Mac cannot sleep mid-run: `caffeinate -i env LIVE=1 uv run python -m app.meta.s2_armav2 flower --record`. On Oct 29 an idle sleep broke a run between two calls.
+
 ## The contract
 
 `docs/regions.schema.json` is the single source of truth between Author and Explore. Change it only with a version bump and a migration note in PLAN.md. Explore must work from `regions.json` alone, with no network, for labels and earcons.
