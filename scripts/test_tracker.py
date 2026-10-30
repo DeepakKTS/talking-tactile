@@ -331,6 +331,13 @@ class TestDecision(TrackerTestCase):
         self.assertEqual(len(s["decisions"]), len(self.initial["decisions"]) + 1)
         self.assertEqual(s["log"][0]["text"], "Decision edited: Old title. Now: New title.")
 
+    def test_decision_titles_ending_in_a_period_log_one_period(self) -> None:
+        s = self.assert_ok_write("decision", "Ends here.", "--chose", "A", "--why", "B")
+        self.assertEqual(s["log"][0]["text"], "Decision: Ends here.")
+        dec_id = s["decisions"][-1]["id"]
+        s = self.assert_ok_write("decision-edit", dec_id, "--title", "Now this.")
+        self.assertEqual(s["log"][0]["text"], "Decision edited: Ends here. Now: Now this.")
+
     def test_decision_edit_needs_a_known_id_and_a_change(self) -> None:
         self.assert_fails_unchanged("decision-edit", "dec-nope", "--title", "x")
         s = self.assert_ok_write("decision", "T", "--chose", "A", "--why", "B")

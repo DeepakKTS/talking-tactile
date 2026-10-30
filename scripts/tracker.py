@@ -352,6 +352,11 @@ def cmd_issue_status(state: dict, args: argparse.Namespace) -> str | None:
     return text
 
 
+def sentence(text: str) -> str:
+    """Text ending in one period, whether or not it came with one."""
+    return text.rstrip().rstrip(".") + "."
+
+
 def cmd_decision(state: dict, args: argparse.Namespace) -> str | None:
     if not args.title.strip() or not args.chose.strip():
         raise TrackerError("A decision needs a title and what was chosen.")
@@ -363,7 +368,7 @@ def cmd_decision(state: dict, args: argparse.Namespace) -> str | None:
         "why": args.why,
     }
     state["decisions"].append(decision)
-    text = f"Decision: {args.title}."
+    text = f"Decision: {sentence(args.title)}"
     commit(state, decision, text)
     return text
 
@@ -378,9 +383,9 @@ def cmd_decision_edit(state: dict, args: argparse.Namespace) -> str | None:
         raise TrackerError("A decision's title and what was chosen cannot be empty.")
     old = decision["title"]
     decision.update(changes)
-    text = f"Decision edited: {old}."
+    text = f"Decision edited: {sentence(old)}"
     if "title" in changes and changes["title"] != old:
-        text += f" Now: {changes['title']}."
+        text += f" Now: {sentence(changes['title'])}"
     commit(state, decision, text)
     return text
 
