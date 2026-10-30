@@ -34,6 +34,7 @@ import numpy.typing as npt
 from app.config import load_tactile_rules
 from app.geometry import print_marks
 from app.geometry.scale import fit_to_page
+from app.meta import s2_armav2
 from app.meta import s2_bakeoff as bake
 from app.meta import s2_grades as grades
 from app.meta import s2_grading as grading
@@ -277,11 +278,43 @@ def write(run_name: str, scored: dict[str, dict[str, Any]], tables: list[str]) -
     return path
 
 
+def v2_run(name: str, result: dict[str, Any], final: dict[str, Mask]) -> dict[str, Any]:
+    """A v2 result as the scorer reads it: the points are the ones sent to SAM."""
+    rows = result["rows"]
+    conf: dict[str, float | None] = {}
+    for r in rows:
+        c = [i["confidence"] for i in r["instances"] if i.get("confidence") is not None]
+        conf[r["part"]] = max(c) if c else None
+    return {
+        "figure": name,
+        "parts": [r["part"] for r in rows],
+        "masks": final,
+        "points": {
+            r["part"]: [g["sent"] for i in r["instances"] for g in i["points"] if g["sent"]]
+            for r in rows
+        },
+        "confidence": conf,
+        "kind": {r["part"]: r["kind"] for r in rows},
+    }
+
+
+async def v2_runs(
+    v1: dict[str, tuple[npt.NDArray[np.uint8], dict[str, Any], dict[str, dict[str, Mask]]]],
+) -> dict[str, tuple[npt.NDArray[np.uint8], dict[str, Any], dict[str, dict[str, Mask]]]]:
+    out = {}
+    for name, (image, _, masks) in v1.items():
+        run, result = await s2_armav2.run_figure(s2_armav2.replayer(name), name, False, "none")
+        out[name] = (image, v2_run(name, result, run.final), masks)
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("run", choices=["v1"])
+    ap.add_argument("run", choices=["v1", "v2"])
     args = ap.parse_args()
     runs = asyncio.run(v1_runs())
+    if args.run == "v2":
+        runs = asyncio.run(v2_runs(runs))
     scored, tables = {}, [f"# S2 scores, {args.run}\n"]
     for name, (image, run, v1) in runs.items():
         g = grades.load(bake.OUT_ROOT / name)

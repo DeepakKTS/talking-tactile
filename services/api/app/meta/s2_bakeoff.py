@@ -547,17 +547,32 @@ def stepper(grading: dict[str, Any]) -> str:
         }
         for p in grading["parts"]
     ]
+    return step_view(
+        steps,
+        ("Arm A: Spark point, SAM mask", "Arm B: code regions named by Spark"),
+        "The figure is at 30%, the part's mask at full strength with a 2 px outline, and the "
+        "Arm A prompt point is the crosshair in both views.",
+        ("Arm A", "Arm B"),
+    )
+
+
+def step_view(
+    steps: list[dict[str, Any]], titles: tuple[str, str], about: str, alts: tuple[str, str]
+) -> str:
+    """Steps of part, label, a and b image paths, and a_facts and b_facts, shown one at a
+    time with the a and b images side by side. alts name the two images for alt text."""
     data = json.dumps(steps).replace("<", "\\u003c")
+    left, right = (html.escape(t) for t in titles)
+    alt_a, alt_b = (json.dumps(a + " mask for ") for a in alts)
     return f"""<section id="step" aria-label="One part at a time">
 <h2>One part at a time</h2>
-<p>Left and right arrow keys, or the buttons. The figure is at 30%, the part's mask at full
-strength with a 2 px outline, and the Arm A prompt point is the crosshair in both views.</p>
+<p>Left and right arrow keys, or the buttons. {html.escape(about, quote=False)}</p>
 <div class="nav"><button id="prev" type="button">Previous</button>
 <span id="count"></span><button id="next" type="button">Next</button></div>
 <p id="name" aria-live="polite"></p><p id="label"></p>
-<div class="pair"><figure><figcaption>Arm A: Spark point, SAM mask</figcaption>
+<div class="pair"><figure><figcaption>{left}</figcaption>
 <img id="ia" alt=""><ul id="fa"></ul></figure>
-<figure><figcaption>Arm B: code regions named by Spark</figcaption>
+<figure><figcaption>{right}</figcaption>
 <img id="ib" alt=""><ul id="fb"></ul></figure></div>
 </section>
 <script>
@@ -579,9 +594,9 @@ function show(i) {{
   document.getElementById("name").textContent = s.part;
   document.getElementById("label").textContent = "label: " + s.label;
   document.getElementById("ia").src = s.a;
-  document.getElementById("ia").alt = "Arm A mask for " + s.part;
+  document.getElementById("ia").alt = {alt_a} + s.part;
   document.getElementById("ib").src = s.b;
-  document.getElementById("ib").alt = "Arm B mask for " + s.part;
+  document.getElementById("ib").alt = {alt_b} + s.part;
   list("fa", s.a_facts);
   list("fb", s.b_facts);
 }}

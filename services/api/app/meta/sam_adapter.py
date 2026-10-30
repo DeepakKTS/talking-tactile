@@ -80,6 +80,42 @@ def point_request_body(
     }
 
 
+def objects_request_body(
+    model: str,
+    png: bytes,
+    size: tuple[int, int],
+    objects: list[tuple[list[tuple[int, int]], list[tuple[int, int]]]],
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    """Several objects in one request, ids 1 to n, each with its positive points and its
+    negative points, all (x, y) in integer pixels of the image as sent. The docs
+    (sam/segmenting, read Oct 29) allow one or more point tokens per object, a leading - on a
+    negative point, and up to 16 objects per request."""
+    text = sam.build_object_prompt(
+        size=size,
+        objects=[
+            sam.PromptObject(
+                id=i,
+                prompts=[
+                    sam.FramePrompt(
+                        points=[sam.PromptPoint(x=x, y=y) for x, y in pos]
+                        + [sam.PromptPoint(x=x, y=y, label="negative") for x, y in neg]
+                    )
+                ],
+            )
+            for i, (pos, neg) in enumerate(objects, 1)
+        ],
+    )
+    url = "data:image/png;base64," + base64.b64encode(png).decode()
+    content = [{"type": "input_text", "text": text}, {"type": "input_image", "image_url": url}]
+    return {
+        "model": model,
+        "input": [{"type": "message", "role": "user", "content": content}],
+        "stream": True,
+        "metadata": dict(metadata),
+    }
+
+
 async def parse_events(events: list[Any]) -> sam.ImageSegmentationResult:
     async def gen() -> AsyncIterator[Any]:
         for ev in events:
