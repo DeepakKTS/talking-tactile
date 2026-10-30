@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 184,
- "updated_at": "2026-10-30T17:52:27.847Z",
+ "rev": 186,
+ "updated_at": "2026-10-30T18:02:38.358Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1386,14 +1386,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "",
    "timebox": "this phase",
    "fallback": "",
-   "status": "blocked",
-   "note": "Stopped at the replay, before any commit: graded references regress. Literal clip (own regions only): Japan regions lose 51 to 69% (prefecture lines cut each region into drawn sub-regions), Kanto IoU 0.974 to 0.391, Kyushu 0.985 to 0.339; heart right pulmonary arteries 0.947 to 0.646. Minimal clip (remove only regions holding another part's point) keeps Japan and the heart's references, but under both the 4 aortic arch members share one drawn region and all overlap (left common carotid artery 0.927 to 0, a graded reference), and the 4 Blausen lobes are one drawn region at step 14 (shaded into each other), so none stays touchable. Uploaded brain, minimal: postcentral gyrus clipped to its own red region (minus 60%, so parietal lobe is no longer covered), cerebellum still overlaps pons through region 32 it gets from medulla and spinal cord, which S2 nested in its oversized mask; spinal cord overlaps pons. Waiting on the user's call: minimal clip, an exemption for merge-proposal mates, and fill-aware drawn regions for shaded figures.",
+   "status": "cut",
+   "note": "Superseded on Oct 30 by teacher confirmation: the invariant is not committed as a gate. Its minimal-clip region logic stays as a detector for an Author warning (d5-13). The replay numbers in the blocked note above stand.",
    "done_at": null,
    "tags": [
     "pipeline",
     "s2"
    ],
-   "changed_at": "2026-10-30T17:52:27.793Z"
+   "changed_at": "2026-10-30T18:02:38.292Z"
   },
   {
    "id": "d6-1",
@@ -2366,6 +2366,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "A job is figure hash, options, edit version and Runner.pipeline_version: a hash of every stage's own cache key inputs, without upstream digests or edits. A repeated upload reuses a job only on the same pipeline version; otherwise it starts a new job, whose unchanged stages come from the cache. The job database gains jobs.pipeline by a migration from version 2.",
    "why": "A re-upload returned the figure's old finished job forever, so code changes never reached figures already run, and republishing on Oct 30 needed hand edits to the dev database. Deriving the version from the cache keys means it moves exactly when some stage's output could change; S1 and S2 keys hold no code, so a code change never pays for a Meta call again.",
    "changed_at": "2026-10-30T17:37:16.202Z"
+  },
+  {
+   "id": "dec-mvva5bij7fq1",
+   "date": "2026-10-30",
+   "title": "Touch requires teacher confirmation. A part is touchable only after the teacher marks it checked; region overlap is a warning in Author, not a gate.",
+   "decision": "touchable = checked by the teacher (Mark checked, an accepted Fix outline, or an accepted merge) and not a suggestion. Unchecked parts are listed at publish and named in Explore's intro; publish never blocks on them. The minimal-clip region logic only warns.",
+   "why": "The touch-safety invariant as a gate regressed graded references on replay (aortic arch members overlap one another, shaded Blausen lobes are one drawn region, literal clipping cut Japan's regions by half). A teacher's look is the check that holds on every figure; the detector points the teacher at the outlines most likely to be wrong.",
+   "changed_at": "2026-10-30T18:02:38.358Z"
   }
  ],
  "risks": [
@@ -2456,6 +2464,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T18:02:38.358Z",
+   "kind": "claude",
+   "text": "Decision: Touch requires teacher confirmation. A part is touchable only after the teacher marks it checked; region overlap is a warning in Author, not a gate."
+  },
+  {
+   "ts": "2026-10-30T18:02:38.292Z",
+   "kind": "claude",
+   "text": "Task d5-12 \"Touch-safety invariant: clip touchable masks to their drawn regions; overlaps go to the teacher\" is now cut. Note: Superseded on Oct 30 by teacher confirmation: the invariant is not committed as a gate. Its minimal-clip region logic stays as a detector for an Author warning (d5-13). The replay numbers in the blocked note above stand."
+  },
   {
    "ts": "2026-10-30T17:52:27.847Z",
    "kind": "claude",
