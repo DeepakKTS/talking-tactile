@@ -97,6 +97,7 @@ def test_each_number_comes_from_the_masks() -> None:
         "on_line": 1,
         "fragmented": 1,
         "overlap_pairs": 0,
+        "overlap_pairs_before": 0,
         "points": 3,
         "points_on_text": 1,
         "points_on_line": 1,
@@ -158,6 +159,17 @@ def test_the_committed_v2_scores_count_their_own_rows(name: str) -> None:
     assert "confident_fails" not in s  # the grades are of v1's masks
     assert c["fragmented"] == sum(1 for r in rows if score.fragmented(r))
     assert c["points"] == sum(len(r["points"]) for r in rows)
+    assert c["overlap_pairs_before"] == len(s["pairs_before"])
     v2 = json.loads((bake.OUT_ROOT / name / "results_v2.json").read_text())
     assert [r["part"] for r in rows] == [r["part"] for r in v2["rows"]]
     assert [r["area_px"] for r in rows] == [r["final_px"] for r in v2["rows"]]
+
+
+def test_overlap_is_reported_before_and_after_resolution() -> None:
+    r = run()
+    r["masks_before"] = dict(r["masks"]) | {"label": box(40, 80, 40, 80)}  # spilled on chamber
+    s = score.score(r, np.zeros((H, W, 3), np.uint8), marks(), {})
+    by = {x["part"]: x for x in s["parts"]}
+    assert by["label"]["overlaps_before"] == ["chamber"] and by["label"]["overlaps"] == []
+    assert (s["counts"]["overlap_pairs_before"], s["counts"]["overlap_pairs"]) == (1, 0)
+    assert "overlapped before resolution chamber" in by["label"]["flags"]

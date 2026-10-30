@@ -315,6 +315,7 @@ class ArmAv2:
         self.scene = scene_of(fig.image)
         self.floor = bake.floor_px(fig)
         self.final: dict[str, Mask] = {}
+        self.kept: dict[str, Mask] = {}  # before contested pixels are resolved
 
     def _name(self, what: str) -> str | None:
         return f"armav2_{self.fig.name}_{what}" if self.record else None
@@ -503,6 +504,7 @@ class ArmAv2:
             mask = await self.segment_part(row, sent)
             if mask is not None:
                 kept[part] = mask
+        self.kept = kept
         self.final = self.finish(rows, kept, info)
         result["rows"] = list(rows.values())
         result["calls"] = self.live.calls

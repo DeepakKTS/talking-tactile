@@ -29,6 +29,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -58,6 +59,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -89,6 +91,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -118,6 +121,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "ovary"
+     ],
+     "overlaps_before": [
       "ovary"
      ],
      "points": [
@@ -157,6 +163,9 @@
      "overlaps": [
       "style"
      ],
+     "overlaps_before": [
+      "style"
+     ],
      "points": [
       {
        "xy": [
@@ -188,6 +197,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -221,6 +231,9 @@
      "overlaps": [
       "nectary"
      ],
+     "overlaps_before": [
+      "nectary"
+     ],
      "points": [
       {
        "xy": [
@@ -252,6 +265,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -283,6 +297,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "sepal"
+     ],
+     "overlaps_before": [
       "sepal"
      ],
      "points": [
@@ -318,6 +335,9 @@
      "overlaps": [
       "pedicel"
      ],
+     "overlaps_before": [
+      "pedicel"
+     ],
      "points": [
       {
        "xy": [
@@ -348,6 +368,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "floral axis"
+     ],
+     "overlaps_before": [
       "floral axis"
      ],
      "points": [
@@ -384,6 +407,9 @@
       "regression": true
      },
      "overlaps": [
+      "pollen sac"
+     ],
+     "overlaps_before": [
       "pollen sac"
      ],
      "points": [
@@ -425,6 +451,11 @@
       "anther",
       "filament stalk"
      ],
+     "overlaps_before": [
+      "connective",
+      "anther",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -460,6 +491,9 @@
       "regression": true
      },
      "overlaps": [
+      "pollen sac"
+     ],
+     "overlaps_before": [
       "pollen sac"
      ],
      "points": [
@@ -499,6 +533,9 @@
      "overlaps": [
       "pollen sac"
      ],
+     "overlaps_before": [
+      "pollen sac"
+     ],
      "points": [
       {
        "xy": [
@@ -528,6 +565,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -595,6 +633,56 @@
      "of_smaller": 0.731
     }
    ],
+   "pairs_before": [
+    {
+     "parts": [
+      "style",
+      "ovary"
+     ],
+     "overlap_px": 88,
+     "of_smaller": 0.278
+    },
+    {
+     "parts": [
+      "sepal",
+      "nectary"
+     ],
+     "overlap_px": 313,
+     "of_smaller": 0.23
+    },
+    {
+     "parts": [
+      "floral axis",
+      "pedicel"
+     ],
+     "overlap_px": 144,
+     "of_smaller": 0.778
+    },
+    {
+     "parts": [
+      "connective",
+      "pollen sac"
+     ],
+     "overlap_px": 245,
+     "of_smaller": 1.0
+    },
+    {
+     "parts": [
+      "pollen sac",
+      "anther"
+     ],
+     "overlap_px": 281,
+     "of_smaller": 1.0
+    },
+    {
+     "parts": [
+      "pollen sac",
+      "filament stalk"
+     ],
+     "overlap_px": 7437,
+     "of_smaller": 0.731
+    }
+   ],
    "counts": {
     "parts": 16,
     "no_mask": 0,
@@ -606,6 +694,7 @@
     "on_line": 3,
     "fragmented": 5,
     "overlap_pairs": 6,
+    "overlap_pairs_before": 6,
     "points": 16,
     "points_on_text": 3,
     "points_on_line": 1,
@@ -646,6 +735,9 @@
      "overlaps": [
       "aorta"
      ],
+     "overlaps_before": [
+      "aorta"
+     ],
      "points": [
       {
        "xy": [
@@ -676,6 +768,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "right pulmonary arteries"
+     ],
+     "overlaps_before": [
       "right pulmonary arteries"
      ],
      "points": [
@@ -713,6 +808,9 @@
      "overlaps": [
       "superior vena cava"
      ],
+     "overlaps_before": [
+      "superior vena cava"
+     ],
      "points": [
       {
        "xy": [
@@ -742,6 +840,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -777,6 +876,9 @@
      "overlaps": [
       "chordae tendineae"
      ],
+     "overlaps_before": [
+      "chordae tendineae"
+     ],
      "points": [
       {
        "xy": [
@@ -806,6 +908,10 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "chordae tendineae",
+      "right ventricle"
+     ],
+     "overlaps_before": [
       "chordae tendineae",
       "right ventricle"
      ],
@@ -843,6 +949,11 @@
       "tricuspid valve",
       "right ventricle"
      ],
+     "overlaps_before": [
+      "right atrium",
+      "tricuspid valve",
+      "right ventricle"
+     ],
      "points": [
       {
        "xy": [
@@ -876,6 +987,10 @@
       "tricuspid valve",
       "chordae tendineae"
      ],
+     "overlaps_before": [
+      "tricuspid valve",
+      "chordae tendineae"
+     ],
      "points": [
       {
        "xy": [
@@ -906,6 +1021,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -943,6 +1059,10 @@
       "left subclavian artery",
       "aorta"
      ],
+     "overlaps_before": [
+      "left subclavian artery",
+      "aorta"
+     ],
      "points": [
       {
        "xy": [
@@ -972,6 +1092,10 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "left common carotid artery",
+      "aorta"
+     ],
+     "overlaps_before": [
       "left common carotid artery",
       "aorta"
      ],
@@ -1009,6 +1133,11 @@
       "left common carotid artery",
       "left subclavian artery"
      ],
+     "overlaps_before": [
+      "brachiocephalic artery",
+      "left common carotid artery",
+      "left subclavian artery"
+     ],
      "points": [
       {
        "xy": [
@@ -1042,6 +1171,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1069,6 +1199,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "mitral valve"
+     ],
+     "overlaps_before": [
       "mitral valve"
      ],
      "points": [
@@ -1104,6 +1237,10 @@
       "mitral valve",
       "left ventricle"
      ],
+     "overlaps_before": [
+      "mitral valve",
+      "left ventricle"
+     ],
      "points": [
       {
        "xy": [
@@ -1133,6 +1270,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "septum"
+     ],
+     "overlaps_before": [
       "septum"
      ],
      "points": [
@@ -1170,6 +1310,11 @@
       "left atrium",
       "left ventricle"
      ],
+     "overlaps_before": [
+      "left pulmonary veins",
+      "left atrium",
+      "left ventricle"
+     ],
      "points": [
       {
        "xy": [
@@ -1203,6 +1348,10 @@
       "left atrium",
       "mitral valve"
      ],
+     "overlaps_before": [
+      "left atrium",
+      "mitral valve"
+     ],
      "points": [
       {
        "xy": [
@@ -1233,6 +1382,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [
+      "semilunar valves"
+     ],
+     "overlaps_before": [
       "semilunar valves"
      ],
      "points": [
@@ -1366,6 +1518,120 @@
      "of_smaller": 0.96
     }
    ],
+   "pairs_before": [
+    {
+     "parts": [
+      "brachiocephalic artery",
+      "aorta"
+     ],
+     "overlap_px": 493,
+     "of_smaller": 0.932
+    },
+    {
+     "parts": [
+      "superior vena cava",
+      "right pulmonary arteries"
+     ],
+     "overlap_px": 4723,
+     "of_smaller": 0.696
+    },
+    {
+     "parts": [
+      "right atrium",
+      "chordae tendineae"
+     ],
+     "overlap_px": 22389,
+     "of_smaller": 0.462
+    },
+    {
+     "parts": [
+      "tricuspid valve",
+      "chordae tendineae"
+     ],
+     "overlap_px": 35353,
+     "of_smaller": 0.69
+    },
+    {
+     "parts": [
+      "tricuspid valve",
+      "right ventricle"
+     ],
+     "overlap_px": 29988,
+     "of_smaller": 0.585
+    },
+    {
+     "parts": [
+      "chordae tendineae",
+      "right ventricle"
+     ],
+     "overlap_px": 121714,
+     "of_smaller": 0.876
+    },
+    {
+     "parts": [
+      "left common carotid artery",
+      "left subclavian artery"
+     ],
+     "overlap_px": 10250,
+     "of_smaller": 0.935
+    },
+    {
+     "parts": [
+      "left common carotid artery",
+      "aorta"
+     ],
+     "overlap_px": 10834,
+     "of_smaller": 0.988
+    },
+    {
+     "parts": [
+      "left subclavian artery",
+      "aorta"
+     ],
+     "overlap_px": 102417,
+     "of_smaller": 0.978
+    },
+    {
+     "parts": [
+      "left pulmonary veins",
+      "mitral valve"
+     ],
+     "overlap_px": 677,
+     "of_smaller": 0.212
+    },
+    {
+     "parts": [
+      "left atrium",
+      "mitral valve"
+     ],
+     "overlap_px": 14258,
+     "of_smaller": 0.9
+    },
+    {
+     "parts": [
+      "left atrium",
+      "left ventricle"
+     ],
+     "overlap_px": 12083,
+     "of_smaller": 0.763
+    },
+    {
+     "parts": [
+      "semilunar valves",
+      "septum"
+     ],
+     "overlap_px": 598,
+     "of_smaller": 0.266
+    },
+    {
+     "parts": [
+      "mitral valve",
+      "left ventricle"
+     ],
+     "overlap_px": 101368,
+     "of_smaller": 0.96
+    }
+   ],
    "counts": {
     "parts": 19,
     "no_mask": 0,
@@ -1377,6 +1643,7 @@
     "on_line": 2,
     "fragmented": 7,
     "overlap_pairs": 14,
+    "overlap_pairs_before": 14,
     "points": 19,
     "points_on_text": 0,
     "points_on_line": 0,
@@ -1414,6 +1681,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1441,6 +1709,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1474,6 +1743,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1505,6 +1775,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1536,6 +1807,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1569,6 +1841,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1600,6 +1873,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1631,6 +1905,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1658,6 +1933,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1675,6 +1951,7 @@
     }
    ],
    "pairs": [],
+   "pairs_before": [],
    "counts": {
     "parts": 9,
     "no_mask": 0,
@@ -1686,6 +1963,7 @@
     "on_line": 0,
     "fragmented": 2,
     "overlap_pairs": 0,
+    "overlap_pairs_before": 0,
     "points": 9,
     "points_on_text": 0,
     "points_on_line": 0,

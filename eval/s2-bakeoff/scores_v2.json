@@ -29,6 +29,13 @@
      "instances": 2,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "stigma",
+      "style",
+      "ovary",
+      "petal",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -68,7 +75,8 @@
       }
      ],
      "flags": [
-      "3 fragments"
+      "3 fragments",
+      "overlapped before resolution stigma, style, ovary, petal, filament stalk"
      ]
     },
     {
@@ -85,6 +93,7 @@
      "instances": 0,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [],
      "flags": []
     },
@@ -102,6 +111,13 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "style",
+      "ovary",
+      "petal",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -113,7 +129,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution ovules, style, ovary, petal, filament stalk"
+     ]
     },
     {
      "part": "style",
@@ -129,6 +147,14 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "stigma",
+      "ovary",
+      "petal",
+      "pedicel",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -150,7 +176,8 @@
       }
      ],
      "flags": [
-      "4 fragments"
+      "4 fragments",
+      "overlapped before resolution ovules, stigma, ovary, petal, pedicel, filament stalk"
      ]
     },
     {
@@ -171,6 +198,13 @@
       "regression": true
      },
      "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "stigma",
+      "style",
+      "petal",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -210,7 +244,8 @@
       }
      ],
      "flags": [
-      "regression: IoU 0.0 with the passing Arm B mask"
+      "regression: IoU 0.0 with the passing Arm B mask",
+      "overlapped before resolution ovules, stigma, style, petal, filament stalk"
      ]
     },
     {
@@ -227,6 +262,13 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "stigma",
+      "style",
+      "ovary",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -266,7 +308,8 @@
       }
      ],
      "flags": [
-      "4 fragments"
+      "4 fragments",
+      "overlapped before resolution ovules, stigma, style, ovary, filament stalk"
      ]
     },
     {
@@ -283,6 +326,9 @@
      "instances": 2,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -303,7 +349,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution filament stalk"
+     ]
     },
     {
      "part": "perianth group",
@@ -319,6 +367,7 @@
      "instances": 0,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [],
      "flags": []
     },
@@ -336,6 +385,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -366,6 +416,7 @@
      "instances": 0,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -395,6 +446,10 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "style",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -415,7 +470,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution style, filament stalk"
+     ]
     },
     {
      "part": "connective",
@@ -435,6 +492,10 @@
       "regression": true
      },
      "overlaps": [],
+     "overlaps_before": [
+      "pollen sac",
+      "anther"
+     ],
      "points": [
       {
        "xy": [
@@ -447,7 +508,8 @@
       }
      ],
      "flags": [
-      "regression: IoU 0.042 with the passing Arm B mask"
+      "regression: IoU 0.042 with the passing Arm B mask",
+      "overlapped before resolution pollen sac, anther"
      ]
     },
     {
@@ -468,6 +530,11 @@
       "regression": true
      },
      "overlaps": [],
+     "overlaps_before": [
+      "connective",
+      "anther",
+      "filament stalk"
+     ],
      "points": [
       {
        "xy": [
@@ -516,7 +583,8 @@
       }
      ],
      "flags": [
-      "regression: IoU 0.353 with the passing Arm B mask"
+      "regression: IoU 0.353 with the passing Arm B mask",
+      "overlapped before resolution connective, anther, filament stalk"
      ]
     },
     {
@@ -537,6 +605,10 @@
       "regression": true
      },
      "overlaps": [],
+     "overlaps_before": [
+      "connective",
+      "pollen sac"
+     ],
      "points": [
       {
        "xy": [
@@ -578,7 +650,8 @@
      "flags": [
       "regression: IoU 0.043 with the passing Arm B mask",
       "under a point symbol's area",
-      "12% on leader lines"
+      "12% on leader lines",
+      "overlapped before resolution connective, pollen sac"
      ]
     },
     {
@@ -599,6 +672,16 @@
       "regression": true
      },
      "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "stigma",
+      "style",
+      "ovary",
+      "petal",
+      "sepal",
+      "pedicel",
+      "pollen sac"
+     ],
      "points": [
       {
        "xy": [
@@ -640,7 +723,8 @@
      "flags": [
       "regression: IoU 0.003 with the passing Arm A mask",
       "13% on text",
-      "15 fragments"
+      "15 fragments",
+      "overlapped before resolution ovules, stigma, style, ovary, petal, sepal, pedicel, pollen sac"
      ]
     },
     {
@@ -657,6 +741,7 @@
      "instances": 0,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [],
      "flags": [
       "11% on text"
@@ -664,6 +749,184 @@
     }
    ],
    "pairs": [],
+   "pairs_before": [
+    {
+     "parts": [
+      "ovules",
+      "stigma"
+     ],
+     "overlap_px": 27180,
+     "of_smaller": 0.845
+    },
+    {
+     "parts": [
+      "ovules",
+      "style"
+     ],
+     "overlap_px": 34275,
+     "of_smaller": 0.645
+    },
+    {
+     "parts": [
+      "ovules",
+      "ovary"
+     ],
+     "overlap_px": 98860,
+     "of_smaller": 1.0
+    },
+    {
+     "parts": [
+      "ovules",
+      "petal"
+     ],
+     "overlap_px": 30069,
+     "of_smaller": 0.266
+    },
+    {
+     "parts": [
+      "ovules",
+      "filament stalk"
+     ],
+     "overlap_px": 30966,
+     "of_smaller": 0.274
+    },
+    {
+     "parts": [
+      "stigma",
+      "style"
+     ],
+     "overlap_px": 28769,
+     "of_smaller": 0.894
+    },
+    {
+     "parts": [
+      "stigma",
+      "ovary"
+     ],
+     "overlap_px": 22713,
+     "of_smaller": 0.706
+    },
+    {
+     "parts": [
+      "stigma",
+      "petal"
+     ],
+     "overlap_px": 30815,
+     "of_smaller": 0.958
+    },
+    {
+     "parts": [
+      "stigma",
+      "filament stalk"
+     ],
+     "overlap_px": 30675,
+     "of_smaller": 0.954
+    },
+    {
+     "parts": [
+      "style",
+      "ovary"
+     ],
+     "overlap_px": 26398,
+     "of_smaller": 0.497
+    },
+    {
+     "parts": [
+      "style",
+      "petal"
+     ],
+     "overlap_px": 39296,
+     "of_smaller": 0.74
+    },
+    {
+     "parts": [
+      "style",
+      "pedicel"
+     ],
+     "overlap_px": 5517,
+     "of_smaller": 0.326
+    },
+    {
+     "parts": [
+      "style",
+      "filament stalk"
+     ],
+     "overlap_px": 48306,
+     "of_smaller": 0.909
+    },
+    {
+     "parts": [
+      "ovary",
+      "petal"
+     ],
+     "overlap_px": 24813,
+     "of_smaller": 0.251
+    },
+    {
+     "parts": [
+      "ovary",
+      "filament stalk"
+     ],
+     "overlap_px": 25119,
+     "of_smaller": 0.254
+    },
+    {
+     "parts": [
+      "petal",
+      "filament stalk"
+     ],
+     "overlap_px": 247443,
+     "of_smaller": 0.964
+    },
+    {
+     "parts": [
+      "sepal",
+      "filament stalk"
+     ],
+     "overlap_px": 5091,
+     "of_smaller": 0.722
+    },
+    {
+     "parts": [
+      "pedicel",
+      "filament stalk"
+     ],
+     "overlap_px": 15215,
+     "of_smaller": 0.898
+    },
+    {
+     "parts": [
+      "connective",
+      "pollen sac"
+     ],
+     "overlap_px": 9162,
+     "of_smaller": 0.596
+    },
+    {
+     "parts": [
+      "connective",
+      "anther"
+     ],
+     "overlap_px": 39571,
+     "of_smaller": 0.919
+    },
+    {
+     "parts": [
+      "pollen sac",
+      "anther"
+     ],
+     "overlap_px": 13101,
+     "of_smaller": 0.852
+    },
+    {
+     "parts": [
+      "pollen sac",
+      "filament stalk"
+     ],
+     "overlap_px": 4327,
+     "of_smaller": 0.281
+    }
+   ],
    "counts": {
     "parts": 16,
     "no_mask": 1,
@@ -675,6 +938,7 @@
     "on_line": 2,
     "fragmented": 4,
     "overlap_pairs": 0,
+    "overlap_pairs_before": 22,
     "points": 35,
     "points_on_text": 0,
     "points_on_line": 0,
@@ -701,6 +965,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -737,6 +1002,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -777,6 +1043,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -813,6 +1080,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -853,6 +1121,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -880,6 +1149,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -909,6 +1179,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "right ventricle"
+     ],
      "points": [
       {
        "xy": [
@@ -929,7 +1202,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution right ventricle"
+     ]
     },
     {
      "part": "right ventricle",
@@ -945,6 +1220,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "chordae tendineae"
+     ],
      "points": [
       {
        "xy": [
@@ -965,7 +1243,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution chordae tendineae"
+     ]
     },
     {
      "part": "inferior vena cava",
@@ -981,6 +1261,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1012,6 +1293,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1039,6 +1321,7 @@
      "instances": 0,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1068,6 +1351,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1108,6 +1392,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1144,6 +1429,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "septum"
+     ],
      "points": [
       {
        "xy": [
@@ -1165,7 +1453,8 @@
       }
      ],
      "flags": [
-      "2 fragments"
+      "2 fragments",
+      "overlapped before resolution septum"
      ]
     },
     {
@@ -1182,6 +1471,9 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "septum"
+     ],
      "points": [
       {
        "xy": [
@@ -1193,7 +1485,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution septum"
+     ]
     },
     {
      "part": "semilunar valves",
@@ -1209,6 +1503,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1236,6 +1531,10 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "left ventricle",
+      "septum"
+     ],
      "points": [
       {
        "xy": [
@@ -1247,7 +1546,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution left ventricle, septum"
+     ]
     },
     {
      "part": "left ventricle",
@@ -1263,6 +1564,10 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "mitral valve",
+      "septum"
+     ],
      "points": [
       {
        "xy": [
@@ -1283,7 +1588,9 @@
        "on_ink": false
       }
      ],
-     "flags": []
+     "flags": [
+      "overlapped before resolution mitral valve, septum"
+     ]
     },
     {
      "part": "septum",
@@ -1299,6 +1606,12 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [
+      "left pulmonary veins",
+      "left atrium",
+      "mitral valve",
+      "left ventricle"
+     ],
      "points": [
       {
        "xy": [
@@ -1329,11 +1642,62 @@
       }
      ],
      "flags": [
-      "7 fragments"
+      "7 fragments",
+      "overlapped before resolution left pulmonary veins, left atrium, mitral valve, left ventricle"
      ]
     }
    ],
    "pairs": [],
+   "pairs_before": [
+    {
+     "parts": [
+      "chordae tendineae",
+      "right ventricle"
+     ],
+     "overlap_px": 5509,
+     "of_smaller": 0.979
+    },
+    {
+     "parts": [
+      "left pulmonary veins",
+      "septum"
+     ],
+     "overlap_px": 4327,
+     "of_smaller": 0.645
+    },
+    {
+     "parts": [
+      "left atrium",
+      "septum"
+     ],
+     "overlap_px": 15599,
+     "of_smaller": 0.984
+    },
+    {
+     "parts": [
+      "mitral valve",
+      "left ventricle"
+     ],
+     "overlap_px": 4121,
+     "of_smaller": 0.508
+    },
+    {
+     "parts": [
+      "mitral valve",
+      "septum"
+     ],
+     "overlap_px": 54846,
+     "of_smaller": 1.0
+    },
+    {
+     "parts": [
+      "left ventricle",
+      "septum"
+     ],
+     "overlap_px": 8111,
+     "of_smaller": 1.0
+    }
+   ],
    "counts": {
     "parts": 19,
     "no_mask": 1,
@@ -1345,6 +1709,7 @@
     "on_line": 0,
     "fragmented": 2,
     "overlap_pairs": 0,
+    "overlap_pairs_before": 6,
     "points": 31,
     "points_on_text": 0,
     "points_on_line": 0,
@@ -1375,6 +1740,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1411,6 +1777,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1451,6 +1818,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1491,6 +1859,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1540,6 +1909,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1580,6 +1950,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1620,6 +1991,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1660,6 +2032,7 @@
       "regression": false
      },
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1696,6 +2069,7 @@
      "instances": 1,
      "reference": null,
      "overlaps": [],
+     "overlaps_before": [],
      "points": [
       {
        "xy": [
@@ -1723,6 +2097,7 @@
     }
    ],
    "pairs": [],
+   "pairs_before": [],
    "counts": {
     "parts": 9,
     "no_mask": 0,
@@ -1734,6 +2109,7 @@
     "on_line": 0,
     "fragmented": 1,
     "overlap_pairs": 0,
+    "overlap_pairs_before": 0,
     "points": 19,
     "points_on_text": 0,
     "points_on_line": 0,

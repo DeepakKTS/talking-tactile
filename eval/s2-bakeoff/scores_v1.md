@@ -2,7 +2,7 @@
 
 ## flower
 
-16 parts, no mask 0, regressions 4 of 5 references, specks 4, under a point symbol 10, on text 3, on leader lines 3, fragmented 5, overlapping pairs 6. Points 16: on text 3, on lines 1, on ink 0. Graded fail at confidence 0.7 or higher: 2.
+16 parts, no mask 0, regressions 4 of 5 references, specks 4, under a point symbol 10, on text 3, on leader lines 3, fragmented 5, overlapping pairs 6 before resolution and 6 after. Points 16: on text 3, on lines 1, on ink 0. Graded fail at confidence 0.7 or higher: 2.
 
 | # | Part | v1 A grade | Kind | Conf | mm2 | Pieces | Text | Line | Ref IoU | Flags |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -25,7 +25,7 @@
 
 ## heart
 
-19 parts, no mask 0, regressions 0 of 4 references, specks 0, under a point symbol 4, on text 0, on leader lines 2, fragmented 7, overlapping pairs 14. Points 19: on text 0, on lines 0, on ink 1. Graded fail at confidence 0.7 or higher: 1.
+19 parts, no mask 0, regressions 0 of 4 references, specks 0, under a point symbol 4, on text 0, on leader lines 2, fragmented 7, overlapping pairs 14 before resolution and 14 after. Points 19: on text 0, on lines 0, on ink 1. Graded fail at confidence 0.7 or higher: 1.
 
 | # | Part | v1 A grade | Kind | Conf | mm2 | Pieces | Text | Line | Ref IoU | Flags |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -51,7 +51,7 @@
 
 ## japan_regions
 
-9 parts, no mask 0, regressions 0 of 7 references, specks 0, under a point symbol 1, on text 0, on leader lines 0, fragmented 2, overlapping pairs 0. Points 9: on text 0, on lines 0, on ink 0. Graded fail at confidence 0.7 or higher: 1.
+9 parts, no mask 0, regressions 0 of 7 references, specks 0, under a point symbol 1, on text 0, on leader lines 0, fragmented 2, overlapping pairs 0 before resolution and 0 after. Points 9: on text 0, on lines 0, on ink 0. Graded fail at confidence 0.7 or higher: 1.
 
 | # | Part | v1 A grade | Kind | Conf | mm2 | Pieces | Text | Line | Ref IoU | Flags |
 |---|---|---|---|---|---|---|---|---|---|---|

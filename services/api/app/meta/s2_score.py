@@ -17,7 +17,9 @@ Per part:
 - fragments: 8-connected pieces at or over the speck floor; flagged when there are more
   pieces than instances (v2 lists each instance; v1 has one), never for a group.
 - sibling overlap: as in overlaps.json, another part of the run covering more than 20% of the
-  smaller mask. Groups are left out: a group's mask is its members'.
+  smaller mask. Groups are left out: a group's mask is its members'. Reported before and
+  after v2 gives contested pixels to the smaller mask; before is the real spill measure.
+  v1 has no such step, so its before and after are the same masks.
 - points: whether each prompt point is on text, a leader line or ink.
 Sizes are on a letter page, as S3 would print the figure."""
 
@@ -105,9 +107,8 @@ def score(
     floor_px = speck_mm2 / mm**2
     masks: dict[str, Mask] = run["masks"]
     kinds = run.get("kind", {})
-    pairs = grading.overlap_pairs(
-        {p: m for p, m in masks.items() if m.any() and kinds.get(p) != "group"}
-    )
+    pairs = sibling_pairs(masks, kinds)
+    pairs_before = sibling_pairs(run.get("masks_before", masks), kinds)
     rows = []
     for part in run["parts"]:
         m = masks.get(part, np.zeros(image.shape[:2], bool))
@@ -129,9 +130,8 @@ def score(
             "fragments": fragments(m, floor_px) if area else 0,
             "instances": run.get("instances", {}).get(part, 1),
             "reference": None if ref is None else reference(m, ref),
-            "overlaps": [
-                q for pr in pairs for q in pr["parts"] if part in pr["parts"] and q != part
-            ],
+            "overlaps": partners(pairs, part),
+            "overlaps_before": partners(pairs_before, part),
             "points": [point_on(p, marks) for p in run["points"].get(part, [])],
         }
         row["flags"] = flags(row)
@@ -147,6 +147,7 @@ def score(
         "on_line": sum(1 for r in rows if (r["line_share"] or 0) > ON_MARKS),
         "fragmented": sum(1 for r in rows if fragmented(r)),
         "overlap_pairs": len(pairs),
+        "overlap_pairs_before": len(pairs_before),
         "points": sum(len(r["points"]) for r in rows),
         "points_on_text": sum(p["on_text"] for r in rows for p in r["points"]),
         "points_on_line": sum(p["on_line"] for r in rows for p in r["points"]),
@@ -159,8 +160,19 @@ def score(
         "point_symbol_px": round(symbol_mm2 / mm**2, 1),
         "parts": rows,
         "pairs": pairs,
+        "pairs_before": pairs_before,
         "counts": counts,
     }
+
+
+def sibling_pairs(masks: dict[str, Mask], kinds: dict[str, str]) -> list[dict[str, Any]]:
+    return grading.overlap_pairs(
+        {p: m for p, m in masks.items() if m.any() and kinds.get(p) != "group"}
+    )
+
+
+def partners(pairs: list[dict[str, Any]], part: str) -> list[str]:
+    return [q for pr in pairs for q in pr["parts"] if part in pr["parts"] and q != part]
 
 
 def reference(mask: Mask, ref: dict[str, Any]) -> dict[str, Any]:
@@ -190,6 +202,8 @@ def flags(row: dict[str, Any]) -> list[str]:
         out.append(f"{row['line_share']:.0%} on leader lines")
     if fragmented(row):
         out.append(f"{row['fragments']} fragments")
+    if row["overlaps_before"] != row["overlaps"]:
+        out.append("overlapped before resolution " + ", ".join(row["overlaps_before"]))
     if row["overlaps"]:
         out.append("overlaps " + ", ".join(row["overlaps"]))
     for p in row["points"]:
@@ -288,7 +302,9 @@ def write(run_name: str, scored: dict[str, dict[str, Any]], tables: list[str]) -
     return path
 
 
-def v2_run(name: str, result: dict[str, Any], final: dict[str, Mask]) -> dict[str, Any]:
+def v2_run(
+    name: str, result: dict[str, Any], final: dict[str, Mask], kept: dict[str, Mask]
+) -> dict[str, Any]:
     """A v2 result as the scorer reads it: the points are the ones sent to SAM."""
     rows = result["rows"]
     conf: dict[str, float | None] = {}
@@ -306,6 +322,7 @@ def v2_run(name: str, result: dict[str, Any], final: dict[str, Mask]) -> dict[st
         "confidence": conf,
         "kind": {r["part"]: r["kind"] for r in rows},
         "instances": {r["part"]: sum(1 for i in r["instances"] if i.get("kept_px")) for r in rows},
+        "masks_before": kept,
     }
 
 
@@ -315,7 +332,7 @@ async def v2_runs(
     out = {}
     for name, (image, _, masks) in v1.items():
         run, result = await s2_armav2.run_figure(s2_armav2.replayer(name), name, False, "none")
-        out[name] = (image, v2_run(name, result, run.final), masks)
+        out[name] = (image, v2_run(name, result, run.final, run.kept), masks)
     return out
 
 
@@ -348,7 +365,8 @@ def summary(s: dict[str, Any]) -> str:
         f"{c['parts']} parts, no mask {c['no_mask']}, regressions {c['regression']} of "
         f"{c['references']} references, specks {c['speck']}, under a point symbol "
         f"{c['under_point_symbol']}, on text {c['on_text']}, on leader lines {c['on_line']}, "
-        f"fragmented {c['fragmented']}, overlapping pairs {c['overlap_pairs']}. Points "
+        f"fragmented {c['fragmented']}, overlapping pairs {c['overlap_pairs_before']} before "
+        f"resolution and {c['overlap_pairs']} after. Points "
         f"{c['points']}: on text {c['points_on_text']}, on lines {c['points_on_line']}, on ink "
         f"{c['points_on_ink']}.{graded}"
     )
