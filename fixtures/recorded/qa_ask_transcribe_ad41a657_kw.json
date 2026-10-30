@@ -1,0 +1,46 @@
+{
+ "recorded_at": "2026-10-30T19:26:47+00:00",
+ "model": "muse-voice-transcribe-1.0",
+ "request": {
+  "method": "POST",
+  "path": "/asr/transcribe",
+  "multipart": {
+   "request": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "PUSH_TO_TALK",
+    "languageBias": [
+     "English"
+    ],
+    "keywords": [
+     "superior vena cava",
+     "right pulmonary arteries",
+     "right pulmonary veins",
+     "right atrium",
+     "right ventricle",
+     "inferior vena cava",
+     "aortic arch",
+     "left pulmonary arteries",
+     "left pulmonary veins",
+     "left atrium",
+     "left ventricle",
+     "septum",
+     "tricuspid valve",
+     "chordae tendineae",
+     "semilunar valves",
+     "mitral valve"
+    ]
+   },
+   "audio": "<data audio/wav sha256=ad41a657965e546656cc0b64154c136d7d1716b38b202ff09c60391b28423475 bytes=53092>"
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "sessionId": "voyager/transcribe/8FBC45EA1AB349A3987F5DE322194B18",
+   "transcript": "What does the the left ventricle do?",
+   "audioDurationMs": 1600,
+   "turns": []
+  }
+ }
+}

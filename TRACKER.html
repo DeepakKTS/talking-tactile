@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 201,
- "updated_at": "2026-10-30T19:19:31.332Z",
+ "rev": 204,
+ "updated_at": "2026-10-30T19:32:43.285Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1505,6 +1505,23 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "voice"
    ],
    "changed_at": "2026-10-30T19:19:31.332Z"
+  },
+  {
+   "id": "d5-20",
+   "day": 5,
+   "title": "Live: question eval, transcribe clips, release-to-first-word latency",
+   "detail": "",
+   "timebox": "phase B",
+   "fallback": "",
+   "status": "done",
+   "note": "Live under caffeinate -i, recorded (qa_ask_*, 64 files, no key in them; replays.json indexes them for both figures; a replay reproduces all 58 answers). Question eval on published version 3 (eval/qa/RESULTS.md): Commons brain 28 of 28 source and citations correct, no outside words. Heart: source 29 of 30, citations 27 of 30, 1 answer with outside words. Misses: h02 cites the aortic arch, named in the left ventricle's teacher description (my expectation left it out); h04 cites the inferior vena cava, missing from my may list; h20 'What does the aortic arch do?' answered from the left ventricle's description as teacher_description ('carries blood pumped by the left ventricle'), expected off_figure. All 7 injection questions and all 10 off-figure ones on the brain, 4 of 5 on the heart, got the fixed wording. Spark p50 3.1 s. Transcribe, 3 say clips without and with 16 keywords: every word right in all 6 (one repeated 'the' with keywords), 0.84 to 1.49 s. Release to first spoken word, headless Chrome with a fake microphone, live API, 12 holds: p50 4138 ms, p95 5105 ms; transcribe p50 941 / p95 1355, Spark 3258 / 4078, network and server code 13 / 15, device 6 / 10 (WAV encoding 1.4 / 4.5). eval/qa/VOICE.md.",
+   "done_at": "2026-10-30T19:32:43.285Z",
+   "tags": [
+    "eval",
+    "live",
+    "voice"
+   ],
+   "changed_at": "2026-10-30T19:32:43.285Z"
   },
   {
    "id": "d6-1",
@@ -2493,6 +2510,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "The answer prompt (ask_answer.v1) gets the published regions.json in words (parts with neighbors and directions computed in code, nesting, groups, teacher descriptions, untouchable parts, lines), the touch context and the figure image; Spark answers at low effort in a fixed shape (answer_text, source, cited_part_ids). Code has the last word: off_figure and unsure get fixed wording that sends the student to the teacher, a teacher_description answer must cite a described part, two sentences at most, cites are the figure's ids.",
    "why": "A student must never learn from an answer the figure and the teacher did not give: general knowledge from a model can be wrong for this figure's grade band and cannot be checked by the teacher. Positions come from code because the model must never guess geometry.",
    "changed_at": "2026-10-30T18:59:50.600Z"
+  },
+  {
+   "id": "dec-mvvdd5ssqt9y",
+   "date": "2026-10-30",
+   "title": "Voice: push-to-talk, file transcribe endpoint, keyword hints. Realtime cut for this build.",
+   "decision": "Explore records while the screen is held and sends one WAV to POST /api/ask, which calls the file transcribe endpoint (PUSH_TO_TALK) with the figure's part, line and group names as keywords. The realtime WebSocket client in spikes/ is not used.",
+   "why": "A question is short and ends when the finger lets go, so streaming partials buy little: live, transcribe took 0.94 s p50 and 1.36 s p95 of a 4.14 s p50 release-to-first-word, which Spark dominates (3.26 s p50). The file endpoint is one request through LiveCaller, metered and replayable like every other call; the realtime endpoint has never run live (spikes/muse-voice.md).",
+   "changed_at": "2026-10-30T19:32:43.045Z"
   }
  ],
  "risks": [
@@ -2583,6 +2608,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T19:32:43.285Z",
+   "kind": "claude",
+   "text": "Task d5-20 \"Live: question eval, transcribe clips, release-to-first-word latency\" is now done. Note: Live under caffeinate -i, recorded (qa_ask_*, 64 files, no key in them; replays.json indexes them for both figures; a replay reproduces all 58 answers). Question eval on published version 3 (eval/qa/RESULTS.md): Commons brain 28 of 28 source and citations correct, no outside words. Heart: source 29 of 30, citations 27 of 30, 1 answer with outside words. Misses: h02 cites the aortic arch, named in the left ventricle's teacher description (my expectation left it out); h04 cites the inferior vena cava, missing from my may list; h20 'What does the aortic arch do?' answered from the left ventricle's description as teacher_description ('carries blood pumped by the left ventricle'), expected off_figure. All 7 injection questions and all 10 off-figure ones on the brain, 4 of 5 on the heart, got the fixed wording. Spark p50 3.1 s. Transcribe, 3 say clips without and with 16 keywords: every word right in all 6 (one repeated 'the' with keywords), 0.84 to 1.49 s. Release to first spoken word, headless Chrome with a fake microphone, live API, 12 holds: p50 4138 ms, p95 5105 ms; transcribe p50 941 / p95 1355, Spark 3258 / 4078, network and server code 13 / 15, device 6 / 10 (WAV encoding 1.4 / 4.5). eval/qa/VOICE.md."
+  },
+  {
+   "ts": "2026-10-30T19:32:43.093Z",
+   "kind": "claude",
+   "text": "Task d5-20 \"Live: question eval, transcribe clips, release-to-first-word latency\" added to day 5."
+  },
+  {
+   "ts": "2026-10-30T19:32:43.045Z",
+   "kind": "claude",
+   "text": "Decision: Voice: push-to-talk, file transcribe endpoint, keyword hints. Realtime cut for this build."
+  },
   {
    "ts": "2026-10-30T19:19:31.332Z",
    "kind": "claude",

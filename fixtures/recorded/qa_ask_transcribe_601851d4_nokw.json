@@ -1,0 +1,28 @@
+{
+ "recorded_at": "2026-10-30T19:26:48+00:00",
+ "model": "muse-voice-transcribe-1.0",
+ "request": {
+  "method": "POST",
+  "path": "/asr/transcribe",
+  "multipart": {
+   "request": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "PUSH_TO_TALK",
+    "languageBias": [
+     "English"
+    ]
+   },
+   "audio": "<data audio/wav sha256=601851d45a9269a0c4e725f1d15d779506c8041019a0d816a2c80e8aaae3b9f3 bytes=59168>"
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "sessionId": "voyager/transcribe/C313E20B693E48BF8C82BD90AA26204A",
+   "transcript": "Where is the superior vena cava?",
+   "audioDurationMs": 1760,
+   "turns": []
+  }
+ }
+}

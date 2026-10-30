@@ -1,0 +1,28 @@
+{
+ "recorded_at": "2026-10-30T19:26:50+00:00",
+ "model": "muse-voice-transcribe-1.0",
+ "request": {
+  "method": "POST",
+  "path": "/asr/transcribe",
+  "multipart": {
+   "request": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "PUSH_TO_TALK",
+    "languageBias": [
+     "English"
+    ]
+   },
+   "audio": "<data audio/wav sha256=a3e0833213dcc2234db0f7f21b3893ea5c972e6a19a09176ad7cea4c8d081054 bytes=74124>"
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "sessionId": "voyager/transcribe/C13F8701E2DE4F9A9B61A1CFEF73191D",
+   "transcript": "what is next to the left pulmonary veins?.",
+   "audioDurationMs": 2240,
+   "turns": []
+  }
+ }
+}

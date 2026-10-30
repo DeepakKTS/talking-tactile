@@ -1,0 +1,46 @@
+{
+ "recorded_at": "2026-10-30T19:26:49+00:00",
+ "model": "muse-voice-transcribe-1.0",
+ "request": {
+  "method": "POST",
+  "path": "/asr/transcribe",
+  "multipart": {
+   "request": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "PUSH_TO_TALK",
+    "languageBias": [
+     "English"
+    ],
+    "keywords": [
+     "superior vena cava",
+     "right pulmonary arteries",
+     "right pulmonary veins",
+     "right atrium",
+     "right ventricle",
+     "inferior vena cava",
+     "aortic arch",
+     "left pulmonary arteries",
+     "left pulmonary veins",
+     "left atrium",
+     "left ventricle",
+     "septum",
+     "tricuspid valve",
+     "chordae tendineae",
+     "semilunar valves",
+     "mitral valve"
+    ]
+   },
+   "audio": "<data audio/wav sha256=601851d45a9269a0c4e725f1d15d779506c8041019a0d816a2c80e8aaae3b9f3 bytes=59168>"
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "sessionId": "voyager/transcribe/6BFE6AE99DDA410CBD0A0FC857BD6652",
+   "transcript": "where is the superior vena cava?",
+   "audioDurationMs": 1760,
+   "turns": []
+  }
+ }
+}

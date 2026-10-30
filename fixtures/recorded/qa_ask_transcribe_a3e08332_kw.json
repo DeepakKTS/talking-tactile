@@ -1,0 +1,46 @@
+{
+ "recorded_at": "2026-10-30T19:26:51+00:00",
+ "model": "muse-voice-transcribe-1.0",
+ "request": {
+  "method": "POST",
+  "path": "/asr/transcribe",
+  "multipart": {
+   "request": {
+    "model": "muse-voice-transcribe-1.0",
+    "audioEncoding": "WAV",
+    "mode": "PUSH_TO_TALK",
+    "languageBias": [
+     "English"
+    ],
+    "keywords": [
+     "superior vena cava",
+     "right pulmonary arteries",
+     "right pulmonary veins",
+     "right atrium",
+     "right ventricle",
+     "inferior vena cava",
+     "aortic arch",
+     "left pulmonary arteries",
+     "left pulmonary veins",
+     "left atrium",
+     "left ventricle",
+     "septum",
+     "tricuspid valve",
+     "chordae tendineae",
+     "semilunar valves",
+     "mitral valve"
+    ]
+   },
+   "audio": "<data audio/wav sha256=a3e0833213dcc2234db0f7f21b3893ea5c972e6a19a09176ad7cea4c8d081054 bytes=74124>"
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "sessionId": "voyager/transcribe/12C989E811914897BB5D56E7DE8DB752",
+   "transcript": "What is next to the left pulmonary veins?",
+   "audioDurationMs": 2240,
+   "turns": []
+  }
+ }
+}
