@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 207,
- "updated_at": "2026-10-30T19:42:50.601Z",
+ "rev": 210,
+ "updated_at": "2026-10-30T19:46:18.002Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1540,6 +1540,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-30T19:42:50.557Z"
   },
   {
+   "id": "d5-22",
+   "day": 5,
+   "title": "README: Privacy",
+   "detail": "",
+   "timebox": "phase B",
+   "fallback": "",
+   "status": "done",
+   "note": "README.md Privacy: on free API credits Meta may use request content for product improvement; this build sends the student's spoken question (and the typed one, the figure and its image) to Meta's API; classroom use needs paid usage without that condition. What stays where: the recording is made only while held and not kept by the backend; the transcript is shown only on the student's screen; the cost ledger now logs a question's length, not its words (live_client describe changed); recordings only with META_RECORD. RULES.md 1.4 (Standard mode, not Contributor mode, for a real student's voice) names a setting no request in this build sets; not checked against the docs this phase.",
+   "done_at": "2026-10-30T19:46:17.962Z",
+   "tags": [
+    "docs",
+    "privacy"
+   ],
+   "changed_at": "2026-10-30T19:46:17.962Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -2140,9 +2156,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-10-30T17:52:27.847Z",
-   "item": "Meta Model API, 379 live calls, from eval/live/ledger.jsonl (1 unpriced)",
-   "usd": 1.678409
+   "ts": "2026-10-30T19:46:18.002Z",
+   "item": "Meta Model API, 491 live calls, from eval/live/ledger.jsonl (1 unpriced)",
+   "usd": 2.369785
   }
  ],
  "outreach": [
@@ -2624,6 +2640,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T19:46:18.002Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $2.369785 over 491 live calls, 1 of them unpriced."
+  },
+  {
+   "ts": "2026-10-30T19:46:17.962Z",
+   "kind": "claude",
+   "text": "Task d5-22 \"README: Privacy\" is now done. Note: README.md Privacy: on free API credits Meta may use request content for product improvement; this build sends the student's spoken question (and the typed one, the figure and its image) to Meta's API; classroom use needs paid usage without that condition. What stays where: the recording is made only while held and not kept by the backend; the transcript is shown only on the student's screen; the cost ledger now logs a question's length, not its words (live_client describe changed); recordings only with META_RECORD. RULES.md 1.4 (Standard mode, not Contributor mode, for a real student's voice) names a setting no request in this build sets; not checked against the docs this phase."
+  },
+  {
+   "ts": "2026-10-30T19:46:17.924Z",
+   "kind": "claude",
+   "text": "Task d5-22 \"README: Privacy\" added to day 5."
+  },
   {
    "ts": "2026-10-30T19:42:50.601Z",
    "kind": "claude",

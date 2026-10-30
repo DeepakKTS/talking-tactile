@@ -336,7 +336,8 @@ class LiveMetaClient:
             body,
             caller="ask",
             model=self._models.spark,
-            describe=f"figure {figure_id[:12]}, question: {what[:60]}",
+            # The ledger is kept in git: a student's words never go in it, only their length.
+            describe=f"figure {figure_id[:12]}, question of {len(what)} characters",
             units=spark_units,
             record_as=self._name(f"ask_{slug(what)[:40]}_{digest}"),
         )
