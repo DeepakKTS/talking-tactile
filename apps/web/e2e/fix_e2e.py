@@ -155,7 +155,7 @@ def main() -> None:
             result["author"] = fix_aorta(page, fail)
             merge_branches(page)
             result["rules_after_merges"] = page.get_by_text("All tactile rules pass.").count() == 1
-            result["checked"] = check_all(page, base, api, fid)
+            result["warnings_at_confirm"] = check_all(page)
             page.get_by_role("button", name="Publish for students").click()
             page.get_by_role("link", name="Open version 1 in Explore").wait_for(timeout=60000)
             published = json.loads(urllib.request.urlopen(f"{api}/api/figures/{fid}/published/1/regions.json").read())

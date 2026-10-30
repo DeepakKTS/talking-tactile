@@ -23,6 +23,7 @@ export function Review({ api, id, status, onEdited }: Props) {
   const [report, setReport] = useState<Violation[]>([]);
   const [warnings, setWarnings] = useState<OverlapWarning[]>([]);
   const [area, setArea] = useState<OverlapWarning | null>(null);
+  const [confirmAll, setConfirmAll] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [refused, setRefused] = useState<Violation[] | null>(null);
@@ -105,6 +106,8 @@ export function Review({ api, id, status, onEdited }: Props) {
   const unchecked = parts.filter((r) => !r.verified_by_teacher).length;
   const flagged = notTouchable(file);
   const waiting = notCheckedYet(file);
+  const unchecking = new Set(waiting.map((r) => partId(r.id)));
+  const warned = warnings.filter((w) => unchecking.has(partId(w.region_id)));
   const notes = forYourInformation(file);
 
   return (
@@ -134,6 +137,28 @@ export function Review({ api, id, status, onEdited }: Props) {
               ? "Every part is checked."
               : `${unchecked} of ${parts.length} parts not checked yet. A student can touch a part only once you check it.`}
           </p>
+          {waiting.length > 0 && !confirmAll && (
+            <p><button type="button" disabled={busy || !settled} onClick={() => { setConfirmAll(true); }}>Mark all parts checked</button></p>
+          )}
+          {confirmAll && (
+            <section aria-label="Confirm marking all parts checked">
+              <p>Mark all {waiting.length} parts checked? A student can then touch each of them.</p>
+              {warned.length > 0 ? (
+                <>
+                  <p>These parts carry a warning. Look at them first:</p>
+                  <ul aria-label="Parts with a warning">
+                    {warned.map((w) => <li key={`${w.region_id} ${w.other}`}>{w.part}: {w.text}.</li>)}
+                  </ul>
+                </>
+              ) : <p>No part carries a warning.</p>}
+              <button type="button" disabled={busy || !settled} onClick={() => {
+                setConfirmAll(false);
+                const ids = waiting.map((r) => partId(r.id));
+                void send(`Marking ${ids.length} parts checked`, () => api.edit(id, ids[0] ?? "", { op: "check", also: ids.slice(1) }));
+              }}>Yes, mark all {waiting.length} checked</button>{" "}
+              <button type="button" onClick={() => { setConfirmAll(false); }}>Cancel</button>
+            </section>
+          )}
           <ul aria-label="Parts" style={{ listStyle: "none", padding: 0 }}>
             {parts.map((r) => (
               // Keyed on the saved text too, so the fields start over after an edit lands.

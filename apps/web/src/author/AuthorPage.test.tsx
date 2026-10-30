@@ -251,6 +251,33 @@ describe("author page", () => {
     expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // and the part's outline
   });
 
+  it("marks every part checked in one edit, after a confirm that lists the parts with a warning", async () => {
+    const [a, b] = server.regions.regions;
+    if (!a || !b) throw new Error("the fixture has regions");
+    server.warnings = [{ region_id: a.id, part: a.label, other: b.label, text: `This outline also covers the area where ${b.label} is`, area_mm: [] }];
+    await upload();
+    fireEvent.click(screen.getByRole("button", { name: "Mark all parts checked" }));
+    const confirm = screen.getByRole("region", { name: "Confirm marking all parts checked" });
+    expect(within(confirm).getByRole("list", { name: "Parts with a warning" }).textContent)
+      .toBe(`${a.label}: This outline also covers the area where ${b.label} is.`);
+    const before = server.calls.length;
+    fireEvent.click(within(confirm).getByRole("button", { name: `Yes, mark all ${synthetic.regions.length} checked` }));
+    await waitFor(() => { expect(server.calls.slice(before).some((c) => c.method === "PATCH")).toBe(true); });
+    const ids = [...new Set(synthetic.regions.map((r) => r.id.split("_")[0]))];
+    const sent = server.calls.slice(before).filter((c) => c.method === "PATCH");
+    expect(sent.map((c) => [c.url.split("/").at(-1), c.body])).toEqual([[ids[0], { op: "check", also: ids.slice(1) }]]);
+  });
+
+  it("cancels marking all parts checked", async () => {
+    await upload();
+    fireEvent.click(screen.getByRole("button", { name: "Mark all parts checked" }));
+    expect(screen.getByText("No part carries a warning.")).toBeTruthy();
+    const before = server.calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("region", { name: "Confirm marking all parts checked" })).toBeNull();
+    expect(server.calls.slice(before).some((c) => c.method === "PATCH")).toBe(false);
+  });
+
   it("lists each group with its members for the teacher's information, never as a part", async () => {
     const [a, b, c] = server.regions.regions;
     if (!a || !b || !c) throw new Error("the fixture has regions");

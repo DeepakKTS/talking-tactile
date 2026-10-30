@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 190, updated 2026-10-30T18:36:06.978Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 192, updated 2026-10-30T18:43:14.788Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -187,6 +187,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: app/geometry/overlap.py: the minimal-clip region logic as a detector only. On the parts as edited, each listed phrase maps to its sheet part (renames and merges kept); a part owns the drawn regions of its own and its nested children's points; covering a region that holds another part's point is a warning. Inside a region the part also owns, only when the fills are within FILL_DELTA (shaded lobes are one drawn region). S5 writes warnings.json (draft only, never published); Author shows 'This outline also covers the area where X is' on the part with Show on sheet (the covered area in orange). Replay counts: heart 14 (the 4 aortic arch members pairwise, right and left ventricle over the septum), flower 2, Japan 1, uploaded brain 7 (postcentral gyrus over parietal lobe, cerebellum over pons, spinal cord over pons and medulla, ...), Commons brain 4 (cerebellum and brainstem into the lobes; 16 before the fill rule). Tests: test_overlap.py, Author warning, API draft-only.
 - [x] d5-14 Touch requires the teacher's check: touchable only once checked; unchecked parts listed at publish and named in Explore's intro (phase A)
   - Note: regions.json: touchable = checked by the teacher (check edit naming any number of regions, rename, describe, merge into, add, or an accepted Fix outline: mask source teacher) and not a spill suggestion; thin and under_point_symbol stay informative. Neighbors and line separates name touchable regions only; merge proposals name drawn regions, checked or not; svg_ids compares every drawn region. Author: Parts lists every drawn part; Needs you only suggestions and parts with no shape; Not touchable when published adds 'Not checked yet.' per part; a draft line says Explore will say it once both are checked. Explore: unchanged code; unchecked parts are dropped and named in the intro. Synthetic fixture regenerated as published with every part checked; heart draft fixtures regenerated (nothing touchable). e2e: explore, plan and fix check every part through the API before publishing; all pass. Publish never waits.
+- [x] d5-15 Mark all parts checked, with a confirm step listing parts that carry a warning (phase A)
+  - Note: Author: 'Mark all parts checked' opens a confirm step: 'Mark all N parts checked?', the parts with an overlap warning listed first (or 'No part carries a warning.'), then 'Yes, mark all N checked' sends one check edit naming every unchecked part, or Cancel. The e2e runs (explore, plan, fix) use the button before publishing; all pass. Tests: Author confirm and cancel.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
