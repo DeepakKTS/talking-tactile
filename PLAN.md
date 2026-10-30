@@ -203,6 +203,8 @@ Cost estimate per figure, to confirm on Day 1: about 10 to 25 SAM calls, so roug
 
 See the edge case table in the PDF. The rule of thumb: when in doubt, say less. A wrong label spoken with confidence is worse than silence.
 
+Known limitation (Oct 30): continuous vessels and their branches are merged by the teacher. A vessel drawn as one unbroken shape with its branches, such as the heart's aorta with the brachiocephalic, left common carotid and left subclavian arteries, is one drawn region: no drawn boundary separates them, so code cannot say where one ends and the next begins, and S2 does not split them by the nearer point. S2 proposes the merge ("Merge ... as 'aortic arch'"), and the teacher accepts it in one press or fixes each outline; until then each is checked, or not, like any part, and Author warns that their outlines cover each other's areas.
+
 ## 12. Evaluation
 
 | Suite | What | Goal |
