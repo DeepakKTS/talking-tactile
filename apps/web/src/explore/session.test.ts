@@ -4,7 +4,8 @@ import type { AudioPort } from "./audio";
 import type { Pt } from "./homography";
 import { Metrics } from "./metrics";
 import { type AskRequest, ExploreSession, OFFLINE_ANSWER, keyAction, notTouchableSentence } from "./session";
-import { SYNTHETIC } from "./testkit";
+import { untouchableNames } from "../shared/regions";
+import { SYNTHETIC, sheet, square } from "./testkit";
 
 class FakeAudio implements AudioPort {
   log: string[] = [];
@@ -228,5 +229,45 @@ describe("keys", () => {
     ["m", "more"], [".", "repeat"], ["w", "here"], ["x", null],
   ] as const)("%s is %s", (key, action) => {
     expect(keyAction(key)).toBe(action);
+  });
+});
+
+describe("lines and the subject in speech", () => {
+  const file = sheet([
+    { id: "r1", poly: square(50, 50, 40), label: "right atrium" },
+    { id: "r2", poly: square(100, 50, 40), label: "right ventricle" },
+  ], {
+    lines: [{ id: "l1", label: "tricuspid valve", separates: ["r1", "r2"], between: ["right atrium", "right ventricle"] }],
+    subject: { label: "heart", polygon_mm: [[40, 40], [150, 40], [150, 120], [40, 120]] },
+  });
+
+  function feed(session: ExploreSession, p: Pt, t0: number, t1: number) {
+    for (let t = t0; t < t1; t += FRAME) session.finger({ p, t, receivedAt: performance.now() });
+  }
+
+  it("says the line, then the part, at the crossing, and logs its code latency", () => {
+    const audio = new FakeAudio();
+    const metrics = new Metrics();
+    const session = new ExploreSession(file, EXPLORE, { audio, metrics, ask: () => Promise.resolve("") });
+    feed(session, [70, 70], 0, 1500);
+    feed(session, [95, 70], 1500, 1700);
+    feed(session, [120, 70], 1700, 3500);
+    expect(audio.said()).toEqual(["Right atrium", "Tricuspid valve, right ventricle"]);
+    expect(metrics.frameToBoundaryMs.count).toBe(1);
+    expect(metrics.frameToBoundaryMs.p50).toBeLessThan(5);
+  });
+
+  it("says the subject once when the finger rests on no part inside it", () => {
+    const audio = new FakeAudio();
+    const session = new ExploreSession(file, EXPLORE, { audio, metrics: new Metrics(), ask: () => Promise.resolve("") });
+    feed(session, [95, 110], 0, 4000);
+    expect(audio.said()).toEqual(["Heart"]);
+  });
+
+  it("names untouchable parts in the intro, never lines", () => {
+    const audio = new FakeAudio();
+    const session = new ExploreSession(file, EXPLORE, { audio, metrics: new Metrics(), ask: () => Promise.resolve(""), notTouchable: untouchableNames(file) });
+    session.intro();
+    expect(audio.said()[0]).not.toContain("not touchable");
   });
 });

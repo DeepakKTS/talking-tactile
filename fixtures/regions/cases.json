@@ -24,6 +24,7 @@
   {"name": "abbrev null", "op": "set", "path": ["regions", 0, "abbrev"], "value": null, "valid": false},
   {"name": "centroid with 1 number", "op": "set", "path": ["regions", 0, "centroid_mm"], "value": [1], "valid": false},
   {"name": "schema_version 1", "op": "set", "path": ["schema_version"], "value": 1, "valid": false},
+  {"name": "schema_version 2", "op": "set", "path": ["schema_version"], "value": 2, "valid": false},
   {"name": "touchable missing", "op": "delete", "path": ["regions", 0, "touchable"], "valid": false},
   {"name": "touchable as string", "op": "set", "path": ["regions", 0, "touchable"], "value": "yes", "valid": false},
   {"name": "touchable false", "op": "set", "path": ["regions", 0, "touchable"], "value": false, "valid": true},

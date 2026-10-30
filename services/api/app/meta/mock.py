@@ -18,7 +18,7 @@ from typing import Any, Literal
 
 from app.config import Meta
 from app.meta.cost import CostMeter
-from app.meta.types import PartPhrase, Understanding
+from app.meta.types import PartPhrase, SheetContext, Understanding
 from app.models.image import RGB
 from app.models.mask import Mask
 from app.paths import RECORDED_DIR
@@ -141,13 +141,13 @@ class MockMetaClient:
             client.cap_calls(cap)
 
     async def understand(
-        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt, sheet: SheetContext
     ) -> Understanding:
         """Synthetic: the listing only, so S2 finds the parts by phrase. Replayed: as live."""
         replay = self._replay(figure_id)
         if replay is not None:
             self.calls.append(CallRecord(call="understand", figure_id=figure_id, phrase=None))
-            u: Understanding = await replay.understand(image, figure_id, prompt, locate)
+            u: Understanding = await replay.understand(image, figure_id, prompt, locate, sheet)
             return u
         fig = self._figure(figure_id)
         self.calls.append(CallRecord(call="understand", figure_id=figure_id, phrase=None))
@@ -168,10 +168,12 @@ class MockMetaClient:
             verdict_reason="Mock answer for the synthetic test figure.",
         )
 
-    async def segment(self, image: RGB, figure_id: str, phrase: str, prompt: Prompt) -> list[Mask]:
+    async def segment(
+        self, image: RGB, figure_id: str, phrase: str, prompt: Prompt, what: str = ""
+    ) -> list[Mask]:
         replay = self._replay(figure_id)
         if replay is not None:
-            masks: list[Mask] = await replay.segment(image, figure_id, phrase, prompt)
+            masks: list[Mask] = await replay.segment(image, figure_id, phrase, prompt, what)
             return masks
         fig = self._figure(figure_id)
         self.calls.append(CallRecord(call="segment", figure_id=figure_id, phrase=phrase))

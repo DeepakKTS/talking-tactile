@@ -149,7 +149,7 @@ def test_a_part_spark_did_not_locate_needs_the_teacher() -> None:
 def test_a_spill_cleared_by_the_retry_is_used() -> None:
     sam = FakeSam(
         {
-            ("left", False): [box(12, 188)],  # holds the right box's point (150, 60)
+            ("left", False): [box(12, 160)],  # holds the right box's point (150, 60)
             ("left", True): [box(12, 88)],
             ("right", False): [box(112, 188)],
         }
@@ -163,8 +163,8 @@ def test_a_spill_cleared_by_the_retry_is_used() -> None:
 def test_a_spill_that_survives_goes_to_the_teacher_as_an_untouchable_suggestion() -> None:
     sam = FakeSam(
         {
-            ("left", False): [box(12, 188)],
-            ("left", True): [box(12, 170)],
+            ("left", False): [box(12, 160)],  # 63% of right: a spill, not nesting
+            ("left", True): [box(12, 155)],
             ("right", False): [box(112, 188)],
         }
     )
@@ -177,13 +177,13 @@ def test_a_spill_that_survives_goes_to_the_teacher_as_an_untouchable_suggestion(
         "spill",
         "holds points of right after a retry",
     )
-    assert t.suggestion is not None and int(t.suggestion.sum()) == 158 * 86
+    assert t.suggestion is not None and int(t.suggestion.sum()) == 143 * 86
 
 
 def test_a_failed_retry_keeps_the_mask_as_spill() -> None:
     sam = FakeSam(
         {
-            ("left", False): [box(12, 188)],
+            ("left", False): [box(12, 160)],
             ("left", True): LiveCallCapError("cap"),
             ("right", False): [box(112, 188)],
         }
@@ -266,8 +266,8 @@ def test_mock_parts_without_points_are_found_by_phrase() -> None:
 def test_grounded_with_flags_and_suggestions_survives_the_cache(tmp_path: Any) -> None:
     sam = FakeSam(
         {
-            ("left", False): [box(12, 188)],
-            ("left", True): [box(12, 170)],
+            ("left", False): [box(12, 160)],  # 63% of right: a spill, not nesting
+            ("left", True): [box(12, 155)],
             ("right", False): [box(112, 188)],
         }
     )
@@ -324,3 +324,184 @@ def test_the_job_cap_is_two_spark_calls_and_two_per_part_up_to_60(parts: int, ca
     from app.meta.client import job_cap  # noqa: PLC0415
 
     assert job_cap(parts, RULES.meta) == cap
+
+
+# The plan for touch (S1 locate v2): lines, nesting, shared regions and the silhouette.
+
+
+class SubjectSam(FakeSam):
+    """FakeSam that also answers the subject's phrase call, or raises."""
+
+    def __init__(self, answers: dict[tuple[str, bool], Any], subject: Any) -> None:
+        super().__init__(answers)
+        self.subject = subject
+        self.phrases: list[tuple[str, str]] = []
+
+    async def segment(
+        self, image: Any, figure_id: str, phrase: str, prompt: Any, what: str = ""
+    ) -> list[Any]:
+        self.phrases.append((phrase, what))
+        if isinstance(self.subject, Exception):
+            raise self.subject
+        from app.models.mask import Mask as PartMask  # noqa: PLC0415
+
+        return [PartMask(data=m, label=phrase, score=0.9, source="sam") for m in self.subject]
+
+
+def line(name: str, separates: Sequence[str] = (), parent: str = "") -> PartPhrase:
+    return PartPhrase(
+        phrase=name, print_label=name, kind="line", separates=tuple(separates), parent=parent
+    )
+
+
+def planned(*parts: PartPhrase, subject: str = "", shared: Sequence[Any] = ()) -> Understanding:
+    from app.meta.types import SharedRegion  # noqa: PLC0415
+
+    return understanding(*parts).model_copy(
+        update={
+            "subject": subject,
+            "shares_region": [SharedRegion(parts=tuple(p), name=n) for p, n in shared],
+        }
+    )
+
+
+def test_a_line_gets_no_call_no_mask_and_never_needs_the_teacher() -> None:
+    sam = FakeSam({("left", False): [box(12, 88)], ("right", False): [box(112, 188)]})
+    u = planned(part("left", 150), line("border", ["left", "right"]), part("right", 750))
+    g = ground(sam, u)
+    assert [c[0] for c in sam.calls] == ["left", "right"]
+    assert [m.label for m in g.parts] == ["left", "right"]
+    assert g.teacher == [] and "border" not in g.flags
+
+
+def test_a_lines_points_never_count_as_spill() -> None:
+    """Spark gave the line a point by mistake; it is not sent and spills nothing."""
+    bad = line("border", ["left", "right"]).model_copy(
+        update={"instances": (Instance(where="main", points=(GridPoint(x=150, y=500),)),)}
+    )
+    sam = FakeSam({("left", False): [box(12, 88)]})
+    g = ground(sam, planned(part("left", 150), bad))
+    assert [c[0] for c in sam.calls] == ["left"] and g.teacher == []
+
+
+def test_a_mask_mostly_inside_a_larger_one_is_its_nested_child_whatever_spark_said() -> None:
+    """Spark gave right no parent; 95% of its mask lies inside left's, so it is left's
+    child: its point is no spill for left, and left's outline keeps right's pixels."""
+    sam = FakeSam({("left", False): [box(12, 188)], ("right", False): [box(110, 192)]})
+    g = ground(sam, understanding(part("left", 150), part("right", 750)))
+    assert g.nested == {"right": "left"} and g.teacher == []
+    assert all(not retry for _, retry, _ in sam.calls)
+    masks = {m.label: m.data for m in g.parts}
+    assert int(masks["right"].sum()) == 82 * 86  # the smaller keeps every pixel it claimed
+    assert int(masks["left"].sum()) == 176 * 86  # the parent's outline holds its child
+    assert g.facts["right"]["inside_of"] == {"left": round(78 / 82, 4)}
+
+
+def test_a_mask_under_the_nesting_share_is_still_spill() -> None:
+    sam = FakeSam(
+        {
+            ("left", False): [box(12, 182)],  # 70 of right's 76 columns: 92%
+            ("left", True): [box(12, 170)],
+            ("right", False): [box(112, 188)],
+        }
+    )
+    g = ground(sam, understanding(part("left", 150), part("right", 750)))
+    assert g.nested == {} and teacher(g)["left"][0] == "spill"
+
+
+def test_masks_with_a_high_iou_share_a_region_split_by_the_nearer_point() -> None:
+    """pons and medulla: SAM gives both the whole stem. Neither is spill; the stem is
+    split between them at the midpoint of their points, and a merge is proposed."""
+    stem = box(12, 188)
+    sam = FakeSam({("pons", False): [stem], ("medulla", False): [box(14, 188)]})
+    g = ground(sam, understanding(part("pons", 150), part("medulla", 750)))
+    assert g.teacher == [] and g.nested == {}
+    masks = {m.label: m.data for m in g.parts}
+    assert masks["pons"][60, 80] and masks["medulla"][60, 100]  # points at x 30 and 150
+    assert not (masks["pons"] & masks["medulla"]).any()
+    (m,) = g.merges
+    assert (m.parts, m.name) == (("pons", "medulla"), "pons and medulla")
+    assert m.why == "their outlines overlap almost entirely"
+
+
+def test_parts_spark_marked_as_one_shape_are_no_spill_and_keep_sparks_name() -> None:
+    sam = FakeSam({("pons", False): [box(12, 160)], ("medulla", False): [box(112, 188)]})
+    u = planned(
+        part("pons", 150), part("medulla", 750), shared=[(("pons", "medulla"), "brainstem")]
+    )
+    g = ground(sam, u)
+    assert g.teacher == [] and all(not retry for _, retry, _ in sam.calls)
+    (m,) = g.merges
+    assert (m.parts, m.name) == (("pons", "medulla"), "brainstem")
+
+
+def test_the_subjects_largest_piece_is_the_silhouette() -> None:
+    whole = box(5, 195, 5, 115)
+    speck = box(0, 3, 0, 3)
+    sam = SubjectSam({("left", False): [box(12, 88)]}, [whole, speck])
+    g = ground(sam, planned(part("left", 150), subject="boxes"))
+    assert sam.phrases == [("boxes", "s2_subject")]
+    assert g.silhouette is not None and int(g.silhouette.sum()) == 190 * 110
+    assert g.facts[s2_points.SUBJECT] == {"phrase": "boxes", "instances": 2, "px": 190 * 110}
+
+
+@pytest.mark.parametrize("answer", [LiveCallCapError("cap"), []])
+def test_a_failed_or_empty_silhouette_never_blocks_the_job(answer: Any) -> None:
+    sam = SubjectSam({("left", False): [box(12, 88)]}, answer)
+    g = ground(sam, planned(part("left", 150), subject="boxes"))
+    assert g.silhouette is None and [m.label for m in g.parts] == ["left"]
+
+
+def test_no_subject_no_silhouette_call() -> None:
+    sam = SubjectSam({("left", False): [box(12, 88)]}, [box(5, 195)])
+    g = ground(sam, planned(part("left", 150)))
+    assert sam.phrases == [] and g.silhouette is None
+
+
+def test_nesting_merges_and_the_silhouette_survive_the_cache(tmp_path: Any) -> None:
+    sam = SubjectSam(
+        {("left", False): [box(12, 188)], ("right", False): [box(110, 192)]}, [box(5, 195)]
+    )
+    g = ground(sam, planned(part("left", 150), part("right", 750), subject="boxes"))
+    s2_ground.save(g, tmp_path)
+    back = s2_ground.load(tmp_path)
+    assert back.nested == g.nested == {"right": "left"} and back.merges == g.merges
+    assert back.silhouette is not None and (back.silhouette == g.silhouette).all()
+
+
+def test_relate_picks_the_smallest_container_and_shared_pairs_do_not_nest() -> None:
+    big, mid, small = box(0, 200, 0, 120), box(10, 100), box(20, 40)
+    r = pm.relate({"big": big, "mid": mid, "small": small, "twin": box(10, 101)})
+    assert r.nested["small"] == "mid" and r.nested["mid"] == "big"
+    assert {"mid", "twin"} in r.shared and "twin" not in r.nested.values()
+
+
+def test_resolve_keeps_a_nested_childs_pixels_in_its_parent() -> None:
+    parent, child = box(0, 100), box(40, 60)
+    final, lost, won, _ = pm.resolve(
+        {"parent": parent, "child": child},
+        {"parent": [(10, 50)], "child": [(50, 50)]},
+        1,
+        nested={"child": "parent"},
+    )
+    assert (final["parent"] == parent).all() and (final["child"] == child).all()
+    assert lost["parent"] == {} and won["parent"] == {}
+
+
+def test_nesting_is_tested_again_on_the_mask_a_retry_keeps() -> None:
+    """The heart's septum, Oct 30: its first mask took most of the heart. left lies wholly
+    inside it, so left's point is no spill; right's does count, so the wall is asked again,
+    and the strip that comes back holds neither box: nothing is recorded as nested."""
+    sam = FakeSam(
+        {
+            ("left", False): [box(12, 60)],
+            ("right", False): [box(112, 188)],
+            ("wall", False): [box(0, 160, 0, 120)],  # all of left, 63% of right
+            ("wall", True): [box(64, 100)],
+        }
+    )
+    g = ground(sam, understanding(part("left", 150), part("right", 750), part("wall", 375)))
+    assert ("wall", True, [[(150, 60)]]) in sam.calls  # right's point only
+    assert g.nested == {} and g.teacher == []
+    assert g.facts["left"]["inside_of"] == {"wall": 1.0}  # the first masks, as eval data
+    assert [m.label for m in g.parts] == ["left", "right", "wall"]

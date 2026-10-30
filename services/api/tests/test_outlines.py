@@ -19,7 +19,7 @@ from app.pipeline.outlines import (
     spill_of,
     with_outlines,
 )
-from app.pipeline.s2_types import Grounded, TeacherPart
+from app.pipeline.s2_types import Grounded, MergeProposal, TeacherPart
 
 
 def outline(part: str = "aorta", pos: Any = ((10, 10),), neg: Any = ()) -> ed.OutlineEdit:
@@ -131,5 +131,10 @@ def test_the_spill_check_finds_other_parts_points_but_not_a_childs() -> None:
         verdict="make_tactile",
         verdict_reason="r",
     )
-    assert spill_of("b", mask(0, 20), grounded(), u) == ["a"]  # c is b's child
+    assert spill_of("b", mask(2, 20), grounded(), u) == ["a"]  # c is b's child
+    assert spill_of("b", mask(0, 20), grounded(), u) == []  # all of a is inside: nested
     assert spill_of("b", mask(5, 10), grounded(), u) == []
+    shared = grounded().model_copy(
+        update={"merges": [MergeProposal(parts=("a", "b"), name="ab", why="w")]}
+    )
+    assert spill_of("b", mask(2, 20), shared, u) == []  # a shares b's region

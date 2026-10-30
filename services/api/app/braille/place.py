@@ -26,6 +26,7 @@ from app.braille.louis import Translator
 from app.braille.models import BrailleLine, KeyEntry, Placement
 from app.config import Braille, TactileRules
 from app.geometry.layout import LayoutRegion, inside_point
+from app.geometry.plan import key_text
 from app.geometry.sheet import Sheet
 
 _EPS = 1e-9
@@ -50,11 +51,13 @@ KEY_TITLE = "key"
 
 
 def translate_for_sheet(sheet: Sheet, translator: Translator, rules: Braille) -> Translations:
-    """Braille for every label, abbreviation and texture meaning, and the key page title."""
+    """Braille for every label, abbreviation and texture meaning, each line part's key
+    entry, and the key page title."""
     labels = list(dict.fromkeys(r.label for r in sheet.regions))
     abbrevs = abbreviations(labels, rules.abbrev_letters)
     meanings = [t.meaning for t in sheet.textures]
-    texts = list(dict.fromkeys([*labels, *abbrevs.values(), *meanings, KEY_TITLE]))
+    lines = line_entries(sheet)
+    texts = list(dict.fromkeys([*labels, *abbrevs.values(), *meanings, *lines, KEY_TITLE]))
     return Translations(
         abbrevs=abbrevs, braille=dict(zip(texts, translator.translate(texts), strict=True))
     )
@@ -135,6 +138,12 @@ class _Placer:
         self, r: LayoutRegion, kind: Literal["label", "abbrev"], line: BrailleLine, inside: bool
     ) -> None:
         self.placed.append(Placement(region_id=r.id, kind=kind, inside=inside, line=line))
+
+
+def line_entries(sheet: Sheet) -> list[str]:
+    """The key's entry for each line part, in print."""
+    labels = {r.id: r.label for r in sheet.regions}
+    return [key_text(line, labels) for line in sheet.lines]
 
 
 def place_braille(sheet: Sheet, t: Translations, rules: TactileRules) -> BrailleLayout:

@@ -40,7 +40,7 @@ describe("parseRegions", () => {
 
   it("types a hand-written file the same way the schema does", () => {
     const sample = {
-      schema_version: 2,
+      schema_version: 3,
       figure_id: "abc",
       title: "t",
       figure_type: "other",

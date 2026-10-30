@@ -11,6 +11,7 @@ from app.braille.louis import Translator
 from app.braille.place import BrailleLayout, Translations, place_braille, translate_for_sheet
 from app.config import Earcons, TactileRules
 from app.geometry.layout import enforce_gaps, make_point_symbols, regions_from_parts
+from app.geometry.plan import SheetPlan, contour, silhouette_polygon
 from app.geometry.reconcile import ReconciledPart
 from app.geometry.scale import PageFit
 from app.geometry.sheet import Sheet
@@ -27,7 +28,7 @@ class ComposedSheet(BaseModel):
     unresolved_gaps: list[tuple[str, str]]
 
 
-def build_sheet(
+def build_sheet(  # noqa: PLR0913  keyword-only inputs, each from S4
     *,
     parts: Sequence[ReconciledPart],
     image: NDArray[np.uint8],
@@ -37,7 +38,11 @@ def build_sheet(
     rules: TactileRules,
     earcons: Earcons,
     translator: Translator,
+    plan: SheetPlan | None = None,
 ) -> ComposedSheet:
+    """plan: S1's lines and merge proposals, mapped to parts, and the subject's silhouette.
+    The silhouette's contour is raised last, clear of every outline and braille block."""
+    plan = plan or SheetPlan()
     regions = regions_from_parts(parts, fit, rules.vectorize)
     regions = make_point_symbols(regions, rules.spacing, rules.layout)
     regions, unresolved = enforce_gaps(
@@ -50,11 +55,23 @@ def build_sheet(
     )
     limit = rules.textures.limit_for(grade_band)
     regions, textures = assign_textures(regions, groups, limit, rules.textures.order, earcons)
-    sheet = Sheet(page=fit.page, grade_band=grade_band, regions=regions, textures=textures)
+    sheet = Sheet(
+        page=fit.page,
+        grade_band=grade_band,
+        regions=regions,
+        textures=textures,
+        lines=plan.lines,
+        merges=plan.merges,
+        subject=plan.subject,
+    )
     translations = translate_for_sheet(sheet, translator, rules.braille)
     braille = place_braille(sheet, translations, rules)
+    outline = None if plan.silhouette is None else silhouette_polygon(plan.silhouette, fit, rules)
+    raised = [] if outline is None else contour(outline, regions, braille.placements, rules)
     return ComposedSheet(
-        sheet=sheet.model_copy(update={"braille": braille.placements}),
+        sheet=sheet.model_copy(
+            update={"braille": braille.placements, "silhouette": outline, "contour": raised}
+        ),
         braille=braille,
         translations=translations,
         unresolved_gaps=unresolved,

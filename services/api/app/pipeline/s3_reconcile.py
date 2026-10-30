@@ -16,7 +16,7 @@ _FILE = "reconciled.json"
 
 
 def reconcile_masks(g: Grounded, fit: PageFit, rules: Reconcile) -> Reconciled:
-    return reconcile(g.parts, g.text, fit.mm_per_px, rules)
+    return reconcile(g.parts, g.text, fit.mm_per_px, rules, g.nested)
 
 
 def save(rec: Reconciled, out: Path) -> None:

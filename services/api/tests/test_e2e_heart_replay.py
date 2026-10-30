@@ -1,14 +1,17 @@
-"""The heart end to end through the API, on replay of the live runs of Oct 30: S1 from the
-first run (fixtures/recorded/pipeline_heart_s1_*), S2 and the Fix outline calls from the run
-under the per-job cap (pipeline_heart2_*: 19 SAM calls and 7 retries; then 3 fix calls for
-the aorta and 3 for the left ventricle). Mock mode answers the heart from the same files
-(fixtures/recorded/replays.json), so the replay client here is the mock.
+"""The heart end to end through the API, on replay of the live runs of Oct 30 with S1's plan
+for touch: S1 from fixtures/recorded/plan_heart_s1_*, S2 from plan2_heart_* (15 area calls,
+3 retries and the subject's phrase call), and the Fix outline calls from the earlier run
+under the per-job cap (pipeline_heart2_fix_*: 3 for the aorta and 3 for the left
+ventricle; a fix call is matched on its points alone). Mock mode answers the heart from the
+same files (fixtures/recorded/replays.json), so the replay client here is the mock.
 
-1. Upload, the draft Author shows with its flags, publish, the published regions.json: it
-   must equal fixtures/pipeline/heart_regions.json, the live draft, which the web tests read.
-2. Fix outline as the live check did: three previews per part with the same masks and spill
-   answers, accept, and the final draft must equal the live one,
-   fixtures/pipeline/heart_fixed_draft.json. Its rules report refuses publishing (409)."""
+1. Upload with no grade band, as the live run did; the draft Author shows must equal
+   fixtures/pipeline/heart_regions.json, which the web tests read.
+   Its rules report holds the left subclavian artery's point symbol, so publishing waits
+   for a merge (the aortic arch proposal) or an edit.
+2. Fix outline: three previews per part with the recorded masks and today's spill answers,
+   accept, and the final draft must equal fixtures/pipeline/heart_fixed_draft.json. Its
+   rules report still refuses publishing (409)."""
 
 import asyncio
 import json
@@ -38,18 +41,9 @@ LEFT_VENTRICLE = [
     ([[1480, 1120], [1380, 1200]], [], 88949),
     ([[1480, 1120], [1380, 1200]], [[1052, 1054], [1351, 934]], 61417),
 ]
-SPILL = {
-    "aorta": [["brachiocephalic artery", "left common carotid artery", "left subclavian artery"]]
-    * 2
-    + [
-        [
-            "brachiocephalic artery",
-            "left common carotid artery",
-            "left pulmonary arteries",
-            "left subclavian artery",
-        ]
-    ],
-    "left ventricle": [[], ["chordae tendineae", "mitral valve"], ["chordae tendineae"]],
+SPILL = {  # the aortic branches share the aorta's region, so they are no spill for it
+    "aorta": [[], [], ["left pulmonary arteries"]],
+    "left ventricle": [[], ["septum"], []],
 }
 
 
@@ -60,9 +54,7 @@ async def heart(body: Any) -> dict[str, Any]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
         files = {"file": ("heart.png", HEART.read_bytes(), "image/png")}
-        fid = (await http.post("/api/figures", files=files, data={"grade_band": "9_12"})).json()[
-            "figure_id"
-        ]
+        fid = (await http.post("/api/figures", files=files)).json()["figure_id"]
         await service.drain()
         out: dict[str, Any] = {"status": (await http.get(f"/api/figures/{fid}")).json()}
         await body(http, service, f"/api/figures/{fid}", out)
@@ -73,22 +65,28 @@ def test_the_heart_through_the_api_on_replay() -> None:
     async def body(http: httpx.AsyncClient, service: Any, base: str, out: dict[str, Any]) -> None:
         out["draft"] = (await http.get(f"{base}/regions.json")).json()
         out["report"] = (await http.get(f"{base}/report.json")).json()
-        pub = await http.post(f"{base}/publish")
-        out["publish"] = pub.status_code
-        out["published"] = (
-            await http.get(f"{base}/published/{pub.json()['version']}/regions.json")
-        ).json()
+        out["publish"] = (await http.post(f"{base}/publish")).status_code
 
     got = asyncio.run(heart(body))
     assert [s["outcome"] for s in got["status"]["job"]["stages"]] == ["ran"] * 6
     draft = RegionsFile.from_json_obj(got["draft"])
-    assert draft.schema_version == 2 and check_references(draft) == []
-    assert {r.label for r in draft.regions if not r.touchable} == {"aorta"}
-    assert len({r.label for r in draft.regions if r.touchable}) == 18 and draft.needs_teacher == []
-    thin = {r.label for r in draft.regions if any(f.reason == "thin" for f in r.flags or [])}
-    assert thin == {"chordae tendineae", "mitral valve", "semilunar valves", "tricuspid valve"}
-    assert got["report"] == [] and got["publish"] == 201  # flags never block publishing
-    assert got["published"] == got["draft"] == DRAFT
+    assert draft.schema_version == 3 and check_references(draft) == []
+    assert {r.label for r in draft.regions if not r.touchable} == {"septum"}
+    assert len({r.label for r in draft.regions if r.touchable}) == 14 and draft.needs_teacher == []
+    lines = {x.label: (x.between, x.separates, x.parent) for x in draft.lines or []}
+    assert lines == {
+        "tricuspid valve": (["right atrium", "right ventricle"], ["r5", "r6"], None),
+        "chordae tendineae": (None, None, "r6"),
+        "semilunar valves": (["left ventricle", "aorta"], ["r14", "r10"], None),
+        "mitral valve": (["left atrium", "left ventricle"], ["r13", "r14"], None),
+    }
+    assert [(m.name, m.region_ids) for m in draft.merge_proposals or []] == [
+        ("aortic arch", ["r1", "r8", "r9", "r10"])
+    ]
+    assert draft.subject is not None and draft.subject.label == "heart"
+    assert [(v["rule"], v["regions"]) for v in got["report"]] == [("point_symbol", ["r9"])]
+    assert got["publish"] == 409  # the left subclavian artery is under a point symbol
+    assert got["draft"] == DRAFT
 
 
 def test_fix_outline_on_replay_gives_the_live_fixes() -> None:
@@ -125,9 +123,7 @@ def test_fix_outline_on_replay_gives_the_live_fixes() -> None:
     assert got["draft"] == FIXED
     fixed = RegionsFile.from_json_obj(got["draft"])
     teacher = {r.label for r in fixed.regions if r.source == "teacher"}
-    assert teacher == {"aorta", "left ventricle"} and all(r.touchable for r in fixed.regions)
-    assert sorted((v["rule"], v["regions"][0]) for v in got["report"]) == [
-        ("point_symbol", "r11"),
-        ("point_symbol", "r7_2"),
-    ]
+    assert teacher == {"aorta", "left ventricle"}
+    assert {r.label for r in fixed.regions if not r.touchable} == {"septum"}
+    assert [(v["rule"], v["regions"][0]) for v in got["report"]] == [("point_symbol", "r9")]
     assert got["publish"]["error"]["code"] == "rules_violated"  # the 409 rule still applies

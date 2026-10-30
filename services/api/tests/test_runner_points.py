@@ -16,7 +16,7 @@ from app.meta.client import ObjectMask
 from app.meta.cost import CostMeter
 from app.meta.types import GridPoint, Instance, PartPhrase, Understanding
 from app.models.regions import RegionsFile, check_references
-from app.pipeline import s2_points
+from app.pipeline import s1_understand, s2_points
 from app.pipeline.jobs import JobOptions, JobRecord
 from app.pipeline.runner import STAGES, Runner
 from app.prompts import PROMPTS_DIR
@@ -29,19 +29,6 @@ MASKS = {m.label: m.data for m in FIG.truth_masks.values()}
 PARENT = {"inner core": "outer chamber"}
 
 
-def spill() -> np.ndarray:
-    """The box around the right chamber and the right lobe, filled: one piece holding both
-    parts' points. A spill that is not connected would already go with the piece rule."""
-    both = MASKS["right chamber"] | MASKS["right lobe"]
-    rows, cols = np.nonzero(both)
-    out = np.zeros_like(both)
-    out[rows.min() : rows.max() + 1, cols.min() : cols.max() + 1] = True
-    return out
-
-
-SPILL = spill()
-
-
 def inside_point(phrase: str) -> GridPoint:
     """The pixel deepest inside the part, less its children, on the 0-1000 grid."""
     m = MASKS[phrase].copy()
@@ -51,6 +38,24 @@ def inside_point(phrase: str) -> GridPoint:
     d = cv2.distanceTransform(m.astype(np.uint8), cv2.DIST_L2, 5)
     y, x = np.unravel_index(int(d.argmax()), d.shape)
     return GridPoint(x=int(x) * 1000 // W + 1, y=int(y) * 1000 // H + 1)
+
+
+def spill() -> np.ndarray:
+    """The right chamber, a corridor to the right lobe's point, and the lobe within a disk
+    around that point: one piece holding both parts' points and about half the lobe, so the
+    lobe is no nested child of it. A spill that is not connected would already go with the
+    piece rule."""
+    lobe, chamber = MASKS["right lobe"], MASKS["right chamber"]
+    a, b = inside_point("right chamber"), inside_point("right lobe")
+    pa, pb = (a.x * W // 1000, a.y * H // 1000), (b.x * W // 1000, b.y * H // 1000)
+    corridor = np.zeros((H, W), np.uint8)
+    cv2.line(corridor, pa, pb, 1, thickness=40)
+    yy, xx = np.mgrid[0:H, 0:W]
+    near = np.hypot(xx - pb[0], yy - pb[1]) < 200
+    return chamber | corridor.astype(bool) | (lobe & near)
+
+
+SPILL = spill()
 
 
 class FakeLive:
@@ -71,7 +76,7 @@ class FakeLive:
         self.cap = cap
 
     async def understand(
-        self, image: Any, figure_id: str, prompt: Any, locate: Any
+        self, image: Any, figure_id: str, prompt: Any, locate: Any, sheet: Any
     ) -> Understanding:
         self.calls.append("understand")
         parts = []
@@ -162,7 +167,7 @@ def test_regions_json_marks_what_a_student_can_touch(
 ) -> None:
     _, runner, job, _ = done
     f = regions(runner, job)
-    assert f.schema_version == 2 and check_references(f) == []
+    assert f.schema_version == 3 and check_references(f) == []
     touch = {r.label for r in f.regions if r.touchable}
     assert "right chamber" not in touch and {"outer chamber", "inner core", "stem"} <= touch
     (sug,) = [r for r in f.regions if not r.touchable]
@@ -193,7 +198,7 @@ def test_a_new_locate_prompt_runs_s1_and_everything_after(
     root = done[0]
     prompts = tmp_path / "prompts"
     shutil.copytree(PROMPTS_DIR, prompts)
-    locate = prompts / "s1_locate.v1.json"
+    locate = prompts / s1_understand.LOCATE_PROMPT
     locate.write_text(locate.read_text("utf-8").replace("1 to 3 points", "1 to 2 points"), "utf-8")
     _, job = run_points(root, prompts=prompts)
     assert outcomes(job) == ran_from("s1")

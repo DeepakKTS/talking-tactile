@@ -1,5 +1,5 @@
 {
- "schema_version": 2,
+ "schema_version": 3,
  "figure_id": "synthetic",
  "title": "Synthetic test figure",
  "figure_type": "labeled_diagram",

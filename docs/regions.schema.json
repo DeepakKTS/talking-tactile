@@ -6,7 +6,7 @@
   "type": "object",
   "required": ["schema_version", "figure_id", "title", "figure_type", "page", "summary", "textures", "regions"],
   "properties": {
-    "schema_version": { "const": 2 },
+    "schema_version": { "const": 3 },
     "figure_id": { "type": "string", "description": "sha256 of the normalized source image" },
     "title": { "type": "string" },
     "figure_type": { "enum": ["labeled_diagram", "bar_chart", "line_graph", "map", "flow_diagram", "other"] },
@@ -76,6 +76,43 @@
               }
             }
           }
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "description": "The whole object the figure shows, and its outline: the silhouette. Explore says the label once each time a finger rests inside it on no part.",
+      "required": ["label", "polygon_mm"],
+      "properties": {
+        "label": { "type": "string" },
+        "polygon_mm": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }, "minItems": 3, "maxItems": 200 }
+      }
+    },
+    "lines": {
+      "type": "array",
+      "description": "Parts that are lines, such as a sulcus or a border: never raised as areas and never touchable. Explore says a line's label when the finger crosses from one region it separates into the other.",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "separates": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2, "description": "The touchable regions on either side, each by its part's main region id" },
+          "between": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2, "description": "The labels of the two parts it separates, for the teacher" },
+          "parent": { "type": ["string", "null"], "description": "The region the line lies in, when it separates no two touchable regions" }
+        }
+      }
+    },
+    "merge_proposals": {
+      "type": "array",
+      "description": "Touchable regions drawn as one unbroken shape, which the teacher may merge under the suggested name.",
+      "items": {
+        "type": "object",
+        "required": ["name", "region_ids", "why"],
+        "properties": {
+          "name": { "type": "string" },
+          "region_ids": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "why": { "type": "string" }
         }
       }
     },

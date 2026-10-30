@@ -153,7 +153,7 @@ describe("author page", () => {
     const parts = screen.getByRole("list", { name: "Parts" });
     expect(within(parts).queryByText("septum")).toBeNull();
     expect(within(parts).getByText("Thin: how the sheet shows it is decided later.")).toBeTruthy();
-    const flagged = screen.getByRole("list", { name: "Not touchable yet" });
+    const flagged = screen.getByRole("list", { name: "Needs you" });
     expect(within(flagged).getAllByText("Not touchable yet.")).toHaveLength(2);
     expect(within(flagged).getByText(/spilled onto other parts, so it is only a suggestion \(holds points of mitral valve after a retry\)/)).toBeTruthy();
     expect(within(flagged).getByText(/No usable point was found on it \(every point was dropped by the guard\)/)).toBeTruthy();
@@ -166,21 +166,55 @@ describe("author page", () => {
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
   });
 
-  it("shows the live heart's spill part as not touchable and still publishes", async () => {
+  it("splits the live heart's parts into needs you and for your information, and merges a proposal in one press", async () => {
     server.regions = structuredClone(heart) as unknown as RegionsFile;
     page();
     const input = screen.getByLabelText(/Figure \(PNG, JPEG or a PDF page\)/);
     fireEvent.change(input, { target: { files: [new File([new Uint8Array([137, 80])], "heart.png", { type: "image/png" })] } });
     fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
     await screen.findByRole("heading", { name: heart.title });
-    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(20);
-    const flagged = within(screen.getByRole("list", { name: "Not touchable yet" })).getAllByRole("listitem");
-    expect(flagged.map((li) => li.querySelector("strong")?.textContent)).toEqual(["aorta"]);
+    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(16);
+    const needs = within(screen.getByRole("list", { name: "Needs you" })).getAllByRole("listitem");
+    expect(needs.map((li) => li.querySelector("strong")?.textContent)).toEqual(["septum"]);
+    const info = within(screen.getByRole("list", { name: "For your information" })).getAllByRole("listitem");
+    expect(info.map((li) => li.textContent)).toEqual([
+      "tricuspid valve A line between right atrium and right ventricle. Not raised; Explore says it when a finger crosses from one to the other.",
+      "chordae tendineae A line in right ventricle. Not raised; listed in the key.",
+      "semilunar valves A line between left ventricle and aorta. Not raised; Explore says it when a finger crosses from one to the other.",
+      "mitral valve A line between left atrium and left ventricle. Not raised; Explore says it when a finger crosses from one to the other.",
+      "aorta Smaller than a point symbol, so the sheet shows it as one.", // its second piece
+    ]);
     expect(within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem")).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", { name: "Show the suggested outline of aorta" }));
-    expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // both pieces
-    fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show the suggested outline of septum" }));
+    expect(document.querySelectorAll("figure svg polygon")).toHaveLength(1);
+    const before = server.calls.length;
+    fireEvent.click(screen.getByRole("button", {
+      name: "Merge brachiocephalic artery, left common carotid artery, left subclavian artery and aorta as 'aortic arch'",
+    }));
+    await screen.findByRole("heading", { name: heart.title });
+    await waitFor(() => { expect(server.calls.slice(before).filter((c) => c.method === "PATCH")).toHaveLength(4); });
+    const sent = server.calls.slice(before).filter((c) => c.method === "PATCH").map((c) => [c.url.split("/").at(-1), c.body]);
+    expect(sent).toEqual([
+      ["r1", { op: "merge", into: "r10" }],
+      ["r8", { op: "merge", into: "r10" }],
+      ["r9", { op: "merge", into: "r10" }],
+      ["r10", { op: "label", label: "aortic arch" }],
+    ]);
+    const publish = screen.getByRole("button", { name: "Publish for students" });
+    await waitFor(() => { expect(publish.hasAttribute("disabled")).toBe(false); });
+    fireEvent.click(publish);
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
+  });
+
+  it("lists nested parts and point symbols for the teacher's information", async () => {
+    const [a, b] = server.regions.regions;
+    if (!a || !b) throw new Error("the fixture has regions");
+    Object.assign(b, { parent: a.id, flags: [{ reason: "under_point_symbol", detail: "small" }] });
+    await upload();
+    const info = within(screen.getByRole("list", { name: "For your information" })).getAllByRole("listitem");
+    const texts = info.map((li) => li.textContent);
+    expect(texts).toContain(`${b.label} Inside ${a.label}, raised within its outline.`);
+    expect(texts).toContain(`${b.label} Smaller than a point symbol, so the sheet shows it as one.`);
   });
 
   it("fixes an outline by clicks, shows the spill warning, and accepts the points as an edit", async () => {

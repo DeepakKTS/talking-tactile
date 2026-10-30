@@ -102,11 +102,17 @@ S1 Understand (Muse Spark). Returns figure type, title, a one paragraph summary,
 
 S1, live since d1-8 (Oct 30): a second Muse Spark call locates each listed part: kind (area, thin or group), a group's members, the part it sits inside, and every instance with 1 to 3 points (app/prompts/s1_locate.v1.json).
 
+S1 plans for touch since Oct 30 (d5-6, app/prompts/s1_locate.v2.json). The locate call is told the grade band, the printed size, the smallest part a fingertip explores (point_symbol_min_mm) and the gap, and plans as a transcriber would: each part is an area, a line (a sulcus, a border: never touched, no points) or a group; an area may have a parent; a line separates two listed areas, or has a parent; shares_region names areas drawn as one unbroken shape, with a combined name; subject names the whole object. Every listed part comes back once; one left out keeps no kind and goes to the teacher. S1's key now holds the job options, so a new grade band or page plans again.
+
 S2 Ground (SAM 3.1). Live since d1-8, Arm A v2f, locked Oct 30 (section 17): point prompts, one call per located part, four at a time; the points guarded in code, a spill retry, the oversize rule, and contested pixels to the smaller mask (app/pipeline/s2_points.py). Print text is found in code. Mock mode keeps the original path: one call per phrase, four at a time, and a call for "text label" so print text can be removed from the raised layer. Keep masks with their scores.
+
+S2 on the plan (d5-6): a line gets no SAM call and never needs the teacher. A part's points are no spill for a mask they lie inside when that part is Spark's child, is nested in the mask (95% or more of its first mask inside, smaller; NEST_INSIDE from the eval figures' masks, eval/plan/RESULTS.md), or shares its region (IoU 0.8 or more, or Spark's shares_region). Each shared group is a merge proposal. Nesting is tested again on the masks S2 keeps; a child stays inside its parent's outline, and near-identical masks are split by the nearer point. One SAM phrase call for the subject gives the silhouette, its largest piece; a failure leaves the sheet without one.
 
 S3 Reconcile (code first, then Muse Spark). Code merges near duplicates (overlap above 0.8), turns full containment into parent and child, assigns partial overlaps to the smaller part, and drops slivers. Then Muse Spark sees the figure with each mask outlined and numbered, and returns which number is which label plus a short description from the caption. This numbered overlay is how we stop the model guessing coordinates.
 
 S4 Layout (code only). Masks to polygons with contour tracing, simplified to 200 points or fewer. Scale to page millimeters. Enforce the 3.2 mm gap by shrinking neighbors, never by moving them. Pick up to 5 textures (3 for lower grades). Turn parts below the point symbol size into point symbols or merge them. Translate labels with liblouis, place braille where it fits, otherwise build a key with abbreviations. Compute centroids and neighbor directions.
+
+S4 on the plan (d5-6): line parts are listed in the key ("central sulcus, a line between precentral gyrus and postcentral gyrus", print note "Not raised: ..."), never drawn as areas. The silhouette's outer contour is raised, untextured, only where every part outline is at least min_gap_mm from its line and braille its clearance; pieces shorter than point_symbol_min_mm are left out. The rules check measures it.
 
 S5 Render. tactile.svg with layers (outlines, textures, braille, key), print.pdf at exact scale with a 100 mm calibration bar, regions.json, and a validation report from the rules check.
 
@@ -117,6 +123,12 @@ regions.json schema version 2 (Oct 30, d1-8). Migration from version 1:
 - Each region may have `flags`: `spill` (only on untouchable regions), `thin` and `under_point_symbol` (both stay touchable).
 - `needs_teacher` lists the parts with no shape at all: `no_points`, `no_mask` or `dropped` by S3.
 - Explore accepts version 2 only and drops untouchable regions at load. A version 1 file is refused as damaged: publish the figure again to make a version 2 file. Neighbors only name touchable regions.
+
+regions.json schema version 3 (Oct 30, d5-6). Migration from version 2:
+- Optional `subject` ({label, polygon_mm}): the whole object and its silhouette. Explore says the label once each time a finger rests inside it on no part.
+- Optional `lines` ({id, label, separates?, between?, parent?}): line parts. `separates` names two touchable regions by their parts' main region ids; Explore says "line, part" when a finger crosses from one into the other. Line ids share the id space with regions and needs_teacher.
+- Optional `merge_proposals` ({name, region_ids, why}): touchable regions drawn as one shape. Author shows each as one merge button.
+- Explore accepts version 3 only; a version 2 file is refused as damaged: publish the figure again. Nothing in a version 2 file changes meaning.
 
 Target: under 90 seconds from upload to review screen.
 

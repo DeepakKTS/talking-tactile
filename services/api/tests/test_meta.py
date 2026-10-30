@@ -20,6 +20,7 @@ from app.pipeline import s1_understand, s2_ground
 from app.pipeline.s0_ingest import figure_id
 from app.prompts import load_prompt
 from app.synthetic.load import SyntheticFigure
+from tests.test_live_client import SHEET
 
 RULES = load_tactile_rules()
 SMOKE_SAM = json.loads((RECORDED_DIR / "smoke_sam_heart_left_ventricle.json").read_text())
@@ -40,7 +41,7 @@ def test_the_mock_is_a_meta_client(mock: MockMetaClient) -> None:
 
 def test_understand_returns_the_synthetic_parts(mock: MockMetaClient,
                                                synthetic: SyntheticFigure) -> None:  # fmt: skip
-    u = asyncio.run(mock.understand(synthetic.image, figure_id(synthetic.image), S1, S1))
+    u = asyncio.run(mock.understand(synthetic.image, figure_id(synthetic.image), S1, S1, SHEET))
     assert isinstance(u, Understanding)
     assert u.title == synthetic.truth.title
     assert u.color_carries_meaning is True
@@ -72,13 +73,13 @@ def test_zero_matches_is_a_result_not_an_error(mock: MockMetaClient,
 def test_an_image_without_fixtures_is_refused(mock: MockMetaClient) -> None:
     other = np.full((10, 10, 3), 255, np.uint8)
     with pytest.raises(MockFixtureMissingError, match="mock mode"):
-        asyncio.run(mock.understand(other, figure_id(other), S1, S1))
+        asyncio.run(mock.understand(other, figure_id(other), S1, S1, SHEET))
 
 
 def test_mock_calls_cost_nothing_and_are_logged(mock: MockMetaClient,
                                                 synthetic: SyntheticFigure) -> None:  # fmt: skip
     fid = figure_id(synthetic.image)
-    asyncio.run(mock.understand(synthetic.image, fid, S1, S1))
+    asyncio.run(mock.understand(synthetic.image, fid, S1, S1, SHEET))
     asyncio.run(mock.segment(synthetic.image, fid, "pore", S2))
     assert [c.call for c in mock.calls] == ["understand", "segment"]
     assert mock.meter.spent_usd == 0

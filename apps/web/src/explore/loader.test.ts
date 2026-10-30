@@ -71,17 +71,19 @@ describe("published regions loader", () => {
     expect(saved.file.regions.some((r) => r.id === "s1")).toBe(false);
   });
 
-  it("loads the live heart with its spill suggestion left out", async () => {
-    // fixtures/pipeline/heart_regions.json: the live draft of Oct 30 under the per-job cap,
-    // replayed and published in services/api/tests/test_e2e_heart_replay.py.
+  it("loads the live heart with its spill suggestion left out and its lines kept", async () => {
+    // fixtures/pipeline/heart_regions.json: the live draft of Oct 30 with S1's plan for touch,
+    // replayed in services/api/tests/test_e2e_heart_replay.py.
     const { f } = fetcher(() => new Response(JSON.stringify(heart)));
     const got = await loadPublished(ID, 1, { fetch: f, storage: null });
-    expect(heart.regions).toHaveLength(22);
-    expect(got.file.regions).toHaveLength(20);
+    expect(heart.regions).toHaveLength(17);
+    expect(got.file.regions).toHaveLength(16);
     expect(got.file.regions.every((r) => r.touchable)).toBe(true);
     const labels = new Set(got.file.regions.map((r) => r.label));
-    expect(labels.has("aorta")).toBe(false);
-    expect(got.notTouchable).toEqual(["aorta"]); // two pieces, one name
+    expect(labels.has("septum")).toBe(false);
+    expect(got.notTouchable).toEqual(["septum"]); // lines are never named here
+    expect(got.file.lines?.map((l) => l.label)).toEqual(["tricuspid valve", "chordae tendineae", "semilunar valves", "mitral valve"]);
+    expect(got.file.subject?.label).toBe("heart");
   });
 
   it("says when the figure is not published, and does not fall back to a draft", async () => {

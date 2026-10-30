@@ -7,6 +7,8 @@ Layers, bottom to top:
             and clearance_to_line_mm off braille.
   outlines  each part's raised outline, drawn outline_width_mm wide inside its edge, so the
             gap between two parts is the gap between their polygons. Point symbols filled.
+  silhouette  the subject's outer contour, untextured, outline_width_mm wide on the edge,
+            only where it keeps min_gap_mm from every outline (app/geometry/plan.py).
   braille   the dots.
 Every outline carries data-region with the region id, which the validator matches against
 regions.json. Output is deterministic: same sheet, same bytes.
@@ -24,9 +26,10 @@ from shapely.ops import unary_union
 
 from app.braille.cells import block_size, dot_centers
 from app.braille.models import KeyEntry
-from app.braille.place import KEY_TITLE, BrailleLayout, Translations
+from app.braille.place import KEY_TITLE, BrailleLayout, Translations, line_entries
 from app.config import ExploreConfig, TactileRules
 from app.geometry.layout import LayoutRegion
+from app.geometry.plan import band as contour_band
 from app.geometry.sheet import Sheet
 from app.models.regions import Texture, TextureId
 
@@ -284,6 +287,13 @@ def render_sheet_svg(sheet: Sheet, title: str, rules: TactileRules,
                                             "data-kind": region.kind,
                                             "data-label": region.label})  # fmt: skip
 
+    if sheet.contour:
+        silhouette = _layer(root, "silhouette")
+        for piece in sheet.contour:
+            d = f.poly(contour_band(piece, rules))
+            ET.SubElement(silhouette, _q("path"), {"d": d, "fill": _INK, "data-kind": "silhouette",
+                                                  "data-label": sheet.subject})  # fmt: skip
+
     braille = _layer(root, "braille")
     for p in sheet.braille:
         g = ET.SubElement(braille, _q("g"), {"data-region": p.region_id, "data-text": p.line.text})
@@ -361,6 +371,14 @@ class _KeyPages:
         self.note(g, len(lines), self.margin, f"{e.abbrev}: {e.label}")
         self.y += height
 
+    def line(self, line_id: str, text: str) -> None:
+        lines = _wrap(self.t.braille[text], self.max_cells)
+        height = len(lines) * self.spacing + self.note_h
+        g = self.row(height, {"data-line": line_id})
+        self.lines(g, lines, self.margin)
+        self.note(g, len(lines), self.margin, f"Not raised: {text}")
+        self.y += height
+
     def texture(self, tex: Texture) -> None:
         r, gap = self.rules.render, self.rules.spacing.min_gap_mm
         sw, sh = r.key_swatch_mm
@@ -385,15 +403,18 @@ class _KeyPages:
 def render_key_svgs(
     sheet: Sheet, layout: BrailleLayout, t: Translations, rules: TactileRules
 ) -> list[str]:
-    """Key pages: the abbreviations used on the sheet, then each texture with its meaning.
-    Empty when the sheet needs no key."""
-    if not layout.key and not sheet.textures:
+    """Key pages: the abbreviations used on the sheet, each texture with its meaning, then
+    each line part, which the sheet does not raise. Empty when the sheet needs no key."""
+    lines = line_entries(sheet)
+    if not layout.key and not sheet.textures and not lines:
         return []
     pages = _KeyPages(sheet.page, t, rules)
     for e in layout.key:
         pages.entry(e)
     for tex in sheet.textures:
         pages.texture(tex)
+    for line, text in zip(sheet.lines, lines, strict=True):
+        pages.line(line.id, text)
     return [_to_text(p) for p in pages.pages]
 
 

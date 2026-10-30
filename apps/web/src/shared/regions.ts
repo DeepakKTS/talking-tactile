@@ -10,6 +10,14 @@ export type Texture = RegionsFile["textures"][number];
 export type Neighbor = NonNullable<Region["neighbors"]>[number];
 export type Direction = Neighbor["direction"];
 export type PointMm = Region["polygon_mm"][number];
+export type Line = NonNullable<RegionsFile["lines"]>[number];
+export type Subject = NonNullable<RegionsFile["subject"]>;
+export type MergeProposal = NonNullable<RegionsFile["merge_proposals"]>[number];
+
+/** The part a region belongs to: a part's further pieces are <part id>_<k>. */
+export function partId(regionId: string): string {
+  return regionId.split("_")[0] ?? regionId;
+}
 
 export class RegionsError extends Error {
   override name = "RegionsError";
@@ -28,7 +36,8 @@ export function parseRegions(data: unknown): RegionsFile {
 }
 
 // Explore runs on touchable regions only. A teacher suggestion (touchable false) is never
-// spoken, hit or guided to; parts in needs_teacher have no shape at all.
+// spoken, hit or guided to; parts in needs_teacher have no shape at all. Lines and the
+// subject stay: they name touchable regions only.
 export function touchableOnly(file: RegionsFile): RegionsFile {
   return { ...file, regions: file.regions.filter((r) => r.touchable) };
 }

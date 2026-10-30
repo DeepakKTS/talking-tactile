@@ -15,7 +15,7 @@ import pytest
 from app.braille.louis import Translator
 from app.config import load_explore, load_tactile_rules
 from app.meta.mock import MockMetaClient
-from app.meta.types import Understanding
+from app.meta.types import SheetContext, Understanding
 from app.models.image import RGB
 from app.models.mask import Mask
 from app.paths import FIXTURES_DIR, REGIONS_SCHEMA
@@ -119,12 +119,14 @@ def test_the_same_upload_again_costs_no_meta_calls(
     assert runner.output_dir(job) == runner.output_dir(first[1])
 
 
-def test_new_options_reuse_the_meta_stages(warm: Path) -> None:
+def test_new_options_plan_again_from_s1(warm: Path) -> None:
+    """S1 plans the parts for the reader and the printed size, so a new grade band or page
+    runs S1 onward."""
     client = MockMetaClient(RULES.meta)
     job = submit_and_run(make_runner(warm, client), JobOptions(grade_band="9_12"))
     assert job.status == "done"
-    assert outcomes(job) == ran_from("s3")
-    assert client.calls == []
+    assert outcomes(job) == ran_from("s1")
+    assert [c.call for c in client.calls][:1] == ["understand"]
 
 
 def test_a_figure_with_no_grade_band_leaves_it_out(warm: Path) -> None:
@@ -209,9 +211,9 @@ def test_editing_the_s2_request_runs_s2_and_not_s1(
 
 class _Retitled(MockMetaClient):
     async def understand(
-        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt, sheet: SheetContext
     ) -> Understanding:
-        u = await super().understand(image, figure_id, prompt, locate)
+        u = await super().understand(image, figure_id, prompt, locate, sheet)
         return u.model_copy(update={"title": "A different title"})
 
 
@@ -300,9 +302,9 @@ def test_an_image_with_no_recording_fails_at_s1(tmp_path: Path) -> None:
 
 class _DescribeOnly(MockMetaClient):
     async def understand(
-        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt, sheet: SheetContext
     ) -> Understanding:
-        u = await super().understand(image, figure_id, prompt, locate)
+        u = await super().understand(image, figure_id, prompt, locate, sheet)
         return u.model_copy(update={"verdict": "describe_only"})
 
 

@@ -1,11 +1,19 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "figure_id": "4f2a9c0d1b7e3a5f6c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
   "title": "Golden contract figure",
   "figure_type": "labeled_diagram",
   "grade_band": "9_12",
   "page": { "size": "letter", "width_mm": 215.9, "height_mm": 279.4 },
   "summary": "A test figure with four parts. One part sits inside another.",
+  "subject": { "label": "test organ", "polygon_mm": [[30, 50], [180, 50], [180, 150], [30, 150]] },
+  "lines": [
+    { "id": "l1", "label": "groove", "separates": ["r1", "r3"], "between": ["outer chamber", "right vessel"] },
+    { "id": "l2", "label": "ridge", "parent": "r1" }
+  ],
+  "merge_proposals": [
+    { "name": "vessel and valve", "region_ids": ["r3", "r4"], "why": "Spark marked them as one unbroken shape" }
+  ],
   "textures": [
     { "id": "dots", "meaning": "chamber", "earcon_hz": 440 },
     { "id": "lines", "meaning": "vessel", "earcon_hz": 523.25 }

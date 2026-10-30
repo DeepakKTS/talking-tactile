@@ -5,14 +5,15 @@ Order of operations:
 2. Remove speck components; drop parts left empty, and parts thinner than a sliver.
 3. Near duplicates (IoU above duplicate_iou) collapse onto the higher score.
 4. A part mostly inside another (contain_fraction) becomes its child; the parent is the
-   smallest container. Parents keep their full area.
+   smallest container. S2's nesting, by phrase, comes first when both parts are left.
+   Parents keep their full area.
 5. Any other overlap goes to the smaller part (then the higher score, then input order).
 6. Specks left by trimming are removed again.
 
 Ids are r1, r2, ... by input position, so they are stable whatever gets dropped.
 """
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 import cv2
 import numpy as np
@@ -156,8 +157,13 @@ def _dedupe(st: _State, duplicate_iou: float) -> None:
     st.alive = [pid for pid in st.ids if pid in kept]
 
 
-def _nest(st: _State, contain_fraction: float) -> None:
+def _nest(st: _State, contain_fraction: float, hints: Mapping[str, str]) -> None:
+    by_label = {st.source[pid].label: pid for pid in reversed(st.alive)}  # the first piece
     for pid in st.alive:
+        hint = by_label.get(hints.get(st.source[pid].label, ""))
+        if hint is not None and hint != pid:
+            st.parent[pid] = hint
+            continue
         holders = [
             other
             for other in st.alive
@@ -207,8 +213,13 @@ def _finish(st: _State, trimmed: set[str], speck_px: float) -> Reconciled:
 
 
 def reconcile(
-    parts: Sequence[Mask], text: Sequence[Mask], mm_per_px: float, rules: Reconcile
+    parts: Sequence[Mask],
+    text: Sequence[Mask],
+    mm_per_px: float,
+    rules: Reconcile,
+    nested: Mapping[str, str] | None = None,
 ) -> Reconciled:
+    """nested: S2's child phrase -> parent phrase."""
     shapes = {m.shape for m in [*parts, *text]}
     if len(shapes) > 1:
         raise ValueError(f"all masks must be the size of the normalized image, got {shapes}")
@@ -217,6 +228,6 @@ def reconcile(
     st = _State(parts)
     _clean(st, text, speck_px, sliver_px)
     _dedupe(st, rules.duplicate_iou)
-    _nest(st, rules.contain_fraction)
+    _nest(st, rules.contain_fraction, nested or {})
     trimmed = _trim_overlaps(st)
     return _finish(st, trimmed, speck_px)

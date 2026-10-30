@@ -6,7 +6,9 @@ background check does: a positive point off the figure is refused. A click on la
 a leader line is allowed, with a warning. The mask keeps the pieces that hold a positive
 point, less S3's specks, as in S2. It replaces the part's S2 mask in place, so S3's ids for
 the other parts do not move; a part S2 left to the teacher gets its first mask at the end.
-The spill check is S2's: the mask holds another part's prompt point, not a child's."""
+The spill check is S2's: the mask holds another part's prompt point, not that of Spark's
+child, a part nested in the mask (by its S2 mask), or a part it shares a region with (S2's
+merge proposals)."""
 
 from collections.abc import Sequence
 
@@ -60,7 +62,12 @@ def prompt_points(g: Grounded) -> dict[str, list[Point]]:
 
 def spill_of(part: str, mask: BoolImage, g: Grounded, u: Understanding) -> list[str]:
     parents = {p.phrase: p.parent for p in u.parts}
-    return sorted(pm.points_inside(part, mask, prompt_points(g), parents))
+    mates = {q for m in g.merges if part in m.parts for q in m.parts} - {part}
+    others: dict[str, BoolImage] = {}
+    for m in g.parts:
+        others[m.label] = others[m.label] | m.data if m.label in others else m.data
+    ignore = mates | pm.children_by_geometry(part, mask, others)
+    return sorted(pm.points_inside(part, mask, prompt_points(g), parents, ignore))
 
 
 def with_outlines(g: Grounded, outlined: Sequence[tuple[str, BoolImage]]) -> Grounded:

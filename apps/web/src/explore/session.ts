@@ -158,6 +158,11 @@ export class ExploreSession {
         this.remember(e.region);
       } else if (e.kind === "exit") {
         audio.exitTick();
+      } else if (e.kind === "boundary") {
+        audio.say(`${capital(e.line)}, ${e.region.label}`);
+        metrics.frameToBoundaryMs.push(performance.now() - s.receivedAt);
+      } else if (e.kind === "subject") {
+        audio.say(capital(e.label));
       } else {
         audio.say(capital(e.region.label));
         metrics.dwellToLabelMs.push(performance.now() - s.receivedAt);

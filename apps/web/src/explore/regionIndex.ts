@@ -3,7 +3,7 @@
 // (inset above 0) or grown (below 0) by a margin, measured as the distance to its nearest
 // edge, which is what the hysteresis in the touch state machine needs.
 import type { ExploreConfig } from "../shared/config";
-import type { Region, RegionsFile } from "../shared/regions";
+import { partId, type Region, type RegionsFile } from "../shared/regions";
 import type { Pt } from "./homography";
 
 export interface IndexedRegion {
@@ -70,10 +70,21 @@ function box(poly: readonly Pt[]): IndexedRegion["box"] {
   return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
 }
 
+/** The subject's silhouette, where a finger on no part hears the subject's name. */
+export interface IndexedSubject {
+  label: string;
+  polygon: readonly Pt[];
+  box: readonly [number, number, number, number];
+}
+
+const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+
 export class RegionIndex {
   /** Smallest area first. */
   readonly regions: readonly IndexedRegion[];
+  readonly subject: IndexedSubject | null;
   private readonly ids: ReadonlyMap<string, IndexedRegion>;
+  private readonly borders: ReadonlyMap<string, string>;
 
   constructor(
     readonly file: RegionsFile,
@@ -97,6 +108,29 @@ export class RegionIndex {
       })
       .sort((a, b) => a.area - b.area || (a.id < b.id ? -1 : 1));
     this.ids = new Map(this.regions.map((r) => [r.id, r]));
+    const lines = (file.lines ?? []).flatMap((l) => (l.separates ? [[pairKey(l.separates[0], l.separates[1]), l.label] as const] : []));
+    this.borders = new Map(lines);
+    const s = file.subject;
+    if (s) {
+      const polygon = s.polygon_mm.map(([x, y]) => [x, y] as const);
+      this.subject = { label: s.label, polygon, box: box(polygon) };
+    } else {
+      this.subject = null;
+    }
+  }
+
+  /** The line drawn between the parts of two regions, if one separates them. */
+  border(a: IndexedRegion, b: IndexedRegion): string | null {
+    const pa = partId(a.id);
+    const pb = partId(b.id);
+    return pa === pb ? null : (this.borders.get(pairKey(pa, pb)) ?? null);
+  }
+
+  /** True when p is inside the subject's silhouette shrunk by insetMm (grown when negative). */
+  inSubject(p: Pt, insetMm: number): boolean {
+    const s = this.subject;
+    if (!s) return false;
+    return this.contains({ polygon: s.polygon, box: s.box }, p, insetMm);
   }
 
   byId(id: string): IndexedRegion | undefined {
@@ -104,7 +138,7 @@ export class RegionIndex {
   }
 
   /** True when p is inside r's outline shrunk by insetMm (grown when insetMm is negative). */
-  contains(r: IndexedRegion, p: Pt, insetMm: number): boolean {
+  contains(r: Pick<IndexedRegion, "polygon" | "box">, p: Pt, insetMm: number): boolean {
     const grow = Math.max(0, -insetMm);
     const [x0, y0, x1, y1] = r.box;
     if (p[0] < x0 - grow || p[0] > x1 + grow || p[1] < y0 - grow || p[1] > y1 + grow) return false;

@@ -72,7 +72,7 @@ _CONSUMES: dict[str, tuple[str, ...]] = {
     "s1": ("s0",),
     "s2": ("s0", "s1"),
     "s3": ("s0", "s2"),
-    "s4": ("s0", "s1", "s3"),
+    "s4": ("s0", "s1", "s2", "s3"),  # S2 for the silhouette and the merge proposals
     "s5": ("s0", "s1", "s2", "s3", "s4"),  # S2 and S3 for the parts left to the teacher
 }
 _LOAD: dict[str, Callable[[Path], Any]] = {
@@ -163,6 +163,10 @@ class Runner:
                 "schema": s1_understand.SCHEMA_DIGEST,
                 "effort": SPARK_EFFORT,
                 "max_parts": meta.max_parts,
+                # The locate call plans for the reader and the printed size.
+                "options": options.model_dump(mode="json"),
+                "spacing": self.rules.spacing.model_dump(mode="json"),
+                "page": self.rules.page.model_dump(mode="json"),
             }
         sam = {
             "client": self.client.cache_tag,
@@ -322,8 +326,11 @@ class Runner:
     ) -> Any:
         v = walk.value
         if stage == "s1":
+            ing = await v("s0")
+            fit = await self._fit(walk, job.options)
+            sheet = s1_understand.sheet_context(ing, fit, job.options.grade_band, self.rules)
             return await s1_understand.understand(
-                client, await v("s0"), self.s1_prompt, self.s1_locate, self.rules.meta
+                client, ing, self.s1_prompt, self.s1_locate, sheet, self.rules
             )
         if stage == "s2":
             return await s2_ground.ground(
@@ -338,16 +345,20 @@ class Runner:
         if stage == "s4":
             fit = await self._fit(walk, job.options)
             parts = await self._edited_parts(walk, edits, client)
+            rec: Reconciled = await v("s3")
+            u: Understanding = await v("s1")
+            plan = s4_layout.sheet_plan(u, await v("s2"), rec.parts, parts)
             return await asyncio.to_thread(
                 s4_layout.layout,
                 parts,
                 await v("s0"),
-                await v("s1"),
+                u,
                 fit,
                 job.options.grade_band,
                 self.rules,
                 self.explore.earcons,
                 self.translator,
+                sheet_plan=plan,
             )
         fit = await self._fit(walk, job.options)
         grounded = await self._grounded(walk, edits, client)  # outlines come from the cache

@@ -1,0 +1,182 @@
+{
+ "recorded_at": "2026-10-30T09:27:11+00:00",
+ "model": "muse-spark-1.3",
+ "request": {
+  "method": "POST",
+  "path": "/chat/completions",
+  "json": {
+   "model": "muse-spark-1.3",
+   "reasoning_effort": "medium",
+   "messages": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "The image is a science figure that will become a raised-line tactile graphic for a blind student. It will print 165 mm wide and 95 mm tall. On the sheet, a part a fingertip can explore is at least 6.4 mm across, and raised outlines are at least 3.2 mm apart. Plan its parts as a tactile transcriber would. The listed parts are: \"ovules\" (printed label \"ovules\"); \"pistil\" (printed label \"pistil\"); \"stigma\" (printed label \"stigma\"); \"style\" (printed label \"style\"); \"ovary\" (printed label \"ovary\"); \"petal\" (printed label \"petal/corolla\"); \"sepal\" (printed label \"sepal/calyx\"); \"perianth\" (printed label \"perianth\"); \"nectary\" (printed label \"nectary\"); \"floral axis\" (printed label \"floral axis\"); \"pedicel\" (printed label \"pedicel\"); \"connective\" (printed label \"connective\"); \"anther\" (printed label \"anther\"); \"microsporangium\" (printed label \"microsporangium\"); \"filament\" (printed label \"filament\"); \"stamen\" (printed label \"stamen\").\nReturn every listed part exactly once, using the part name exactly as given:\n- kind: \"area\" for a region a fingertip can explore, such as a lobe, a chamber or a petal. \"line\" for a part that is itself a line, a groove or a border, such as a sulcus, a fissure or a boundary drawn as a line; a line is never an area to touch. \"group\" for a part made of other listed parts.\n- members: for a group, the listed parts it is made of; otherwise empty.\n- parent: the listed area this part belongs to when it is a sub-structure of it, such as a gyrus within a lobe; otherwise empty.\n- separates: for a line that is the border between two listed areas, those two areas; otherwise empty, and give the line its parent.\n- instances: for an area, every place it appears, in the main drawing and in any inset or enlarged view. For each instance, 1 to 3 points spread across its filled interior, each as far as possible from the part's edges. For an elongated area such as a vessel or a stalk, put the points on its midline along its length. Never put a point on label text, a leader line or an outline, or on the part's tip or edge. A line or a group has no instances and no points.\nAlso return:\n- subject: the whole object or objects the figure shows, in one to three words, such as \"brain\" or \"flower\".\n- shares_region: each set of listed areas drawn as one unbroken shape, with no drawn line or color change between them, and a short name for the combined shape. Empty when there is none.\nCoordinates are on a 0 to 1000 grid of this image: x from the left edge, y from the top edge."
+      },
+      {
+       "type": "image_url",
+       "image_url": {
+        "url": "<data image/png sha256=39b89389620d0fb8b3da44890a3a171ff87dde2ea82e4750a86fa26b6c85a95d bytes=600110>"
+       }
+      }
+     ]
+    }
+   ],
+   "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+     "name": "PartPoints",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "subject": {
+        "type": "string"
+       },
+       "parts": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "properties": {
+          "part": {
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "area",
+            "line",
+            "group"
+           ]
+          },
+          "members": {
+           "type": "array",
+           "items": {
+            "type": "string"
+           }
+          },
+          "parent": {
+           "type": "string"
+          },
+          "separates": {
+           "type": "array",
+           "items": {
+            "type": "string"
+           }
+          },
+          "instances": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "properties": {
+             "where": {
+              "type": "string"
+             },
+             "points": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+               "type": "object",
+               "properties": {
+                "x": {
+                 "type": "integer"
+                },
+                "y": {
+                 "type": "integer"
+                }
+               },
+               "required": [
+                "x",
+                "y"
+               ],
+               "additionalProperties": false
+              }
+             }
+            },
+            "required": [
+             "where",
+             "points"
+            ],
+            "additionalProperties": false
+           }
+          }
+         },
+         "required": [
+          "part",
+          "kind",
+          "members",
+          "parent",
+          "separates",
+          "instances"
+         ],
+         "additionalProperties": false
+        }
+       },
+       "shares_region": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "properties": {
+          "parts": {
+           "type": "array",
+           "items": {
+            "type": "string"
+           }
+          },
+          "name": {
+           "type": "string"
+          }
+         },
+         "required": [
+          "parts",
+          "name"
+         ],
+         "additionalProperties": false
+        }
+       }
+      },
+      "required": [
+       "subject",
+       "parts",
+       "shares_region"
+      ],
+      "additionalProperties": false
+     }
+    }
+   }
+  }
+ },
+ "response": {
+  "status": 200,
+  "json": {
+   "id": "chatcmpl-01a18c22-75c5-71c0-ad67-682ba5c4e982",
+   "choices": [
+    {
+     "finish_reason": "stop",
+     "index": 0,
+     "message": {
+      "content": "{\"parts\": [{\"instances\": [{\"points\": [{\"x\": 77, \"y\": 282}, {\"x\": 117, \"y\": 318}], \"where\": \"left inset\"}, {\"points\": [{\"x\": 481, \"y\": 590}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"ovary\", \"part\": \"ovules\", \"separates\": []}, {\"instances\": [], \"kind\": \"group\", \"members\": [\"stigma\", \"style\", \"ovary\", \"ovules\"], \"parent\": \"\", \"part\": \"pistil\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 528, \"y\": 345}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"stigma\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 518, \"y\": 444}, {\"x\": 498, \"y\": 520}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"style\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 50, \"y\": 250}, {\"x\": 130, \"y\": 360}], \"where\": \"left inset\"}, {\"points\": [{\"x\": 501, \"y\": 604}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"ovary\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 360, \"y\": 390}, {\"x\": 635, \"y\": 475}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"petal\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 410, \"y\": 630}], \"where\": \"main left\"}, {\"points\": [{\"x\": 560, \"y\": 690}], \"where\": \"main right\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"sepal\", \"separates\": []}, {\"instances\": [], \"kind\": \"group\", \"members\": [\"petal\", \"sepal\"], \"parent\": \"\", \"part\": \"perianth\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 440, \"y\": 735}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"nectary\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 474, \"y\": 724}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"floral axis\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 452, \"y\": 780}, {\"x\": 438, \"y\": 860}], \"where\": \"main\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"pedicel\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 862, \"y\": 535}], \"where\": \"right inset\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"anther\", \"part\": \"connective\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 453, \"y\": 370}], \"where\": \"main left\"}, {\"points\": [{\"x\": 585, \"y\": 425}], \"where\": \"main right\"}, {\"points\": [{\"x\": 805, \"y\": 552}, {\"x\": 862, \"y\": 558}], \"where\": \"right inset\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"anther\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 825, \"y\": 615}, {\"x\": 850, \"y\": 585}], \"where\": \"right inset\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"anther\", \"part\": \"microsporangium\", \"separates\": []}, {\"instances\": [{\"points\": [{\"x\": 425, \"y\": 500}], \"where\": \"main left\"}, {\"points\": [{\"x\": 531, \"y\": 620}, {\"x\": 543, \"y\": 510}], \"where\": \"main right\"}, {\"points\": [{\"x\": 740, \"y\": 740}, {\"x\": 761, \"y\": 650}], \"where\": \"right inset\"}], \"kind\": \"area\", \"members\": [], \"parent\": \"\", \"part\": \"filament\", \"separates\": []}, {\"instances\": [], \"kind\": \"group\", \"members\": [\"anther\", \"microsporangium\", \"connective\", \"filament\"], \"parent\": \"\", \"part\": \"stamen\", \"separates\": []}], \"shares_region\": [{\"name\": \"pistil column\", \"parts\": [\"stigma\", \"style\", \"ovary\"]}, {\"name\": \"flower base\", \"parts\": [\"nectary\", \"floral axis\", \"pedicel\"]}], \"subject\": \"mature flower\"}",
+      "refusal": null,
+      "role": "assistant"
+     },
+     "logprobs": null
+    }
+   ],
+   "created": 1793352431,
+   "model": "muse-spark-1.3",
+   "object": "chat.completion",
+   "usage": {
+    "completion_tokens": 12220,
+    "prompt_tokens": 3731,
+    "total_tokens": 15951,
+    "completion_tokens_details": {
+     "reasoning_tokens": 11058
+    },
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    }
+   }
+  }
+ }
+}

@@ -5,7 +5,9 @@ loosens anything: fixes belong in the geometry stages.
 Checks: ids and parents, polygon validity and the point cap, inside the figure area, the
 minimum gap between outlines and inside a parent, the point symbol size, the area texture
 count for the grade band, and braille: clearance to every line, the gap between braille
-blocks, and never sitting on another part. SVG ids are checked with the render stage.
+blocks, and never sitting on another part. The silhouette's raised contour: inside the
+figure area, min_gap_mm from every outline and braille's clearance from every braille
+block. SVG ids are checked with the render stage.
 """
 
 import itertools
@@ -17,6 +19,7 @@ from shapely.ops import unary_union
 
 from app.config import TactileRules
 from app.geometry.layout import LayoutRegion, size_mm
+from app.geometry.plan import band
 from app.geometry.sheet import Sheet
 from app.models.regions import MAX_POLYGON_POINTS, MIN_POLYGON_POINTS, RegionsFile
 from app.render.svg import sheet_ids
@@ -262,6 +265,35 @@ def _braille(sheet: Sheet, rules: TactileRules) -> list[Violation]:
     return out
 
 
+def _silhouette(sheet: Sheet, rules: TactileRules) -> list[Violation]:
+    if not sheet.contour:
+        return []
+    gap = rules.spacing.min_gap_mm
+    clearance = rules.braille.clearance_to_line_mm
+    ax, ay, aw, ah = rules.page.figure_area_mm(sheet.page)
+    area = box(ax, ay, ax + aw, ay + ah).buffer(_EPS)
+    out: list[Violation] = []
+    for i, piece in enumerate(sheet.contour, 1):
+        line = band(piece, rules)
+        name = f"silhouette piece {i}"
+        if not line.within(area):
+            out.append(Violation(rule="inside_page", regions=[], measured=0, limit=0,
+                                 message=f"{name} is outside the figure area"))  # fmt: skip
+        for r in sheet.regions:
+            d = float(line.distance(r.polygon))
+            if d < gap - _EPS:
+                out.append(Violation(rule="min_gap", regions=[r.id], measured=d, limit=gap,
+                                     message=f"{name} is {d:.2f} mm from {r.id}, "
+                                     f"the minimum is {gap} mm"))  # fmt: skip
+        for p in sheet.braille:
+            d = float(line.distance(p.line.rect))
+            if d < clearance - _EPS:
+                msg = f"braille for {p.region_id} is {d:.2f} mm from {name}, the minimum is "
+                out.append(Violation(rule="braille_clearance", regions=[p.region_id], measured=d,
+                                     limit=clearance, message=f"{msg}{clearance} mm"))  # fmt: skip
+    return out
+
+
 def check_svg_ids(svg: str, regions_file: RegionsFile) -> list[Violation]:
     """Every touchable region in regions.json is drawn in tactile.svg, and the reverse. A
     teacher suggestion (touchable false) is not raised, so it is not drawn."""
@@ -299,4 +331,5 @@ def validate_sheet(sheet: Sheet, rules: TactileRules) -> list[Violation]:
         *_point_sizes(sheet, rules),
         *_textures(sheet, rules),
         *_braille(sheet, rules),
+        *_silhouette(sheet, rules),
     ]

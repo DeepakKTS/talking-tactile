@@ -1,11 +1,14 @@
 // The teacher's review: the figure as uploaded, the parts found, and the tactile sheet.
 // Each part can be marked checked, renamed, described, merged into another or deleted, and
-// a missing part added by name. Parts the system could not make touchable are listed apart,
-// with the reason; publishing does not wait for them, and the publish area names each one.
+// a missing part added by name. Parts the system could not make touchable are listed under
+// Needs you, with the reason; publishing does not wait for them, and the publish area names
+// each one. For your information lists what needs no action: line parts and what each
+// separates, parts nested in another, and parts shown as a point symbol. Each merge proposal
+// is one button: merges into the largest of its parts, then the suggested name.
 // The rules report is shown before publishing; a publish the rules refuse lists every
 // violation in words. After publishing: print and explore.
 import { useEffect, useState } from "react";
-import type { Region, RegionsFile } from "../shared/regions";
+import { type MergeProposal, partId, type Region, type RegionsFile } from "../shared/regions";
 import { ApiError, type Edit, type FigureApi, type FixPreview, type Point, type Publication, type Status, type Violation, describeViolation } from "./api";
 
 interface Props {
@@ -64,6 +67,15 @@ export function Review({ api, id, status, onEdited }: Props) {
 
   const edit = (r: Region, e: Edit, what: string) => send(what, () => api.edit(id, r.id, e));
 
+  const merge = (m: MergeProposal) =>
+    send(`Merging ${joined(m.region_ids.map(labelOf))} as ${m.name}`, async () => {
+      const into = largest(file?.regions ?? [], m.region_ids);
+      for (const rid of m.region_ids) {
+        if (rid !== into) await api.edit(id, rid, { op: "merge", into });
+      }
+      await api.edit(id, into, { op: "label", label: m.name });
+    });
+
   const publish = async () => {
     setBusy(true);
     setRefused(null);
@@ -88,6 +100,7 @@ export function Review({ api, id, status, onEdited }: Props) {
   const touchable = file.regions.filter((r) => r.touchable);
   const unchecked = touchable.filter((r) => !r.verified_by_teacher).length;
   const flagged = notTouchable(file);
+  const notes = forYourInformation(file);
 
   return (
     <section aria-label="Review">
@@ -122,11 +135,27 @@ export function Review({ api, id, status, onEdited }: Props) {
                 onFix={() => { setFixing({ region: r.id, label: r.label }); }} />
             ))}
           </ul>
+          {(file.merge_proposals ?? []).length > 0 && (
+            <>
+              <h3>Suggested merges</h3>
+              <p>These parts are drawn as one shape with no line between them.</p>
+              <ul aria-label="Suggested merges" style={{ listStyle: "none", padding: 0 }}>
+                {(file.merge_proposals ?? []).map((m) => (
+                  <li key={m.region_ids.join(" ")}>
+                    <button type="button" disabled={busy || !settled} onClick={() => void merge(m)}>
+                      Merge {joined(m.region_ids.map(labelOf))} as &apos;{m.name}&apos;
+                    </button>{" "}
+                    <span>{capital(m.why)}.</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
           {flagged.length > 0 && (
             <>
-              <h3>Not touchable yet</h3>
-              <p>A student cannot touch these parts. Each needs you; the reason is given.</p>
-              <ul aria-label="Not touchable yet" style={{ listStyle: "none", padding: 0 }}>
+              <h3>Needs you</h3>
+              <p>A student cannot touch these parts yet. Each needs you; the reason is given.</p>
+              <ul aria-label="Needs you" style={{ listStyle: "none", padding: 0 }}>
                 {flagged.map((f) => (
                   <li key={f.id} style={{ borderLeft: "0.4rem solid #c62828", padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
                     <strong>{f.label}</strong> <span>Not touchable yet.</span> {f.reason}{" "}
@@ -138,6 +167,19 @@ export function Review({ api, id, status, onEdited }: Props) {
                     <button type="button" disabled={busy || !settled} onClick={() => { setFixing({ region: f.id, label: f.label }); }}>
                       Fix outline of {f.label}
                     </button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {notes.length > 0 && (
+            <>
+              <h3>For your information</h3>
+              <p>Nothing to do here. This is how the sheet shows these parts.</p>
+              <ul aria-label="For your information" style={{ listStyle: "none", padding: 0 }}>
+                {notes.map((n) => (
+                  <li key={n.key} style={{ borderLeft: "0.4rem solid #1565c0", padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
+                    <strong>{n.label}</strong> <span>{n.text}</span>
                   </li>
                 ))}
               </ul>
@@ -216,6 +258,66 @@ export function notTouchable(file: RegionsFile): Flagged[] {
   }
   for (const t of file.needs_teacher ?? []) {
     out.push({ id: t.id, label: t.label, outlines: [], reason: `${REASONS[t.reason] ?? t.reason} (${t.detail}).` });
+  }
+  return out;
+}
+
+interface Note {
+  key: string;
+  label: string;
+  text: string;
+}
+
+const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+export function joined(names: readonly string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1] ?? ""}`;
+}
+
+function polygonArea(r: Region): number {
+  let s = 0;
+  const pts = r.polygon_mm;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const a = pts[i];
+    const b = pts[j];
+    if (a && b) s += b[0] * a[1] - a[0] * b[1];
+  }
+  return Math.abs(s) / 2;
+}
+
+// The proposal's part whose regions cover the most of the sheet: the others merge into it.
+export function largest(regions: readonly Region[], ids: readonly string[]): string {
+  const area = (rid: string) => regions.filter((r) => partId(r.id) === rid).reduce((a, r) => a + polygonArea(r), 0);
+  return [...ids].sort((a, b) => area(b) - area(a))[0] ?? ids[0] ?? "";
+}
+
+// What needs no action: line parts and what each separates, parts nested in another, and
+// parts too small for anything but a point symbol. Once per part.
+export function forYourInformation(file: RegionsFile): Note[] {
+  const label = (rid: string) => file.regions.find((r) => r.id === rid)?.label ?? rid;
+  const out: Note[] = [];
+  for (const l of file.lines ?? []) {
+    const text = l.between
+      ? `A line between ${l.between[0]} and ${l.between[1]}. Not raised; ${l.separates ? "Explore says it when a finger crosses from one to the other" : "listed in the key"}.`
+      : `A line${l.parent ? ` in ${label(l.parent)}` : ""}. Not raised; listed in the key.`;
+    out.push({ key: l.id, label: l.label, text });
+  }
+  const seen = new Set<string>();
+  for (const r of file.regions) {
+    if (!r.touchable || seen.has(partId(r.id))) continue;
+    if (r.parent) {
+      seen.add(partId(r.id));
+      out.push({ key: `nested ${r.id}`, label: r.label, text: `Inside ${label(r.parent)}, raised within its outline.` });
+    }
+  }
+  const small = new Set<string>();
+  for (const r of file.regions) {
+    if (!r.touchable || small.has(partId(r.id))) continue;
+    if (r.flags?.some((f) => f.reason === "under_point_symbol")) {
+      small.add(partId(r.id));
+      out.push({ key: `small ${r.id}`, label: r.label, text: "Smaller than a point symbol, so the sheet shows it as one." });
+    }
   }
   return out;
 }

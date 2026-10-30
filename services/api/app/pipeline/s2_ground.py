@@ -16,7 +16,7 @@ from app.models.mask import Mask, MaskSource
 from app.pipeline import s2_points
 from app.pipeline.cache import load_mask, save_mask
 from app.pipeline.s0_ingest import Ingested
-from app.pipeline.s2_types import Grounded, TeacherPart
+from app.pipeline.s2_types import Grounded, MergeProposal, TeacherPart
 from app.prompts import Prompt, schema_digest
 
 __all__ = ["PROMPT", "SCHEMA_DIGEST", "Grounded", "TeacherPart", "ground", "load", "save"]
@@ -24,6 +24,7 @@ __all__ = ["PROMPT", "SCHEMA_DIGEST", "Grounded", "TeacherPart", "ground", "load
 PROMPT = "s2_ground.v1.json"
 _FILE = "grounded.json"
 _NOTES = "teacher.json"
+_SILHOUETTE = "silhouette.png"
 
 
 class MaskEntry(BaseModel):
@@ -75,8 +76,16 @@ def save(g: Grounded, out: Path) -> None:
             obj["file"] = f"suggestion{i:03d}.png"
             save_mask(out / obj["file"], t.suggestion)
         teacher.append(obj)
-    notes = {"flags": g.flags, "teacher": teacher, "facts": g.facts}
+    notes = {
+        "flags": g.flags,
+        "teacher": teacher,
+        "facts": g.facts,
+        "nested": g.nested,
+        "merges": [m.model_dump(mode="json") for m in g.merges],
+    }
     (out / _NOTES).write_text(json.dumps(notes, indent=1), "utf-8")
+    if g.silhouette is not None:
+        save_mask(out / _SILHOUETTE, g.silhouette)
 
 
 def load(src: Path) -> Grounded:
@@ -96,4 +105,7 @@ def load(src: Path) -> Grounded:
         flags=notes.get("flags", {}),
         teacher=teacher,
         facts=notes.get("facts", {}),
+        nested=notes.get("nested", {}),
+        merges=[MergeProposal.model_validate(m) for m in notes.get("merges", [])],
+        silhouette=load_mask(src / _SILHOUETTE) if (src / _SILHOUETTE).exists() else None,
     )

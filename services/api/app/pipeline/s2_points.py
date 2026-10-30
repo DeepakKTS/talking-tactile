@@ -1,20 +1,29 @@
-"""S2 by points, Arm A v2f (S2 locked Oct 30; eval/s2-bakeoff/, tracker decisions).
+"""S2 by points, Arm A v2f (S2 locked Oct 30; eval/s2-bakeoff/, tracker decisions), on S1's
+plan for touch (Oct 30).
 
 For each part S1 located:
-1. Its points through the guard (app/geometry/points.py): on the background, dropped; on or
-   near a print mark, moved within GUARD_PX or dropped. A part with none left needs the
-   teacher (no points).
-2. One SAM call per part that is not a group, one object per instance with its points, at
-   most sam_concurrency calls at a time. Each instance keeps the pieces of its mask that
-   hold one of its points, less specks (app/geometry/part_masks.py).
-3. Spill retry, after every first call: a mask holding another part's point (not a child's)
-   is asked for once more with that point as a negative. If the new mask is free, it is
-   used; if not, the smaller is kept as spill.
-4. Oversize rule on the rest. Spill masks go to the teacher as suggestions: never touchable,
-   and no part in step 5.
-5. Contested pixels to the smallest mask, ties to the nearer point. Pixels won and lost
-   are recorded per part.
-6. A group's mask is the union of its members'. A part left with no mask needs the teacher.
+1. A line (a sulcus, a border) gets no SAM call and no mask, and is never sent to the
+   teacher: the sheet does not raise it, and Explore speaks it at the border it separates.
+   Other parts' points go through the guard (app/geometry/points.py): on the background,
+   dropped; on or near a print mark, moved within GUARD_PX or dropped. A part with none left
+   needs the teacher (no points).
+2. One SAM call per part that is not a group or a line, one object per instance with its
+   points, at most sam_concurrency calls at a time. Each instance keeps the pieces of its
+   mask that hold one of its points, less specks (app/geometry/part_masks.py). With them,
+   one phrase call for S1's subject, whose largest piece is the silhouette; when it fails,
+   S2 carries on without one.
+3. Relations (part_masks): masks with a high IoU, and areas Spark marked shares_region,
+   share a region, and each such group is a merge proposal for the teacher.
+4. Spill retry: a mask holding the point of another area is asked for once more with that
+   point as a negative, unless that area is Spark's child of the part, is nested in the
+   mask (by its first mask), or shares its region. If the new mask is free, it is used; if
+   not, the smaller is kept as spill.
+5. Oversize rule on the rest. Spill masks go to the teacher as suggestions: never touchable,
+   and no part in step 6. Nesting is tested again on the masks kept.
+6. Contested pixels to the smallest mask, ties to the nearer point; near-identical masks
+   are split by the nearer point, and a nested child stays inside its parent's outline.
+   Pixels won and lost are recorded per part.
+7. A group's mask is the union of its members'. A part left with no mask needs the teacher.
 
 S2 has no page size, so its speck floor is S3's on a letter page. Print text found in code
 (app/geometry/print_marks.py) is the text mask S3 cuts out of the raised layer."""
@@ -23,6 +32,7 @@ import asyncio
 from collections.abc import Sequence
 from typing import Any
 
+import cv2
 import httpx
 import numpy as np
 
@@ -35,15 +45,16 @@ from app.meta.client import MetaClient, job_cap
 from app.meta.live import LiveCallCapError, LiveCallError
 from app.meta.mock import MockFixtureMissingError
 from app.meta.types import PartPhrase, Understanding
+from app.models.image import RGB
 from app.models.mask import BoolImage, Mask
 from app.pipeline.s0_ingest import Ingested
-from app.pipeline.s2_types import Grounded, TeacherPart
+from app.pipeline.s2_types import Grounded, MergeProposal, TeacherPart
 from app.prompts import Prompt
 
 Point = tuple[int, int]
 # The stage cache keys on this and SETTINGS, not on the code, so a code change never pays
 # for Meta calls again. Bump the version when a change would send other prompts.
-METHOD = "arm-a-v2f.1"
+METHOD = "arm-a-v2f.3-plan"
 MAX_OBJECTS = 16  # sam/segmenting: box and point prompts name up to 16 objects
 SETTINGS = {
     "method": METHOD,
@@ -52,9 +63,12 @@ SETTINGS = {
     "object_diff": gp.OBJECT_DIFF,
     "oversize_points": pm.OVERSIZE_POINTS,
     "oversize_share": pm.OVERSIZE_SHARE,
+    "nest_inside": pm.NEST_INSIDE,
+    "shared_iou": pm.SHARED_IOU,
     "max_objects": MAX_OBJECTS,
     "print_marks": {k: v for k, v in vars(print_marks).items() if k.isupper()},
 }
+SUBJECT = "_subject"  # S2's facts on the silhouette call, beside the parts'
 _CALL_ERRORS = (LiveCallError, LiveCallCapError, httpx.HTTPError, MockFixtureMissingError)
 
 
@@ -80,7 +94,11 @@ class _Run:
         rules: TactileRules,
     ) -> None:
         self.client, self.ing, self.prompt, self.rules = client, ing, prompt, rules
+        self.u = u
         self.parts = {p.phrase: p for p in u.parts}
+        self.lines = [p.phrase for p in u.parts if p.kind == "line"]
+        self.relations = pm.Relations(nested={}, shared=[], inside={}, iou={})
+        self.firsts: dict[str, BoolImage] = {}
         self.scene = gp.scene_of(ing.image, float(rules.layout.color_group_max_delta))
         self.floor = speck_floor_px(ing.image, rules)
         self.gate = asyncio.Semaphore(rules.meta.sam_concurrency)
@@ -104,7 +122,7 @@ class _Run:
             return
         if p.kind == "thin":
             self.flags[p.phrase].append("thin")
-        if p.kind == "group":
+        if p.kind in ("group", "line"):
             return
         instances = []
         for inst in p.instances:
@@ -126,7 +144,19 @@ class _Run:
         self.sent[p.phrase] = instances
 
     def points(self) -> dict[str, list[Point]]:
+        """The prompt points the spill check counts: areas' only, since lines and groups
+        send none."""
         return {part: [p for inst in insts for p in inst] for part, insts in self.sent.items()}
+
+    def parents(self) -> dict[str, str]:
+        return {q: p.parent for q, p in self.parts.items()}
+
+    def ignore(self, part: str, mask: BoolImage) -> set[str]:
+        """Parts whose points do not count as spill for part's mask: those nested in it by
+        their first masks, and those it shares a region with. Spark's children are left out
+        by points_inside."""
+        mates = {q for g in self.relations.shared if part in g for q in g}
+        return pm.children_by_geometry(part, mask, self.firsts) | (mates - {part})
 
     async def call(
         self, part: str, negatives: Sequence[Point], retry: bool
@@ -170,9 +200,9 @@ class _Run:
 
     async def retry(self, part: str, mask: BoolImage) -> tuple[str, BoolImage, str | None]:
         """The mask to keep, and why it is spill, or None."""
-        parents = {q: p.parent for q, p in self.parts.items()}
+        parents = self.parents()
         pts = self.points()
-        held = pm.points_inside(part, mask, pts, parents)
+        held = pm.points_inside(part, mask, pts, parents, self.ignore(part, mask))
         if not held:
             return part, mask, None
         names = ", ".join(sorted(held))
@@ -188,7 +218,7 @@ class _Run:
         if isinstance(got, str):
             return part, mask, f"holds points of {names}; the retry call failed: {got}"
         again = got[0]
-        still = pm.points_inside(part, again, pts, parents)
+        still = pm.points_inside(part, again, pts, parents, self.ignore(part, again))
         if again.any() and not still:
             self.flags[part].append(f"spill onto {names} cleared by a retry")
             return part, again, None
@@ -199,20 +229,72 @@ class _Run:
     def split_spill(self, retried: list[tuple[str, BoolImage, str | None]]) -> dict[str, BoolImage]:
         """The masks that stay touchable; spill, by the retry or the oversize rule, goes to
         the teacher as a suggestion."""
-        parents = {q: p.parent for q, p in self.parts.items()}
+        parents = self.parents()
         object_px = int(self.scene.obj.sum())
         touch: dict[str, BoolImage] = {}
         for part, mask, after_retry in retried:
             p = self.parts[part]
             spill = after_retry
             if spill is None:
-                held = pm.points_inside(part, mask, self.points(), parents)
+                held = pm.points_inside(part, mask, self.points(), parents, self.ignore(part, mask))
                 spill = pm.oversize(held, mask, object_px, p.kind == "thin", bool(p.parent))
             if spill is None:
                 touch[part] = mask
             else:
                 self.need_teacher(part, "spill", spill, suggestion=mask)
         return touch
+
+    def relate(self, firsts: dict[str, BoolImage]) -> None:
+        """Shared regions on the first masks, before any spill check; their shares and IoUs
+        go in the facts."""
+        self.firsts = firsts
+        self.relations = r = pm.relate(firsts, [s.parts for s in self.u.shares_region])
+        for part in firsts:
+            self.facts[part] |= {"inside_of": r.inside[part], "iou": r.iou[part]}
+
+    def nest(self, kept: dict[str, BoolImage]) -> dict[str, str]:
+        """The nesting S2 records: tested again on the masks it keeps."""
+        nested = pm.relate(kept, [s.parts for s in self.u.shares_region]).nested
+        for child, parent in nested.items():
+            self.flags[child].append(f"nested inside {parent}")
+        self.relations.nested = nested
+        return nested
+
+    def merges(self) -> list[MergeProposal]:
+        """One proposal per shared group, named by Spark when it marked the group."""
+        order = list(self.parts)
+        out = []
+        for g in self.relations.shared:
+            names = tuple(sorted(g, key=order.index))
+            marked = [s for s in self.u.shares_region if set(s.parts) & g]
+            if marked:
+                name, why = marked[0].name, "Spark marked them as one unbroken shape"
+            else:
+                name, why = _joined(names), "their outlines overlap almost entirely"
+            out.append(MergeProposal(parts=names, name=name, why=why))
+        return out
+
+    async def silhouette(self) -> BoolImage | None:
+        """The subject's largest piece, or None; never fails the job."""
+        subject = self.u.subject
+        if not subject:
+            return None
+        async with self.gate:
+            try:
+                masks = await self.client.segment(
+                    self.ing.image, self.ing.figure_id, subject, self.prompt, what="s2_subject"
+                )
+            except _CALL_ERRORS as exc:
+                error = f"{type(exc).__name__}: {exc}"
+                self.facts[SUBJECT] = {"phrase": subject, "error": error}
+                return None
+        found = largest_piece(masks, self.ing.image)
+        self.facts[SUBJECT] = {
+            "phrase": subject,
+            "instances": len(masks),
+            "px": int(found.sum()) if found is not None else 0,
+        }
+        return found
 
     def unite_groups(self, final: dict[str, BoolImage]) -> None:
         groups = {q for q, p in self.parts.items() if p.kind == "group"}
@@ -227,10 +309,10 @@ class _Run:
             else:
                 self.need_teacher(g, "no_mask", "no member of the group has a mask")
 
-    def result(self, final: dict[str, BoolImage]) -> Grounded:
+    def result(self, final: dict[str, BoolImage], silhouette: BoolImage | None) -> Grounded:
         order = list(self.parts)
         for part in order:
-            if part not in final and part not in self.teacher:
+            if part not in final and part not in self.teacher and part not in self.lines:
                 self.need_teacher(part, "no_mask", "nothing of its mask is left")
         masks = []
         for part, data in final.items():
@@ -246,16 +328,24 @@ class _Run:
             flags={p: f for p, f in self.flags.items() if f},
             teacher=[self.teacher[p] for p in order if p in self.teacher],
             facts=self.facts,
+            nested=self.relations.nested,
+            merges=self.merges(),
+            silhouette=silhouette,
         )
 
     async def ground(self) -> Grounded:
         for p in self.parts.values():
             self.guard(p)
+        outline = asyncio.ensure_future(self.silhouette())  # first in line at the gate
         firsts = await asyncio.gather(*(self.first(part) for part in self.sent))
+        shape = await outline
         kept = {part: m for part, m in firsts if m is not None}
+        self.relate(kept)
         retried = await asyncio.gather(*(self.retry(part, m) for part, m in kept.items()))
         touch = self.split_spill(list(retried))
-        final, lost, won, respeck = pm.resolve(touch, self.points(), self.floor)
+        final, lost, won, respeck = pm.resolve(
+            touch, self.points(), self.floor, self.nest(touch), self.relations.alike
+        )
         for part in final:
             self.facts[part] |= {
                 "lost_to": lost[part],
@@ -263,7 +353,24 @@ class _Run:
                 "respeck_px": respeck[part],
             }
         self.unite_groups(final)
-        return self.result(final)
+        return self.result(final, shape)
+
+
+def _joined(names: Sequence[str]) -> str:
+    return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
+
+
+def largest_piece(masks: Sequence[Mask], image: RGB) -> BoolImage | None:
+    """The largest 8-connected piece of the instances' union, or None when there is none."""
+    if not masks:
+        return None
+    union = np.logical_or.reduce([m.data for m in masks]).astype(np.uint8)
+    n, labels, st, _ = cv2.connectedComponentsWithStats(union, connectivity=8)
+    if n <= 1:
+        return None
+    biggest = 1 + int(np.argmax(st[1:, cv2.CC_STAT_AREA]))
+    out: BoolImage = labels == biggest
+    return out if out.shape == image.shape[:2] else None
 
 
 async def ground_points(

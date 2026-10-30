@@ -12,6 +12,15 @@
 // capped at max_per_second in any second; a capped sound is dropped, the state still
 // changes. Speed is the straight line move over speed_window_ms, so jitter at rest does not
 // add up to a speed. All numbers come from explore.yaml.
+//
+// Lines (regions.json lines): entering a part from the part on the other side of a line,
+// directly or after no more than dwell.hold_ms on neither, gives a boundary event with the
+// earcon: the line's name and the part's, said at once, so the part counts as labelled. It
+// rides on the earcon: when the cap drops the earcon, the boundary goes too, and the label
+// comes on dwell as usual.
+// The subject: a finger on no part but inside the silhouette, slower than speed_below_mm_s
+// for hold_ms, gives one subject event, again only after it has been on a part or outside
+// the silhouette (grown by exit_grow_mm).
 import type { ExploreConfig } from "../shared/config";
 import type { Pt } from "./homography";
 import type { IndexedRegion, RegionIndex } from "./regionIndex";
@@ -21,7 +30,9 @@ import type { IndexedRegion, RegionIndex } from "./regionIndex";
 export type TouchEvent =
   | { kind: "earcon"; region: IndexedRegion; t: number; since: number }
   | { kind: "exit"; region: IndexedRegion; t: number; since: number }
-  | { kind: "label"; region: IndexedRegion; t: number; since: number };
+  | { kind: "label"; region: IndexedRegion; t: number; since: number }
+  | { kind: "boundary"; region: IndexedRegion; line: string; t: number; since: number }
+  | { kind: "subject"; label: string; t: number; since: number };
 
 export type Phase = "outside" | "entering" | "inside" | "dwelled" | "leaving";
 
@@ -39,6 +50,9 @@ export class TouchMachine {
   private pending: { target: IndexedRegion | null; since: number } | null = null;
   private slowSince: number | null = null;
   private lastSeen: number | null = null;
+  private left: { region: IndexedRegion; at: number } | null = null;
+  private subjectSince: number | null = null;
+  private subjectSaid = false;
   private readonly history: Sample[] = [];
   private readonly sounds: number[] = [];
   /** Earcons and exit ticks dropped by the per second cap. */
@@ -69,6 +83,9 @@ export class TouchMachine {
     this.pending = null;
     this.slowSince = null;
     this.lastSeen = null;
+    this.left = null;
+    this.subjectSince = null;
+    this.subjectSaid = false;
     this.history.length = 0;
   }
 
@@ -94,6 +111,7 @@ export class TouchMachine {
       }
     }
     this.dwell(t, events);
+    this.onSubject(p, t, events);
     return events;
   }
 
@@ -115,21 +133,49 @@ export class TouchMachine {
     if (from && !this.index.contains(from, p, -this.cfg.hysteresis.exit_grow_mm)) {
       this.sound({ kind: "exit", region: from, t, since }, events);
     }
-    if (to) this.sound({ kind: "earcon", region: to, t, since }, events);
+    const before = from ?? (this.left && t - this.left.at <= this.cfg.dwell.hold_ms ? this.left.region : null);
+    const line = to && before ? this.index.border(before, to) : null;
+    const heard = to ? this.sound({ kind: "earcon", region: to, t, since }, events) : false;
+    if (from) this.left = { region: from, at: t };
     this.current = to;
     this.pending = null;
     this.dwelled = false;
     this.insideSince = t;
+    if (to && line && heard) {
+      events.push({ kind: "boundary", region: to, line, t, since });
+      this.dwelled = true;
+    }
   }
 
-  private sound(e: TouchEvent, events: TouchEvent[]): void {
+  private sound(e: TouchEvent, events: TouchEvent[]): boolean {
     while (this.sounds.length && (this.sounds[0] ?? 0) <= e.t - 1000) this.sounds.shift();
     if (this.sounds.length >= this.cfg.earcons.max_per_second) {
       this.droppedSounds++;
-      return;
+      return false;
     }
     this.sounds.push(e.t);
     events.push(e);
+    return true;
+  }
+
+  private onSubject(p: Pt, t: number, events: TouchEvent[]): void {
+    const subject = this.index.subject;
+    if (!subject) return;
+    const { enter_shrink_mm, exit_grow_mm } = this.cfg.hysteresis;
+    const onPart = this.current !== null || (this.pending?.target ?? null) !== null;
+    const inside = this.index.inSubject(p, this.subjectSaid ? -exit_grow_mm : enter_shrink_mm);
+    if (onPart || !inside) {
+      if (this.current !== null || !inside) this.subjectSaid = false;
+      this.subjectSince = null;
+      return;
+    }
+    this.subjectSince ??= t;
+    if (this.subjectSaid || this.slowSince === null) return;
+    const from = Math.max(this.slowSince, this.subjectSince);
+    if (t - from >= this.cfg.dwell.hold_ms) {
+      this.subjectSaid = true;
+      events.push({ kind: "subject", label: subject.label, t, since: from });
+    }
   }
 
   private dwell(t: number, events: TouchEvent[]): void {

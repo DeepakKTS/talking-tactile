@@ -26,7 +26,7 @@ function run(m: TouchMachine, path: (t: number) => Pt | null, t0: number, t1: nu
   return out;
 }
 
-const kinds = (es: TouchEvent[]) => es.map((e) => `${e.kind}:${e.region.id}`);
+const kinds = (es: TouchEvent[]) => es.map((e) => `${e.kind}:${"region" in e ? e.region.id : ""}`);
 
 describe("touch state machine", () => {
   it("plays the earcon after enter_hold_ms inside the shrunk outline", () => {
@@ -244,3 +244,91 @@ function lcg(seed: number): () => number {
     return s / 2147483648;
   };
 }
+
+// Two parts with a line between them, inside a silhouette, and a third part with none.
+const BRAIN = new RegionIndex(sheet([
+  { id: "a", poly: square(50, 50, 40), label: "precentral gyrus" },
+  { id: "b_2", poly: square(100, 50, 40), label: "postcentral gyrus" },
+  { id: "b", poly: square(100, 110, 40), label: "postcentral gyrus" },
+  { id: "c", poly: square(150, 50, 20), label: "occipital lobe" },
+], {
+  lines: [{ id: "l1", label: "central sulcus", separates: ["a", "b"] }],
+  subject: { label: "brain", polygon_mm: [[40, 40], [180, 40], [180, 160], [40, 160]] },
+}), EXPLORE);
+
+const named = (es: TouchEvent[]) =>
+  es.map((e) => (e.kind === "subject" ? `subject:${e.label}` : e.kind === "boundary" ? `boundary:${e.line}:${e.region.id}` : `${e.kind}:${e.region.id}`));
+
+/** a's middle, then a straight slide at speed mm/s to b's middle (piece b_2), then rest. */
+function cross(m: TouchMachine, speed: number, t0 = 0, cap?: TouchMachine) {
+  const start: Pt = [70, 70];
+  const end: Pt = [120, 70];
+  const travel = ((end[0] - start[0]) / speed) * 1000;
+  const path = (t: number): Pt => {
+    if (t < t0 + 1500) return start;
+    const k = Math.min(1, (t - t0 - 1500) / travel);
+    return [start[0] + k * (end[0] - start[0]), 70];
+  };
+  return run(cap ?? m, path, t0, t0 + 1500 + travel + 2000);
+}
+
+describe("lines and the subject", () => {
+  it("says the line and the part at the crossing, after the enter hold, and not again on dwell", () => {
+    const m = new TouchMachine(BRAIN, EXPLORE);
+    const es = cross(m, 50);
+    expect(named(es)).toEqual(["earcon:a", "label:a", "exit:a", "earcon:b_2", "boundary:central sulcus:b_2"]);
+    const earcon = es[3];
+    const boundary = es[4];
+    expect(boundary?.t).toBe(earcon?.t);
+    expect((boundary?.t ?? 0) - (boundary?.since ?? 0)).toBeGreaterThanOrEqual(H.enter_hold_ms);
+    expect(m.phase).toBe("dwelled");
+  });
+
+  it("knows a crossing through the gap after a pause shorter than a dwell", () => {
+    const m = new TouchMachine(BRAIN, EXPLORE);
+    run(m, () => [70, 70], 0, 1000);
+    run(m, () => [95, 70], 1000, 1000 + H.exit_hold_ms + D.hold_ms / 2); // in the gap
+    expect(named(run(m, () => [120, 70], 1600, 2200))).toEqual(["earcon:b_2", "boundary:central sulcus:b_2"]);
+  });
+
+  it("does not call a return after a long rest in the gap a crossing", () => {
+    const m = new TouchMachine(BRAIN, EXPLORE);
+    run(m, () => [70, 70], 0, 1000);
+    const gap = run(m, () => [95, 70], 1000, 3000);
+    expect(named(gap)).toEqual(["exit:a", "subject:brain"]);
+    expect(named(run(m, () => [120, 70], 3000, 4000))).toEqual(["earcon:b_2", "label:b_2"]);
+  });
+
+  it("says nothing more for a part with no line to it", () => {
+    const m = new TouchMachine(BRAIN, EXPLORE);
+    run(m, () => [120, 70], 0, 1500);
+    const es = run(m, () => [160, 60], 1500, 3500);
+    expect(named(es)).toEqual(["exit:b_2", "earcon:c", "label:c"]);
+  });
+
+  it("drops the line with the earcon when the budget is spent; the label comes on dwell", () => {
+    const tight = { ...EXPLORE, earcons: { ...EXPLORE.earcons, max_per_second: 1 } };
+    const m = new TouchMachine(BRAIN, tight);
+    run(m, () => [70, 70], 0, 300); // the earcon for a spends the budget
+    const es = run(m, () => [120, 70], 300, 1400);
+    expect(named(es)).toEqual(["label:b_2"]);
+    expect(m.droppedSounds).toBe(2); // a's exit tick and b's earcon
+  });
+
+  it("says the subject once per stay inside the silhouette on no part", () => {
+    const m = new TouchMachine(BRAIN, EXPLORE);
+    expect(named(run(m, () => [95, 100], 0, 3000))).toEqual(["subject:brain"]);
+    expect(named(run(m, () => [95, 100], 3000, 5000))).toEqual([]);
+    run(m, () => [70, 70], 5000, 6000); // onto a part, and back
+    expect(named(run(m, () => [95, 100], 6000, 8000))).toEqual(["exit:a", "subject:brain"]);
+    run(m, () => [10, 10], 8000, 9000); // off the silhouette, and back
+    expect(named(run(m, () => [95, 100], 9000, 11000))).toEqual(["subject:brain"]);
+  });
+
+  it("says nothing outside the silhouette or while the finger moves", () => {
+    const m = new TouchMachine(BRAIN, EXPLORE);
+    expect(run(m, () => [20, 200], 0, 3000)).toEqual([]);
+    const sweep = (t: number): Pt => [95, 45 + ((t / 1000) * 2 * D.speed_below_mm_s) % 100];
+    expect(run(m, sweep, 3000, 6000).filter((e) => e.kind === "subject")).toEqual([]);
+  });
+});

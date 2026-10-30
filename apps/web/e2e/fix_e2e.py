@@ -9,15 +9,15 @@
 Mock mode answers the heart from the live recordings of Oct 30 (fixtures/recorded/
 replays.json), Fix outline clicks included, so no request reaches the network.
 
-1. /author: upload heart.png. The aorta is the one part not touchable (a spill suggestion).
-2. Fix outline of aorta: click the two points of the live check, (1020, 340) and (980, 520)
-   in figure pixels, on the preview. Each click is answered from its recording, with the
-   spill warning. Accept the outline anyway.
-3. The rules report now names three gaps between the aorta and its branch arteries, so the
-   branches are merged into the aorta by the Edit form, as a teacher would. Publish.
-4. The published regions.json: version 2, the aorta touchable and set by the teacher.
-5. /explore, script mode: the intro names no part as not touchable, and touching the aorta
-   gives its earcon, then "Aorta".
+1. /author: upload heart.png. With S1's plan the aorta is touchable (its branches share its
+   region), and the septum is the one part that needs the teacher (a spill suggestion).
+2. Fix outline of aorta, from its row: click the two points of the live check, (1020, 340)
+   and (980, 520) in figure pixels, on the preview. Each click is answered from its
+   recording; the branches are no spill, as they share the aorta's region. Accept.
+3. The branches are merged into the aorta by the Edit form, as a teacher would. Publish.
+4. The published regions.json: version 3, the aorta touchable and set by the teacher.
+5. /explore, script mode: the intro names the septum only, and touching the aorta gives its
+   earcon, then "Aorta".
 
 Prints what it saw as JSON and exits non-zero if a check fails."""
 
@@ -65,11 +65,11 @@ def enabled(page: Page, name: str) -> None:
 
 def fix_aorta(page: Page, fail: list[str]) -> dict[str, Any]:
     out: dict[str, Any] = {}
-    flagged = page.get_by_role("list", name="Not touchable yet")
+    flagged = page.get_by_role("list", name="Needs you")
     out["not_touchable"] = flagged.locator("strong").all_text_contents()
-    if out["not_touchable"] != ["aorta"]:
+    if out["not_touchable"] != ["septum"]:
         fail.append(f"not touchable at the start: {out['not_touchable']}")
-    flagged.get_by_role("button", name="Fix outline of aorta").click()
+    page.get_by_role("list", name="Parts").get_by_role("button", name="Fix outline of aorta").first.click()
     panel = page.get_by_role("region", name="Fix outline of aorta")
     status = panel.get_by_role("status")
     status.get_by_text("Click inside aorta to add a point.").wait_for(timeout=60000)
@@ -94,19 +94,17 @@ def fix_aorta(page: Page, fail: list[str]) -> dict[str, Any]:
         )
         out["answers"].append(status.text_content())
     out["points_shown"] = panel.get_by_text("Positive points:").text_content()
-    out["spill_warning"] = panel.get_by_role("alert").text_content()
+    out["spill_warnings"] = panel.get_by_role("alert").count()
     want = "(1020, 340), (980, 520)"
-    if want not in (out["points_shown"] or "") or "brachiocephalic artery" not in (out["spill_warning"] or ""):
-        fail.append(f"fix panel: {out['points_shown']} / {out['spill_warning']}")
+    if want not in (out["points_shown"] or "") or out["spill_warnings"]:
+        fail.append(f"fix panel: {out['points_shown']} / {out['spill_warnings']} spill warning(s)")
     if not all((a or "").startswith("SAM answered in") and " of 30." in (a or "") for a in out["answers"]):
         fail.append(f"fix answers: {out['answers']}")
     img.evaluate("(el) => el.removeAttribute('style')")  # back in the panel, off the buttons
-    panel.get_by_role("button", name="Accept the outline of aorta anyway").click()
+    panel.get_by_role("button", name="Accept the outline of aorta").click()
     panel.wait_for(state="detached", timeout=120000)
     enabled(page, "Publish for students")
-    problems = page.get_by_role("list", name="Rule problems").locator("li")
-    problems.nth(2).wait_for(timeout=60000)  # the aorta now touches its three branches
-    out["rule_problems"] = problems.all_text_contents()
+    out["rule_problems"] = page.get_by_role("list", name="Rule problems").locator("li").all_text_contents()
     return out
 
 
@@ -166,7 +164,7 @@ def main() -> None:
                 "untouchable": [r["label"] for r in published["regions"] if not r["touchable"]],
                 "needs_teacher": published.get("needs_teacher", []),
             }
-            if published["schema_version"] != 2 or not aorta or not all(r["touchable"] and r["source"] == "teacher" for r in aorta):
+            if published["schema_version"] != 3 or not aorta or not all(r["touchable"] and r["source"] == "teacher" for r in aorta):
                 fail.append(f"published aorta: {result['published']}")
 
             ex = browser.new_context()
@@ -178,8 +176,8 @@ def main() -> None:
             start_by_keys(explore)
             intro = [e.get("text", "") for e in log_since(explore, 0) if e["kind"] == "say"]
             result["explore_intro"] = intro[:1]
-            if any("not touchable" in s for s in intro):
-                fail.append(f"the intro names a part not touchable: {intro[:1]}")
+            if not intro or " One part is not touchable yet: septum. " not in intro[0]:
+                fail.append(f"the intro does not name the septum alone: {intro[:1]}")
             result["aorta_touched"] = touch_all(explore, aorta[:1], 1, fail, "explore") == 1
             result["silent_failures"] = reqs.silent()
             result["page_errors"] = errors

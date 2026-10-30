@@ -198,3 +198,18 @@ def mutated_golden(draw: st.DrawFn) -> Any:
 @given(mutated_golden())
 def test_models_accept_exactly_what_the_schema_accepts(obj: Any) -> None:
     assert model_ok(obj) == schema_ok(obj)
+
+
+def test_lines_and_merge_proposals_name_touchable_regions() -> None:
+    obj = copy.deepcopy(GOLDEN)
+    obj["lines"][0]["separates"] = ["r1", "s9"]
+    obj["lines"][1]["parent"] = "r8"
+    obj["lines"][1]["id"] = "r2"
+    obj["merge_proposals"][0]["region_ids"] = ["r3", "x"]
+    problems = rm.check_references(rm.RegionsFile.from_json_obj(obj))
+    assert problems == [
+        "duplicate region id r2",
+        "l1: separates s9, which is not a touchable region",
+        "r2: parent r8 does not exist",
+        "merge vessel and valve: x is not a touchable region",
+    ]

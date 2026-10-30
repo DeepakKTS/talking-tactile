@@ -1,10 +1,12 @@
 """regions.json from a laid-out sheet: the file Explore runs from.
 
 Parts S2 or S3 could not make touchable go in too, for the teacher: a spill mask as a
-suggestion region with touchable false, and a part with no shape in needs_teacher."""
+suggestion region with touchable false, and a part with no shape in needs_teacher. From S1's
+plan: the line parts, the merge proposals, and the subject with its silhouette."""
 
 from collections.abc import Mapping, Sequence
 from collections.abc import Set as AbstractSet
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -15,14 +17,20 @@ from app.geometry.neighbors import centroids, find_neighbors
 from app.geometry.sheet import Sheet
 from app.models.mask import region_source
 from app.models.regions import (
+    MIN_POLYGON_POINTS,
     FigureType,
     Flag,
+    Line,
+    MergeProposal,
     Page,
     PointMm,
     Region,
     RegionsFile,
+    Subject,
     TeacherEntry,
 )
+
+MIN_MERGE = 2
 
 
 class Suggestion(BaseModel):
@@ -99,9 +107,10 @@ def build_regions_file(
                 **({"flags": flags} if flags else {}),
             )
         )
+    plan = plan_fields(sheet, {r.id for r in regions}, d)
     regions += suggestion_regions(teacher.suggestions, {r.id for r in regions}, d)
     return RegionsFile(
-        schema_version=2,
+        schema_version=3,
         figure_id=info.figure_id,
         title=info.title,
         figure_type=info.figure_type,
@@ -110,9 +119,43 @@ def build_regions_file(
         textures=sheet.textures,
         regions=regions,
         needs_teacher=teacher.needs_teacher,
+        **plan,
         # Like the region fields above: the schema allows grade_band missing, not null.
         **({} if sheet.grade_band is None else {"grade_band": sheet.grade_band}),
     )
+
+
+def plan_fields(sheet: Sheet, touchable: AbstractSet[str], decimals: int) -> dict[str, Any]:
+    """subject, lines and merge_proposals, each left out when there is none. A line or a
+    proposal names only touchable regions; a part id is its main region's id."""
+    out: dict[str, Any] = {}
+    if sheet.silhouette is not None:
+        ring = ring_mm(list(sheet.silhouette.exterior.coords)[:-1], decimals)
+        if len(ring) >= MIN_POLYGON_POINTS:
+            out["subject"] = Subject(label=sheet.subject, polygon_mm=ring)
+    lines = []
+    for x in sheet.lines:
+        separates = x.separates if x.separates and set(x.separates) <= touchable else None
+        parent = x.parent if x.parent in touchable and separates is None else None
+        lines.append(
+            Line(
+                id=x.id,
+                label=x.label,
+                **({"separates": list(separates)} if separates else {}),
+                **({"between": list(x.between)} if x.between else {}),
+                **({"parent": parent} if parent else {}),
+            )
+        )
+    if lines:
+        out["lines"] = lines
+    merges = [
+        MergeProposal(name=m.name, region_ids=[p for p in m.part_ids if p in touchable], why=m.why)
+        for m in sheet.merges
+        if sum(p in touchable for p in m.part_ids) >= MIN_MERGE
+    ]
+    if merges:
+        out["merge_proposals"] = merges
+    return out
 
 
 def ring_mm(coords: Sequence[Sequence[float]], decimals: int) -> list[PointMm]:

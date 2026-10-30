@@ -59,6 +59,20 @@ Credit line, not required: "Mature flower diagram.svg by Mariana Ruiz (LadyofHat
 
 Credit line: "Eight regions of Japan (en).svg by Bigmorr, derived from a map by Orange Wave, CC BY-SA 4.0, via Wikimedia Commons. Resized." Share-alike applies to anything made from it, as for heart.png.
 
+## fixtures/eval/brain_lobes.png
+
+| | |
+|---|---|
+| Title | Blausen 0111 BrainLobes.png |
+| Author | BruceBlaus (Blausen.com staff), "Medical gallery of Blausen Medical 2014", WikiJournal of Medicine 1 (2), DOI:10.15347/wjm/2014.010 |
+| Source | https://commons.wikimedia.org/wiki/File:Blausen_0111_BrainLobes.png |
+| License | Creative Commons Attribution 3.0 Unported (CC BY 3.0), https://creativecommons.org/licenses/by/3.0/ |
+| License checked | 2026-10-30, through the Wikimedia Commons API (LicenseShortName "CC BY 3.0", Artist BruceBlaus, Credit "Own work") |
+| Changes | None. The original 2250 x 1350 px PNG, sha1 d65957456cce55d799f2ca3326ee64934fa266c9 as the API lists it |
+| Use | Eval figure for the tactile-aware part plan (eval/plan/): a lateral view with labeled lobes, drawn as one unbroken shape |
+
+Credit line: "Blausen 0111 BrainLobes.png by BruceBlaus (Blausen.com staff, Medical gallery of Blausen Medical 2014), CC BY 3.0, via Wikimedia Commons."
+
 ## fixtures/audio/question_aorta_ventricle.wav
 
 | | |
@@ -97,4 +111,5 @@ The license text in both places is the Apache License 2.0 from https://www.apach
 ## Not stored here
 
 - The other 17 eval figures in `spikes/eval-figures.md` are listed by URL, with their licenses, but not downloaded into the repository. Add each one here if it is ever committed.
+- The lateral-view brain figure uploaded on Oct 30 (figure fa460241...) is not openly licensed. It and its live recordings stay local, git-ignored as `fixtures/private/` and `fixtures/recorded/private_*`.
 - The fake camera clip for the tracking checks is built locally from File:Index finger 2.JPG by Than Ball (public domain, PD-user-en), https://commons.wikimedia.org/wiki/File:Index_finger_2.JPG. It is not committed.

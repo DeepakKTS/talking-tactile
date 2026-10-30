@@ -2,12 +2,15 @@
 per job, metered and written to the ledger.
 
 S1 is two Muse Spark calls at reasoning effort medium (the S1 spike's effort). The listing
-call sends the S1 prompt and LISTING_SCHEMA. The locate call sends the listed parts with
-app/prompts/s1_locate.v1.json and LOCATE_SCHEMA, and its answer is merged into the parts:
-kind, members, parent, and instances with their points on the 0-1000 grid.
+call sends the S1 prompt and LISTING_SCHEMA. The locate call sends the listed parts and the
+sheet (grade band, printed size, minimum part and gap) with app/prompts/s1_locate.v2.json
+and LOCATE_SCHEMA, and its answer is merged into the parts: kind, members, parent, the
+areas a line separates, and instances with their points on the 0-1000 grid; and into the
+figure: subject and shares_region. Names that are not listed parts are dropped in code.
 
 S2 sends point prompts, several objects per call (sam_adapter.objects_request_body).
-segment sends a phrase, for a part a teacher adds by name."""
+segment sends a phrase: S2's subject, for the silhouette, and a part a teacher adds by
+name."""
 
 import asyncio
 import base64
@@ -29,6 +32,8 @@ from app.meta.types import (
     LOCATE_SCHEMA,
     Instance,
     PartPhrase,
+    SharedRegion,
+    SheetContext,
     Understanding,
 )
 from app.models.image import RGB
@@ -36,6 +41,7 @@ from app.models.mask import Mask
 from app.prompts import Prompt
 
 SPARK_EFFORT = "medium"  # spikes/muse-spark.md
+_PAIR = 2  # a line separates two areas; a shared region has two or more
 _SLUG = re.compile(r"[^a-z0-9]+")
 
 
@@ -79,37 +85,70 @@ def object_masks(parsed: Any, size: tuple[int, int]) -> list[ObjectMask]:
     ]
 
 
-def locate_text(locate: Prompt, parts: Sequence[PartPhrase]) -> str:
+def locate_text(locate: Prompt, parts: Sequence[PartPhrase], sheet: SheetContext) -> str:
     listed = "; ".join(
         f'"{p.phrase}" (printed label "{p.print_label}")' if p.print_label else f'"{p.phrase}"'
         for p in parts
     )
-    return str(locate.template["user"]).format(listed=listed)
+    return str(locate.template["user"]).format(
+        listed=listed,
+        reader=sheet.reader,
+        width_mm=round(sheet.width_mm),
+        height_mm=round(sheet.height_mm),
+        min_part_mm=sheet.min_part_mm,
+        gap_mm=sheet.gap_mm,
+    )
+
+
+def _plan(item: dict[str, Any], kinds: dict[str, str], listed: set[str]) -> dict[str, Any]:
+    """One part's plan, with names checked against the listing: a line separates two areas
+    the answer planned or nothing, and has no instances; a parent is a listed part other
+    than itself."""
+    name, kind = item["part"], item["kind"]
+    parent = item.get("parent", "")
+    parent = parent if parent in listed and parent != name else ""
+    separates = tuple(dict.fromkeys(q for q in item.get("separates", []) if q != name))
+    two_areas = len(separates) == _PAIR and all(kinds.get(q) == "area" for q in separates)
+    line = kind == "line"
+    return {
+        "kind": kind,
+        "members": tuple(m for m in item["members"] if m in listed and m != name),
+        "parent": parent,
+        "separates": separates if line and two_areas else (),
+        "instances": ()
+        if line or kind == "group"
+        else tuple(Instance.model_validate(i) for i in item["instances"]),
+    }
 
 
 def merge_located(u: Understanding, answer: dict[str, Any]) -> Understanding:
     """The listed parts with what the locate call said about each, by exact name. A part
-    the answer leaves out keeps kind None, so S2 sends it to the teacher."""
+    the answer leaves out keeps kind None, so S2 sends it to the teacher. Shared regions
+    keep their listed areas, and only those with two or more."""
     found: dict[str, dict[str, Any]] = {}
+    listed = {p.phrase for p in u.parts}
     for item in answer["parts"]:
-        found.setdefault(item["part"], item)
-    parts = []
-    for p in u.parts:
-        item = found.get(p.phrase)
-        if item is None:
-            parts.append(p)
-            continue
-        parts.append(
-            p.model_copy(
-                update={
-                    "kind": item["kind"],
-                    "members": tuple(item["members"]),
-                    "parent": item["parent"],
-                    "instances": tuple(Instance.model_validate(i) for i in item["instances"]),
-                }
-            )
-        )
-    return u.model_copy(update={"parts": parts, "located": True})
+        if item["part"] in listed:
+            found.setdefault(item["part"], item)
+    kinds = {name: str(item["kind"]) for name, item in found.items()}
+    parts = [
+        p if p.phrase not in found else p.model_copy(update=_plan(found[p.phrase], kinds, listed))
+        for p in u.parts
+    ]
+    shared = []
+    for s in answer.get("shares_region", []):
+        names = tuple(dict.fromkeys(q for q in s["parts"] if kinds.get(q) == "area"))
+        if len(names) >= _PAIR:
+            name = str(s["name"]).strip() or " and ".join(names)
+            shared.append(SharedRegion(parts=names, name=name))
+    return u.model_copy(
+        update={
+            "parts": parts,
+            "located": True,
+            "subject": str(answer.get("subject", "")).strip(),
+            "shares_region": shared,
+        }
+    )
 
 
 class LiveMetaClient:
@@ -173,7 +212,7 @@ class LiveMetaClient:
         return dict(json.loads(res.body["choices"][0]["message"]["content"]))
 
     async def understand(
-        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt, sheet: SheetContext
     ) -> Understanding:
         png = png_bytes(image)
         t = prompt.template
@@ -196,22 +235,24 @@ class LiveMetaClient:
         body = spark_body(
             self._models.spark,
             None,
-            locate_text(locate, u.parts),
+            locate_text(locate, u.parts, sheet),
             png,
             ("PartPoints", LOCATE_SCHEMA),
         )
         return merge_located(u, await self._spark("locate", figure_id, body))
 
-    async def segment(self, image: RGB, figure_id: str, phrase: str, prompt: Prompt) -> list[Mask]:
+    async def segment(
+        self, image: RGB, figure_id: str, phrase: str, prompt: Prompt, what: str = ""
+    ) -> list[Mask]:
         h, w = image.shape[:2]
         res = await self._caller.post_sse(
             "/responses",
             sam_adapter.request_body(self._models.sam, png_bytes(image), prompt.template, phrase),
             caller="s2",
             model=self._models.sam,
-            describe=f"figure {figure_id[:12]} {w}x{h}, phrase: {phrase}",
+            describe=f"figure {figure_id[:12]} {w}x{h}, {what or 'phrase'}: {phrase}",
             units=lambda _usage: {"images": 1},
-            record_as=self._name(slug(phrase)),
+            record_as=self._name(f"{what}_{slug(phrase)}" if what else slug(phrase)),
         )
         parsed = await sam_adapter.parse_events(res.body)
         return await asyncio.to_thread(sam_adapter.to_masks, parsed, (h, w), phrase)

@@ -1,4 +1,5 @@
-"""S2's output: the touchable part masks, the print text, and what the teacher must see."""
+"""S2's output: the touchable part masks, the print text, what the teacher must see, and
+what S2 found about the parts: nesting, merge proposals and the subject's silhouette."""
 
 from typing import Any, Literal
 
@@ -26,11 +27,29 @@ class TeacherPart(BaseModel):
         return None if value is None else value.astype(bool)
 
 
-class Grounded(BaseModel):
+class MergeProposal(BaseModel):
+    """Areas drawn as one shape: Spark said so (shares_region), or their masks overlap."""
+
     model_config = ConfigDict(frozen=True)
+
+    parts: tuple[str, ...]  # phrases, in S1 order
+    name: str  # the suggested combined name
+    why: str  # in words, for the teacher
+
+
+class Grounded(BaseModel):
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     parts: list[Mask]  # in phrase order, then SAM's instance order
     text: list[Mask]
     flags: dict[str, list[str]] = {}  # per phrase, in words
     teacher: list[TeacherPart] = []
     facts: dict[str, Any] = {}  # per phrase: points, confidences, pixels won and lost
+    nested: dict[str, str] = {}  # child phrase -> parent phrase, from the masks alone
+    merges: list[MergeProposal] = []
+    silhouette: BoolImage | None = None  # the subject's outline, largest piece only
+
+    @field_validator("silhouette", mode="before")
+    @classmethod
+    def _bool(cls, value: Any) -> Any:
+        return None if value is None else value.astype(bool)

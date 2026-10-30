@@ -46,6 +46,9 @@ export class Metrics {
   readonly touchToEarconMs = new Samples();
   /** Dwell met to the label being handed to speech. */
   readonly dwellToLabelMs = new Samples();
+  /** Landmarks of the frame that crosses a line into a part, to the line and part being
+   * handed to speech. Code only. */
+  readonly frameToBoundaryMs = new Samples();
 
   summary(): Record<string, { count: number; p50: number; p95: number }> {
     return {
@@ -54,6 +57,7 @@ export class Metrics {
       enterToEarconMs: this.enterToEarconMs.summary(),
       touchToEarconMs: this.touchToEarconMs.summary(),
       dwellToLabelMs: this.dwellToLabelMs.summary(),
+      frameToBoundaryMs: this.frameToBoundaryMs.summary(),
     };
   }
 }

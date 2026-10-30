@@ -1,0 +1,1172 @@
+[
+ {
+  "figure": "heart",
+  "status": "done",
+  "grade_band": null,
+  "subject": "heart",
+  "listed": 19,
+  "areas": [
+   "brachiocephalic artery",
+   "superior vena cava",
+   "right pulmonary arteries",
+   "right pulmonary veins",
+   "right atrium",
+   "right ventricle",
+   "inferior vena cava",
+   "left common carotid artery",
+   "left subclavian artery",
+   "aorta",
+   "left pulmonary arteries",
+   "left pulmonary veins",
+   "left atrium",
+   "left ventricle",
+   "septum"
+  ],
+  "groups": [],
+  "lines": [
+   {
+    "line": "tricuspid valve",
+    "separates": [
+     "right atrium",
+     "right ventricle"
+    ],
+    "parent": "right ventricle"
+   },
+   {
+    "line": "chordae tendineae",
+    "separates": [],
+    "parent": "right ventricle"
+   },
+   {
+    "line": "semilunar valves",
+    "separates": [
+     "left ventricle",
+     "aorta"
+    ],
+    "parent": "aorta"
+   },
+   {
+    "line": "mitral valve",
+    "separates": [
+     "left atrium",
+     "left ventricle"
+    ],
+    "parent": "left ventricle"
+   }
+  ],
+  "unlocated": [],
+  "spark_shared": [
+   {
+    "parts": [
+     "aorta",
+     "brachiocephalic artery",
+     "left common carotid artery",
+     "left subclavian artery"
+    ],
+    "name": "aortic arch"
+   }
+  ],
+  "touchable_areas": [
+   "brachiocephalic artery",
+   "superior vena cava",
+   "right pulmonary arteries",
+   "right pulmonary veins",
+   "right atrium",
+   "right ventricle",
+   "inferior vena cava",
+   "left common carotid artery",
+   "left subclavian artery",
+   "aorta",
+   "left pulmonary arteries",
+   "left pulmonary veins",
+   "left atrium",
+   "left ventricle"
+  ],
+  "needs_you": [
+   {
+    "part": "septum",
+    "reason": "spill",
+    "detail": "holds points of right ventricle after a retry"
+   }
+  ],
+  "nested": {},
+  "merges": [
+   {
+    "parts": [
+     "brachiocephalic artery",
+     "left common carotid artery",
+     "left subclavian artery",
+     "aorta"
+    ],
+    "name": "aortic arch",
+    "why": "Spark marked them as one unbroken shape"
+   }
+  ],
+  "silhouette": {
+   "phrase": "heart",
+   "instances": 1,
+   "px": 803939
+  },
+  "regions_json": {
+   "touchable": 14,
+   "lines": [
+    {
+     "id": "l1",
+     "label": "tricuspid valve",
+     "separates": [
+      "r5",
+      "r6"
+     ],
+     "between": [
+      "right atrium",
+      "right ventricle"
+     ]
+    },
+    {
+     "id": "l2",
+     "label": "chordae tendineae",
+     "parent": "r6"
+    },
+    {
+     "id": "l3",
+     "label": "semilunar valves",
+     "separates": [
+      "r14",
+      "r10"
+     ],
+     "between": [
+      "left ventricle",
+      "aorta"
+     ]
+    },
+    {
+     "id": "l4",
+     "label": "mitral valve",
+     "separates": [
+      "r13",
+      "r14"
+     ],
+     "between": [
+      "left atrium",
+      "left ventricle"
+     ]
+    }
+   ],
+   "merge_proposals": 1,
+   "subject_drawn": true,
+   "needs_teacher": 0
+  },
+  "contour_pieces": {
+   "pieces": 3
+  },
+  "rules_report": 1,
+  "pairs": [
+   {
+    "part": "left common carotid artery",
+    "inside": "aorta",
+    "share": 0.9934,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "right ventricle",
+    "inside": "septum",
+    "share": 0.9907,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "right atrium",
+    "inside": "septum",
+    "share": 0.9883,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left ventricle",
+    "inside": "septum",
+    "share": 0.9715,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left subclavian artery",
+    "inside": "aorta",
+    "share": 0.9675,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "brachiocephalic artery",
+    "inside": "aorta",
+    "share": 0.9616,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left atrium",
+    "inside": "septum",
+    "share": 0.906,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left atrium",
+    "inside": "left ventricle",
+    "share": 0.8929,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "inferior vena cava",
+    "inside": "septum",
+    "share": 0.8014,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "right pulmonary arteries",
+    "inside": "superior vena cava",
+    "share": 0.7805,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left pulmonary veins",
+    "inside": "left ventricle",
+    "share": 0.6826,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left pulmonary arteries",
+    "inside": "septum",
+    "share": 0.6548,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "left pulmonary veins",
+    "inside": "septum",
+    "share": 0.6246,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "right pulmonary veins",
+    "inside": "septum",
+    "share": 0.5505,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "superior vena cava",
+    "inside": "septum",
+    "share": 0.4074,
+    "iou": 0.0,
+    "spark": ""
+   }
+  ],
+  "live_calls": 21,
+  "score": {
+   "counts": {
+    "parts": 15,
+    "no_mask": 1,
+    "needs_teacher": 1,
+    "regression": 0,
+    "references": 4,
+    "speck": 0,
+    "under_point_symbol": 0,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 2,
+    "overlap_pairs": 0,
+    "overlap_pairs_before": 0,
+    "points": 25,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   },
+   "summary": "15 parts, no mask 1, needs teacher 1, regressions 0 of 4 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 2, overlapping pairs 0 before resolution and 0 after. Points 25: on text 0, on lines 0, on ink 0.",
+   "references": [
+    {
+     "part": "right pulmonary arteries",
+     "v2f_iou": 0.952,
+     "iou": 0.947,
+     "now": "right pulmonary arteries",
+     "match": "name",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "right atrium",
+     "v2f_iou": 0.985,
+     "iou": 0.969,
+     "now": "right atrium",
+     "match": "name",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "left common carotid artery",
+     "v2f_iou": 0.0,
+     "iou": 0.927,
+     "now": "left common carotid artery",
+     "match": "name",
+     "verdict": "improved",
+     "flags": []
+    },
+    {
+     "part": "left pulmonary arteries",
+     "v2f_iou": 0.972,
+     "iou": 0.976,
+     "now": "left pulmonary arteries",
+     "match": "name",
+     "verdict": "held",
+     "flags": []
+    }
+   ]
+  }
+ },
+ {
+  "figure": "flower",
+  "status": "done",
+  "grade_band": null,
+  "subject": "mature flower",
+  "listed": 16,
+  "areas": [
+   "ovules",
+   "stigma",
+   "style",
+   "ovary",
+   "petal",
+   "sepal",
+   "nectary",
+   "floral axis",
+   "pedicel",
+   "connective",
+   "anther",
+   "microsporangium",
+   "filament"
+  ],
+  "groups": [
+   "pistil",
+   "perianth",
+   "stamen"
+  ],
+  "lines": [],
+  "unlocated": [],
+  "spark_shared": [
+   {
+    "parts": [
+     "stigma",
+     "style",
+     "ovary"
+    ],
+    "name": "pistil column"
+   },
+   {
+    "parts": [
+     "nectary",
+     "floral axis",
+     "pedicel"
+    ],
+    "name": "flower base"
+   }
+  ],
+  "touchable_areas": [
+   "ovules",
+   "stigma",
+   "style",
+   "ovary",
+   "petal",
+   "sepal",
+   "nectary",
+   "pedicel",
+   "connective",
+   "anther",
+   "microsporangium",
+   "filament"
+  ],
+  "needs_you": [
+   {
+    "part": "floral axis",
+    "reason": "no_mask",
+    "detail": "SAM's mask holds none of the part's points"
+   }
+  ],
+  "nested": {
+   "microsporangium": "connective"
+  },
+  "merges": [
+   {
+    "parts": [
+     "petal",
+     "filament"
+    ],
+    "name": "petal and filament",
+    "why": "their outlines overlap almost entirely"
+   },
+   {
+    "parts": [
+     "connective",
+     "anther"
+    ],
+    "name": "connective and anther",
+    "why": "their outlines overlap almost entirely"
+   },
+   {
+    "parts": [
+     "ovules",
+     "stigma",
+     "style",
+     "ovary"
+    ],
+    "name": "pistil column",
+    "why": "Spark marked them as one unbroken shape"
+   },
+   {
+    "parts": [
+     "nectary",
+     "floral axis",
+     "pedicel"
+    ],
+    "name": "flower base",
+    "why": "Spark marked them as one unbroken shape"
+   }
+  ],
+  "silhouette": {
+   "phrase": "mature flower",
+   "instances": 2,
+   "px": 148899
+  },
+  "regions_json": {
+   "touchable": 14,
+   "lines": [],
+   "merge_proposals": 4,
+   "subject_drawn": true,
+   "needs_teacher": 2
+  },
+  "contour_pieces": {
+   "pieces": 1
+  },
+  "rules_report": 31,
+  "pairs": [
+   {
+    "part": "microsporangium",
+    "inside": "anther",
+    "share": 1.0,
+    "iou": 0.0,
+    "spark": "parent"
+   },
+   {
+    "part": "connective",
+    "inside": "anther",
+    "share": 0.9921,
+    "iou": 0.895,
+    "spark": "parent"
+   },
+   {
+    "part": "ovules",
+    "inside": "ovary",
+    "share": 0.9903,
+    "iou": 0.9254,
+    "spark": "parent"
+   },
+   {
+    "part": "stigma",
+    "inside": "petal",
+    "share": 0.9867,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "stigma",
+    "inside": "ovary",
+    "share": 0.9831,
+    "iou": 0.2663,
+    "spark": ""
+   },
+   {
+    "part": "microsporangium",
+    "inside": "connective",
+    "share": 0.9669,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "stigma",
+    "inside": "filament",
+    "share": 0.9606,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "style",
+    "inside": "petal",
+    "share": 0.9597,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "nectary",
+    "inside": "petal",
+    "share": 0.9577,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "pedicel",
+    "inside": "petal",
+    "share": 0.9569,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "filament",
+    "inside": "petal",
+    "share": 0.9559,
+    "iou": 0.8676,
+    "spark": ""
+   },
+   {
+    "part": "ovary",
+    "inside": "ovules",
+    "share": 0.9338,
+    "iou": 0.9254,
+    "spark": ""
+   },
+   {
+    "part": "style",
+    "inside": "filament",
+    "share": 0.9193,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "pedicel",
+    "inside": "filament",
+    "share": 0.9064,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "petal",
+    "inside": "filament",
+    "share": 0.9038,
+    "iou": 0.8676,
+    "spark": ""
+   },
+   {
+    "part": "anther",
+    "inside": "connective",
+    "share": 0.9015,
+    "iou": 0.895,
+    "spark": ""
+   },
+   {
+    "part": "stigma",
+    "inside": "style",
+    "share": 0.8958,
+    "iou": 0.6608,
+    "spark": ""
+   },
+   {
+    "part": "sepal",
+    "inside": "petal",
+    "share": 0.8821,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "style",
+    "inside": "ovary",
+    "share": 0.8763,
+    "iou": 0.2863,
+    "spark": ""
+   },
+   {
+    "part": "stigma",
+    "inside": "ovules",
+    "share": 0.8387,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "style",
+    "inside": "ovules",
+    "share": 0.8045,
+    "iou": 0.2714,
+    "spark": ""
+   },
+   {
+    "part": "style",
+    "inside": "stigma",
+    "share": 0.7159,
+    "iou": 0.6608,
+    "spark": ""
+   },
+   {
+    "part": "sepal",
+    "inside": "filament",
+    "share": 0.5063,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "ovary",
+    "inside": "petal",
+    "share": 0.3175,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "ovary",
+    "inside": "filament",
+    "share": 0.3038,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "ovary",
+    "inside": "style",
+    "share": 0.2984,
+    "iou": 0.2863,
+    "spark": ""
+   },
+   {
+    "part": "ovules",
+    "inside": "petal",
+    "share": 0.2908,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "ovules",
+    "inside": "style",
+    "share": 0.2905,
+    "iou": 0.2714,
+    "spark": ""
+   },
+   {
+    "part": "ovules",
+    "inside": "filament",
+    "share": 0.2775,
+    "iou": 0.0,
+    "spark": ""
+   },
+   {
+    "part": "ovary",
+    "inside": "stigma",
+    "share": 0.2675,
+    "iou": 0.2663,
+    "spark": ""
+   }
+  ],
+  "live_calls": 18,
+  "score": {
+   "counts": {
+    "parts": 16,
+    "no_mask": 1,
+    "needs_teacher": 1,
+    "regression": 3,
+    "references": 3,
+    "speck": 0,
+    "under_point_symbol": 2,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 4,
+    "overlap_pairs": 1,
+    "overlap_pairs_before": 1,
+    "points": 25,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   },
+   "summary": "16 parts, no mask 1, needs teacher 1, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 4, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
+   "references": [
+    {
+     "part": "ovary",
+     "v2f_iou": 0.245,
+     "iou": 0.0,
+     "now": "ovary",
+     "match": "name",
+     "verdict": "still regressed",
+     "flags": [
+      "regression: IoU 0.0 with the passing Arm B mask",
+      "3 fragments"
+     ]
+    },
+    {
+     "part": "connective",
+     "v2f_iou": 0.0,
+     "iou": 0.068,
+     "now": "connective",
+     "match": "name",
+     "verdict": "still regressed",
+     "flags": [
+      "regression: IoU 0.068 with the passing Arm B mask",
+      "overlaps microsporangium"
+     ]
+    },
+    {
+     "part": "pollen sac",
+     "v2f_iou": 0.476,
+     "iou": 0.367,
+     "now": "microsporangium",
+     "match": "mask IoU 0.367",
+     "verdict": "still regressed",
+     "flags": [
+      "overlaps connective"
+     ]
+    },
+    {
+     "part": "anther",
+     "v2f_iou": 0.0,
+     "iou": 0.198,
+     "now": "anther",
+     "match": "name",
+     "verdict": "still regressed",
+     "flags": [
+      "regression: IoU 0.198 with the passing Arm B mask",
+      "5 fragments"
+     ]
+    },
+    {
+     "part": "filament stalk",
+     "v2f_iou": 0.0,
+     "iou": 0.0,
+     "now": "filament",
+     "match": "word",
+     "verdict": "still regressed",
+     "flags": []
+    }
+   ]
+  }
+ },
+ {
+  "figure": "japan_regions",
+  "status": "done",
+  "grade_band": null,
+  "subject": "Japan",
+  "listed": 9,
+  "areas": [
+   "Hokkaido island area",
+   "Tohoku region area",
+   "Kanto region area",
+   "Chubu region area",
+   "Kansai region area",
+   "Chugoku region area",
+   "Shikoku island area",
+   "Kyushu island area",
+   "Okinawa islands inset"
+  ],
+  "groups": [],
+  "lines": [],
+  "unlocated": [],
+  "spark_shared": [],
+  "touchable_areas": [
+   "Hokkaido island area",
+   "Tohoku region area",
+   "Kanto region area",
+   "Chubu region area",
+   "Kansai region area",
+   "Chugoku region area",
+   "Shikoku island area",
+   "Kyushu island area",
+   "Okinawa islands inset"
+  ],
+  "needs_you": [],
+  "nested": {},
+  "merges": [],
+  "silhouette": {
+   "phrase": "Japan",
+   "instances": 0,
+   "px": 0
+  },
+  "regions_json": {
+   "touchable": 9,
+   "lines": [],
+   "merge_proposals": 0,
+   "subject_drawn": false,
+   "needs_teacher": 0
+  },
+  "contour_pieces": {
+   "pieces": 0
+  },
+  "rules_report": 0,
+  "pairs": [],
+  "live_calls": 12,
+  "score": {
+   "counts": {
+    "parts": 9,
+    "no_mask": 0,
+    "needs_teacher": 0,
+    "regression": 0,
+    "references": 0,
+    "speck": 0,
+    "under_point_symbol": 0,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 0,
+    "overlap_pairs": 0,
+    "overlap_pairs_before": 0,
+    "points": 19,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   },
+   "summary": "9 parts, no mask 0, needs teacher 0, regressions 0 of 0 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 0, overlapping pairs 0 before resolution and 0 after. Points 19: on text 0, on lines 0, on ink 0.",
+   "references": [
+    {
+     "part": "Hokkaido region",
+     "v2f_iou": 0.986,
+     "iou": 0.984,
+     "now": "Hokkaido island area",
+     "match": "word",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "Kanto region",
+     "v2f_iou": 0.981,
+     "iou": 0.974,
+     "now": "Kanto region area",
+     "match": "word",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "Chubu region",
+     "v2f_iou": 0.958,
+     "iou": 0.93,
+     "now": "Chubu region area",
+     "match": "word",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "Kansai region",
+     "v2f_iou": 0.612,
+     "iou": 0.804,
+     "now": "Kansai region area",
+     "match": "word",
+     "verdict": "improved",
+     "flags": []
+    },
+    {
+     "part": "Chugoku region",
+     "v2f_iou": 0.971,
+     "iou": 0.965,
+     "now": "Chugoku region area",
+     "match": "word",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "Shikoku region",
+     "v2f_iou": 0.982,
+     "iou": 0.983,
+     "now": "Shikoku island area",
+     "match": "word",
+     "verdict": "held",
+     "flags": []
+    },
+    {
+     "part": "Kyushu region",
+     "v2f_iou": 0.986,
+     "iou": 0.985,
+     "now": "Kyushu island area",
+     "match": "word",
+     "verdict": "held",
+     "flags": []
+    }
+   ]
+  }
+ },
+ {
+  "figure": "brain_upload",
+  "status": "done",
+  "grade_band": "6_8",
+  "subject": "human brain",
+  "listed": 12,
+  "areas": [
+   "frontal lobe",
+   "precentral gyrus",
+   "postcentral gyrus",
+   "parietal lobe",
+   "temporal lobe",
+   "occipital lobe",
+   "pons",
+   "medulla",
+   "cerebellum",
+   "spinal cord"
+  ],
+  "groups": [],
+  "lines": [
+   {
+    "line": "central sulcus",
+    "separates": [
+     "precentral gyrus",
+     "postcentral gyrus"
+    ],
+    "parent": ""
+   },
+   {
+    "line": "lateral sulcus",
+    "separates": [
+     "frontal lobe",
+     "temporal lobe"
+    ],
+    "parent": ""
+   }
+  ],
+  "unlocated": [],
+  "spark_shared": [
+   {
+    "parts": [
+     "pons",
+     "medulla",
+     "spinal cord"
+    ],
+    "name": "brainstem"
+   }
+  ],
+  "touchable_areas": [
+   "frontal lobe",
+   "precentral gyrus",
+   "postcentral gyrus",
+   "parietal lobe",
+   "temporal lobe",
+   "occipital lobe",
+   "pons",
+   "medulla",
+   "cerebellum",
+   "spinal cord"
+  ],
+  "needs_you": [],
+  "nested": {},
+  "merges": [
+   {
+    "parts": [
+     "postcentral gyrus",
+     "parietal lobe"
+    ],
+    "name": "postcentral gyrus and parietal lobe",
+    "why": "their outlines overlap almost entirely"
+   },
+   {
+    "parts": [
+     "pons",
+     "medulla",
+     "cerebellum",
+     "spinal cord"
+    ],
+    "name": "brainstem",
+    "why": "Spark marked them as one unbroken shape"
+   }
+  ],
+  "silhouette": {
+   "phrase": "human brain",
+   "instances": 1,
+   "px": 1042167
+  },
+  "regions_json": {
+   "touchable": 10,
+   "lines": [
+    {
+     "id": "l1",
+     "label": "central sulcus",
+     "separates": [
+      "r2",
+      "r3"
+     ],
+     "between": [
+      "precentral gyrus",
+      "postcentral gyrus"
+     ]
+    },
+    {
+     "id": "l2",
+     "label": "lateral sulcus",
+     "separates": [
+      "r1",
+      "r5"
+     ],
+     "between": [
+      "frontal lobe",
+      "temporal lobe"
+     ]
+    }
+   ],
+   "merge_proposals": 2,
+   "subject_drawn": true,
+   "needs_teacher": 0
+  },
+  "contour_pieces": {
+   "pieces": 0
+  },
+  "rules_report": 0,
+  "pairs": [
+   {
+    "part": "parietal lobe",
+    "inside": "postcentral gyrus",
+    "share": 0.9946,
+    "iou": 0.9643,
+    "spark": ""
+   },
+   {
+    "part": "spinal cord",
+    "inside": "medulla",
+    "share": 0.9926,
+    "iou": 0.9725,
+    "spark": ""
+   },
+   {
+    "part": "medulla",
+    "inside": "pons",
+    "share": 0.9916,
+    "iou": 0.4038,
+    "spark": ""
+   },
+   {
+    "part": "spinal cord",
+    "inside": "pons",
+    "share": 0.9914,
+    "iou": 0.3985,
+    "spark": ""
+   },
+   {
+    "part": "medulla",
+    "inside": "spinal cord",
+    "share": 0.9797,
+    "iou": 0.9725,
+    "spark": ""
+   },
+   {
+    "part": "pons",
+    "inside": "cerebellum",
+    "share": 0.9725,
+    "iou": 0.9353,
+    "spark": ""
+   },
+   {
+    "part": "postcentral gyrus",
+    "inside": "parietal lobe",
+    "share": 0.9694,
+    "iou": 0.9643,
+    "spark": "parent"
+   },
+   {
+    "part": "spinal cord",
+    "inside": "cerebellum",
+    "share": 0.9626,
+    "iou": 0.3779,
+    "spark": ""
+   },
+   {
+    "part": "medulla",
+    "inside": "cerebellum",
+    "share": 0.9624,
+    "iou": 0.3827,
+    "spark": ""
+   },
+   {
+    "part": "cerebellum",
+    "inside": "pons",
+    "share": 0.9607,
+    "iou": 0.9353,
+    "spark": ""
+   },
+   {
+    "part": "precentral gyrus",
+    "inside": "frontal lobe",
+    "share": 0.893,
+    "iou": 0.0,
+    "spark": "parent"
+   },
+   {
+    "part": "pons",
+    "inside": "medulla",
+    "share": 0.4052,
+    "iou": 0.4038,
+    "spark": ""
+   },
+   {
+    "part": "pons",
+    "inside": "spinal cord",
+    "share": 0.3998,
+    "iou": 0.3985,
+    "spark": ""
+   },
+   {
+    "part": "cerebellum",
+    "inside": "medulla",
+    "share": 0.3885,
+    "iou": 0.3827,
+    "spark": ""
+   },
+   {
+    "part": "cerebellum",
+    "inside": "spinal cord",
+    "share": 0.3836,
+    "iou": 0.3779,
+    "spark": ""
+   }
+  ],
+  "live_calls": 13
+ },
+ {
+  "figure": "brain_lobes",
+  "status": "done",
+  "grade_band": "6_8",
+  "subject": "brain",
+  "listed": 6,
+  "areas": [
+   "frontal lobe",
+   "parietal lobe",
+   "temporal lobe",
+   "occipital lobe",
+   "olfactory bulb",
+   "cerebellum and brainstem"
+  ],
+  "groups": [],
+  "lines": [],
+  "unlocated": [],
+  "spark_shared": [],
+  "touchable_areas": [
+   "frontal lobe",
+   "parietal lobe",
+   "temporal lobe",
+   "occipital lobe",
+   "cerebellum and brainstem"
+  ],
+  "needs_you": [
+   {
+    "part": "olfactory bulb",
+    "reason": "no_points",
+    "detail": "every point was dropped by the guard"
+   }
+  ],
+  "nested": {},
+  "merges": [],
+  "silhouette": {
+   "phrase": "brain",
+   "instances": 1,
+   "px": 1035244
+  },
+  "regions_json": {
+   "touchable": 5,
+   "lines": [],
+   "merge_proposals": 0,
+   "subject_drawn": true,
+   "needs_teacher": 1
+  },
+  "contour_pieces": {
+   "pieces": 1
+  },
+  "rules_report": 0,
+  "pairs": [],
+  "live_calls": 8
+ }
+]

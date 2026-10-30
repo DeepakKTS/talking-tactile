@@ -126,8 +126,35 @@ class Region(ContractModel):
     flags: list[Flag] | None = None
 
 
+class Subject(ContractModel):
+    """The whole object shown, and its silhouette."""
+
+    label: StrictStr
+    polygon_mm: Annotated[
+        list[PointMm], Field(min_length=MIN_POLYGON_POINTS, max_length=MAX_POLYGON_POINTS)
+    ]
+
+
+class Line(ContractModel):
+    """A part that is a line: spoken at the border it separates, never touched."""
+
+    _nullable: ClassVar[frozenset[str]] = frozenset({"parent"})
+
+    id: StrictStr
+    label: StrictStr
+    separates: Annotated[list[StrictStr], Field(min_length=2, max_length=2)] | None = None
+    between: Annotated[list[StrictStr], Field(min_length=2, max_length=2)] | None = None
+    parent: StrictStr | None = None
+
+
+class MergeProposal(ContractModel):
+    name: StrictStr
+    region_ids: Annotated[list[StrictStr], Field(min_length=2)]
+    why: StrictStr
+
+
 class RegionsFile(ContractModel):
-    schema_version: Annotated[Literal[2], BeforeValidator(_not_bool)]
+    schema_version: Annotated[Literal[3], BeforeValidator(_not_bool)]
     figure_id: StrictStr
     title: StrictStr
     figure_type: FigureType
@@ -136,6 +163,9 @@ class RegionsFile(ContractModel):
     summary: StrictStr
     textures: Annotated[list[Texture], Field(max_length=MAX_TEXTURES)]
     regions: list[Region]
+    subject: Subject | None = None
+    lines: list[Line] | None = None
+    merge_proposals: list[MergeProposal] | None = None
     needs_teacher: list[TeacherEntry] | None = None
 
     @classmethod
@@ -144,7 +174,7 @@ class RegionsFile(ContractModel):
         return cls.model_validate(obj)
 
     def to_json_obj(self) -> dict[str, Any]:
-        """The JSON form: unset optionals are left out, parent is always written."""
+        """The JSON form: unset optionals are left out, a region's parent is always written."""
         out: dict[str, Any] = self.model_dump(mode="json", exclude_none=True)
         for dumped, region in zip(out["regions"], self.regions, strict=True):
             dumped["parent"] = region.parent
@@ -152,12 +182,17 @@ class RegionsFile(ContractModel):
 
 
 def check_references(regions_file: RegionsFile) -> list[str]:
-    """Problems the schema cannot express: duplicate ids (regions and needs_teacher share
-    them), parents that do not exist, and neighbors that are not touchable regions. Empty
-    when the file is consistent."""
+    """Problems the schema cannot express: duplicate ids (regions, lines and needs_teacher
+    share them), parents that do not exist, and neighbors, the regions a line separates and
+    the regions of a merge proposal that are not touchable regions. Empty when the file is
+    consistent."""
     problems: list[str] = []
     seen: set[str] = set()
-    ids = [r.id for r in regions_file.regions] + [t.id for t in regions_file.needs_teacher or []]
+    ids = (
+        [r.id for r in regions_file.regions]
+        + [x.id for x in regions_file.lines or []]
+        + [t.id for t in regions_file.needs_teacher or []]
+    )
     for rid in ids:
         if rid in seen:
             problems.append(f"duplicate region id {rid}")
@@ -173,4 +208,20 @@ def check_references(regions_file: RegionsFile) -> list[str]:
                 problems.append(f"{region.id}: neighbor {neighbor.id} does not exist")
             elif neighbor.id not in touchable:
                 problems.append(f"{region.id}: neighbor {neighbor.id} is not touchable")
+    return problems + _plan_references(regions_file, touchable)
+
+
+def _plan_references(regions_file: RegionsFile, touchable: set[str]) -> list[str]:
+    problems: list[str] = []
+    regions = {r.id for r in regions_file.regions}
+    for line in regions_file.lines or []:
+        for rid in line.separates or []:
+            if rid not in touchable:
+                problems.append(f"{line.id}: separates {rid}, which is not a touchable region")
+        if line.parent is not None and line.parent not in regions:
+            problems.append(f"{line.id}: parent {line.parent} does not exist")
+    for m in regions_file.merge_proposals or []:
+        for rid in m.region_ids:
+            if rid not in touchable:
+                problems.append(f"merge {m.name}: {rid} is not a touchable region")
     return problems

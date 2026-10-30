@@ -5,7 +5,7 @@
  * The contract between Author and Explore. Explore must run from this file alone for labels, earcons and guidance.
  */
 export interface TalkingTactileRegionsFile {
-  schema_version: 2;
+  schema_version: 3;
   /**
    * sha256 of the normalized source image
    */
@@ -87,6 +87,53 @@ export interface TalkingTactileRegionsFile {
       reason: "spill" | "thin" | "under_point_symbol";
       detail: string;
     }[];
+  }[];
+  /**
+   * The whole object the figure shows, and its outline: the silhouette. Explore says the label once each time a finger rests inside it on no part.
+   */
+  subject?: {
+    label: string;
+    /**
+     * @minItems 3
+     * @maxItems 200
+     */
+    polygon_mm: [[number, number], [number, number], [number, number], ...[number, number][]];
+  };
+  /**
+   * Parts that are lines, such as a sulcus or a border: never raised as areas and never touchable. Explore says a line's label when the finger crosses from one region it separates into the other.
+   */
+  lines?: {
+    id: string;
+    label: string;
+    /**
+     * The touchable regions on either side, each by its part's main region id
+     *
+     * @minItems 2
+     * @maxItems 2
+     */
+    separates?: [string, string];
+    /**
+     * The labels of the two parts it separates, for the teacher
+     *
+     * @minItems 2
+     * @maxItems 2
+     */
+    between?: [string, string];
+    /**
+     * The region the line lies in, when it separates no two touchable regions
+     */
+    parent?: string | null;
+  }[];
+  /**
+   * Touchable regions drawn as one unbroken shape, which the teacher may merge under the suggested name.
+   */
+  merge_proposals?: {
+    name: string;
+    /**
+     * @minItems 2
+     */
+    region_ids: [string, string, ...string[]];
+    why: string;
   }[];
   /**
    * Listed parts with no shape to touch: no prompt point survived, SAM gave no mask, or S3 dropped the part.

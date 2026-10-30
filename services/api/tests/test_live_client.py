@@ -15,7 +15,7 @@ from app.config import load_tactile_rules
 from app.meta.cost import CostMeter
 from app.meta.live import Ledger, LiveCaller
 from app.meta.live_client import LiveMetaClient, merge_located
-from app.meta.types import Understanding
+from app.meta.types import SheetContext, Understanding
 from app.pipeline import s1_understand, s2_ground
 from app.prompts import load_prompt
 from tests.test_s2_bakeoff import chat
@@ -41,12 +41,14 @@ LISTING = {
     "verdict_reason": "ok",
 }
 LOCATED = {
+    "subject": " boxes ",
     "parts": [
         {
             "part": "left box",
             "kind": "area",
             "members": [],
             "parent": "boxes",
+            "separates": [],
             "instances": [
                 {"where": "main", "points": [{"x": 150, "y": 500}, {"x": 300, "y": 500}]}
             ],
@@ -54,13 +56,24 @@ LOCATED = {
         {
             "part": "boxes",
             "kind": "group",
-            "members": ["left box", "right box"],
+            "members": ["left box", "right box", "a part not listed"],
             "parent": "",
+            "separates": [],
             "instances": [],
         },
-        {"part": "a part not listed", "kind": "area", "members": [], "parent": "", "instances": []},
-    ]
+        {
+            "part": "a part not listed",
+            "kind": "area",
+            "members": [],
+            "parent": "",
+            "separates": [],
+            "instances": [],
+        },
+    ],
+    "shares_region": [],
 }
+SHEET = SheetContext(reader=" in grades 6 to 8", width_mm=165.1, height_mm=99.06,
+                     min_part_mm=6.4, gap_mm=3.2)  # fmt: skip
 
 
 def box_mask(x0: int, x1: int) -> tuple[int, int, int, int, Any]:
@@ -105,16 +118,21 @@ def client(tmp_path: Path, seen: list[dict[str, Any]]) -> tuple[LiveMetaClient, 
 def test_s1_lists_then_locates_and_merges_by_exact_name(tmp_path: Path) -> None:
     seen: list[dict[str, Any]] = []
     live, _, _ = client(tmp_path, seen)
-    u = asyncio.run(live.understand(IMAGE, "f" * 64, S1, LOCATE))
+    u = asyncio.run(live.understand(IMAGE, "f" * 64, S1, LOCATE, SHEET))
     assert [b["response_format"]["json_schema"]["name"] for b in seen] == [
         "FigureUnderstanding",
         "PartPoints",
     ]
     assert all(b["reasoning_effort"] == "medium" for b in seen)
     text = seen[1]["messages"][0]["content"][0]["text"]
-    assert text.startswith("The image is a science figure. Its parts are: ")
+    assert text.startswith(
+        "The image is a science figure that will become a raised-line tactile graphic for a "
+        "blind student in grades 6 to 8. It will print 165 mm wide and 99 mm tall. On the "
+        "sheet, a part a fingertip can explore is at least 6.4 mm across, and raised outlines "
+        "are at least 3.2 mm apart."
+    )
     assert '"left box" (printed label "left"); "right box"; "boxes".' in text
-    assert u.located
+    assert u.located and u.subject == "boxes" and u.shares_region == []
     left, right, group = u.parts
     assert (left.kind, left.parent, len(left.instances[0].points)) == ("area", "boxes", 2)
     assert right.kind is None and right.instances == ()  # not in the answer: the teacher's
@@ -144,9 +162,60 @@ def test_each_job_counts_its_own_calls_and_shares_the_meter_and_ledger(tmp_path:
     seen: list[dict[str, Any]] = []
     live, ledger, meter = client(tmp_path, seen)
     first = live.for_job()
-    asyncio.run(first.understand(IMAGE, "f" * 64, S1, LOCATE))
+    asyncio.run(first.understand(IMAGE, "f" * 64, S1, LOCATE, SHEET))
     second = live.for_job()
     assert isinstance(first, LiveMetaClient) and isinstance(second, LiveMetaClient)
     assert (first.calls, second.calls) == (2, 0)
     assert second.meter is meter and meter.spent_usd > 0
     assert len(ledger.path.read_text().splitlines()) == 2
+
+
+PLAN_LISTING = Understanding.model_validate(
+    LISTING
+    | {
+        "parts": [
+            {"phrase": p, "print_label": p}
+            for p in ("frontal lobe", "central sulcus", "parietal lobe", "pons", "medulla", "gyrus")
+        ]
+    }
+)
+
+
+def item(part: str, kind: str, **kw: Any) -> dict[str, Any]:
+    point = [{"where": "main", "points": [{"x": 10, "y": 10}]}]
+    return {"part": part, "kind": kind, "members": [], "parent": "", "separates": [],
+            "instances": point} | kw  # fmt: skip
+
+
+def test_the_plan_keeps_lines_without_points_and_checks_names_against_the_listing() -> None:
+    answer = {
+        "subject": "brain",
+        "parts": [
+            item("frontal lobe", "area"),
+            item("central sulcus", "line", separates=["frontal lobe", "parietal lobe"]),
+            item("parietal lobe", "area", parent="parietal lobe"),  # its own parent: dropped
+            item("pons", "area"),
+            item("medulla", "line", separates=["pons", "nowhere"], parent="pons"),
+            item("gyrus", "area", parent="frontal lobe", separates=["pons", "medulla"]),
+        ],
+        "shares_region": [
+            {"parts": ["pons", "medulla", "nowhere"], "name": "brainstem"},  # medulla: a line
+            {"parts": ["pons", "frontal lobe", "pons"], "name": ""},
+        ],
+    }
+    u = merge_located(PLAN_LISTING, answer)
+    by = {p.phrase: p for p in u.parts}
+    sulcus = by["central sulcus"]
+    assert (sulcus.kind, sulcus.separates, sulcus.instances) == (
+        "line",
+        ("frontal lobe", "parietal lobe"),
+        (),
+    )
+    assert by["parietal lobe"].parent == ""
+    medulla = by["medulla"]  # separates an area that is not listed: a line under its parent
+    assert (medulla.separates, medulla.parent, medulla.instances) == ((), "pons", ())
+    gyrus = by["gyrus"]  # an area separates nothing
+    assert (gyrus.parent, gyrus.separates, len(gyrus.instances)) == ("frontal lobe", (), 1)
+    assert u.subject == "brain"
+    assert [(s.parts, s.name) for s in u.shares_region] == [
+        (("pons", "frontal lobe"), "pons and frontal lobe")]  # fmt: skip

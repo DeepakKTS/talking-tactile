@@ -14,7 +14,7 @@ from app.meta.cost import CostMeter
 from app.meta.live import Ledger, LiveCaller, live_enabled
 from app.meta.mock import MockMetaClient
 from app.meta.record import Recorder
-from app.meta.types import Understanding
+from app.meta.types import SheetContext, Understanding
 from app.models.image import RGB
 from app.models.mask import BoolImage, Mask
 from app.prompts import Prompt
@@ -70,13 +70,17 @@ class MetaClient(Protocol):
         ...
 
     async def understand(
-        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt, sheet: SheetContext
     ) -> Understanding:
-        """S1: Muse Spark reads the figure. Live, a second call locates each part."""
+        """S1: Muse Spark reads the figure. Live, a second call plans each part for touch
+        on this sheet and locates it."""
         ...
 
-    async def segment(self, image: RGB, figure_id: str, phrase: str, prompt: Prompt) -> list[Mask]:
-        """SAM finds every instance of one phrase. Zero matches gives an empty list."""
+    async def segment(
+        self, image: RGB, figure_id: str, phrase: str, prompt: Prompt, what: str = ""
+    ) -> list[Mask]:
+        """SAM finds every instance of one phrase. Zero matches gives an empty list. what
+        names the call in the ledger and the recording, as s2_subject for the silhouette."""
         ...
 
     async def segment_points(

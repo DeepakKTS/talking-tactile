@@ -16,3 +16,7 @@ eval/**/*.mp4
 eval/**/*.mov
 eval/**/*.webm
 eval/s2-bakeoff/*/img/
+
+# Figures that are not openly licensed, and their live recordings: kept local
+fixtures/recorded/private_*
+fixtures/private/

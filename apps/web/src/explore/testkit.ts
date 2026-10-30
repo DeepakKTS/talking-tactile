@@ -15,9 +15,11 @@ export const square = (x: number, y: number, s: number): Pt[] => [
 
 export function sheet(
   regions: { id: string; poly: Pt[]; label?: string; texture?: string; centroid?: Pt }[],
+  plan: Pick<RegionsFile, "lines" | "subject" | "merge_proposals"> = {},
 ): RegionsFile {
   return parseRegions({
-    schema_version: 2,
+    ...plan,
+    schema_version: 3,
     figure_id: "test",
     title: "Test",
     figure_type: "labeled_diagram",
