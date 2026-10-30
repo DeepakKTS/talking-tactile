@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 230, updated 2026-10-30T21:49:00.706Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 232, updated 2026-10-30T21:55:10.710Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -221,6 +221,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Full eval live twice on published version 4: (a) ask_answer.v1 with the image (task 5's run, qa2) and (b) ask_answer_text.v1 with no image sent (qa3, recorded, not replayed). Heart: (a) source 30/32, citations 28/32; (b) 31/32, 30/32. Brain: both 29/29 and 28/29. No outside words in either. Spark heart p50/p95 (a) 3314/5288 ms, (b) 2409/4286; brain (a) 2923/4688, (b) 2374/3824. Scores not equal ((b) better on the heart; misses differ: (b) h01 answered from the right atrium's description; (b) right on h20 and h60, deflects h30), so by the rule (a) stays; the no-image prompt and the Asker image option stay for the experiment only. Release to first spoken word for (a), version 4, 250 ms post-roll included, 12 holds, headless with a fake microphone: p50 4510 ms, p95 5935; transcribe 974/1244, Spark 3052/4441, network and server code 15/23, device 8/10 (encode 3/5). eval/qa/VOICE.md.
 - [x] d5-31 Picture questions decide the image: 6 per figure, both variants live
   - Note: Added h62-h67 and b68-b73 (category image) with expectations from the version 4 sheet (right ventricle biggest heart part by area, 820 mm2; frontal lobe biggest lobe, 1765 against parietal 1551; aortic arch top, inferior vena cava bottom; cerebellum and brainstem bottom; neighbors from regions.json). qa_eval --only CATEGORY. Live, recorded qa4 (image) and qa5 (no image), not replayed. With image: heart source 5/6, citations 5/6 (h63 'Which part is the biggest?' deflected), brain 6/6, 6/6; Spark p50 6.4 s heart, 5.3 s brain on these. Without: heart 3/6, brain 3/6 (shape and size questions deflected). Outside-word flags with the image are words the picture supplies (curved, long, rounded); h67 said 'looks larger than the left atrium in this picture', sight wording RULES.md 2.4 forbids. Image kept.
+- [x] d5-32 README Privacy: the billing page's free-credit notice restored beside the docs
+  - Note: README quotes the billing page at dev.meta.ai on 2026-10-27, verbatim: 'While using free credits your content may be used for product improvement', with a 'Stop using free credits' link (Deepak's screenshot), beside the docs quotes; says the docs read on Oct 30 do not mention it or explain how it interacts with Standard models; the teacher's steps now include stopping free credits or confirming with Meta; the retention question stays open. Replaces the Oct 30 withdrawal of the free-credit claim, which had relied on the docs alone.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

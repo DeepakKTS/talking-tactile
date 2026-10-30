@@ -45,11 +45,13 @@ What Meta's docs say (read on Oct 30, 2026 at dev.meta.ai; RULES.md 1.4):
 - Coding harness subscriptions (Muse Code) are Contributor by default "regardless of which
   Meta Model you select"; Standard there needs "the applicable setting in your Account"
   (Terms, section 3.3).
-- Credits: the docs read do not say that free or promotional credits change how request
-  content is used; the mode does. The Terms mention promotional credits (section 13.3) and
-  leave use "through promotional credits" out of Meta's indemnity for the Standard Services
-  (section 17.2). An earlier version of this section said that on free credits Meta may use
-  request content for product improvement; the docs read on Oct 30 do not say that.
+- Credits, from the Model API dashboard rather than the docs: on 2026-10-27 the billing page at
+  dev.meta.ai showed, verbatim, "While using free credits your content may be used for product
+  improvement", with a "Stop using free credits" link (screenshot taken by Deepak, the project
+  owner). The docs pages read on Oct 30 do not mention this, and do not explain how it
+  interacts with Standard models, whose content "is not used to train Meta models". The Terms
+  mention promotional credits (section 13.3) and leave use "through promotional credits" out of
+  Meta's indemnity for the Standard Services (section 17.2), and say no more about them.
 - Retention: the pricing page mentions zero data retention ("priced at parity with Standard
   mode" for Muse Voice Transcribe); the pages read do not say how to get it.
 
@@ -62,6 +64,10 @@ What the teacher or school must do before a class uses it:
 - Run it with an API key on the Model API, not through a Muse Code or other coding harness
   subscription, or set that account to Standard (Terms, section 3.3).
 - Keep the models in `config/tactile_rules.yaml` as they are.
+- Stop using free credits before a class uses it (the "Stop using free credits" link on the
+  billing page), or confirm with Meta that content sent on free credits to Standard models is
+  not used for product improvement. Until one of these is done, assume a student's question may
+  be used, as the billing page says.
 - Read Meta's terms for retention and promotional credits themselves, or ask Meta: the pages
   above do not settle how long request content is kept, or how to get zero data retention.
 
