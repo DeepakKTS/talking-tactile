@@ -13,7 +13,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Merge proposals: 1. brachiocephalic artery, left common carotid artery, left subclavian artery, aorta as 'aortic arch' (Spark marked them as one unbroken shape)
 - Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 803939 px; in regions.json: True, 3 raised contour piece(s).
-- Rules report: 1 violation(s). Replayed calls: None.
+- Rules report: 1 violation(s). Replayed calls: 21.
 
 15 parts, no mask 1, needs teacher 1, regressions 0 of 4 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 2, overlapping pairs 0 before resolution and 0 after. Points 25: on text 0, on lines 0, on ink 0.
 
@@ -28,16 +28,16 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: mature flower. Grade band: none.
 - Listed 16: areas 13, lines 0, groups 3, not located 0.
-- Touchable areas: 6 of 13. Touchable parts in regions.json: 6.
-- Needs you: 7. ovules (same_outline: same outline as ovary; a drawn line or color edge lies between them); stigma (spill: holds points of ovary, ovules, style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses); style (spill: holds points of ovary, ovules; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses); ovary (spill: holds points of style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses); floral axis (no_mask: SAM's mask holds none of the part's points); connective (same_outline: same outline as anther; a drawn line or color edge lies between them); filament (same_outline: same outline as petal; a drawn line or color edge lies between them)
+- Touchable areas: 7 of 13. Touchable parts in regions.json: 7.
+- Needs you: 6. ovules (same_outline: same outline as ovary; a drawn line or color edge lies between them); style (spill: holds points of ovary, ovules after a retry); ovary (spill: holds points of style after a retry); floral axis (no_mask: SAM's mask holds none of the part's points); connective (same_outline: same outline as anther; a drawn line or color edge lies between them); filament (same_outline: same outline as petal; a drawn line or color edge lies between them)
 - Lines: none.
 - Nested by geometry: microsporangium in anther.
 - Merge proposals: 1. floral axis, pedicel as 'flower base' (Spark marked them as one unbroken shape)
 - Left out of a merge Spark marked: nectary (not merged with floral axis: a drawn line or color edge lies between them).
-- Silhouette: SAM 2 instance(s), 148899 px; in regions.json: True, 2 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: None.
+- Silhouette: SAM 2 instance(s), 148899 px; in regions.json: True, 1 raised contour piece(s).
+- Rules report: 0 violation(s). Replayed calls: 20.
 
-16 parts, no mask 10, needs teacher 7, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.
+16 parts, no mask 9, needs teacher 6, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.
 
 | Reference part | Listed now as | Matched by | v2f IoU | IoU now | Verdict |
 |---|---|---|---|---|---|
@@ -58,7 +58,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Merge proposals: 0.
 - Left out of a merge Spark marked: none.
 - Silhouette: SAM 0 instance(s), 0 px; in regions.json: False, 0 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: None.
+- Rules report: 0 violation(s). Replayed calls: 12.
 
 9 parts, no mask 0, needs teacher 0, regressions 0 of 0 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 0, overlapping pairs 0 before resolution and 0 after. Points 19: on text 0, on lines 0, on ink 0.
 
@@ -83,7 +83,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Merge proposals: 1. pons, medulla, spinal cord as 'brainstem' (Spark marked them as one unbroken shape)
 - Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 1042167 px; in regions.json: True, 0 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: None.
+- Rules report: 0 violation(s). Replayed calls: 13.
 
 ## brain_lobes
 
@@ -96,7 +96,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Merge proposals: 0.
 - Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 1035244 px; in regions.json: True, 1 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: None.
+- Rules report: 0 violation(s). Replayed calls: 8.
 
 ## First-mask pairs, for NEST_INSIDE
 

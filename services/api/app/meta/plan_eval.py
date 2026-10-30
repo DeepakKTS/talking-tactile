@@ -6,6 +6,8 @@ recordings: no live call, nothing spent.
 Each figure was run live once through the pipeline (META_RECORD=plan_NAME, or private_brain
 for the uploaded brain, which is not openly licensed). Heart and flower ran S2 live a second
 time (plan2_NAME) once NEST_INSIDE moved to 0.95, which changed two retries' negatives.
+The flower's stigma, style and ovary retries, asked for once drawn boundaries stopped them
+sharing a region, were sent live on their own (plan3_flower, Oct 30).
 Here the whole pipeline runs again in mock mode on those recordings, so any change to S2
 to S5 is measured on the same answers.
 A request the recordings do not hold (a retry the live run did not make) fails like a
@@ -56,7 +58,12 @@ V2F = REPO_ROOT / "eval" / "s2-bakeoff" / "scores_v2f.json"
 _EVAL = FIXTURES_DIR / "eval"
 FIGURES: dict[str, tuple[Path, list[str], GradeBand | None, bool]] = {
     "heart": (FIXTURES_DIR / "heart.png", ["plan_heart_s1_", "plan2_heart_"], None, True),
-    "flower": (_EVAL / "flower.png", ["plan_flower_s1_", "plan2_flower_"], None, True),
+    "flower": (
+        _EVAL / "flower.png",
+        ["plan_flower_s1_", "plan2_flower_", "plan3_flower_"],
+        None,
+        True,
+    ),
     "japan_regions": (_EVAL / "japan_regions.png", ["plan_japan_"], None, True),
     "brain_upload": (
         FIXTURES_DIR / "private" / "brain_upload.png",

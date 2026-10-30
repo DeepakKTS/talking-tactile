@@ -318,7 +318,7 @@
     "boundary": "none"
    }
   ],
-  "live_calls": null,
+  "live_calls": 21,
   "score": {
    "counts": {
     "parts": 15,
@@ -426,6 +426,7 @@
    }
   ],
   "touchable_areas": [
+   "stigma",
    "petal",
    "sepal",
    "nectary",
@@ -440,19 +441,14 @@
     "detail": "same outline as ovary; a drawn line or color edge lies between them"
    },
    {
-    "part": "stigma",
-    "reason": "spill",
-    "detail": "holds points of ovary, ovules, style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
-   },
-   {
     "part": "style",
     "reason": "spill",
-    "detail": "holds points of ovary, ovules; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
+    "detail": "holds points of ovary, ovules after a retry"
    },
    {
     "part": "ovary",
     "reason": "spill",
-    "detail": "holds points of style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
+    "detail": "holds points of style after a retry"
    },
    {
     "part": "floral axis",
@@ -495,14 +491,14 @@
    "px": 148899
   },
   "regions_json": {
-   "touchable": 6,
+   "touchable": 7,
    "lines": [],
    "merge_proposals": 0,
    "subject_drawn": true,
    "needs_teacher": 1
   },
   "contour_pieces": {
-   "pieces": 2
+   "pieces": 1
   },
   "rules_report": 0,
   "pairs": [
@@ -791,12 +787,12 @@
     "boundary": "a drawn line or color edge lies between them"
    }
   ],
-  "live_calls": null,
+  "live_calls": 20,
   "score": {
    "counts": {
     "parts": 16,
-    "no_mask": 10,
-    "needs_teacher": 7,
+    "no_mask": 9,
+    "needs_teacher": 6,
     "regression": 3,
     "references": 3,
     "speck": 0,
@@ -811,7 +807,7 @@
     "points_on_line": 0,
     "points_on_ink": 0
    },
-   "summary": "16 parts, no mask 10, needs teacher 7, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
+   "summary": "16 parts, no mask 9, needs teacher 6, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
    "references": [
     {
      "part": "ovary",
@@ -821,7 +817,7 @@
      "match": "name",
      "verdict": "still regressed",
      "flags": [
-      "needs teacher: spill, holds points of style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses",
+      "needs teacher: spill, holds points of style after a retry",
       "regression: IoU 0.0 with the passing Arm B mask"
      ]
     },
@@ -927,7 +923,7 @@
   "rules_report": 0,
   "pairs": [],
   "boundaries": [],
-  "live_calls": null,
+  "live_calls": 12,
   "score": {
    "counts": {
     "parts": 9,
@@ -1291,7 +1287,7 @@
     "boundary": "none"
    }
   ],
-  "live_calls": null
+  "live_calls": 13
  },
  {
   "figure": "brain_lobes",
@@ -1345,6 +1341,6 @@
   "rules_report": 0,
   "pairs": [],
   "boundaries": [],
-  "live_calls": null
+  "live_calls": 8
  }
 ]

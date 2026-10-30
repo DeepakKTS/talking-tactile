@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 179, updated 2026-10-30T17:37:16.247Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 181, updated 2026-10-30T17:48:24.916Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -179,6 +179,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Published into the dev data dir (data/, what make dev serves) through Author in headless Chrome on a mock-mode API answering from the live recordings: no network, no spend. A repeated upload returns the figure's existing job unless it failed, so the heart's two done jobs from before the plan's merge proposals were marked failed (error_code superseded) in the git-ignored dev database first (backed up). Heart: one press of 'Merge brachiocephalic artery, left common carotid artery, left subclavian artery and aorta as aortic arch' (3 merges and a rename), rules pass, published version 1, schema 3: 11 touchable parts, septum a suggestion, 4 lines, subject heart, no proposal left. Commons brain (fixtures/recorded/replays.json now indexes it; grade band 6_8 as recorded): no rule failure, published version 1, schema 3: 5 touchable, olfactory bulb in needs_teacher (no points), subject brain. Explore loads both versions (ready, intro names the one untouchable part), no page errors.
 - [x] d5-10 Job identity includes the pipeline version: a re-upload after a pipeline change is a new job from the cached stages (this phase)
   - Note: Runner.pipeline_version(options); jobs.pipeline (db schema 3, migrated from 2 in place: tables, rows and publications kept; checked on a copy of the dev database: 2 publications kept, old jobs pipeline None). FigureService.submit and JobStore.find_live match on it; edit runs record it. Tests: an upload after a code change is a new job with S0 to S2 cached, S3 to S5 run, no Meta call, and a third upload returns that job; a version 2 database migrates and its jobs are not reused. No hand edit to the dev database.
+- [x] d5-11 Flower: the 3 unrecorded SAM retries live (this phase)
+  - Note: Phase A captured the exact requests S2 sends for the flower with no recording (mock run, nothing sent): stigma, style and ovary retries. Phase B sent only those live under caffeinate -i, META_RECORD=plan3_flower: 3 SAM calls, $0.0075. plan_eval replays them with the rest. Flower: 7 of 13 areas touchable (was 6; stigma cleared by its retry), rule violations 0; still needs you: style and ovary spill after their retries, ovules, connective, filament same outline, floral axis no mask. Reference verdicts unchanged (all 5 still below 0.8). Heart, Japan, both brains unchanged.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
