@@ -12,7 +12,7 @@ import pytest
 from jsonschema import Draft202012Validator
 from PIL import Image
 from pypdf import PdfReader
-from shapely.geometry import Point
+from shapely.geometry import Point, box
 from shapely.ops import unary_union
 
 from app.braille.cells import cell_dots
@@ -23,7 +23,13 @@ from app.models.regions import RegionsFile, check_references
 from app.paths import REGIONS_SCHEMA
 from app.render.pdf import render_pdf
 from app.render.regions_json import FigureInfo, build_regions_file
-from app.render.svg import NS, render_key_svgs, render_sheet_svg, texture_geometry
+from app.render.svg import (
+    NS,
+    _texture_parts,
+    render_key_svgs,
+    render_sheet_svg,
+    texture_geometry,
+)
 
 RULES = load_tactile_rules()
 EXPLORE = load_explore()
@@ -188,3 +194,11 @@ def test_print_scale_measured_at_300_dpi(svg: str, composed: ComposedSheet, tmp_
     ys, xs = np.nonzero(patch)
     assert xs.min() / px_per_mm == pytest.approx(inset - RULES.render.guide_line_mm / 2, abs=0.2)
     assert ys.min() / px_per_mm == pytest.approx(inset - RULES.render.guide_line_mm / 2, abs=0.2)
+
+
+@pytest.mark.parametrize("texture", ["lines", "grid", "cross", "dots"])
+def test_a_region_thinner_than_a_texture_line_gets_no_texture(texture: str) -> None:
+    """Found live on the heart, Oct 30: a clipped region thinner than one texture line left
+    an empty area whose centre was NaN, and S5 failed."""
+    lines, dots, solid = _texture_parts(box(0, 0, 40, 0.3), texture, RULES)  # type: ignore[arg-type]
+    assert (lines, dots, solid) == ([], [], None)

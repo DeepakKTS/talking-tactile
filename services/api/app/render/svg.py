@@ -167,6 +167,8 @@ def _texture_parts(
     if texture == "dots":
         return [], _pattern_dots(clip, r.texture_spacing_mm, r.texture_dot_mm / 2), None
     inner = clip.buffer(-r.texture_line_mm / 2)
+    if inner.is_empty:  # thinner than one texture line: no line fits, as with dots
+        return [], [], None
     lines = _pattern_lines(inner, texture, r.texture_spacing_mm, r.texture_min_piece_mm)
     return lines, [], None
 
