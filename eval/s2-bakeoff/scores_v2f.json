@@ -1,0 +1,2046 @@
+{
+ "rules": {
+  "regression_iou": 0.8,
+  "speck_mm2": 2.0,
+  "point_symbol_mm2": 32.2,
+  "on_marks_share": 0.1,
+  "confident": 0.7,
+  "overlap": 0.2,
+  "page": "letter"
+ },
+ "figures": {
+  "flower": {
+   "figure": "flower",
+   "mm_per_px": 0.08062,
+   "speck_floor_px": 307.7,
+   "point_symbol_px": 4950.1,
+   "parts": [
+    {
+     "part": "ovules",
+     "kind": "area",
+     "confidence": 0.9296875,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 2,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "style",
+      "ovary"
+     ],
+     "points": [
+      {
+       "xy": [
+        161,
+        308
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        161,
+        364
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        245,
+        383
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1005,
+        658
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1005,
+        697
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1005,
+        732
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of ovary, style; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of ovary, style; after a retry",
+      "overlapped before resolution style, ovary"
+     ]
+    },
+    {
+     "part": "pistil group",
+     "kind": "group",
+     "confidence": null,
+     "area_px": 89807,
+     "area_mm2": 583.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 2,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "stigma",
+     "kind": "area",
+     "confidence": 0.5859375,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "style"
+     ],
+     "points": [
+      {
+       "xy": [
+        1083,
+        415
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of style; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of style; after a retry",
+      "overlapped before resolution style"
+     ]
+    },
+    {
+     "part": "style",
+     "kind": "thin",
+     "confidence": 0.43359375,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "stigma",
+      "ovary"
+     ],
+     "points": [
+      {
+       "xy": [
+        1051,
+        500
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1040,
+        579
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of ovary, ovules, stigma; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of ovary, ovules, stigma; after a retry",
+      "overlapped before resolution ovules, stigma, ovary"
+     ]
+    },
+    {
+     "part": "ovary",
+     "kind": "area",
+     "confidence": 0.8359375,
+     "area_px": 89807,
+     "area_mm2": 583.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 2,
+     "instances": 2,
+     "reference": {
+      "arm": "B",
+      "iou": 0.245,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [
+      "ovules",
+      "style"
+     ],
+     "points": [
+      {
+       "xy": [
+        950,
+        694
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1060,
+        694
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        94,
+        272
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        270,
+        453
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "regression: IoU 0.245 with the passing Arm B mask",
+      "overlapped before resolution ovules, style"
+     ]
+    },
+    {
+     "part": "petal",
+     "kind": "area",
+     "confidence": 0.7734375,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "floral axis",
+      "filament stalk"
+     ],
+     "points": [
+      {
+       "xy": [
+        747,
+        461
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1044,
+        354
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1371,
+        583
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of filament stalk; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of filament stalk; after a retry",
+      "overlapped before resolution floral axis, filament stalk"
+     ]
+    },
+    {
+     "part": "sepal",
+     "kind": "area",
+     "confidence": 0.5078125,
+     "area_px": 3375,
+     "area_mm2": 21.9,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.021,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        866,
+        743
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1125,
+        811
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "under a point symbol's area"
+     ]
+    },
+    {
+     "part": "perianth group",
+     "kind": "group",
+     "confidence": null,
+     "area_px": 3375,
+     "area_mm2": 21.9,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.021,
+     "fragments": 1,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [],
+     "teacher": null,
+     "flags": [
+      "under a point symbol's area"
+     ]
+    },
+    {
+     "part": "nectary",
+     "kind": "area",
+     "confidence": 0.5546875,
+     "area_px": 2246,
+     "area_mm2": 14.6,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.001,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        897,
+        869
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "under a point symbol's area"
+     ]
+    },
+    {
+     "part": "floral axis",
+     "kind": "area",
+     "confidence": 0.63671875,
+     "area_px": 4824,
+     "area_mm2": 31.4,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "petal",
+      "filament stalk"
+     ],
+     "points": [
+      {
+       "xy": [
+        991,
+        837
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "under a point symbol's area",
+      "overlapped before resolution petal, filament stalk"
+     ]
+    },
+    {
+     "part": "pedicel",
+     "kind": "area",
+     "confidence": 0.73828125,
+     "area_px": 20654,
+     "area_mm2": 134.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.002,
+     "line_share": 0.003,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        913,
+        981
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        909,
+        1041
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "connective",
+     "kind": "area",
+     "confidence": 0.55078125,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 0,
+     "reference": {
+      "arm": "B",
+      "iou": 0.0,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1750,
+        619
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "no mask",
+     "flags": [
+      "needs teacher: no mask",
+      "regression: IoU 0.0 with the passing Arm B mask"
+     ]
+    },
+    {
+     "part": "pollen sac",
+     "kind": "area",
+     "confidence": 0.44140625,
+     "area_px": 8018,
+     "area_mm2": 52.1,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.008,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "B",
+      "iou": 0.476,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [
+      "anther"
+     ],
+     "points": [
+      {
+       "xy": [
+        1188,
+        513
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1701,
+        711
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1739,
+        690
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1765,
+        696
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "regression: IoU 0.476 with the passing Arm B mask",
+      "overlapped before resolution anther"
+     ]
+    },
+    {
+     "part": "anther",
+     "kind": "area",
+     "confidence": 0.82421875,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 3,
+     "reference": {
+      "arm": "B",
+      "iou": 0.0,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [
+      "pollen sac",
+      "filament stalk"
+     ],
+     "points": [
+      {
+       "xy": [
+        923,
+        435
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1171,
+        502
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1656,
+        631
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of filament stalk; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of filament stalk; after a retry",
+      "regression: IoU 0.0 with the passing Arm B mask",
+      "overlapped before resolution pollen sac, filament stalk"
+     ]
+    },
+    {
+     "part": "filament stalk",
+     "kind": "thin",
+     "confidence": 0.5234375,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 3,
+     "reference": {
+      "arm": "A",
+      "iou": 0.0,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [
+      "petal",
+      "floral axis",
+      "anther"
+     ],
+     "points": [
+      {
+       "xy": [
+        890,
+        595
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        865,
+        664
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1143,
+        660
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1116,
+        768
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1547,
+        833
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1526,
+        909
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of sepal; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of sepal; after a retry",
+      "regression: IoU 0.0 with the passing Arm A mask",
+      "overlapped before resolution petal, floral axis, anther"
+     ]
+    },
+    {
+     "part": "stamen group",
+     "kind": "group",
+     "confidence": null,
+     "area_px": 8018,
+     "area_mm2": 52.1,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.008,
+     "fragments": 1,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [],
+     "teacher": null,
+     "flags": []
+    }
+   ],
+   "pairs": [],
+   "pairs_before": [
+    {
+     "parts": [
+      "ovules",
+      "style"
+     ],
+     "overlap_px": 13795,
+     "of_smaller": 0.611
+    },
+    {
+     "parts": [
+      "ovules",
+      "ovary"
+     ],
+     "overlap_px": 86536,
+     "of_smaller": 0.962
+    },
+    {
+     "parts": [
+      "stigma",
+      "style"
+     ],
+     "overlap_px": 6263,
+     "of_smaller": 0.952
+    },
+    {
+     "parts": [
+      "style",
+      "ovary"
+     ],
+     "overlap_px": 13868,
+     "of_smaller": 0.614
+    },
+    {
+     "parts": [
+      "petal",
+      "floral axis"
+     ],
+     "overlap_px": 1121,
+     "of_smaller": 0.232
+    },
+    {
+     "parts": [
+      "petal",
+      "filament stalk"
+     ],
+     "overlap_px": 37724,
+     "of_smaller": 0.614
+    },
+    {
+     "parts": [
+      "floral axis",
+      "filament stalk"
+     ],
+     "overlap_px": 1302,
+     "of_smaller": 0.27
+    },
+    {
+     "parts": [
+      "pollen sac",
+      "anther"
+     ],
+     "overlap_px": 7027,
+     "of_smaller": 0.876
+    },
+    {
+     "parts": [
+      "anther",
+      "filament stalk"
+     ],
+     "overlap_px": 10280,
+     "of_smaller": 0.209
+    }
+   ],
+   "counts": {
+    "parts": 16,
+    "no_mask": 7,
+    "needs_teacher": 7,
+    "regression": 5,
+    "references": 5,
+    "speck": 0,
+    "under_point_symbol": 4,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 0,
+    "overlap_pairs": 0,
+    "overlap_pairs_before": 9,
+    "points": 36,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   }
+  },
+  "heart": {
+   "figure": "heart",
+   "mm_per_px": 0.08062,
+   "speck_floor_px": 307.7,
+   "point_symbol_px": 4950.1,
+   "parts": [
+    {
+     "part": "brachiocephalic artery",
+     "kind": "area",
+     "confidence": 0.87890625,
+     "area_px": 9404,
+     "area_mm2": 61.1,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.002,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "aorta"
+     ],
+     "points": [
+      {
+       "xy": [
+        968,
+        245
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "overlapped before resolution aorta"
+     ]
+    },
+    {
+     "part": "superior vena cava",
+     "kind": "area",
+     "confidence": 0.859375,
+     "area_px": 37643,
+     "area_mm2": 244.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        843,
+        556
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "right pulmonary arteries",
+     "kind": "area",
+     "confidence": 0.828125,
+     "area_px": 6678,
+     "area_mm2": 43.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.032,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.952,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        747,
+        531
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        722,
+        580
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "right pulmonary veins",
+     "kind": "area",
+     "confidence": 0.82421875,
+     "area_px": 8548,
+     "area_mm2": 55.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.023,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        708,
+        650
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        691,
+        728
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "right atrium",
+     "kind": "area",
+     "confidence": 0.78125,
+     "area_px": 49196,
+     "area_mm2": 319.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.985,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        870,
+        846
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "tricuspid valve",
+     "kind": "area",
+     "confidence": 0.58203125,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        880,
+        1010
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "no mask",
+     "flags": [
+      "needs teacher: no mask"
+     ]
+    },
+    {
+     "part": "chordae tendineae",
+     "kind": "thin",
+     "confidence": 0.3671875,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 2,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "semilunar valves",
+      "mitral valve",
+      "left ventricle"
+     ],
+     "points": [
+      {
+       "xy": [
+        1054,
+        1080
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1116,
+        1144
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1370,
+        999
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1396,
+        1128
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of left ventricle, mitral valve, semilunar valves; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of left ventricle, mitral valve, semilunar valves; after a retry",
+      "overlapped before resolution semilunar valves, mitral valve, left ventricle"
+     ]
+    },
+    {
+     "part": "right ventricle",
+     "kind": "area",
+     "confidence": 0.2041015625,
+     "area_px": 42345,
+     "area_mm2": 275.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.016,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        942,
+        1136
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1105,
+        1192
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "inferior vena cava",
+     "kind": "area",
+     "confidence": 0.72265625,
+     "area_px": 17045,
+     "area_mm2": 110.8,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.008,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        905,
+        1326
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "left common carotid artery",
+     "kind": "area",
+     "confidence": 0.58984375,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 0,
+     "reference": {
+      "arm": "A",
+      "iou": 0.0,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1128,
+        209
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "no mask",
+     "flags": [
+      "needs teacher: no mask",
+      "regression: IoU 0.0 with the passing Arm A mask"
+     ]
+    },
+    {
+     "part": "left subclavian artery",
+     "kind": "area",
+     "confidence": 0.65625,
+     "area_px": 1536,
+     "area_mm2": 10.0,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.093,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "aorta"
+     ],
+     "points": [
+      {
+       "xy": [
+        1206,
+        226
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "under a point symbol's area",
+      "overlapped before resolution aorta"
+     ]
+    },
+    {
+     "part": "aorta",
+     "kind": "area",
+     "confidence": 0.92578125,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 2,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "brachiocephalic artery",
+      "left subclavian artery"
+     ],
+     "points": [
+      {
+       "xy": [
+        1116,
+        459
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1259,
+        1491
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of brachiocephalic artery; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of brachiocephalic artery; after a retry",
+      "overlapped before resolution brachiocephalic artery, left subclavian artery"
+     ]
+    },
+    {
+     "part": "left pulmonary arteries",
+     "kind": "area",
+     "confidence": 0.90234375,
+     "area_px": 50395,
+     "area_mm2": 327.5,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.002,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.972,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1208,
+        596
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1351,
+        499
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1351,
+        564
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "left pulmonary veins",
+     "kind": "area",
+     "confidence": 0.84375,
+     "area_px": 6697,
+     "area_mm2": 43.5,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.008,
+     "fragments": 2,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1400,
+        652
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1449,
+        702
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "2 fragments"
+     ]
+    },
+    {
+     "part": "left atrium",
+     "kind": "area",
+     "confidence": 0.62109375,
+     "area_px": 16172,
+     "area_mm2": 105.1,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.004,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1351,
+        765
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "semilunar valves",
+     "kind": "thin",
+     "confidence": 0.796875,
+     "area_px": 40339,
+     "area_mm2": 262.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.007,
+     "fragments": 2,
+     "instances": 2,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "chordae tendineae"
+     ],
+     "points": [
+      {
+       "xy": [
+        1218,
+        820
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1284,
+        867
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "overlapped before resolution chordae tendineae"
+     ]
+    },
+    {
+     "part": "mitral valve",
+     "kind": "thin",
+     "confidence": 0.333984375,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "chordae tendineae",
+      "left ventricle"
+     ],
+     "points": [
+      {
+       "xy": [
+        1353,
+        917
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1409,
+        939
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of left ventricle; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of left ventricle; after a retry",
+      "overlapped before resolution chordae tendineae, left ventricle"
+     ]
+    },
+    {
+     "part": "left ventricle",
+     "kind": "area",
+     "confidence": 0.515625,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [
+      "chordae tendineae",
+      "mitral valve"
+     ],
+     "points": [
+      {
+       "xy": [
+        1429,
+        1047
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1388,
+        1209
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": "spill, holds points of chordae tendineae, mitral valve; after a retry",
+     "flags": [
+      "needs teacher: spill, holds points of chordae tendineae, mitral valve; after a retry",
+      "overlapped before resolution chordae tendineae, mitral valve"
+     ]
+    },
+    {
+     "part": "septum",
+     "kind": "area",
+     "confidence": 0.29296875,
+     "area_px": 95608,
+     "area_mm2": 621.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.003,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1251,
+        1091
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1302,
+        1244
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    }
+   ],
+   "pairs": [],
+   "pairs_before": [
+    {
+     "parts": [
+      "brachiocephalic artery",
+      "aorta"
+     ],
+     "overlap_px": 6768,
+     "of_smaller": 0.72
+    },
+    {
+     "parts": [
+      "chordae tendineae",
+      "semilunar valves"
+     ],
+     "overlap_px": 16766,
+     "of_smaller": 0.416
+    },
+    {
+     "parts": [
+      "chordae tendineae",
+      "mitral valve"
+     ],
+     "overlap_px": 24154,
+     "of_smaller": 0.507
+    },
+    {
+     "parts": [
+      "chordae tendineae",
+      "left ventricle"
+     ],
+     "overlap_px": 38066,
+     "of_smaller": 0.971
+    },
+    {
+     "parts": [
+      "left subclavian artery",
+      "aorta"
+     ],
+     "overlap_px": 1084,
+     "of_smaller": 0.706
+    },
+    {
+     "parts": [
+      "mitral valve",
+      "left ventricle"
+     ],
+     "overlap_px": 12607,
+     "of_smaller": 0.322
+    }
+   ],
+   "counts": {
+    "parts": 19,
+    "no_mask": 6,
+    "needs_teacher": 6,
+    "regression": 1,
+    "references": 4,
+    "speck": 0,
+    "under_point_symbol": 1,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 1,
+    "overlap_pairs": 0,
+    "overlap_pairs_before": 6,
+    "points": 33,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   }
+  },
+  "japan_regions": {
+   "figure": "japan_regions",
+   "mm_per_px": 0.09193,
+   "speck_floor_px": 236.7,
+   "point_symbol_px": 3806.9,
+   "parts": [
+    {
+     "part": "Hokkaido region",
+     "kind": "area",
+     "confidence": 0.9609375,
+     "area_px": 73197,
+     "area_mm2": 618.5,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.986,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1364,
+        348
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1329,
+        450
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Tohoku region",
+     "kind": "area",
+     "confidence": 0.87890625,
+     "area_px": 60632,
+     "area_mm2": 512.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1253,
+        768
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1170,
+        941
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Kanto region",
+     "kind": "area",
+     "confidence": 0.8984375,
+     "area_px": 28539,
+     "area_mm2": 241.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.981,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1147,
+        1101
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1126,
+        1179
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Chubu region",
+     "kind": "area",
+     "confidence": 0.80859375,
+     "area_px": 58062,
+     "area_mm2": 490.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.958,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        934,
+        1200
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1038,
+        1024
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Kansai region",
+     "kind": "area",
+     "confidence": 0.71484375,
+     "area_px": 20225,
+     "area_mm2": 170.9,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.041,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "B",
+      "iou": 0.612,
+      "regression": true
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        738,
+        1247
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        790,
+        1368
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": [
+      "regression: IoU 0.612 with the passing Arm B mask"
+     ]
+    },
+    {
+     "part": "Chugoku region",
+     "kind": "area",
+     "confidence": 0.8828125,
+     "area_px": 27859,
+     "area_mm2": 235.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.971,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        519,
+        1271
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        626,
+        1229
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Shikoku region",
+     "kind": "area",
+     "confidence": 0.92578125,
+     "area_px": 17439,
+     "area_mm2": 147.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.982,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        577,
+        1385
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        661,
+        1362
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Kyushu region",
+     "kind": "area",
+     "confidence": 0.921875,
+     "area_px": 34785,
+     "area_mm2": 294.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.986,
+      "regression": false
+     },
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        377,
+        1431
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        348,
+        1574
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    },
+    {
+     "part": "Okinawa inset region",
+     "kind": "area",
+     "confidence": 0.75390625,
+     "area_px": 345681,
+     "area_mm2": 2921.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.06,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "overlaps_before": [],
+     "points": [
+      {
+       "xy": [
+        1253,
+        1892
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "teacher": null,
+     "flags": []
+    }
+   ],
+   "pairs": [],
+   "pairs_before": [],
+   "counts": {
+    "parts": 9,
+    "no_mask": 0,
+    "needs_teacher": 0,
+    "regression": 1,
+    "references": 7,
+    "speck": 0,
+    "under_point_symbol": 0,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 0,
+    "overlap_pairs": 0,
+    "overlap_pairs_before": 0,
+    "points": 17,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   }
+  }
+ }
+}
