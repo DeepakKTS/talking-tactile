@@ -11,6 +11,7 @@ import httpx
 import numpy as np
 import numpy.typing as npt
 from meta_sam_parser._mask_codec import _encode_raster
+from PIL import Image
 
 from app.config import load_tactile_rules
 from app.geometry.print_marks import PrintMarks
@@ -271,8 +272,18 @@ def fixes_caller(tmp_path: Path, sent: list[str], answers: dict[str, httpx.Respo
     )
 
 
+def filled_figure(tmp_path: Path) -> bake.Figure:
+    """The two outlined boxes with filled insides, so they are figure and not page."""
+    img = small_figure(tmp_path).image.copy()
+    img[12:98, 12:88] = (200, 200, 60)
+    img[12:98, 112:188] = (60, 160, 200)
+    path = tmp_path / "filled.png"
+    Image.fromarray(img).save(path)
+    return bake.load_figure("filled", path)
+
+
 def fixes_run(tmp_path: Path, answers: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
-    fig = small_figure(tmp_path)
+    fig = filled_figure(tmp_path)
     parts = [{"phrase": p, "print_label": ""} for p in ("left box", "right box")]
     sent: list[str] = []
     run = v2.ArmAv2(fixes_caller(tmp_path, sent, answers), fig, parts, {}, False, fixes=True)
@@ -341,7 +352,7 @@ def test_equal_masks_split_by_the_nearer_prompt_point() -> None:
 
 def test_a_spill_after_the_retry_goes_to_the_teacher_untouchable(tmp_path: Path) -> None:
     both, less, right = (sam_answer([box_mask(*b)]) for b in ((12, 188), (12, 170), (112, 188)))
-    fig = small_figure(tmp_path)
+    fig = filled_figure(tmp_path)
     parts = [{"phrase": p, "print_label": ""} for p in ("left box", "right box")]
     answers = {"left": both, "left retry": less, "right": right}
     run = v2.ArmAv2(fixes_caller(tmp_path, [], answers), fig, parts, {}, False, fixes=True)
@@ -379,3 +390,22 @@ def test_oversize_masks_are_spill() -> None:
     wide = np.zeros((100, 100), bool)
     wide[35:, :50] = True  # 65% of the object, holding r's point only
     assert run.oversize(rows["q"], wide, rows, sent) is None  # an area part with no parent
+
+
+def test_a_point_on_the_background_is_dropped_and_its_part_goes_to_the_teacher(
+    tmp_path: Path,
+) -> None:
+    fig = small_figure(tmp_path)  # white insides: every point there is page, not figure
+    parts = [{"phrase": p, "print_label": ""} for p in ("left box", "right box")]
+    sent: list[str] = []
+    answers = {"left": sam_answer([box_mask(12, 88)]), "right": sam_answer([box_mask(112, 188)])}
+    run = v2.ArmAv2(fixes_caller(tmp_path, sent, answers), fig, parts, {}, False, fixes=True)
+    rows = {r["part"]: r for r in asyncio.run(run.run())["rows"]}
+    assert sent == ["spark"] and run.final == {}
+    for row in rows.values():
+        assert row["instances"][0]["points"][0]["on"] == ["background"]
+        assert row["flags"][0].endswith("dropped: on the background")
+        assert "needs teacher: no points" in row["flags"]
+        assert "needs teacher: no mask" not in row["flags"]
+    plain = v2.ArmAv2(fixes_caller(tmp_path, [], answers), fig, parts, {}, False)
+    assert asyncio.run(plain.run())["calls"] == 3  # v2 sends them, as it did live

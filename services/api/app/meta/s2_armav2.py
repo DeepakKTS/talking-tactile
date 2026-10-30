@@ -32,6 +32,8 @@ how they appear on the sheet is decided later.
 v2f, with --fixes (recordings armav2f_*, files results_v2f.json and v2f.html):
 - Point clearance: a point must sit CLEARANCE_PX from any text, leader line or ink pixel,
   not just off it; else the guard moves or drops it as above.
+- Background: a point off the figure (s2_grading.object_mask, the scorer's object area) is
+  dropped, never moved. A part left with no points is flagged "needs teacher: no points".
 - Empty-mask rule: a part whose mask ends empty stays in the results, flagged "needs
   teacher". A failed SAM call is flagged the same way instead of stopping the run.
 - Spill retry: after every part's first call, a mask holding another part's prompt point
@@ -177,6 +179,7 @@ class Scene:
     marks: print_marks.PrintMarks
     obj: Mask
     clearance: int = 0
+    reject_background: bool = False  # v2f: a point off the figure is dropped, never moved
     near: Mask = field(init=False)  # on a mark, or closer to one than clearance
     clean: Mask = field(init=False)
 
@@ -193,8 +196,12 @@ class Scene:
         return [k for k, a in (("text", m.text), ("line", m.line), ("ink", m.ink)) if a[y, x]]
 
 
-def scene_of(image: npt.NDArray[np.uint8], clearance: int = 0) -> Scene:
-    return Scene(image, print_marks.find(image), grading.object_mask(image), clearance)
+def scene_of(
+    image: npt.NDArray[np.uint8], clearance: int = 0, reject_background: bool = False
+) -> Scene:
+    return Scene(
+        image, print_marks.find(image), grading.object_mask(image), clearance, reject_background
+    )
 
 
 def fill_delta() -> float:
@@ -228,6 +235,14 @@ def guard(scene: Scene, p: Point, fill: npt.NDArray[np.float64] | None) -> dict[
     """A point as sent: kept if no mark is under it or within the scene's clearance, else
     moved to the nearest clean pixel of the fill color within GUARD_PX, else dropped."""
     x, y = p
+    if scene.reject_background and not scene.obj[y, x]:
+        return {
+            "px": list(p),
+            "on": ["background"],
+            "sent": None,
+            "moved_px": None,
+            "dropped": True,
+        }
     on = scene.on(p) or (["near a mark"] if scene.near[y, x] else [])
     if not on:
         return {"px": list(p), "on": [], "sent": list(p), "moved_px": 0.0, "dropped": False}
@@ -246,7 +261,11 @@ def guard(scene: Scene, p: Point, fill: npt.NDArray[np.float64] | None) -> dict[
 
 
 def guard_instance(scene: Scene, points: list[Point]) -> list[dict[str, Any]]:
-    clean = [p for p in points if not scene.near[p[1], p[0]]]
+    clean = (
+        [p for p in points if scene.clean[p[1], p[0]]]
+        if scene.reject_background
+        else [p for p in points if not scene.near[p[1], p[0]]]
+    )
     fill = (
         np.asarray(np.median([scene.image[y, x].astype(int) for x, y in clean], axis=0), float)
         if clean
@@ -313,6 +332,8 @@ def contest(
 
 
 def where_on(on: list[str]) -> str:
+    if on == ["background"]:
+        return "on the background"
     marks = [m for m in on if m != "near a mark"]
     return "on " + " and ".join(marks) if marks else "near a mark"
 
@@ -394,7 +415,7 @@ class ArmAv2:
         self.record = record
         self.fixes = fixes  # v2f: point clearance, the empty-mask rule and the spill retry
         self.models = load_tactile_rules().meta.models
-        self.scene = scene_of(fig.image, CLEARANCE_PX if fixes else 0)
+        self.scene = scene_of(fig.image, CLEARANCE_PX if fixes else 0, reject_background=fixes)
         self.floor = bake.floor_px(fig)
         self.final: dict[str, Mask] = {}
         self.kept: dict[str, Mask] = {}  # before contested pixels are resolved
@@ -532,7 +553,9 @@ class ArmAv2:
         part = row["part"]
         insts = self.sent_instances(row)
         if not insts:
-            row["flags"].append("no point left to send")
+            row["flags"].append(
+                "needs teacher: no points" if self.fixes else "no point left to send"
+            )
             return None
         negs = negatives(part, sent[part], sent, self.v1.get(part))
         row["negatives"] = negs
@@ -673,7 +696,8 @@ class ArmAv2:
             row["final_px"] = int(final[part].sum()) if part in final else 0
             if row["kind"] == "thin":
                 row["flags"].append("thin: kept for the record, sheet use decided later")
-            if not row["final_px"] and part not in self.suggested:
+            no_points = "needs teacher: no points" in row["flags"]
+            if not row["final_px"] and part not in self.suggested and not no_points:
                 row["flags"].append("needs teacher: no mask" if self.fixes else "no mask")
         return final
 

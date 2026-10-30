@@ -315,7 +315,10 @@ def teacher(flags: list[str]) -> str | None:
     for f in flags:
         if f.startswith("spill: "):
             return "spill, " + f.removeprefix("spill: ")
-    return "no mask" if "needs teacher: no mask" in flags else None
+    for reason in ("no points", "no mask"):
+        if f"needs teacher: {reason}" in flags:
+            return reason
+    return None
 
 
 def v2_run(
