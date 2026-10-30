@@ -8,11 +8,24 @@ from pathlib import Path
 from app.config import Reconcile
 from app.geometry.reconcile import Dropped, Reconciled, ReconciledPart, reconcile
 from app.geometry.scale import PageFit
+from app.meta.types import Understanding
 from app.models.mask import Mask
 from app.pipeline.cache import load_mask, save_mask
 from app.pipeline.s2_ground import Grounded
 
 _FILE = "reconciled.json"
+
+
+def without_groups(g: Grounded, u: Understanding) -> Grounded:
+    """S2's output less any part S1 planned as a group: a group is never drawn, and never
+    needs the teacher (Oct 30). S2 output cached before then holds group masks."""
+    groups = {p.phrase for p in u.parts if p.kind == "group"}
+    if not groups:
+        return g
+    parts = [m for m in g.parts if m.label not in groups]
+    teacher = [t for t in g.teacher if t.phrase not in groups]
+    nested = {c: q for c, q in g.nested.items() if c not in groups and q not in groups}
+    return g.model_copy(update={"parts": parts, "teacher": teacher, "nested": nested})
 
 
 def reconcile_masks(g: Grounded, fit: PageFit, rules: Reconcile) -> Reconciled:

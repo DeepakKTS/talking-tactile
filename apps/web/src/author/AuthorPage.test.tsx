@@ -220,6 +220,20 @@ describe("author page", () => {
     expect(texts).toContain(`${b.label} Smaller than a point symbol, so the sheet shows it as one.`);
   });
 
+  it("lists each group with its members for the teacher's information, never as a part", async () => {
+    const [a, b, c] = server.regions.regions;
+    if (!a || !b || !c) throw new Error("the fixture has regions");
+    Object.assign(a, { group: "stamen" });
+    Object.assign(b, { group: "stamen" });
+    await upload();
+    const info = within(screen.getByRole("list", { name: "For your information" })).getAllByRole("listitem");
+    expect(info.map((li) => li.textContent)).toContain(
+      `stamen A group of ${a.label} and ${b.label}. Not raised; Explore says it with each of them.`,
+    );
+    const parts = within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem");
+    expect(parts.some((li) => li.textContent.includes("stamen"))).toBe(false);
+  });
+
   it("fixes an outline by clicks, shows the spill warning, and accepts the points as an edit", async () => {
     server.regions.needs_teacher = [{ id: "n1", label: "septum", reason: "no_mask", detail: "SAM's mask holds none of the part's points" }];
     await upload();

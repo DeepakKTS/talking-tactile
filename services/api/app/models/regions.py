@@ -118,6 +118,7 @@ class Region(ContractModel):
     centroid_mm: PointMm | None = None
     texture: StrictStr | None = None
     parent: StrictStr | None = None
+    group: StrictStr | None = None  # the group it is a member of, said with its label
     neighbors: list[Neighbor] | None = None
     source: RegionSource
     confidence: Annotated[StrictFloat, Field(ge=_CONFIDENCE_MIN, le=_CONFIDENCE_MAX)] | None = None

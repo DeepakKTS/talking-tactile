@@ -36,7 +36,8 @@ def sheet_plan(
     before: Sequence[ReconciledPart],
     parts: Sequence[ReconciledPart],
 ) -> SheetPlan:
-    """S1's lines and S2's merge proposals on the parts as edited, and the silhouette."""
+    """S1's lines, groups and S2's merge proposals on the parts as edited, and the
+    silhouette."""
     ids = plan.part_ids([p.phrase for p in u.parts], before, parts)
     labels = {p.id: p.mask.label for p in parts}
     merges = [(m.parts, m.name, m.why) for m in g.merges]
@@ -45,6 +46,7 @@ def sheet_plan(
         silhouette=g.silhouette,
         lines=plan.sheet_lines(u, ids, labels),
         merges=plan.sheet_merges(merges, ids),
+        groups=plan.sheet_groups(u, ids),
     )
 
 
@@ -134,6 +136,7 @@ def load(src: Path) -> ComposedSheet:
         lines=[SheetLine.model_validate(x) for x in s.get("lines", [])],
         merges=[SheetMerge.model_validate(x) for x in s.get("merges", [])],
         subject=s.get("subject", ""),
+        groups=s.get("groups", {}),
         silhouette=_polygon(s.get("silhouette_wkb")),
         contour=[_line(x) for x in s.get("contour_wkb", [])],
     )

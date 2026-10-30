@@ -57,6 +57,10 @@ export interface TalkingTactileRegionsFile {
     texture?: string;
     parent?: string | null;
     /**
+     * The group S1 planned this region as a member of, such as the stamen for an anther. A group is never a region and never drawn; Explore says it after the label: 'anther, part of the stamen'. Added within version 3 on Oct 30: optional, and readers of version 3 ignore unknown properties.
+     */
+    group?: string;
+    /**
      * Computed in code. Direction is from this region to the neighbor.
      */
     neighbors?: {

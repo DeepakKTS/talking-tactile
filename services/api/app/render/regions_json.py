@@ -89,6 +89,7 @@ def build_regions_file(
             "abbrev": abbrev.get(r.id),
             "texture": r.texture,
             "description": descriptions.get(r.group_key),
+            "group": sheet.groups.get(r.group_key),
         }
         regions.append(
             Region(

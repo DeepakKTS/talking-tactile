@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 171,
- "updated_at": "2026-10-30T17:01:18.980Z",
+ "rev": 174,
+ "updated_at": "2026-10-30T17:16:35.936Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1316,6 +1316,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "s2"
    ],
    "changed_at": "2026-10-30T17:01:18.980Z"
+  },
+  {
+   "id": "d5-8",
+   "day": 5,
+   "title": "Groups are not drawn: members drawn as themselves, spoken with their group",
+   "detail": "",
+   "timebox": "this phase",
+   "fallback": "",
+   "status": "done",
+   "note": "S2 no longer unites group masks; runner._grounded drops groups for S3 and S5 (s3_reconcile.without_groups), S3's key holds S1. plan.sheet_groups maps each member's part id to the group that lists it; regions.json region.group (optional, within v3, PLAN.md note; golden fixture has one). Explore: dwell, 'what is here', guidance arrival and a line crossing say 'anther, part of the stamen'. Author: For your information lists 'stamen A group of anther and filament'. Flower rule violations, replay of the live recordings: 2 before, 0 after (all from the perianth group); with last phase's S2 (no boundary evidence) 31 before, 7 after, none from a group (style pieces, connective and microsporangium, anther pieces, two point symbols). Flower: pistil no longer needs the teacher. Heart, Japan, both brains unchanged. Tests: S2, plan, render, contract (Python and Ajv), Explore session, Author; plan_e2e, fix_e2e, explore_e2e pass.",
+   "done_at": "2026-10-30T17:16:35.936Z",
+   "tags": [
+    "pipeline",
+    "explore"
+   ],
+   "changed_at": "2026-10-30T17:16:35.936Z"
   },
   {
    "id": "d6-1",
@@ -2272,6 +2288,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "With IoU 0.8 or more and a drawn boundary, the smaller part needs the teacher ('same outline as' the larger), its mask an untouchable suggestion with Fix outline; its points are no spill for the larger.",
    "why": "A split by the nearer point invents a line where SAM gave both parts one outline. On the uploaded brain it sends parietal lobe (same outline as postcentral gyrus) and pons (same outline as cerebellum) to the teacher; the larger keeps an outline that also covers the smaller's drawn region, which the teacher sees only in the preview.",
    "changed_at": "2026-10-30T17:01:18.943Z"
+  },
+  {
+   "id": "dec-mvv8i3zpjqo4",
+   "date": "2026-10-30",
+   "title": "Groups are spoken with their members, never drawn",
+   "decision": "S2 makes no group mask, S3 and S5 drop any a cached S2 output holds, and no member nests in a group. Each member's region carries its group's name (optional region.group, added within regions.json v3); Explore says 'anther, part of the stamen'; Author lists the group with its members under For your information.",
+   "why": "A group's mask was the union of its members, so S3 nested the members in it and S4's gap enforcement left them partly outside: on the flower every remaining rule violation after the boundary change came from that (sepal in perianth). With groups not drawn the flower has 0 violations (2 before); on the S2 of the last phase it has 7 (31 before), none from a group. region.group is additive: v3 readers ignore unknown properties, so no version bump, and the heart and Commons brain can be republished on v3.",
+   "changed_at": "2026-10-30T17:16:35.898Z"
   }
  ],
  "risks": [
@@ -2362,6 +2386,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T17:16:35.936Z",
+   "kind": "claude",
+   "text": "Task d5-8 \"Groups are not drawn: members drawn as themselves, spoken with their group\" is now done. Note: S2 no longer unites group masks; runner._grounded drops groups for S3 and S5 (s3_reconcile.without_groups), S3's key holds S1. plan.sheet_groups maps each member's part id to the group that lists it; regions.json region.group (optional, within v3, PLAN.md note; golden fixture has one). Explore: dwell, 'what is here', guidance arrival and a line crossing say 'anther, part of the stamen'. Author: For your information lists 'stamen A group of anther and filament'. Flower rule violations, replay of the live recordings: 2 before, 0 after (all from the perianth group); with last phase's S2 (no boundary evidence) 31 before, 7 after, none from a group (style pieces, connective and microsporangium, anther pieces, two point symbols). Flower: pistil no longer needs the teacher. Heart, Japan, both brains unchanged. Tests: S2, plan, render, contract (Python and Ajv), Explore session, Author; plan_e2e, fix_e2e, explore_e2e pass."
+  },
+  {
+   "ts": "2026-10-30T17:16:35.898Z",
+   "kind": "claude",
+   "text": "Decision: Groups are spoken with their members, never drawn."
+  },
+  {
+   "ts": "2026-10-30T17:16:35.856Z",
+   "kind": "claude",
+   "text": "Task d5-8 \"Groups are not drawn: members drawn as themselves, spoken with their group\" added to day 5."
+  },
   {
    "ts": "2026-10-30T17:01:18.980Z",
    "kind": "claude",

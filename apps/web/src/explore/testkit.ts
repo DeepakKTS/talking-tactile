@@ -14,7 +14,7 @@ export const square = (x: number, y: number, s: number): Pt[] => [
 ];
 
 export function sheet(
-  regions: { id: string; poly: Pt[]; label?: string; texture?: string; centroid?: Pt }[],
+  regions: { id: string; poly: Pt[]; label?: string; texture?: string; centroid?: Pt; group?: string }[],
   plan: Pick<RegionsFile, "lines" | "subject" | "merge_proposals"> = {},
 ): RegionsFile {
   return parseRegions({
@@ -35,6 +35,7 @@ export function sheet(
       touchable: true,
       ...(r.texture ? { texture: r.texture } : {}),
       ...(r.centroid ? { centroid_mm: r.centroid } : {}),
+      ...(r.group ? { group: r.group } : {}),
     })),
   });
 }

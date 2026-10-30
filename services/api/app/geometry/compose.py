@@ -63,6 +63,7 @@ def build_sheet(  # noqa: PLR0913  keyword-only inputs, each from S4
         lines=plan.lines,
         merges=plan.merges,
         subject=plan.subject,
+        groups=plan.groups,
     )
     translations = translate_for_sheet(sheet, translator, rules.braille)
     braille = place_braille(sheet, translations, rules)

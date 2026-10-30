@@ -318,7 +318,7 @@
     "boundary": "none"
    }
   ],
-  "live_calls": 19,
+  "live_calls": null,
   "score": {
    "counts": {
     "parts": 15,
@@ -440,11 +440,6 @@
     "detail": "same outline as ovary; a drawn line or color edge lies between them"
    },
    {
-    "part": "pistil",
-    "reason": "no_mask",
-    "detail": "no member of the group has a mask"
-   },
-   {
     "part": "stigma",
     "reason": "spill",
     "detail": "holds points of ovary, ovules, style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
@@ -504,12 +499,12 @@
    "lines": [],
    "merge_proposals": 0,
    "subject_drawn": true,
-   "needs_teacher": 4
+   "needs_teacher": 1
   },
   "contour_pieces": {
    "pieces": 2
   },
-  "rules_report": 2,
+  "rules_report": 0,
   "pairs": [
    {
     "part": "microsporangium",
@@ -796,12 +791,12 @@
     "boundary": "a drawn line or color edge lies between them"
    }
   ],
-  "live_calls": 18,
+  "live_calls": null,
   "score": {
    "counts": {
     "parts": 16,
-    "no_mask": 8,
-    "needs_teacher": 8,
+    "no_mask": 10,
+    "needs_teacher": 7,
     "regression": 3,
     "references": 3,
     "speck": 0,
@@ -816,7 +811,7 @@
     "points_on_line": 0,
     "points_on_ink": 0
    },
-   "summary": "16 parts, no mask 8, needs teacher 8, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
+   "summary": "16 parts, no mask 10, needs teacher 7, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
    "references": [
     {
      "part": "ovary",
@@ -932,7 +927,7 @@
   "rules_report": 0,
   "pairs": [],
   "boundaries": [],
-  "live_calls": 10,
+  "live_calls": null,
   "score": {
    "counts": {
     "parts": 9,
@@ -1296,7 +1291,7 @@
     "boundary": "none"
    }
   ],
-  "live_calls": 11
+  "live_calls": null
  },
  {
   "figure": "brain_lobes",
@@ -1350,6 +1345,6 @@
   "rules_report": 0,
   "pairs": [],
   "boundaries": [],
-  "live_calls": 6
+  "live_calls": null
  }
 ]

@@ -1,11 +1,14 @@
-"""S1's plan for touch on the laid-out sheet: line parts, merge proposals and the subject's
-silhouette. Pure functions, no I/O.
+"""S1's plan for touch on the laid-out sheet: line parts, groups, merge proposals and the
+subject's silhouette. Pure functions, no I/O.
 
 - Names to parts: S1 and S2 name parts by phrase. A phrase maps to the reconciled part S3
   made from it, by S3's part ids, so a teacher's rename keeps the mapping; after a merge, to
   the part that took it in. A part with no region on the sheet maps to nothing.
 - A line separates two parts when both map to two different parts on the sheet; otherwise
   it keeps its parent's part, if that is on the sheet. Its labels for the teacher stay.
+- A group is never drawn (Oct 30). Each member on the sheet carries the name of the group
+  that lists it, the first in S1's order, and Explore says it with the member's label. A
+  member that is itself a group passes the name to nothing: its own members carry its name.
 - The silhouette is the outer contour of the subject, raised as a line but never textured
   and never touchable. Its line is drawn outline_width_mm wide on the contour, and only
   where every part outline is at least min_gap_mm away from the line's edge, and braille at
@@ -42,6 +45,7 @@ class SheetPlan(BaseModel):
     silhouette: BoolImage | None = None
     lines: list[SheetLine] = []
     merges: list[SheetMerge] = []
+    groups: dict[str, str] = {}  # part id -> the name of the group it is a member of
 
 
 def part_ids(
@@ -62,6 +66,17 @@ def part_ids(
         took = [p.id for p in after if phrase in p.merged]
         if took:
             out[phrase] = took[0]
+    return out
+
+
+def sheet_groups(u: Understanding, ids: Mapping[str, str]) -> dict[str, str]:
+    """Part id -> the name of S1's group that lists it. ids maps phrases to part ids."""
+    out: dict[str, str] = {}
+    for g in (q for q in u.parts if q.kind == "group"):
+        for m in g.members:
+            pid = ids.get(m)
+            if pid is not None:
+                out.setdefault(pid, g.phrase)
     return out
 
 

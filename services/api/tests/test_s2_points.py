@@ -229,14 +229,15 @@ def test_a_mask_without_the_parts_point_leaves_it_to_the_teacher() -> None:
     assert teacher(g)["left"] == ("no_mask", "SAM's mask holds none of the part's points")
 
 
-def test_a_group_is_the_union_of_its_members_with_no_call() -> None:
+def test_a_group_gets_no_call_no_mask_and_never_needs_the_teacher() -> None:
+    """A group is never drawn: its members are drawn as themselves (Oct 30)."""
     sam = FakeSam({("left", False): [box(12, 88)], ("right", False): [box(112, 188)]})
     u = understanding(
         part("left", 150), part("right", 750), part("both", 0, "group", members=["left", "right"])
     )
     g = ground(sam, u)
-    both = next(m for m in g.parts if m.label == "both")
-    assert int(both.data.sum()) == 2 * 76 * 86 and len(sam.calls) == 2
+    assert [m.label for m in g.parts] == ["left", "right"] and len(sam.calls) == 2
+    assert g.teacher == [] and "both" not in g.flags
 
 
 def test_sam_calls_run_at_most_sam_concurrency_at_a_time() -> None:

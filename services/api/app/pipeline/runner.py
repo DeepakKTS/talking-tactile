@@ -71,7 +71,7 @@ STAGES = ("s0", "s1", "s2", "s3", "s4", "s5")
 _CONSUMES: dict[str, tuple[str, ...]] = {
     "s1": ("s0",),
     "s2": ("s0", "s1"),
-    "s3": ("s0", "s2"),
+    "s3": ("s0", "s1", "s2"),  # S1 for the groups, which are never drawn
     "s4": ("s0", "s1", "s2", "s3"),  # S2 for the silhouette and the merge proposals
     "s5": ("s0", "s1", "s2", "s3", "s4"),  # S2 and S3 for the parts left to the teacher
 }
@@ -491,8 +491,8 @@ class Runner:
     async def _grounded(
         self, walk: _Walk, edits: Sequence[Edit], client: MetaClient | None
     ) -> Grounded:
-        """S2's output with the teacher's outlines in place."""
-        g: Grounded = await walk.value("s2")
+        """S2's output with the teacher's outlines in place, less S1's groups."""
+        g = s3_reconcile.without_groups(await walk.value("s2"), await walk.value("s1"))
         outlined = []
         for e in outlines(edits):
             pos = [(x, y) for x, y in e.positive]

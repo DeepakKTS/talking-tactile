@@ -150,3 +150,49 @@ def test_regions_json_names_only_touchable_regions() -> None:
     both = plan_fields(s, {"r1", "r2"}, 2)
     assert both["lines"][0].separates == ["r1", "r2"]
     assert both["merge_proposals"][0].region_ids == ["r1", "r2"]
+
+
+def group(name: str, members: list[str]) -> PartPhrase:
+    return PartPhrase(phrase=name, print_label=name, kind="group", members=tuple(members))
+
+
+def area(name: str) -> PartPhrase:
+    return PartPhrase(phrase=name, print_label=name, kind="area")
+
+
+def test_each_member_on_the_sheet_carries_the_name_of_the_group_that_lists_it() -> None:
+    """The flower: anther and filament in the stamen, the stamen and the petal in the
+    flower. A member that is a group passes its name to its own members only."""
+    u = understanding(
+        group("stamen", ["anther", "filament"]),
+        group("flower", ["stamen", "petal"]),
+        area("anther"),
+        area("filament"),
+        area("petal"),
+        area("sepal"),
+    )
+    ids = {"anther": "r1", "filament": "r2", "petal": "r3", "sepal": "r4"}
+    assert plan.sheet_groups(u, ids) == {"r1": "stamen", "r2": "stamen", "r3": "flower"}
+
+
+def test_s3_never_gets_a_group_even_from_s2_output_cached_with_one() -> None:
+    """S2 output cached before Oct 30 holds the group's union mask, a teacher entry when no
+    member had one, and members nested in it: none of them reaches S3 or the teacher."""
+    from app.pipeline.s2_types import Grounded, TeacherPart  # noqa: PLC0415
+    from app.pipeline.s3_reconcile import without_groups  # noqa: PLC0415
+
+    def m(label: str) -> Mask:
+        return Mask(data=np.ones((2, 2), bool), label=label, score=0.9, source="sam")
+
+    g = Grounded(
+        parts=[m("anther"), m("filament"), m("stamen")],
+        text=[],
+        teacher=[TeacherPart(phrase="pistil", reason="no_mask", detail="no member")],
+        nested={"anther": "stamen", "microsporangium": "anther"},
+    )
+    u = understanding(
+        group("stamen", ["anther", "filament"]), group("pistil", ["ovary"]), area("anther")
+    )
+    out = without_groups(g, u)
+    assert [x.label for x in out.parts] == ["anther", "filament"] and out.teacher == []
+    assert out.nested == {"microsporangium": "anther"}

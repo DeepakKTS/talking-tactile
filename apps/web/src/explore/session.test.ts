@@ -271,3 +271,21 @@ describe("lines and the subject in speech", () => {
     expect(audio.said()[0]).not.toContain("not touchable");
   });
 });
+
+describe("groups in speech", () => {
+  const file = sheet([
+    { id: "r1", poly: square(50, 50, 40), label: "anther", group: "stamen" },
+    { id: "r2", poly: square(100, 50, 40), label: "petal" },
+  ]);
+
+  it("says a member with its group, on dwell and on 'what is here', and a part in no group alone", () => {
+    const audio = new FakeAudio();
+    const session = new ExploreSession(file, EXPLORE, { audio, metrics: new Metrics(), ask: () => Promise.resolve("") });
+    let t = 0;
+    for (const [p, ms] of [[[70, 70], 1500], [[120, 70], 1500]] as const) {
+      for (const end = t + ms; t < end; t += FRAME) session.finger({ p: [p[0], p[1]], t, receivedAt: performance.now() });
+      if (p[0] === 70) session.here();
+    }
+    expect(audio.said()).toEqual(["Anther, part of the stamen", "Anther, part of the stamen", "Petal"]);
+  });
+});

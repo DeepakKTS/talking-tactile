@@ -202,3 +202,13 @@ def test_a_region_thinner_than_a_texture_line_gets_no_texture(texture: str) -> N
     an empty area whose centre was NaN, and S5 failed."""
     lines, dots, solid = _texture_parts(box(0, 0, 40, 0.3), texture, RULES)  # type: ignore[arg-type]
     assert (lines, dots, solid) == ([], [], None)
+
+
+def test_regions_json_names_each_members_group(composed: ComposedSheet) -> None:
+    first = composed.sheet.regions[0]
+    sheet = composed.sheet.model_copy(update={"groups": {first.group_key: "stamen"}})
+    out = build_regions_file(sheet, composed.braille, INFO, RULES)
+    named = {r.id: r.group for r in out.regions}
+    assert named[first.id] == "stamen"
+    assert all(g is None for rid, g in named.items() if rid.partition("_")[0] != first.group_key)
+    assert out.to_json_obj()["regions"][0]["group"] == "stamen"

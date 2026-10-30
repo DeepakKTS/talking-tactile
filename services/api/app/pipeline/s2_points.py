@@ -28,7 +28,8 @@ For each part S1 located:
 6. Contested pixels to the smallest mask, ties to the nearer point, and a nested child
    stays inside its parent's outline.
    Pixels won and lost are recorded per part.
-7. A group's mask is the union of its members'. A part left with no mask needs the teacher.
+7. A group gets no mask (Oct 30): the sheet draws its members as themselves, and Explore
+   says the group with each member. A part left with no mask needs the teacher.
 
 S2 has no page size, so its speck floor is S3's on a letter page. Print text found in code
 (app/geometry/print_marks.py) is the text mask S3 cuts out of the raised layer."""
@@ -103,7 +104,7 @@ class _Run:
         self.client, self.ing, self.prompt, self.rules = client, ing, prompt, rules
         self.u = u
         self.parts = {p.phrase: p for p in u.parts}
-        self.lines = [p.phrase for p in u.parts if p.kind == "line"]
+        self.untouched = {p.phrase for p in u.parts if p.kind in ("line", "group")}
         self.relations = pm.Relations(nested={}, shared=[], inside={}, iou={})
         self.firsts: dict[str, BoolImage] = {}
         self.scene = gp.scene_of(ing.image, float(rules.layout.color_group_max_delta))
@@ -327,23 +328,10 @@ class _Run:
         }
         return found
 
-    def unite_groups(self, final: dict[str, BoolImage]) -> None:
-        groups = {q for q, p in self.parts.items() if p.kind == "group"}
-        members = {q: p.members for q, p in self.parts.items()}
-        for g in groups:
-            union = np.zeros(self.ing.image.shape[:2], bool)
-            for m in pm.members_of(g, members, groups, {g}):
-                if m in final:
-                    union |= final[m]
-            if union.any():
-                final[g] = union
-            else:
-                self.need_teacher(g, "no_mask", "no member of the group has a mask")
-
     def result(self, final: dict[str, BoolImage], silhouette: BoolImage | None) -> Grounded:
         order = list(self.parts)
         for part in order:
-            if part not in final and part not in self.teacher and part not in self.lines:
+            if part not in final and part not in self.teacher and part not in self.untouched:
                 self.need_teacher(part, "no_mask", "nothing of its mask is left")
         masks = []
         for part, data in final.items():
@@ -380,7 +368,6 @@ class _Run:
                 "won_from": won[part],
                 "respeck_px": respeck[part],
             }
-        self.unite_groups(final)
         return self.result(final, shape)
 
 

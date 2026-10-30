@@ -303,6 +303,16 @@ export function forYourInformation(file: RegionsFile): Note[] {
       : `A line${l.parent ? ` in ${label(l.parent)}` : ""}. Not raised; listed in the key.`;
     out.push({ key: l.id, label: l.label, text });
   }
+  const groups = new Map<string, string[]>();
+  for (const r of file.regions) {
+    if (!r.touchable || !r.group) continue;
+    const members = groups.get(r.group) ?? [];
+    if (!members.includes(r.label)) members.push(r.label);
+    groups.set(r.group, members);
+  }
+  for (const [group, members] of groups) {
+    out.push({ key: `group ${group}`, label: group, text: `A group of ${joined(members)}. Not raised; Explore says it with each of them.` });
+  }
   const seen = new Set<string>();
   for (const r of file.regions) {
     if (!r.touchable || seen.has(partId(r.id))) continue;

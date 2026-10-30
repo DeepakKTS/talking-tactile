@@ -58,6 +58,7 @@
       "centroid_mm": [152.6, 100.1],
       "texture": "lines",
       "parent": null,
+      "group": "vessels",
       "neighbors": [
         { "id": "r1", "direction": "left" },
         { "id": "r4", "direction": "down_left" }

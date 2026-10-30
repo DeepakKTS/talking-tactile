@@ -318,16 +318,3 @@ def resolve(
         respeck[p] = int(mine.sum() - cleaned.sum())
         out[p] = cleaned
     return out, lost, won_from, respeck
-
-
-def members_of(
-    group: str, members: Mapping[str, Sequence[str]], groups: set[str], seen: set[str]
-) -> list[str]:
-    """A group's listed members, with member groups opened up."""
-    out: list[str] = []
-    for m in members.get(group, ()):
-        if m in seen or m not in members:
-            continue
-        seen.add(m)
-        out += members_of(m, members, groups, seen) if m in groups else [m]
-    return out

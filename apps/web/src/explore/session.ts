@@ -77,6 +77,11 @@ const SEES_AGAIN = "The camera can see the sheet again.";
 const RECENT = 2;
 
 const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+// A member of a group S1 planned is said with it: groups are never drawn.
+const named = (r: IndexedRegion) => {
+  const group = r.region.group;
+  return group ? `${r.label}, part of the ${group}` : r.label;
+};
 
 /** "2 parts are not touchable yet: aorta and septum. ", or nothing when all are. */
 export function notTouchableSentence(names: readonly string[]): string {
@@ -159,12 +164,12 @@ export class ExploreSession {
       } else if (e.kind === "exit") {
         audio.exitTick();
       } else if (e.kind === "boundary") {
-        audio.say(`${capital(e.line)}, ${e.region.label}`);
+        audio.say(`${capital(e.line)}, ${named(e.region)}`);
         metrics.frameToBoundaryMs.push(performance.now() - s.receivedAt);
       } else if (e.kind === "subject") {
         audio.say(capital(e.label));
       } else {
-        audio.say(capital(e.region.label));
+        audio.say(capital(named(e.region)));
         metrics.dwellToLabelMs.push(performance.now() - s.receivedAt);
       }
     }
@@ -174,7 +179,7 @@ export class ExploreSession {
         if (!audio.speaking) audio.beep();
       } else {
         audio.chime();
-        audio.say(capital(g.region.label));
+        audio.say(capital(named(g.region)));
       }
     }
   }
@@ -239,7 +244,7 @@ export class ExploreSession {
 
   here(): void {
     const r = this.touch.region;
-    this.deps.audio.say(r ? capital(r.label) : "Not on a part.");
+    this.deps.audio.say(r ? capital(named(r)) : "Not on a part.");
   }
 
   /** The part's description, or, with none, its neighbors in words, from code. */

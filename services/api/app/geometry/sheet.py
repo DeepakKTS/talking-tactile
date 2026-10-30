@@ -39,5 +39,6 @@ class Sheet(BaseModel):
     lines: list[SheetLine] = []
     merges: list[SheetMerge] = []
     subject: str = ""
+    groups: dict[str, str] = {}  # part id -> its group's name; a group is never drawn
     silhouette: Polygon | None = None  # the subject's outline, for Explore
     contour: list[LineString] = []  # the pieces of it raised on the sheet
