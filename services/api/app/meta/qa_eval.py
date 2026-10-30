@@ -79,7 +79,9 @@ def load_questions(path: Path = QUESTIONS) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text("utf-8").splitlines() if line.strip()]
 
 
-async def run(live: bool, names: list[str], image: bool = True) -> list[dict[str, Any]]:
+async def run(
+    live: bool, names: list[str], image: bool = True, only: str | None = None
+) -> list[dict[str, Any]]:
     rules = load_tactile_rules()
     client = make_client(False, rules.meta) if live else MockMetaClient(rules.meta)
     app = create_app(data_dir=DATA_DIR, client=client)
@@ -96,7 +98,7 @@ async def run(live: bool, names: list[str], image: bool = True) -> list[dict[str
         )
     rows = []
     for q in load_questions():
-        if q["figure"] not in names:
+        if q["figure"] not in names or (only is not None and q["category"] != only):
             continue
         fid = FIGURES[q["figure"]]
         regions, _ = service._published_figure(fid, VERSION)
@@ -213,14 +215,15 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--live", action="store_true", help="live calls (LIVE=1); default: replay")
     ap.add_argument("--no-image", action="store_true", help="no figure image; *_no_image files")
+    ap.add_argument("--only", help="one category only; files named after it")
     ap.add_argument("figures", nargs="*", choices=[[], *FIGURES], help="default: both")
     args = ap.parse_args()
     names = args.figures or list(FIGURES)
     image = not args.no_image
-    rows = asyncio.run(run(args.live, names, image))
+    rows = asyncio.run(run(args.live, names, image, args.only))
     s = summary(rows)
     OUT.mkdir(parents=True, exist_ok=True)
-    tail = "" if image else "_no_image"
+    tail = ("" if args.only is None else f"_{args.only}") + ("" if image else "_no_image")
     (OUT / f"scores{tail}.json").write_text(
         json.dumps({"summary": s, "rows": rows}, indent=1) + "\n", "utf-8"
     )

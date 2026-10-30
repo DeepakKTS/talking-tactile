@@ -1,0 +1,393 @@
+{
+ "summary": {
+  "heart": {
+   "questions": 6,
+   "errors": 0,
+   "source_correct": 3,
+   "citations_correct": 3,
+   "outside_flags": 0,
+   "by_category": {
+    "image": {
+     "n": 6,
+     "source": 3,
+     "citations": 3
+    }
+   },
+   "spark_ms_p50": 4190.8,
+   "spark_ms_p95": 5513.6
+  },
+  "brain_lobes": {
+   "questions": 6,
+   "errors": 0,
+   "source_correct": 3,
+   "citations_correct": 3,
+   "outside_flags": 0,
+   "by_category": {
+    "image": {
+     "n": 6,
+     "source": 3,
+     "citations": 3
+    }
+   },
+   "spark_ms_p50": 4071.7,
+   "spark_ms_p95": 4856.6
+  }
+ },
+ "rows": [
+  {
+   "id": "h62",
+   "figure": "heart",
+   "category": "image",
+   "question": "What shape is the aortic arch?",
+   "answer": "This figure does not show that. Ask your teacher.",
+   "spark_text": "The figure does not give the shape of the aortic arch.",
+   "source": "off_figure",
+   "spark_source": "off_figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": false,
+   "cited": [],
+   "cite_must": [
+    "aortic arch"
+   ],
+   "cite_may": [],
+   "citations_correct": false,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 2577.8,
+    "server": 2578.7
+   }
+  },
+  {
+   "id": "h63",
+   "figure": "heart",
+   "category": "image",
+   "question": "Which part is the biggest?",
+   "answer": "This figure does not show that. Ask your teacher.",
+   "spark_text": "The figure does not tell which part is biggest.",
+   "source": "off_figure",
+   "spark_source": "off_figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": false,
+   "cited": [],
+   "cite_must": [
+    "right ventricle"
+   ],
+   "cite_may": [
+    "aortic arch",
+    "left ventricle"
+   ],
+   "citations_correct": false,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 3161.1,
+    "server": 3163.9
+   }
+  },
+  {
+   "id": "h64",
+   "figure": "heart",
+   "category": "image",
+   "question": "What is at the top of the heart?",
+   "answer": "The superior vena cava and the aortic arch and the left pulmonary arteries are at the top.",
+   "spark_text": "The superior vena cava and the aortic arch and the left pulmonary arteries are at the top.",
+   "source": "figure",
+   "spark_source": "figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": true,
+   "cited": [
+    "superior vena cava",
+    "aortic arch",
+    "left pulmonary arteries"
+   ],
+   "cite_must": [
+    "aortic arch"
+   ],
+   "cite_may": [
+    "left pulmonary arteries",
+    "right pulmonary arteries",
+    "superior vena cava"
+   ],
+   "citations_correct": true,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 5513.6,
+    "server": 5517.0
+   }
+  },
+  {
+   "id": "h65",
+   "figure": "heart",
+   "category": "image",
+   "question": "What is at the bottom of the figure?",
+   "answer": "The inferior vena cava is below the right ventricle.",
+   "spark_text": "The inferior vena cava is below the right ventricle.",
+   "source": "figure",
+   "spark_source": "figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": true,
+   "cited": [
+    "inferior vena cava",
+    "right ventricle"
+   ],
+   "cite_must": [
+    "inferior vena cava"
+   ],
+   "cite_may": [
+    "left ventricle",
+    "right ventricle"
+   ],
+   "citations_correct": true,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 5123.3,
+    "server": 5125.2
+   }
+  },
+  {
+   "id": "h66",
+   "figure": "heart",
+   "category": "image",
+   "question": "What is next to the right ventricle?",
+   "answer": "The right ventricle is next to the right atrium and the aortic arch and the left ventricle and the inferior vena cava and the left pulmonary arteries and the superior vena cava and the left atrium.",
+   "spark_text": "The right ventricle is next to the right atrium and the aortic arch and the left ventricle and the inferior vena cava and the left pulmonary arteries and the superior vena cava and the left atrium.",
+   "source": "figure",
+   "spark_source": "figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": true,
+   "cited": [
+    "right ventricle",
+    "right atrium",
+    "aortic arch",
+    "left ventricle",
+    "inferior vena cava",
+    "left pulmonary arteries",
+    "superior vena cava",
+    "left atrium"
+   ],
+   "cite_must": [
+    "right ventricle"
+   ],
+   "cite_may": [
+    "aortic arch",
+    "inferior vena cava",
+    "left atrium",
+    "left pulmonary arteries",
+    "left ventricle",
+    "right atrium",
+    "superior vena cava"
+   ],
+   "citations_correct": true,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 3656.2,
+    "server": 3659.9
+   }
+  },
+  {
+   "id": "h67",
+   "figure": "heart",
+   "category": "image",
+   "question": "Is the left atrium bigger than the right atrium?",
+   "answer": "This figure does not show that. Ask your teacher.",
+   "spark_text": "The figure does not say if the left atrium is bigger than the right atrium.",
+   "source": "off_figure",
+   "spark_source": "off_figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": false,
+   "cited": [],
+   "cite_must": [
+    "left atrium",
+    "right atrium"
+   ],
+   "cite_may": [],
+   "citations_correct": false,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 4190.8,
+    "server": 4192.4
+   }
+  },
+  {
+   "id": "b68",
+   "figure": "brain_lobes",
+   "category": "image",
+   "question": "What shape is the temporal lobe?",
+   "answer": "This figure does not show that. Ask your teacher.",
+   "spark_text": "The figure does not tell the shape of the temporal lobe.",
+   "source": "off_figure",
+   "spark_source": "off_figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": false,
+   "cited": [],
+   "cite_must": [
+    "temporal lobe"
+   ],
+   "cite_may": [],
+   "citations_correct": false,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 3140.6,
+    "server": 3142.1
+   }
+  },
+  {
+   "id": "b69",
+   "figure": "brain_lobes",
+   "category": "image",
+   "question": "Which lobe is the biggest?",
+   "answer": "This figure does not show that. Ask your teacher.",
+   "spark_text": "The figure does not say which lobe is the biggest.",
+   "source": "off_figure",
+   "spark_source": "off_figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": false,
+   "cited": [],
+   "cite_must": [
+    "frontal lobe"
+   ],
+   "cite_may": [
+    "parietal lobe"
+   ],
+   "citations_correct": false,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 4071.7,
+    "server": 4073.4
+   }
+  },
+  {
+   "id": "b70",
+   "figure": "brain_lobes",
+   "category": "image",
+   "question": "What is at the top of the brain?",
+   "answer": "The frontal lobe and the parietal lobe are at the top of the brain.",
+   "spark_text": "The frontal lobe and the parietal lobe are at the top of the brain.",
+   "source": "figure",
+   "spark_source": "figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": true,
+   "cited": [
+    "frontal lobe",
+    "parietal lobe"
+   ],
+   "cite_must": [],
+   "cite_may": [
+    "frontal lobe",
+    "parietal lobe"
+   ],
+   "citations_correct": true,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 3781.2,
+    "server": 3783.9
+   }
+  },
+  {
+   "id": "b71",
+   "figure": "brain_lobes",
+   "category": "image",
+   "question": "What is at the bottom of the figure?",
+   "answer": "The cerebellum and brainstem is at the bottom of the figure.",
+   "spark_text": "The cerebellum and brainstem is at the bottom of the figure.",
+   "source": "figure",
+   "spark_source": "figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": true,
+   "cited": [
+    "cerebellum and brainstem"
+   ],
+   "cite_must": [
+    "cerebellum and brainstem"
+   ],
+   "cite_may": [
+    "temporal lobe"
+   ],
+   "citations_correct": true,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 4856.6,
+    "server": 4858.7
+   }
+  },
+  {
+   "id": "b72",
+   "figure": "brain_lobes",
+   "category": "image",
+   "question": "What is next to the occipital lobe?",
+   "answer": "The occipital lobe is next to the parietal lobe and the temporal lobe and the cerebellum and brainstem.",
+   "spark_text": "The occipital lobe is next to the parietal lobe and the temporal lobe and the cerebellum and brainstem.",
+   "source": "figure",
+   "spark_source": "figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": true,
+   "cited": [
+    "occipital lobe",
+    "parietal lobe",
+    "temporal lobe",
+    "cerebellum and brainstem"
+   ],
+   "cite_must": [
+    "occipital lobe"
+   ],
+   "cite_may": [
+    "cerebellum and brainstem",
+    "parietal lobe",
+    "temporal lobe"
+   ],
+   "citations_correct": true,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 2699.2,
+    "server": 2702.6
+   }
+  },
+  {
+   "id": "b73",
+   "figure": "brain_lobes",
+   "category": "image",
+   "question": "Which is bigger, the frontal lobe or the occipital lobe?",
+   "answer": "This figure does not show that. Ask your teacher.",
+   "spark_text": "The figure does not say which is bigger. I cannot tell the size of the frontal lobe and the occipital lobe from the figure.",
+   "source": "off_figure",
+   "spark_source": "off_figure",
+   "sources_ok": [
+    "figure"
+   ],
+   "source_correct": false,
+   "cited": [],
+   "cite_must": [
+    "frontal lobe",
+    "occipital lobe"
+   ],
+   "cite_may": [],
+   "citations_correct": false,
+   "outside_words": [],
+   "timings_ms": {
+    "spark": 4076.8,
+    "server": 4080.4
+   }
+  }
+ ]
+}

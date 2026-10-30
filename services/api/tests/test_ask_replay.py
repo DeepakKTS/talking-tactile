@@ -63,7 +63,10 @@ def request(q: dict[str, Any]) -> ask.AskRequest:
     )  # fmt: skip
 
 
-@pytest.mark.parametrize("q", qa_eval.load_questions(), ids=lambda q: q["id"])
+# The questions the recorded live run answered (scores.json); the image experiment's are apart.
+@pytest.mark.parametrize(
+    "q", [q for q in qa_eval.load_questions() if q["id"] in LIVE], ids=lambda q: q["id"]
+)
 def test_every_eval_question_gets_its_live_answer_back(q: dict[str, Any]) -> None:
     got = asyncio.run(asker().ask(request(q), None))
     live = LIVE[q["id"]]

@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 227,
- "updated_at": "2026-10-30T21:30:44.583Z",
+ "rev": 230,
+ "updated_at": "2026-10-30T21:49:00.706Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1683,6 +1683,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-30T21:30:44.541Z"
   },
   {
+   "id": "d5-31",
+   "day": 5,
+   "title": "Picture questions decide the image: 6 per figure, both variants live",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Added h62-h67 and b68-b73 (category image) with expectations from the version 4 sheet (right ventricle biggest heart part by area, 820 mm2; frontal lobe biggest lobe, 1765 against parietal 1551; aortic arch top, inferior vena cava bottom; cerebellum and brainstem bottom; neighbors from regions.json). qa_eval --only CATEGORY. Live, recorded qa4 (image) and qa5 (no image), not replayed. With image: heart source 5/6, citations 5/6 (h63 'Which part is the biggest?' deflected), brain 6/6, 6/6; Spark p50 6.4 s heart, 5.3 s brain on these. Without: heart 3/6, brain 3/6 (shape and size questions deflected). Outside-word flags with the image are words the picture supplies (curved, long, rounded); h67 said 'looks larger than the left atrium in this picture', sight wording RULES.md 2.4 forbids. Image kept.",
+   "done_at": "2026-10-30T21:49:00.706Z",
+   "tags": [
+    "eval",
+    "live"
+   ],
+   "changed_at": "2026-10-30T21:49:00.706Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -2677,6 +2693,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Explore records while the screen is held and sends one WAV to POST /api/ask, which calls the file transcribe endpoint (PUSH_TO_TALK) with the figure's part, line and group names as keywords. The realtime WebSocket client in spikes/ is not used.",
    "why": "A question is short and ends when the finger lets go, so streaming partials buy little: live, transcribe took 0.94 s p50 and 1.36 s p95 of a 4.14 s p50 release-to-first-word, which Spark dominates (3.26 s p50). The file endpoint is one request through LiveCaller, metered and replayable like every other call; the realtime endpoint has never run live (spikes/muse-voice.md).",
    "changed_at": "2026-10-30T19:32:43.045Z"
+  },
+  {
+   "id": "dec-mvvi8fozf6vz",
+   "date": "2026-10-30",
+   "title": "The figure image stays in the answer prompt",
+   "decision": "ask_answer.v1 with the image, as now.",
+   "why": "On 12 new picture questions (shape, biggest part, top and bottom, next to, which is bigger), live on version 4: with the image heart 5/6 source and citations, brain 6/6; without it 3/6 and 3/6 (it deflects shape and size). The no-image variant was faster (Spark p50 about 0.9 s) and no worse on the other 61 questions, but worse here, so the rule 'switch if no worse' keeps the image.",
+   "changed_at": "2026-10-30T21:49:00.667Z"
   }
  ],
  "risks": [
@@ -2767,6 +2791,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T21:49:00.706Z",
+   "kind": "claude",
+   "text": "Task d5-31 \"Picture questions decide the image: 6 per figure, both variants live\" is now done. Note: Added h62-h67 and b68-b73 (category image) with expectations from the version 4 sheet (right ventricle biggest heart part by area, 820 mm2; frontal lobe biggest lobe, 1765 against parietal 1551; aortic arch top, inferior vena cava bottom; cerebellum and brainstem bottom; neighbors from regions.json). qa_eval --only CATEGORY. Live, recorded qa4 (image) and qa5 (no image), not replayed. With image: heart source 5/6, citations 5/6 (h63 'Which part is the biggest?' deflected), brain 6/6, 6/6; Spark p50 6.4 s heart, 5.3 s brain on these. Without: heart 3/6, brain 3/6 (shape and size questions deflected). Outside-word flags with the image are words the picture supplies (curved, long, rounded); h67 said 'looks larger than the left atrium in this picture', sight wording RULES.md 2.4 forbids. Image kept."
+  },
+  {
+   "ts": "2026-10-30T21:49:00.667Z",
+   "kind": "claude",
+   "text": "Decision: The figure image stays in the answer prompt."
+  },
+  {
+   "ts": "2026-10-30T21:49:00.621Z",
+   "kind": "claude",
+   "text": "Task d5-31 \"Picture questions decide the image: 6 per figure, both variants live\" added to day 5."
+  },
   {
    "ts": "2026-10-30T21:30:44.583Z",
    "kind": "claude",

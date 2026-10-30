@@ -11,7 +11,7 @@ def test_the_set_has_at_least_25_questions_a_figure_in_every_category() -> None:
         assert len(mine) >= 25
         assert {q["category"] for q in mine} == {
             "on_figure", "teacher_description", "off_figure", "untouchable", "injection",
-            "cross_description",
+            "cross_description", "image",
         }  # fmt: skip
     assert len({q["id"] for q in qs}) == len(qs)
     assert all(
