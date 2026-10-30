@@ -1,0 +1,2160 @@
+{
+ "figure": "heart",
+ "image": "fixtures/heart.png",
+ "size": [
+  2048,
+  1612
+ ],
+ "cap": 25,
+ "version": "armav2f",
+ "guard_px": 15,
+ "clearance_px": 6,
+ "fill_delta": 40.0,
+ "floor_px": 307.7,
+ "print_marks": {
+  "words": 66,
+  "leader_segments": 86
+ },
+ "spark": {
+  "latency_ms": 32072.6,
+  "cost_usd": 0.0323875,
+  "usage": {
+   "completion_tokens": 6280,
+   "prompt_tokens": 4558,
+   "total_tokens": 10838,
+   "completion_tokens_details": {
+    "reasoning_tokens": 5208
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": {
+   "parts": [
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 473,
+         "y": 152
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "brachiocephalic artery"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 412,
+         "y": 345
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "superior vena cava"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 365,
+         "y": 328
+        },
+        {
+         "x": 353,
+         "y": 362
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "right pulmonary arteries"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 345,
+         "y": 406
+        },
+        {
+         "x": 334,
+         "y": 452
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "right pulmonary veins"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 425,
+         "y": 525
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "right atrium"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 430,
+         "y": 623
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "tricuspid valve"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 515,
+         "y": 670
+        },
+        {
+         "x": 545,
+         "y": 710
+        }
+       ],
+       "where": ""
+      },
+      {
+       "points": [
+        {
+         "x": 669,
+         "y": 620
+        },
+        {
+         "x": 682,
+         "y": 700
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "thin",
+     "members": [],
+     "parent": "",
+     "part": "chordae tendineae"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 460,
+         "y": 705
+        },
+        {
+         "x": 540,
+         "y": 740
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "right ventricle"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 442,
+         "y": 823
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "inferior vena cava"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 551,
+         "y": 130
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "left common carotid artery"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 589,
+         "y": 138
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "left subclavian artery"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 545,
+         "y": 285
+        }
+       ],
+       "where": ""
+      },
+      {
+       "points": [
+        {
+         "x": 615,
+         "y": 925
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "aorta"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 590,
+         "y": 370
+        },
+        {
+         "x": 660,
+         "y": 310
+        },
+        {
+         "x": 660,
+         "y": 350
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "left pulmonary arteries"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 684,
+         "y": 405
+        },
+        {
+         "x": 708,
+         "y": 436
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "left pulmonary veins"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 660,
+         "y": 475
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "left atrium"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 595,
+         "y": 515
+        }
+       ],
+       "where": ""
+      },
+      {
+       "points": [
+        {
+         "x": 624,
+         "y": 534
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "thin",
+     "members": [],
+     "parent": "",
+     "part": "semilunar valves"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 661,
+         "y": 569
+        },
+        {
+         "x": 688,
+         "y": 583
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "thin",
+     "members": [],
+     "parent": "",
+     "part": "mitral valve"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 698,
+         "y": 650
+        },
+        {
+         "x": 678,
+         "y": 750
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "left ventricle"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 611,
+         "y": 677
+        },
+        {
+         "x": 636,
+         "y": 772
+        }
+       ],
+       "where": ""
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "septum"
+    }
+   ]
+  }
+ },
+ "rows": [
+  {
+   "part": "brachiocephalic artery",
+   "print_label": "Brachiocephalic artery",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 473,
+       "y": 152
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        968,
+        245
+       ],
+       "on": [],
+       "sent": [
+        968,
+        245
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.87890625,
+     "raw_px": 9404,
+     "kept_px": 9404,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 3236.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 9404,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 9404
+  },
+  {
+   "part": "superior vena cava",
+   "print_label": "Superior vena cava",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 412,
+       "y": 345
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        843,
+        556
+       ],
+       "on": [],
+       "sent": [
+        843,
+        556
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.859375,
+     "raw_px": 37772,
+     "kept_px": 37772,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "right pulmonary arteries",
+     "xy": [
+      747,
+      531
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 2054.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 37772,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {
+    "right pulmonary arteries": 128,
+    "right pulmonary veins": 1
+   },
+   "lost_px": 129,
+   "respeck_px": 0,
+   "final_px": 37643
+  },
+  {
+   "part": "right pulmonary arteries",
+   "print_label": "Right pulmonary arteries",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 365,
+       "y": 328
+      },
+      {
+       "x": 353,
+       "y": 362
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        747,
+        528
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        747,
+        531
+       ],
+       "moved_px": 3.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        722,
+        583
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        722,
+        580
+       ],
+       "moved_px": 3.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.828125,
+     "raw_px": 6678,
+     "kept_px": 6678,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2865.6,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 6678,
+   "won_from": {
+    "superior vena cava": 128
+   },
+   "won_px": 128,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 6678
+  },
+  {
+   "part": "right pulmonary veins",
+   "print_label": "Right pulmonary veins",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 345,
+       "y": 406
+      },
+      {
+       "x": 334,
+       "y": 452
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        706,
+        654
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        708,
+        650
+       ],
+       "moved_px": 4.5,
+       "dropped": false
+      },
+      {
+       "px": [
+        684,
+        728
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        691,
+        728
+       ],
+       "moved_px": 7.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.82421875,
+     "raw_px": 8694,
+     "kept_px": 8548,
+     "pieces_dropped": 3,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1490.4,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 8548,
+   "won_from": {
+    "superior vena cava": 1
+   },
+   "won_px": 1,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 8548
+  },
+  {
+   "part": "right atrium",
+   "print_label": "Right atrium",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 425,
+       "y": 525
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        870,
+        846
+       ],
+       "on": [],
+       "sent": [
+        870,
+        846
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.78125,
+     "raw_px": 49196,
+     "kept_px": 49196,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1685.9,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 49196,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 49196
+  },
+  {
+   "part": "tricuspid valve",
+   "print_label": "Atrioventricular (tricuspid) valve",
+   "flags": [
+    "a point of instance 1 is outside its SAM mask",
+    "needs teacher: no mask"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 430,
+       "y": 623
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        880,
+        1004
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        880,
+        1010
+       ],
+       "moved_px": 6.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.58203125,
+     "raw_px": 2851,
+     "kept_px": 0,
+     "pieces_dropped": 4,
+     "points_in_mask": [
+      false
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "chordae tendineae",
+     "xy": [
+      1054,
+      1080
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 2137.5,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 0,
+   "final_px": 0
+  },
+  {
+   "part": "chordae tendineae",
+   "print_label": "Chordae tendineae",
+   "flags": [
+    "spill onto left ventricle, mitral valve, semilunar valves",
+    "needs teacher: spill",
+    "spill: holds points of left ventricle, mitral valve, semilunar valves; after a retry",
+    "thin: kept for the record, sheet use decided later"
+   ],
+   "kind": "thin",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 515,
+       "y": 670
+      },
+      {
+       "x": 545,
+       "y": 710
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1054,
+        1080
+       ],
+       "on": [],
+       "sent": [
+        1054,
+        1080
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1116,
+        1144
+       ],
+       "on": [],
+       "sent": [
+        1116,
+        1144
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.291015625,
+     "raw_px": 15681,
+     "kept_px": 14562,
+     "pieces_dropped": 9,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    },
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 669,
+       "y": 620
+      },
+      {
+       "x": 682,
+       "y": 700
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1370,
+        999
+       ],
+       "on": [],
+       "sent": [
+        1370,
+        999
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1396,
+        1128
+       ],
+       "on": [],
+       "sent": [
+        1396,
+        1128
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.3671875,
+     "raw_px": 84934,
+     "kept_px": 77821,
+     "pieces_dropped": 16,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "right ventricle",
+     "xy": [
+      1105,
+      1192
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1866.2,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 92383,
+   "retry": {
+    "spilled_onto": [
+     "left ventricle",
+     "mitral valve",
+     "semilunar valves"
+    ],
+    "negatives_added": {
+     "semilunar valves": [
+      1284,
+      867
+     ],
+     "mitral valve": [
+      1353,
+      917
+     ],
+     "left ventricle": [
+      1429,
+      1047
+     ]
+    },
+    "sam": {
+     "latency_ms": 2725.7,
+     "cost_usd": 0.0025,
+     "instances": 2
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.39453125,
+      "raw_px": 110031,
+      "kept_px": 105797,
+      "pieces_dropped": 39,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.49609375,
+      "raw_px": 12724,
+      "kept_px": 8641,
+      "pieces_dropped": 8,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 114438,
+    "still_onto": [
+     "right ventricle"
+    ],
+    "used": false
+   },
+   "spill": "holds points of left ventricle, mitral valve, semilunar valves; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "right ventricle",
+   "print_label": "Right ventricle",
+   "flags": [
+    "spill onto chordae tendineae cleared by a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 460,
+       "y": 705
+      },
+      {
+       "x": 540,
+       "y": 740
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        942,
+        1136
+       ],
+       "on": [],
+       "sent": [
+        942,
+        1136
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1105,
+        1192
+       ],
+       "on": [],
+       "sent": [
+        1105,
+        1192
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.2041015625,
+     "raw_px": 80066,
+     "kept_px": 77980,
+     "pieces_dropped": 22,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "chordae tendineae",
+     "xy": [
+      1054,
+      1080
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1643.2,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 77980,
+   "retry": {
+    "spilled_onto": [
+     "chordae tendineae"
+    ],
+    "negatives_added": {
+     "chordae tendineae": [
+      1054,
+      1080
+     ]
+    },
+    "sam": {
+     "latency_ms": 1634.1,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.287109375,
+      "raw_px": 44519,
+      "kept_px": 42345,
+      "pieces_dropped": 15,
+      "points_in_mask": [
+       true,
+       false
+      ]
+     }
+    ],
+    "kept_px": 42345,
+    "still_onto": [],
+    "used": true
+   },
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 42345
+  },
+  {
+   "part": "inferior vena cava",
+   "print_label": "Inferior vena cava",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 442,
+       "y": 823
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        905,
+        1326
+       ],
+       "on": [],
+       "sent": [
+        905,
+        1326
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.72265625,
+     "raw_px": 17045,
+     "kept_px": 17045,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1841.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 17045,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 17045
+  },
+  {
+   "part": "left common carotid artery",
+   "print_label": "Left common carotid artery",
+   "flags": [
+    "a point of instance 1 is outside its SAM mask",
+    "needs teacher: no mask"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 551,
+       "y": 130
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1128,
+        209
+       ],
+       "on": [],
+       "sent": [
+        1128,
+        209
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.58984375,
+     "raw_px": 11818,
+     "kept_px": 0,
+     "pieces_dropped": 2,
+     "points_in_mask": [
+      false
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1058.9,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 0,
+   "final_px": 0
+  },
+  {
+   "part": "left subclavian artery",
+   "print_label": "Left subclavian artery",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 589,
+       "y": 138
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1206,
+        222
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1206,
+        226
+       ],
+       "moved_px": 4.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.65625,
+     "raw_px": 2475,
+     "kept_px": 1536,
+     "pieces_dropped": 7,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "brachiocephalic artery",
+     "xy": [
+      968,
+      245
+     ]
+    },
+    {
+     "of": "aorta",
+     "xy": [
+      1116,
+      459
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1838.9,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 1536,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 1536
+  },
+  {
+   "part": "aorta",
+   "print_label": "Aorta",
+   "flags": [
+    "spill onto brachiocephalic artery",
+    "needs teacher: spill",
+    "spill: holds points of brachiocephalic artery; after a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 545,
+       "y": 285
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1116,
+        459
+       ],
+       "on": [],
+       "sent": [
+        1116,
+        459
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.9140625,
+     "raw_px": 127581,
+     "kept_px": 126856,
+     "pieces_dropped": 6,
+     "points_in_mask": [
+      true
+     ]
+    },
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 615,
+       "y": 925
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1259,
+        1491
+       ],
+       "on": [],
+       "sent": [
+        1259,
+        1491
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.92578125,
+     "raw_px": 15608,
+     "kept_px": 15608,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "brachiocephalic artery",
+     "xy": [
+      968,
+      245
+     ]
+    },
+    {
+     "of": "left subclavian artery",
+     "xy": [
+      1206,
+      226
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1183.2,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 142464,
+   "retry": {
+    "spilled_onto": [
+     "brachiocephalic artery"
+    ],
+    "negatives_added": {
+     "brachiocephalic artery": [
+      968,
+      245
+     ]
+    },
+    "sam": {
+     "latency_ms": 1077.6,
+     "cost_usd": 0.0025,
+     "instances": 2
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.75390625,
+      "raw_px": 109770,
+      "kept_px": 104569,
+      "pieces_dropped": 21,
+      "points_in_mask": [
+       true
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.84765625,
+      "raw_px": 15538,
+      "kept_px": 15538,
+      "pieces_dropped": 0,
+      "points_in_mask": [
+       true
+      ]
+     }
+    ],
+    "kept_px": 120107,
+    "still_onto": [
+     "brachiocephalic artery"
+    ],
+    "used": true
+   },
+   "spill": "holds points of brachiocephalic artery; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "left pulmonary arteries",
+   "print_label": "Left pulmonary arteries",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 590,
+       "y": 370
+      },
+      {
+       "x": 660,
+       "y": 310
+      },
+      {
+       "x": 660,
+       "y": 350
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1208,
+        596
+       ],
+       "on": [],
+       "sent": [
+        1208,
+        596
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1351,
+        499
+       ],
+       "on": [],
+       "sent": [
+        1351,
+        499
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1351,
+        564
+       ],
+       "on": [],
+       "sent": [
+        1351,
+        564
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.90234375,
+     "raw_px": 51394,
+     "kept_px": 50395,
+     "pieces_dropped": 9,
+     "points_in_mask": [
+      true,
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1737.4,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 50395,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 50395
+  },
+  {
+   "part": "left pulmonary veins",
+   "print_label": "Left pulmonary veins",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 684,
+       "y": 405
+      },
+      {
+       "x": 708,
+       "y": 436
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1400,
+        652
+       ],
+       "on": [],
+       "sent": [
+        1400,
+        652
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1449,
+        702
+       ],
+       "on": [],
+       "sent": [
+        1449,
+        702
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.84375,
+     "raw_px": 6697,
+     "kept_px": 6697,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1637.1,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 6697,
+   "won_from": {
+    "left atrium": 9
+   },
+   "won_px": 9,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 6697
+  },
+  {
+   "part": "left atrium",
+   "print_label": "Left atrium",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 660,
+       "y": 475
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1351,
+        765
+       ],
+       "on": [],
+       "sent": [
+        1351,
+        765
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.62109375,
+     "raw_px": 16289,
+     "kept_px": 16181,
+     "pieces_dropped": 1,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1034.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 16181,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {
+    "left pulmonary veins": 9
+   },
+   "lost_px": 9,
+   "respeck_px": 0,
+   "final_px": 16172
+  },
+  {
+   "part": "semilunar valves",
+   "print_label": "Semilunar valves",
+   "flags": [
+    "thin: kept for the record, sheet use decided later"
+   ],
+   "kind": "thin",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 595,
+       "y": 515
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1218,
+        830
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        1218,
+        820
+       ],
+       "moved_px": 10.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.796875,
+     "raw_px": 20375,
+     "kept_px": 20347,
+     "pieces_dropped": 1,
+     "points_in_mask": [
+      true
+     ]
+    },
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 624,
+       "y": 534
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1277,
+        860
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        1284,
+        867
+       ],
+       "moved_px": 9.9,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.337890625,
+     "raw_px": 23821,
+     "kept_px": 19992,
+     "pieces_dropped": 34,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1380.1,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 40339,
+   "won_from": {
+    "septum": 254
+   },
+   "won_px": 254,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 40339
+  },
+  {
+   "part": "mitral valve",
+   "print_label": "Atrioventricular (mitral) valve",
+   "flags": [
+    "spill onto left ventricle",
+    "needs teacher: spill",
+    "spill: holds points of left ventricle; after a retry",
+    "thin: kept for the record, sheet use decided later"
+   ],
+   "kind": "thin",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 661,
+       "y": 569
+      },
+      {
+       "x": 688,
+       "y": 583
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1353,
+        917
+       ],
+       "on": [],
+       "sent": [
+        1353,
+        917
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1409,
+        939
+       ],
+       "on": [],
+       "sent": [
+        1409,
+        939
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.333984375,
+     "raw_px": 82292,
+     "kept_px": 63888,
+     "pieces_dropped": 41,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "chordae tendineae",
+     "xy": [
+      1370,
+      999
+     ]
+    },
+    {
+     "of": "left pulmonary veins",
+     "xy": [
+      1449,
+      702
+     ]
+    },
+    {
+     "of": "left atrium",
+     "xy": [
+      1351,
+      765
+     ]
+    },
+    {
+     "of": "semilunar valves",
+     "xy": [
+      1284,
+      867
+     ]
+    },
+    {
+     "of": "left ventricle",
+     "xy": [
+      1429,
+      1047
+     ]
+    },
+    {
+     "of": "septum",
+     "xy": [
+      1251,
+      1091
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1909.5,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 63888,
+   "retry": {
+    "spilled_onto": [
+     "chordae tendineae",
+     "left ventricle",
+     "semilunar valves"
+    ],
+    "negatives_added": {
+     "chordae tendineae": [
+      1370,
+      999
+     ],
+     "semilunar valves": [
+      1284,
+      867
+     ],
+     "left ventricle": [
+      1429,
+      1047
+     ]
+    },
+    "sam": {
+     "latency_ms": 1658.9,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.388671875,
+      "raw_px": 65640,
+      "kept_px": 47596,
+      "pieces_dropped": 66,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 47596,
+    "still_onto": [
+     "left ventricle"
+    ],
+    "used": true
+   },
+   "spill": "holds points of left ventricle; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "left ventricle",
+   "print_label": "Left ventricle",
+   "flags": [
+    "spill onto chordae tendineae, mitral valve",
+    "needs teacher: spill",
+    "spill: holds points of chordae tendineae, mitral valve; after a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 698,
+       "y": 650
+      },
+      {
+       "x": 678,
+       "y": 750
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1429,
+        1047
+       ],
+       "on": [],
+       "sent": [
+        1429,
+        1047
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1388,
+        1209
+       ],
+       "on": [],
+       "sent": [
+        1388,
+        1209
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.515625,
+     "raw_px": 56872,
+     "kept_px": 54604,
+     "pieces_dropped": 42,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "chordae tendineae",
+     "xy": [
+      1370,
+      999
+     ]
+    },
+    {
+     "of": "left atrium",
+     "xy": [
+      1351,
+      765
+     ]
+    },
+    {
+     "of": "semilunar valves",
+     "xy": [
+      1284,
+      867
+     ]
+    },
+    {
+     "of": "mitral valve",
+     "xy": [
+      1353,
+      917
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 989.5,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 54604,
+   "retry": {
+    "spilled_onto": [
+     "chordae tendineae",
+     "mitral valve"
+    ],
+    "negatives_added": {
+     "chordae tendineae": [
+      1370,
+      999
+     ],
+     "mitral valve": [
+      1409,
+      939
+     ]
+    },
+    "sam": {
+     "latency_ms": 1173.1,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.435546875,
+      "raw_px": 43337,
+      "kept_px": 39199,
+      "pieces_dropped": 47,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 39199,
+    "still_onto": [
+     "chordae tendineae",
+     "mitral valve"
+    ],
+    "used": true
+   },
+   "spill": "holds points of chordae tendineae, mitral valve; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "septum",
+   "print_label": "Septum",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "",
+     "grid": [
+      {
+       "x": 611,
+       "y": 677
+      },
+      {
+       "x": 636,
+       "y": 772
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1251,
+        1091
+       ],
+       "on": [],
+       "sent": [
+        1251,
+        1091
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1302,
+        1244
+       ],
+       "on": [],
+       "sent": [
+        1302,
+        1244
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.29296875,
+     "raw_px": 165483,
+     "kept_px": 95862,
+     "pieces_dropped": 98,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1706.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 95862,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {
+    "semilunar valves": 254
+   },
+   "lost_px": 254,
+   "respeck_px": 0,
+   "final_px": 95608
+  }
+ ],
+ "calls": 25,
+ "spent_usd": 0.092388
+}
