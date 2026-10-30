@@ -1,0 +1,899 @@
+{
+ "figure": "japan_regions",
+ "image": "fixtures/eval/japan_regions.png",
+ "size": [
+  1796,
+  2048
+ ],
+ "cap": 25,
+ "guard_px": 15,
+ "fill_delta": 40.0,
+ "floor_px": 236.7,
+ "print_marks": {
+  "words": 19,
+  "leader_segments": 0
+ },
+ "spark": {
+  "latency_ms": 12496.6,
+  "cost_usd": 0.0157455,
+  "usage": {
+   "completion_tokens": 2396,
+   "prompt_tokens": 4450,
+   "total_tokens": 6846,
+   "completion_tokens_details": {
+    "reasoning_tokens": 1831
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": {
+   "parts": [
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 751,
+         "y": 168
+        },
+        {
+         "x": 697,
+         "y": 222
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Hokkaido region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 687,
+         "y": 370
+        },
+        {
+         "x": 652,
+         "y": 454
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Tohoku region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 636,
+         "y": 555
+        },
+        {
+         "x": 650,
+         "y": 597
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Kanto region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 512,
+         "y": 559
+        },
+        {
+         "x": 554,
+         "y": 594
+        },
+        {
+         "x": 598,
+         "y": 489
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Chubu region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 447,
+         "y": 626
+        },
+        {
+         "x": 426,
+         "y": 605
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Kansai region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 300,
+         "y": 614
+        },
+        {
+         "x": 262,
+         "y": 628
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Chugoku region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 310,
+         "y": 679
+        },
+        {
+         "x": 362,
+         "y": 673
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Shikoku region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 204,
+         "y": 715
+        },
+        {
+         "x": 198,
+         "y": 774
+        }
+       ],
+       "where": "main map"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Kyushu region"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 918,
+         "y": 823
+        },
+        {
+         "x": 720,
+         "y": 933
+        }
+       ],
+       "where": "Okinawa inset"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "Okinawa inset region"
+    }
+   ]
+  }
+ },
+ "rows": [
+  {
+   "part": "Hokkaido region",
+   "print_label": "Hokkaid\u014d",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 751,
+       "y": 168
+      },
+      {
+       "x": 697,
+       "y": 222
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1348,
+        344
+       ],
+       "on": [],
+       "sent": [
+        1348,
+        344
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1251,
+        454
+       ],
+       "on": [],
+       "sent": [
+        1251,
+        454
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.96484375,
+     "raw_px": 72911,
+     "kept_px": 72846,
+     "pieces_dropped": 2,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1514.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 72846,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 72846
+  },
+  {
+   "part": "Tohoku region",
+   "print_label": "T\u014dhoku",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 687,
+       "y": 370
+      },
+      {
+       "x": 652,
+       "y": 454
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1233,
+        757
+       ],
+       "on": [],
+       "sent": [
+        1233,
+        757
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1170,
+        929
+       ],
+       "on": [],
+       "sent": [
+        1170,
+        929
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.8828125,
+     "raw_px": 52137,
+     "kept_px": 51808,
+     "pieces_dropped": 2,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1044.9,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 51808,
+   "lost_to": {
+    "Kanto region": 11
+   },
+   "lost_px": 11,
+   "respeck_px": 0,
+   "final_px": 51797
+  },
+  {
+   "part": "Kanto region",
+   "print_label": "Kant\u014d",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 636,
+       "y": 555
+      },
+      {
+       "x": 650,
+       "y": 597
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1142,
+        1136
+       ],
+       "on": [],
+       "sent": [
+        1142,
+        1136
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1167,
+        1222
+       ],
+       "on": [],
+       "sent": [
+        1167,
+        1222
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.875,
+     "raw_px": 28833,
+     "kept_px": 28659,
+     "pieces_dropped": 1,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1209.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 28659,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 28659
+  },
+  {
+   "part": "Chubu region",
+   "print_label": "Ch\u016bbu",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 512,
+       "y": 559
+      },
+      {
+       "x": 554,
+       "y": 594
+      },
+      {
+       "x": 598,
+       "y": 489
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        919,
+        1144
+       ],
+       "on": [],
+       "sent": [
+        919,
+        1144
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        994,
+        1216
+       ],
+       "on": [],
+       "sent": [
+        994,
+        1216
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1074,
+        1001
+       ],
+       "on": [],
+       "sent": [
+        1074,
+        1001
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.84375,
+     "raw_px": 60433,
+     "kept_px": 60075,
+     "pieces_dropped": 11,
+     "points_in_mask": [
+      true,
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1649.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 60075,
+   "lost_to": {
+    "Kansai region": 454,
+    "Kanto region": 164,
+    "Tohoku region": 104
+   },
+   "lost_px": 722,
+   "respeck_px": 2,
+   "final_px": 59351
+  },
+  {
+   "part": "Kansai region",
+   "print_label": "Kansai",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 447,
+       "y": 626
+      },
+      {
+       "x": 426,
+       "y": 605
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        802,
+        1282
+       ],
+       "on": [],
+       "sent": [
+        802,
+        1282
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        765,
+        1239
+       ],
+       "on": [],
+       "sent": [
+        765,
+        1239
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.796875,
+     "raw_px": 28135,
+     "kept_px": 28135,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1264.1,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 28135,
+   "lost_to": {
+    "Chugoku region": 7
+   },
+   "lost_px": 7,
+   "respeck_px": 0,
+   "final_px": 28128
+  },
+  {
+   "part": "Chugoku region",
+   "print_label": "Ch\u016bgoku",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 300,
+       "y": 614
+      },
+      {
+       "x": 262,
+       "y": 628
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        538,
+        1257
+       ],
+       "on": [],
+       "sent": [
+        538,
+        1257
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        470,
+        1286
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        472,
+        1288
+       ],
+       "moved_px": 2.8,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.84765625,
+     "raw_px": 28026,
+     "kept_px": 27635,
+     "pieces_dropped": 5,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1138.8,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 27635,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 27635
+  },
+  {
+   "part": "Shikoku region",
+   "print_label": "Shikoku",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 310,
+       "y": 679
+      },
+      {
+       "x": 362,
+       "y": 673
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        556,
+        1390
+       ],
+       "on": [],
+       "sent": [
+        556,
+        1390
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        650,
+        1378
+       ],
+       "on": [],
+       "sent": [
+        650,
+        1378
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.9296875,
+     "raw_px": 17439,
+     "kept_px": 17439,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 912.4,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 17439,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 17439
+  },
+  {
+   "part": "Kyushu region",
+   "print_label": "Ky\u016bsh\u016b",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main map",
+     "grid": [
+      {
+       "x": 204,
+       "y": 715
+      },
+      {
+       "x": 198,
+       "y": 774
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        366,
+        1464
+       ],
+       "on": [],
+       "sent": [
+        366,
+        1464
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        355,
+        1585
+       ],
+       "on": [],
+       "sent": [
+        355,
+        1585
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.9140625,
+     "raw_px": 34531,
+     "kept_px": 34531,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1393.1,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 34531,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 34531
+  },
+  {
+   "part": "Okinawa inset region",
+   "print_label": "(Okinawa)",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "Okinawa inset",
+     "grid": [
+      {
+       "x": 918,
+       "y": 823
+      },
+      {
+       "x": 720,
+       "y": 933
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1648,
+        1685
+       ],
+       "on": [],
+       "sent": [
+        1648,
+        1685
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1293,
+        1910
+       ],
+       "on": [],
+       "sent": [
+        1293,
+        1910
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.162109375,
+     "raw_px": 2842,
+     "kept_px": 2449,
+     "pieces_dropped": 4,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 688.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 2449,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 2449
+  }
+ ],
+ "calls": 10,
+ "spent_usd": 0.038245
+}
