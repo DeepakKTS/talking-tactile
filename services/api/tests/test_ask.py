@@ -202,10 +202,12 @@ def test_without_the_image_spark_gets_the_figure_in_words_alone() -> None:
     """The latency experiment's variant (b): no image in the request."""
     from app.meta.live_client import spark_body  # noqa: PLC0415
 
-    body = spark_body("m", "s", "u", None, ("FigureAnswer", ask.ANSWER_SCHEMA), effort="low")
+    body = spark_body(
+        "m", "s", "u", None, ("FigureAnswer", ask.answer_schema(GOLDEN)), effort="low"
+    )
     content = body["messages"][1]["content"]
     assert [c["type"] for c in content] == ["text"]
-    with_image = spark_body("m", "s", "u", b"png", ("FigureAnswer", ask.ANSWER_SCHEMA))
+    with_image = spark_body("m", "s", "u", b"png", ("FigureAnswer", ask.answer_schema(GOLDEN)))
     assert [c["type"] for c in with_image["messages"][1]["content"]] == ["text", "image_url"]
 
     class NoImage(FakeClient):
@@ -220,3 +222,41 @@ def test_without_the_image_spark_gets_the_figure_in_words_alone() -> None:
               lambda fid, v: (GOLDEN, b"png"), image=False)  # fmt: skip
     assert asyncio.run(a.ask(req(), None)).answer == "Yes."
     assert "image" not in text.template["system"].lower()
+
+
+def test_the_schema_makes_a_teacher_description_answer_name_a_described_part() -> None:
+    """The citation rule by construction: Spark's decoding follows the schema, and the
+    teacher_description shape needs a described_part_id among the described parts."""
+    schema = ask.answer_schema(GOLDEN)
+    described, other = schema["properties"]["reply"]["anyOf"]
+    assert described["properties"]["source"]["enum"] == ["teacher_description"]
+    assert described["properties"]["described_part_id"]["enum"] == ["r1"]  # the one described
+    assert "described_part_id" in described["required"]
+    assert "teacher_description" not in other["properties"]["source"]["enum"]
+    for shape in (schema, described, other):
+        assert shape["additionalProperties"] is False
+        assert set(shape["required"]) == set(shape["properties"])
+    bare = GOLDEN.model_copy(
+        update={"regions": [r.model_copy(update={"description": None}) for r in GOLDEN.regions]}
+    )
+    assert len(ask.answer_schema(bare)["properties"]["reply"]["anyOf"]) == 1
+
+
+def test_a_reply_cites_its_described_part_and_the_code_check_stays() -> None:
+    spark = SparkAnswer(answer_text="It holds the core.", source="teacher_description",
+                        cited_part_ids=["r2"], described_part_id="r1")  # fmt: skip
+    assert ask.final(spark, GOLDEN) == ("It holds the core.", "teacher_description", ["r1", "r2"])
+    client = FakeClient({"reply": {"answer_text": "It does x.", "source": "teacher_description",
+                                   "cited_part_ids": ["r4"]}})  # fmt: skip
+    out = asyncio.run(asker(client).ask(req(), None))
+    assert (out.source, out.rule_fallback) == ("unsure", True)
+
+
+def test_spark_gets_the_schema_strict() -> None:
+    from app.meta.live_client import spark_body  # noqa: PLC0415
+
+    body = spark_body("m", "s", "u", None, ("FigureAnswer", {}), "low", strict=True)
+    assert body["response_format"]["json_schema"]["strict"] is True
+    assert (
+        "strict" not in spark_body("m", "s", "u", None, ("X", {}))["response_format"]["json_schema"]
+    )

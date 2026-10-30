@@ -66,8 +66,10 @@ def spark_body(
     png: bytes | None,
     schema: tuple[str, dict[str, Any]],
     effort: str = SPARK_EFFORT,
+    strict: bool = False,
 ) -> dict[str, Any]:
-    """A Spark chat request; png None sends the text alone."""
+    """A Spark chat request; png None sends the text alone. strict asks the server to check
+    the schema against its strict subset (a 400 when it is outside it)."""
     content: list[dict[str, Any]] = [{"type": "text", "text": text}]
     if png is not None:
         url = "data:image/png;base64," + base64.b64encode(png).decode()
@@ -80,7 +82,10 @@ def spark_body(
         "model": model,
         "reasoning_effort": effort,
         "messages": messages,
-        "response_format": {"type": "json_schema", "json_schema": {"name": name, "schema": js}},
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {"name": name, "schema": js, **({"strict": True} if strict else {})},
+        },
     }
 
 
@@ -338,7 +343,7 @@ class LiveMetaClient:
         """Muse Spark answers one question about the figure, at low reasoning effort; with
         png None, from the text alone."""
         body = spark_body(
-            self._models.spark, system, user, png, ("FigureAnswer", schema), effort=ASK_EFFORT
+            self._models.spark, system, user, png, ("FigureAnswer", schema), ASK_EFFORT, strict=True
         )
         digest = hashlib.sha256(user.encode()).hexdigest()[:8]
         res = await self._caller.post_json(

@@ -28,8 +28,8 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from app.models.regions import Region, RegionsFile
 
 Source = Literal["figure", "teacher_description", "off_figure", "unsure"]
-PROMPT = "ask_answer.v1.json"
-TEXT_PROMPT = "ask_answer_text.v1.json"  # the latency experiment's variant: no figure image
+PROMPT = "ask_answer.v2.json"
+TEXT_PROMPT = "ask_answer_text.v2.json"  # the latency experiment's variant: no figure image
 SESSION_QUESTIONS = 50
 CALLS_PER_QUESTION = 2  # transcribe, then Spark
 MAX_SENTENCES = 2
@@ -43,16 +43,52 @@ NOT_HEARD = "I did not catch a question. Hold the screen and ask again."
 CAPPED = f"That is {SESSION_QUESTIONS} questions for this session. Ask your teacher."
 FAILED = "Questions are not working right now. Labels still work."
 
-ANSWER_SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "additionalProperties": False,
-    "required": ["answer_text", "source", "cited_part_ids"],
-    "properties": {
-        "answer_text": {"type": "string"},
-        "source": {"enum": ["figure", "teacher_description", "off_figure", "unsure"]},
-        "cited_part_ids": {"type": "array", "items": {"type": "string"}},
-    },
-}
+
+def _ids(f: RegionsFile) -> list[str]:
+    return list(dict.fromkeys(r.id.partition("_")[0] for r in f.regions))
+
+
+def answer_schema(f: RegionsFile) -> dict[str, Any]:
+    """Spark's answer, per figure: {"reply": one of two shapes}. A teacher_description reply
+    must name a described_part_id from the parts that have a teacher's description, so the
+    citation rule holds by construction: the Model API constrains decoding to the schema
+    ("decoding itself is constrained, so the output is guaranteed to conform",
+    dev.meta.ai/docs/structured-output). anyOf sits below the root, as strict mode requires
+    ("anyOf is supported below the root"), every object sets additionalProperties false and
+    requires all its keys. A figure with no description has the second shape only."""
+    ids = _ids(f)
+    described = list(dict.fromkeys(r.id.partition("_")[0] for r in f.regions if r.description))
+    cites = {"type": "array", "items": {"type": "string", "enum": ids}}
+    other: dict[str, Any] = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["source", "answer_text", "cited_part_ids"],
+        "properties": {
+            "source": {"type": "string", "enum": ["figure", "off_figure", "unsure"]},
+            "answer_text": {"type": "string"},
+            "cited_part_ids": cites,
+        },
+    }
+    shapes = [other]
+    if described:
+        shapes.insert(0, {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["source", "answer_text", "described_part_id", "cited_part_ids"],
+            "properties": {
+                "source": {"type": "string", "enum": ["teacher_description"]},
+                "answer_text": {"type": "string"},
+                "described_part_id": {"type": "string", "enum": described},
+                "cited_part_ids": cites,
+            },
+        })  # fmt: skip
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["reply"],
+        "properties": {"reply": {"anyOf": shapes}},
+    }
+
 
 _READERS = {
     "k5": "a student in kindergarten to grade 5",
@@ -97,6 +133,7 @@ class SparkAnswer(BaseModel):
     answer_text: str
     source: Source
     cited_part_ids: list[str]
+    described_part_id: str | None = None  # a teacher_description reply's described part
 
 
 class Answer(BaseModel):
@@ -109,6 +146,9 @@ class Answer(BaseModel):
     spark: SparkAnswer | None  # as Spark gave it, before code's last word
     timings_ms: dict[str, float]
     prompt: str = PROMPT
+    # Code turned a teacher_description answer into unsure: no described part was cited.
+    # The schema makes this impossible on the Model API; counted on the eval in case.
+    rule_fallback: bool = False
 
 
 class WavError(ValueError):
@@ -202,11 +242,8 @@ def final(spark: SparkAnswer, f: RegionsFile) -> tuple[str, Source, list[str]]:
     """Code's last word on Spark's answer: what Explore says, the source and the cites."""
     ids = {r.id.partition("_")[0] for r in f.regions}
     described = {r.id.partition("_")[0] for r in f.regions if r.description}
-    cited = list(
-        dict.fromkeys(
-            i.partition("_")[0] for i in spark.cited_part_ids if i.partition("_")[0] in ids
-        )
-    )
+    named = [*([spark.described_part_id] if spark.described_part_id else []), *spark.cited_part_ids]
+    cited = list(dict.fromkeys(i.partition("_")[0] for i in named if i.partition("_")[0] in ids))
     source = spark.source
     if source == "teacher_description" and not set(cited) & described:
         source = "unsure"
@@ -280,13 +317,15 @@ class Asker:
         user = prompt_text(self.user, f, req, question)
         t = time.perf_counter()
         image = png if self.image else None
-        raw = await client.answer(req.figure_id, image, self.system, user, ANSWER_SCHEMA, question)
+        schema = answer_schema(f)
+        raw = await client.answer(req.figure_id, image, self.system, user, schema, question)
         timings["spark"] = ms_since(t)
-        spark = SparkAnswer.model_validate(raw)
+        spark = SparkAnswer.model_validate(raw.get("reply", raw))
         text, source, cited = final(spark, f)
+        fallback = spark.source == "teacher_description" and source == "unsure"
         timings["server"] = ms_since(t0)
         return Answer(transcript=question, answer=text, source=source, cited_part_ids=cited,
-                      spark=spark, timings_ms=timings)  # fmt: skip
+                      spark=spark, timings_ms=timings, rule_fallback=fallback)  # fmt: skip
 
 
 class QuestionCapError(Exception):

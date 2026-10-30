@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 232, updated 2026-10-30T21:55:10.710Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 234, updated 2026-10-30T22:00:17.137Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -223,6 +223,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Added h62-h67 and b68-b73 (category image) with expectations from the version 4 sheet (right ventricle biggest heart part by area, 820 mm2; frontal lobe biggest lobe, 1765 against parietal 1551; aortic arch top, inferior vena cava bottom; cerebellum and brainstem bottom; neighbors from regions.json). qa_eval --only CATEGORY. Live, recorded qa4 (image) and qa5 (no image), not replayed. With image: heart source 5/6, citations 5/6 (h63 'Which part is the biggest?' deflected), brain 6/6, 6/6; Spark p50 6.4 s heart, 5.3 s brain on these. Without: heart 3/6, brain 3/6 (shape and size questions deflected). Outside-word flags with the image are words the picture supplies (curved, long, rounded); h67 said 'looks larger than the left atrium in this picture', sight wording RULES.md 2.4 forbids. Image kept.
 - [x] d5-32 README Privacy: the billing page's free-credit notice restored beside the docs
   - Note: README quotes the billing page at dev.meta.ai on 2026-10-27, verbatim: 'While using free credits your content may be used for product improvement', with a 'Stop using free credits' link (Deepak's screenshot), beside the docs quotes; says the docs read on Oct 30 do not mention it or explain how it interacts with Standard models; the teacher's steps now include stopping free credits or confirming with Meta; the retention question stays open. Replaces the Oct 30 withdrawal of the free-credit claim, which had relied on the docs alone.
+- [x] d5-33 Citation rule in the structured-output schema: a teacher_description answer names a described part
+  - Note: Docs (dev.meta.ai/docs/structured-output, Oct 30): 'decoding itself is constrained, so the output is guaranteed to conform'; strict subset: 'no top-level anyOf, oneOf, allOf, enum, or not', 'anyOf is supported below the root', every object additionalProperties false and required listing every key; if/then and contains not mentioned. So the rule is in the schema: answer_schema(f) per figure, {reply: anyOf[teacher_description shape with described_part_id enum = the described parts' ids, other shape with source figure/off_figure/unsure]}, cites enum = the figure's ids, sent with strict: true. Live check: accepted; 'What does the aortic arch do?' came back teacher_description with described_part_id r14 (left ventricle). The described part is added to the cites. The retry path was not needed; code's fallback to unsure stays and is counted (Answer.rule_fallback, qa_eval rule_fallbacks). Prompt ask_answer.v2: rules 3 and 6 for inferences and described_part_id, and RULES.md 2.4's no sight words ('looks', 'see', 'in this picture'), after h67 said 'looks larger ... in this picture'. Replay tests skip until the answers are recorded with v2 (scores.json now names its prompt).
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

@@ -24,7 +24,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from app.ask import TEXT_PROMPT, Asker, AskRequest, prompt_text
+from app.ask import PROMPT, TEXT_PROMPT, Asker, AskRequest, prompt_text
 from app.config import load_tactile_rules
 from app.main import create_app
 from app.meta.client import make_client
@@ -133,6 +133,7 @@ async def run(
             "cited": cited, "cite_must": sorted(must), "cite_may": sorted(may),
             "citations_correct": must <= set(cited) <= must | may,
             "outside_words": outside, "timings_ms": a.timings_ms,
+            "rule_fallback": a.rule_fallback,
         })  # fmt: skip
         print(f"{row['id']} {a.source:20s} {a.answer}")
     return rows
@@ -156,6 +157,7 @@ def summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "source_correct": sum(r["source_correct"] for r in done),
             "citations_correct": sum(r["citations_correct"] for r in done),
             "outside_flags": sum(bool(r["outside_words"]) for r in done),
+            "rule_fallbacks": sum(bool(r.get("rule_fallback")) for r in done),
             "by_category": {
                 k: {"n": v[0], "source": v[1], "citations": v[2]} for k, v in by_cat.items()
             },
@@ -225,7 +227,11 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     tail = ("" if args.only is None else f"_{args.only}") + ("" if image else "_no_image")
     (OUT / f"scores{tail}.json").write_text(
-        json.dumps({"summary": s, "rows": rows}, indent=1) + "\n", "utf-8"
+        json.dumps(
+            {"prompt": PROMPT if image else TEXT_PROMPT, "summary": s, "rows": rows}, indent=1
+        )
+        + "\n",
+        "utf-8",
     )
     (OUT / f"RESULTS{tail}.md").write_text(markdown(rows, s, args.live, image) + "\n", "utf-8")
     print(json.dumps(s, indent=1))

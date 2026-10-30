@@ -25,9 +25,15 @@ from app.prompts import load_prompt
 
 RULES = load_tactile_rules()
 PROMPT = load_prompt(ask.PROMPT)
-LIVE = {
-    r["id"]: r for r in json.loads((REPO_ROOT / "eval" / "qa" / "scores.json").read_text())["rows"]
-}
+SCORES = json.loads((REPO_ROOT / "eval" / "qa" / "scores.json").read_text())
+LIVE = {r["id"]: r for r in SCORES["rows"]}
+# Recordings answer the prompt they were made with; after a prompt change they wait for the
+# next live run (app/meta/qa_eval.py --live), which writes its prompt into scores.json.
+RECORDED_PROMPT = SCORES.get("prompt", "ask_answer.v1.json")
+stale = pytest.mark.skipif(
+    RECORDED_PROMPT != ask.PROMPT,
+    reason=f"answers recorded with {RECORDED_PROMPT}, the prompt is now {ask.PROMPT}",
+)
 IMAGES = {
     "heart": FIXTURES_DIR / "heart.png",
     "brain_lobes": FIXTURES_DIR / "eval" / "brain_lobes.png",
@@ -64,6 +70,7 @@ def request(q: dict[str, Any]) -> ask.AskRequest:
 
 
 # The questions the recorded live run answered (scores.json); the image experiment's are apart.
+@stale
 @pytest.mark.parametrize(
     "q", [q for q in qa_eval.load_questions() if q["id"] in LIVE], ids=lambda q: q["id"]
 )
@@ -94,6 +101,7 @@ def test_the_transcribe_clips_replay_with_and_without_keywords(
     assert asyncio.run(MockMetaClient(RULES.meta).transcribe(fid, wav, words)) == heard
 
 
+@stale
 def test_the_route_answers_from_the_figure_and_deflects_off_it(tmp_path: Path) -> None:
     async def body() -> list[dict[str, Any]]:
         app = create_app(data_dir=tmp_path, client=MockMetaClient(RULES.meta))
