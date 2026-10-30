@@ -70,7 +70,7 @@ Wrap every live run (LIVE=1) in `caffeinate -i`, so the Mac cannot sleep mid-run
 
 ## The contract
 
-`docs/regions.schema.json` is the single source of truth between Author and Explore. Change it only with a version bump and a migration note in PLAN.md. Explore must work from `regions.json` alone, with no network, for labels and earcons.
+`docs/regions.schema.json` is the single source of truth between Author and Explore. Breaking changes to regions.json need a version bump. Additive optional fields don't, but are listed in PLAN.md with the date. The version stays 3. Explore must work from `regions.json` alone, with no network, for labels and earcons.
 
 ## Definition of done for any task
 
