@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 199, updated 2026-10-30T19:12:04.500Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 201, updated 2026-10-30T19:19:31.332Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -195,6 +195,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Route, prompt, transcribe and answer calls, code's last word and session cap in place with unit and route tests (fake client); live eval and replay tests to come (d5 B4, B5).
 - [x] d5-18 Explore: hold anywhere to ask out loud; 16 kHz WAV encoded in the browser; earcons and a thinking tone (phase B)
   - Note: apps/web/src/explore/voice.ts: HoldToTalk state machine (idle, pressed, listening after HOLD_MS 300, busy; under MIN_MS 400 too short; MAX_MS 15 s sends), WebAudioMic (getUserMedia into an AudioWorklet, opened on the first hold and kept, no MediaRecorder), resample to 16 kHz (box filter down, linear up), encodeWav (RIFF, mono 16-bit PCM). Rising earcon on listening, falling on release, a soft 392 Hz blip every 1.1 s until the answer is said. Hold anywhere except a text field or a select; the click after a hold is swallowed; no long-press menu. Typed Ask form kept. Mic denied: spoken 'The microphone is not allowed...' and not asked again; offline: 'Questions need the network. Labels still work.'; server errors are spoken as sent. Headless check (Chrome, fake microphone playing a say clip, mouse held 2.5 s): events stop, listen_start, listen_end, thinking_on, POST /api/ask, answer said, thinking_off, speech_start; WAV RIFF mono 16 kHz 16-bit, 2.14 s, peak 32715; encode 4.2 ms. VoiceOver's double tap and hold could not be checked headless: for the iPhone test.
+- [x] d5-19 Question eval set (heart, Commons brain) and its scorer (phase B)
+  - Note: eval/qa/questions.jsonl: heart 30, Commons brain 28, against published version 3 (every part checked; two teacher descriptions each: heart left ventricle and right atrium, brain frontal and occipital lobe). Categories: on_figure (what is this, next to, below, how many, lines), teacher_description, off_figure (a part's job with no description, general facts), untouchable (septum, olfactory bulb), injection. Each row: accepted sources, parts to cite, parts that may be cited, finger and recent parts. app/meta/qa_eval.py runs them through the same Asker as /api/ask, live (--live, META_RECORD) or on replay, and reports source correct, citations correct (must <= cited <= must + may) and answers with words outside what Spark was given; writes eval/qa/RESULTS.md.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

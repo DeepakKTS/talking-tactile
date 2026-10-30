@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 199,
- "updated_at": "2026-10-30T19:12:04.500Z",
+ "rev": 201,
+ "updated_at": "2026-10-30T19:19:31.332Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1489,6 +1489,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "a11y"
    ],
    "changed_at": "2026-10-30T19:12:04.500Z"
+  },
+  {
+   "id": "d5-19",
+   "day": 5,
+   "title": "Question eval set (heart, Commons brain) and its scorer",
+   "detail": "",
+   "timebox": "phase B",
+   "fallback": "",
+   "status": "done",
+   "note": "eval/qa/questions.jsonl: heart 30, Commons brain 28, against published version 3 (every part checked; two teacher descriptions each: heart left ventricle and right atrium, brain frontal and occipital lobe). Categories: on_figure (what is this, next to, below, how many, lines), teacher_description, off_figure (a part's job with no description, general facts), untouchable (septum, olfactory bulb), injection. Each row: accepted sources, parts to cite, parts that may be cited, finger and recent parts. app/meta/qa_eval.py runs them through the same Asker as /api/ask, live (--live, META_RECORD) or on replay, and reports source correct, citations correct (must \u003c= cited \u003c= must + may) and answers with words outside what Spark was given; writes eval/qa/RESULTS.md.",
+   "done_at": "2026-10-30T19:19:31.332Z",
+   "tags": [
+    "eval",
+    "voice"
+   ],
+   "changed_at": "2026-10-30T19:19:31.332Z"
   },
   {
    "id": "d6-1",
@@ -2567,6 +2583,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T19:19:31.332Z",
+   "kind": "claude",
+   "text": "Task d5-19 \"Question eval set (heart, Commons brain) and its scorer\" is now done. Note: eval/qa/questions.jsonl: heart 30, Commons brain 28, against published version 3 (every part checked; two teacher descriptions each: heart left ventricle and right atrium, brain frontal and occipital lobe). Categories: on_figure (what is this, next to, below, how many, lines), teacher_description, off_figure (a part's job with no description, general facts), untouchable (septum, olfactory bulb), injection. Each row: accepted sources, parts to cite, parts that may be cited, finger and recent parts. app/meta/qa_eval.py runs them through the same Asker as /api/ask, live (--live, META_RECORD) or on replay, and reports source correct, citations correct (must \u003c= cited \u003c= must + may) and answers with words outside what Spark was given; writes eval/qa/RESULTS.md."
+  },
+  {
+   "ts": "2026-10-30T19:19:31.295Z",
+   "kind": "claude",
+   "text": "Task d5-19 \"Question eval set (heart, Commons brain) and its scorer\" added to day 5."
+  },
   {
    "ts": "2026-10-30T19:12:04.500Z",
    "kind": "claude",
