@@ -155,9 +155,24 @@ class Prices(_Section):
 
 
 class MetaModels(_Section):
+    """Standard models only (RULES.md 1.4). The model id chooses the mode on the Model API:
+    "switch between the two by choosing the model ID" (dev.meta.ai/docs/models), and a
+    Contributor model is the id with -contributor, such as muse-spark-1.3-contributor."""
+
     spark: Annotated[StrictStr, Field(min_length=1)]
     sam: Annotated[StrictStr, Field(min_length=1)]
     voice: Annotated[StrictStr, Field(min_length=1)]
+
+    @model_validator(mode="after")
+    def _standard(self) -> Self:
+        for model in (self.spark, self.sam, self.voice):
+            if "contributor" in model.lower():
+                raise ValueError(
+                    f"models: {model} is a Contributor model, whose content Meta may use to "
+                    "train its models; this build sends a student's question and uses "
+                    "Standard models only"
+                )
+        return self
 
 
 class JobCalls(_Section):

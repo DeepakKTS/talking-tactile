@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 218,
- "updated_at": "2026-10-30T20:36:36.697Z",
+ "rev": 220,
+ "updated_at": "2026-10-30T20:44:03.959Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1618,6 +1618,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-30T20:36:36.697Z"
   },
   {
+   "id": "d5-27",
+   "day": 5,
+   "title": "Meta docs on Standard and Contributor mode (RULES.md 1.4); Standard models enforced",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Read dev.meta.ai on Oct 30 (docs/models, docs/pricing-rate-limits, legal/terms-of-service, legal/geographic-use-policy). The mode is set by the model id in each request, not by a request field or (outside coding harness subscriptions) an account setting: muse-spark-1.3 Standard, muse-spark-1.3-contributor Contributor; Muse Voice Transcribe has no Contributor mode; SAM 3.1 and Muse Voice Transcribe are Standard Models. Standard: content not used to train Meta models (Terms 5.1). Contributor: prompts, files, context and responses may train future models; no personal information; no way to exclude traffic (6.2). Coding harness subscriptions default to Contributor unless the account setting is changed (3.3). The docs do not tie free or promotional credits to content use; the earlier README claim was withdrawn. This build already sent only Standard models; config now refuses any Contributor model id (MetaModels, test_config). README Privacy rewritten with quotes and the teacher's steps; retention and zero data retention left as questions for Meta.",
+   "done_at": "2026-10-30T20:44:03.959Z",
+   "tags": [
+    "privacy",
+    "docs"
+   ],
+   "changed_at": "2026-10-30T20:44:03.959Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -2702,6 +2718,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T20:44:03.959Z",
+   "kind": "claude",
+   "text": "Task d5-27 \"Meta docs on Standard and Contributor mode (RULES.md 1.4); Standard models enforced\" is now done. Note: Read dev.meta.ai on Oct 30 (docs/models, docs/pricing-rate-limits, legal/terms-of-service, legal/geographic-use-policy). The mode is set by the model id in each request, not by a request field or (outside coding harness subscriptions) an account setting: muse-spark-1.3 Standard, muse-spark-1.3-contributor Contributor; Muse Voice Transcribe has no Contributor mode; SAM 3.1 and Muse Voice Transcribe are Standard Models. Standard: content not used to train Meta models (Terms 5.1). Contributor: prompts, files, context and responses may train future models; no personal information; no way to exclude traffic (6.2). Coding harness subscriptions default to Contributor unless the account setting is changed (3.3). The docs do not tie free or promotional credits to content use; the earlier README claim was withdrawn. This build already sent only Standard models; config now refuses any Contributor model id (MetaModels, test_config). README Privacy rewritten with quotes and the teacher's steps; retention and zero data retention left as questions for Meta."
+  },
+  {
+   "ts": "2026-10-30T20:44:03.921Z",
+   "kind": "claude",
+   "text": "Task d5-27 \"Meta docs on Standard and Contributor mode (RULES.md 1.4); Standard models enforced\" added to day 5."
+  },
   {
    "ts": "2026-10-30T20:36:36.697Z",
    "kind": "claude",

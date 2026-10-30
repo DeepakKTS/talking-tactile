@@ -213,3 +213,22 @@ def test_app_refuses_to_start_with_bad_config(tmp_path: Path) -> None:
     data = edit(raw(EXPLORE_YAML), "dwell.hold_ms", -5)
     with pytest.raises(ConfigError):
         create_app(explore_path=write(tmp_path, data))
+
+
+@pytest.mark.parametrize("which", ["spark", "sam", "voice"])
+def test_a_contributor_model_is_refused(tmp_path: Path, which: str) -> None:
+    """RULES.md 1.4: the model id chooses Standard or Contributor mode, and this build sends a
+    student's question, so only Standard models load."""
+    data = raw(TACTILE_RULES_YAML)
+    name = f"{data['meta']['models'][which]}-contributor"
+    data = edit(data, f"meta.models.{which}", name)
+    data["meta"]["prices_usd"][name] = {"per_image": 0.01}
+    with pytest.raises(ConfigError, match="Contributor model"):
+        load_tactile_rules(write(tmp_path, data))
+
+
+def test_the_configured_models_are_standard() -> None:
+    models = load_tactile_rules().meta.models
+    assert (models.spark, models.sam, models.voice) == (
+        "muse-spark-1.3", "sam-3.1", "muse-voice-transcribe-1.0",
+    )  # fmt: skip
