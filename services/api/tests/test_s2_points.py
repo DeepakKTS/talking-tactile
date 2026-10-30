@@ -97,6 +97,9 @@ class FakeSam:
     def for_job(self) -> "FakeSam":
         return self
 
+    def cap_calls(self, cap: int) -> None:
+        self.cap = cap
+
     async def segment_points(
         self, image: Any, figure_id: str, part: str, objects: Any, prompt: Any, retry: bool = False
     ) -> list[ObjectMask]:
@@ -308,3 +311,16 @@ def test_the_guard_moves_a_point_off_an_outline_by_the_clearance() -> None:
     scene = gp.scene_of(figure().image, 40.0)
     g = gp.guard_instance(scene, [(14, 60)])[0]  # 2 px inside the left box's outline
     assert g["on"] == [gp.NEAR] and g["sent"] == [17, 60] and g["moved_px"] == 3.0
+
+
+def test_s2_sets_the_job_cap_from_the_number_of_parts() -> None:
+    sam = FakeSam({("left", False): [box(12, 88)], ("right", False): [box(112, 188)]})
+    ground(sam, understanding(part("left", 150), part("right", 750)))
+    assert sam.cap == 2 + 2 * 2
+
+
+@pytest.mark.parametrize(("parts", "cap"), [(0, 2), (3, 8), (19, 40), (29, 60), (40, 60)])
+def test_the_job_cap_is_two_spark_calls_and_two_per_part_up_to_60(parts: int, cap: int) -> None:
+    from app.meta.client import job_cap  # noqa: PLC0415
+
+    assert job_cap(parts, RULES.meta) == cap

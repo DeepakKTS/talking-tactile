@@ -160,6 +160,12 @@ class MetaModels(_Section):
     voice: Annotated[StrictStr, Field(min_length=1)]
 
 
+class JobCalls(_Section):
+    spark: PosInt
+    per_part: PosInt
+    ceiling: PosInt
+
+
 class Meta(_Section):
     budget_usd: PosFloat
     warn_at_fractions: list[Annotated[StrictFloat, Field(gt=0, lt=1)]]
@@ -167,6 +173,8 @@ class Meta(_Section):
     sam_concurrency: PosInt
     text_phrase: Annotated[StrictStr, Field(min_length=1)]
     live_call_cap: PosInt
+    job_calls: JobCalls
+    fix_call_cap: PosInt
     models: MetaModels
     prices_usd: dict[StrictStr, Prices]
 

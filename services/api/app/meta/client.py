@@ -25,6 +25,12 @@ SamObject = tuple[Sequence[Point], Sequence[Point]]  # positive points, negative
 RECORD_ENV = "META_RECORD"
 
 
+def job_cap(parts: int, rules: Meta) -> int:
+    """The live calls one pipeline job may make: 2 Spark + 2 per part, at most the ceiling."""
+    c = rules.job_calls
+    return min(c.ceiling, c.spark + c.per_part * parts)
+
+
 class LiveClientUnavailableError(Exception):
     """Live mode was asked for without LIVE=1."""
 
@@ -54,6 +60,10 @@ class MetaClient(Protocol):
         """The client one pipeline job uses: in live mode a fresh call count under the cap."""
         ...
 
+    def cap_calls(self, cap: int) -> None:
+        """Set this job's live call cap, once the number of parts is known."""
+        ...
+
     async def understand(
         self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt
     ) -> Understanding:
@@ -72,8 +82,10 @@ class MetaClient(Protocol):
         objects: Sequence[SamObject],
         prompt: Prompt,
         retry: bool = False,
+        kind: str = "s2",
     ) -> list[ObjectMask]:
-        """S2: SAM segments each object from its points, in one call."""
+        """SAM segments each object from its points, in one call. kind names the caller in
+        the ledger and the recording: s2, or fix for a teacher's outline."""
         ...
 
 

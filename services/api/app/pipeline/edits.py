@@ -11,6 +11,10 @@ joins the S4 and S5 cache keys, so an edit re-runs layout and render and nothing
 - add: a part SAM finds by name on request (cached like any SAM answer). Mostly inside one
   part, it becomes that part's child. Otherwise it takes only pixels no other part holds,
   and parts mostly inside it become its children.
+- outline: the teacher's points for one listed part, positive and negative, in pixels of
+  the normalized image. SAM's mask from those points replaces the part's S2 mask, or gives
+  a part S2 left to the teacher its first one, before S3: S3's rules run again on it. The
+  hash of the outline edits joins the S3 key. Its mask is marked set by the teacher.
 
 A part a teacher labelled, described, merged into or added is marked verified."""
 
@@ -64,8 +68,22 @@ class AddEdit(_Edit):
     name: Text
 
 
+Px = Annotated[int, Field(ge=0, le=20_000)]
+MAX_POINTS = 20
+
+
+class OutlineEdit(_Edit):
+    op: Literal["outline"]
+    region: RegionId  # where the teacher pressed Fix outline, for the record
+    part: Text  # the listed part it sets: S2's phrase, found by the service from the region
+    positive: Annotated[list[tuple[Px, Px]], Field(min_length=1, max_length=MAX_POINTS)]
+    negative: Annotated[list[tuple[Px, Px]], Field(max_length=MAX_POINTS)] = []
+    spill: list[Text] = []  # parts whose prompt points the accepted mask held
+
+
 Edit = Annotated[
-    LabelEdit | DescribeEdit | MergeEdit | DeleteEdit | AddEdit, Field(discriminator="op")
+    LabelEdit | DescribeEdit | MergeEdit | DeleteEdit | AddEdit | OutlineEdit,
+    Field(discriminator="op"),
 ]
 EDIT = TypeAdapter(Edit)
 EDITS = TypeAdapter(list[Edit])
@@ -77,6 +95,17 @@ class EditError(Exception):
 
 def edits_digest(edits: Sequence[Edit]) -> str:
     return hashlib.sha256(EDITS.dump_json(list(edits))).hexdigest()
+
+
+def outlines(edits: Sequence[Edit]) -> list[OutlineEdit]:
+    """The outline edits, in order. A later one for the same part replaces an earlier one."""
+    last = {e.part: e for e in edits if isinstance(e, OutlineEdit)}
+    return list(last.values())
+
+
+def outlines_digest(edits: Sequence[Edit]) -> str:
+    """The S3 key's share of the edits: only outlines act before S3."""
+    return hashlib.sha256(EDITS.dump_json(list(outlines(edits)))).hexdigest()
 
 
 def added_names(edits: Sequence[Edit]) -> list[str]:
@@ -216,6 +245,8 @@ def apply_edits(
             _merge(st, e)
         elif isinstance(e, DeleteEdit):
             st.remove(st.get(e.region).id)
+        elif isinstance(e, OutlineEdit):
+            continue  # applied to S2's masks before S3
         else:
             n_added += 1
             _add(st, _added_id(n_added), e.name, added.get(e.name, []), contain_fraction)

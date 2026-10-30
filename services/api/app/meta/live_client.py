@@ -21,7 +21,7 @@ from PIL import Image
 
 from app.config import Meta
 from app.meta import sam_adapter
-from app.meta.client import MetaClient, ObjectMask, SamObject
+from app.meta.client import MetaClient, ObjectMask, SamObject, job_cap
 from app.meta.cost import CostMeter
 from app.meta.live import LiveCaller, spark_units
 from app.meta.types import (
@@ -140,8 +140,18 @@ class LiveMetaClient:
         """Live answers depend on the model ids, so a model change re-runs S1 and S2."""
         return f"live:{self._models.spark}:{self._models.sam}"
 
+    def cap_calls(self, cap: int) -> None:
+        self._caller.cap = cap
+
     def for_job(self) -> MetaClient:
         return LiveMetaClient(self._rules, self._make_caller, self._record_prefix)
+
+    def _sam_name(self, kind: str, part: str, retry: bool) -> str:
+        """S2's names are one per part; a fix part gets a call count, since recordings are
+        never overwritten and a teacher clicks several times."""
+        if kind == "s2":
+            return f"s2_{slug(part)}{'_retry' if retry else ''}"
+        return f"{kind}_{slug(part)}_{self._caller.calls + 1:02d}"
 
     def _name(self, what: str) -> str | None:
         return None if self._record_prefix is None else f"{self._record_prefix}_{what}"
@@ -176,6 +186,7 @@ class LiveMetaClient:
         )
         u = Understanding.model_validate(listing)
         u = u.model_copy(update={"parts": u.parts[: self._rules.max_parts]})
+        self.cap_calls(job_cap(len(u.parts), self._rules))
         if not u.parts or u.verdict == "describe_only":
             return u
         body = spark_body(
@@ -209,6 +220,7 @@ class LiveMetaClient:
         objects: Sequence[SamObject],
         prompt: Prompt,
         retry: bool = False,
+        kind: str = "s2",
     ) -> list[ObjectMask]:
         h, w = image.shape[:2]
         body = sam_adapter.objects_request_body(
@@ -222,11 +234,11 @@ class LiveMetaClient:
         res = await self._caller.post_sse(
             "/responses",
             body,
-            caller="s2",
+            caller=kind,
             model=self._models.sam,
             describe=f"figure {figure_id[:12]} {w}x{h}, {len(objects)} objects for {part}{what}",
             units=lambda _usage: {"images": 1},
-            record_as=self._name(f"s2_{slug(part)}{'_retry' if retry else ''}"),
+            record_as=self._name(self._sam_name(kind, part, retry)),
         )
         parsed = await sam_adapter.parse_events(res.body)
         # Decoding is pure Python, about 1 s a mask: off the event loop, so the API answers

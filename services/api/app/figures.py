@@ -12,23 +12,34 @@ version is published only when the tactile rules report written with those exact
 no violation; there is no override."""
 
 import asyncio
+import base64
 import hashlib
 import json
 import shutil
 import stat
+import time
 import uuid
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+import httpx
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.errors import ApiError
+from app.geometry import points as gp
+from app.geometry.layout import part_id_of
 from app.geometry.validate import Violation
+from app.meta.client import MetaClient
+from app.meta.live import LiveCallCapError, LiveCallError
+from app.meta.mock import MockFixtureMissingError
 from app.pipeline import db
-from app.pipeline.edits import Edit, EditError, EditStore
+from app.pipeline.edits import MAX_POINTS, Edit, EditError, EditStore, OutlineEdit
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore
+from app.pipeline.outlines import OutlineError, check_points, old_outline, spill_of
 from app.pipeline.runner import NotReadyError, Runner
 from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, REPORT_FILE, SVG_FILE
+from app.render.preview import preview
 
 MEDIA_TYPES = {
     REGIONS_FILE: "application/json",
@@ -170,7 +181,165 @@ def check_report(out: Path, edit_version: int) -> None:
     )
 
 
-class FigureService:
+# Fix outline: a teacher's points for one part, previewed and then accepted as an edit.
+
+
+class FixPoints(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    positive: list[tuple[int, int]] = Field(max_length=MAX_POINTS)
+    negative: list[tuple[int, int]] = Field(default=[], max_length=MAX_POINTS)
+
+
+class _Fix:
+    """What one preview or accept works from."""
+
+    def __init__(self, job: JobRecord, phrase: str, region: str, context: Any) -> None:
+        self.job, self.phrase, self.region = job, phrase, region
+        self.ing, self.u, self.g, self.rec = context
+
+
+def _fix_errors(exc: Exception) -> ApiError:
+    if isinstance(exc, MockFixtureMissingError):
+        return ApiError(
+            503,
+            "fix_unavailable",
+            "Fixing an outline needs live mode (LIVE=1), or recorded answers in mock mode.",
+        )
+    if isinstance(exc, LiveCallCapError):
+        return ApiError(429, "fix_cap", "This figure used its fix calls for this version.")
+    return ApiError(502, "sam_failed", "SAM did not answer. Try the click again.", True)
+
+
+class FixMixin:
+    """FigureService's Fix outline methods."""
+
+    runner: Runner
+    jobs: JobStore
+    edits: EditStore
+    _fix_clients: dict[tuple[str, int], MetaClient]
+    _scenes: dict[str, gp.Scene]
+
+    async def _fix(self, figure_id: str, region: str) -> _Fix:
+        job = self.jobs.latest_done(figure_id, self.edits.version(figure_id))
+        out = None if job is None else self.runner.output_dir(job)
+        if job is None or out is None:
+            raise ApiError(409, "not_ready", "The latest edits are still being applied.", True)
+        try:
+            context = await self.runner.fix_context(job)
+        except NotReadyError as exc:
+            raise ApiError(409, "not_ready", str(exc), True) from exc
+        regions = json.loads((out / REGIONS_FILE).read_text("utf-8"))
+        rec = context[3]
+        phrase = None
+        for r in regions["regions"]:
+            if r["id"] != region:
+                continue
+            if not r["touchable"]:
+                phrase = r["label"]  # a spill suggestion carries the part's own name
+            else:
+                part = next((p for p in rec.parts if p.id == part_id_of(region)), None)
+                phrase = None if part is None else part.mask.label
+        for t in regions.get("needs_teacher", []):
+            if t["id"] == region:
+                phrase = t["label"]
+        if phrase is None:
+            raise ApiError(
+                422,
+                "edit_invalid",
+                f"There is no part {region} to fix. A part added by name cannot be fixed; "
+                "delete it and fix the part it was meant to be.",
+            )
+        return _Fix(job, phrase, region, context)
+
+    async def _scene(self, figure_id: str, image: Any) -> gp.Scene:
+        if figure_id not in self._scenes:
+            delta = float(self.runner.rules.layout.color_group_max_delta)
+            self._scenes[figure_id] = await asyncio.to_thread(gp.scene_of, image, delta)
+        return self._scenes[figure_id]
+
+    def _fix_client(self, figure_id: str) -> MetaClient:
+        key = (figure_id, self.edits.version(figure_id))
+        if key not in self._fix_clients:
+            client = self.runner.client.for_job()
+            client.cap_calls(self.runner.rules.meta.fix_call_cap)
+            self._fix_clients[key] = client
+        return self._fix_clients[key]
+
+    async def _mask(self, fix: _Fix, points: FixPoints) -> tuple[Any, str, float]:
+        client = self._fix_client(fix.job.figure_id)
+        t0 = time.perf_counter()
+        try:
+            mask, outcome = await self.runner.outline_mask(
+                fix.job.figure_id, fix.phrase, points.positive, points.negative, client
+            )
+        except (MockFixtureMissingError, LiveCallCapError, LiveCallError, httpx.HTTPError) as exc:
+            raise _fix_errors(exc) from exc
+        return mask, outcome, (time.perf_counter() - t0) * 1000
+
+    async def fix_preview(self, figure_id: str, region: str, points: FixPoints) -> dict[str, Any]:
+        """SAM's mask for the teacher's points, drawn over the figure beside the old outline,
+        with the warnings and the spill check. No points: the figure and the old outline."""
+        fix = await self._fix(figure_id, region)
+        scene = await self._scene(figure_id, fix.ing.image)
+        try:
+            warnings = check_points(scene, points.positive, points.negative)
+        except OutlineError as exc:
+            raise ApiError(422, "point_refused", str(exc)) from exc
+        mask, outcome, ms, spill = None, None, None, []
+        if points.positive:
+            mask, outcome, ms = await self._mask(fix, points)
+            spill = spill_of(fix.phrase, mask, fix.g, fix.u) if mask.any() else []
+        old = old_outline(fix.phrase, fix.g)
+        png, scale = await asyncio.to_thread(
+            preview, fix.ing.image, mask, old, points.positive, points.negative
+        )
+        h, w = fix.ing.image.shape[:2]
+        client = self._fix_client(figure_id)
+        return {
+            "part": fix.phrase,
+            "region": region,
+            "width": w,
+            "height": h,
+            "scale": scale,
+            "image": "data:image/png;base64," + base64.b64encode(png).decode(),
+            "warnings": warnings,
+            "spill": spill,
+            "empty": bool(points.positive) and mask is not None and not mask.any(),
+            "area_px": 0 if mask is None else int(mask.sum()),
+            "outcome": outcome,
+            "latency_ms": None if ms is None else round(ms, 1),
+            "calls": getattr(client, "calls", None),
+            "call_cap": self.runner.rules.meta.fix_call_cap,
+        }
+
+    async def fix_accept(
+        self, figure_id: str, region: str, points: FixPoints
+    ) -> tuple[int, JobRecord]:
+        """The outline as an edit: the points, the part, and the spill check's answer."""
+        if not points.positive:
+            raise ApiError(422, "invalid_request", "An outline needs at least one positive point.")
+        fix = await self._fix(figure_id, region)
+        scene = await self._scene(figure_id, fix.ing.image)
+        try:
+            check_points(scene, points.positive, points.negative)
+        except OutlineError as exc:
+            raise ApiError(422, "point_refused", str(exc)) from exc
+        mask, _, _ = await self._mask(fix, points)
+        if not mask.any():
+            raise ApiError(422, "edit_invalid", "SAM found no outline at these points.")
+        edit = OutlineEdit(
+            op="outline",
+            region=region,
+            part=fix.phrase,
+            positive=points.positive,
+            negative=points.negative,
+            spill=spill_of(fix.phrase, mask, fix.g, fix.u),
+        )
+        return await self.edit(figure_id, edit)  # type: ignore[attr-defined, no-any-return]
+
+
+class FigureService(FixMixin):
     def __init__(self, runner: Runner, publications: PublishStore) -> None:
         self.runner = runner
         self.jobs: JobStore = runner.jobs
@@ -179,6 +348,8 @@ class FigureService:
         self._admit: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._run: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._tasks: set[asyncio.Task[JobRecord]] = set()
+        self._fix_clients: dict[tuple[str, int], MetaClient] = {}
+        self._scenes: dict[str, gp.Scene] = {}
 
     def _start(self, job: JobRecord) -> None:
         task = asyncio.create_task(self._run_job(job))

@@ -6,7 +6,7 @@
 // violation in words. After publishing: print and explore.
 import { useEffect, useState } from "react";
 import type { Region, RegionsFile } from "../shared/regions";
-import { ApiError, type Edit, type FigureApi, type Publication, type Status, type Violation, describeViolation } from "./api";
+import { ApiError, type Edit, type FigureApi, type FixPreview, type Point, type Publication, type Status, type Violation, describeViolation } from "./api";
 
 interface Props {
   api: FigureApi;
@@ -23,6 +23,7 @@ export function Review({ api, id, status, onEdited }: Props) {
   const [refused, setRefused] = useState<Violation[] | null>(null);
   const [published, setPublished] = useState<Publication | null>(null);
   const [busy, setBusy] = useState(false);
+  const [fixing, setFixing] = useState<{ region: string; label: string } | null>(null);
 
   const settled = status.job.status === "done" && status.job.edit_version === status.edit_version;
   const version = status.edit_version;
@@ -94,10 +95,20 @@ export function Review({ api, id, status, onEdited }: Props) {
       <p>{file.summary}</p>
       <p role="status">{settled ? message : "Applying your edit."}</p>
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(18rem,1fr) minmax(0,1fr)", gap: "1rem" }}>
-        <figure>
-          <img src={api.draftUrl(id, "source.png", 0)} alt="The figure as uploaded" style={{ maxWidth: "100%" }} />
-          <figcaption>As uploaded</figcaption>
-        </figure>
+        {fixing ? (
+          <FixPanel key={`${fixing.region}\u0000${version}`} api={api} id={id} region={fixing.region} label={fixing.label}
+            busy={busy || !settled}
+            onClose={() => { setFixing(null); }}
+            onAccept={async (positive, negative) => {
+              await send(`Setting the outline of ${fixing.label}`, () => api.edit(id, fixing.region, { op: "outline", positive, negative }));
+              setFixing(null);
+            }} />
+        ) : (
+          <figure>
+            <img src={api.draftUrl(id, "source.png", 0)} alt="The figure as uploaded" style={{ maxWidth: "100%" }} />
+            <figcaption>As uploaded</figcaption>
+          </figure>
+        )}
         <div>
           <h3>Parts</h3>
           <p>
@@ -107,7 +118,8 @@ export function Review({ api, id, status, onEdited }: Props) {
             {touchable.map((r) => (
               // Keyed on the saved text too, so the fields start over after an edit lands.
               <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={touchable} busy={busy || !settled} selected={selected === r.id}
-                onSelect={() => { setSelected(selected === r.id ? null : r.id); }} onEdit={edit} />
+                onSelect={() => { setSelected(selected === r.id ? null : r.id); }} onEdit={edit}
+                onFix={() => { setFixing({ region: r.id, label: r.label }); }} />
             ))}
           </ul>
           {flagged.length > 0 && (
@@ -122,7 +134,10 @@ export function Review({ api, id, status, onEdited }: Props) {
                       <button type="button" onClick={() => { setSelected(selected === f.id ? null : f.id); }} aria-pressed={selected === f.id}>
                         Show the suggested outline of {f.label}
                       </button>
-                    )}
+                    )}{" "}
+                    <button type="button" disabled={busy || !settled} onClick={() => { setFixing({ region: f.id, label: f.label }); }}>
+                      Fix outline of {f.label}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -217,8 +232,9 @@ function PartRow(props: {
   selected: boolean;
   onSelect: () => void;
   onEdit: (r: Region, e: Edit, what: string) => Promise<void>;
+  onFix: () => void;
 }) {
-  const { region: r, all, busy, selected, onSelect, onEdit } = props;
+  const { region: r, all, busy, selected, onSelect, onEdit, onFix } = props;
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState(r.label);
   const [description, setDescription] = useState(r.description ?? "");
@@ -238,7 +254,9 @@ function PartRow(props: {
           Mark {r.label} checked
         </button>
       )}{" "}
-      <button type="button" onClick={() => { setOpen(!open); }} aria-expanded={open}>Edit {r.label}</button>
+      {r.source === "teacher" && <span>Outline set by teacher. </span>}
+      <button type="button" onClick={() => { setOpen(!open); }} aria-expanded={open}>Edit {r.label}</button>{" "}
+      <button type="button" disabled={busy} onClick={onFix}>Fix outline of {r.label}</button>
       {open && (
         <div>
           <form onSubmit={(e) => { e.preventDefault(); void onEdit(r, { op: "label", label }, `Renaming ${r.label}`); }}>
@@ -275,6 +293,124 @@ function PartRow(props: {
       )}
     </li>
   );
+}
+
+// Fix outline: each click on the figure adds a point, positive, or negative with the
+// Negative points toggle or Shift held, and asks SAM for the part's outline from all points.
+// The preview shows the new mask over the faded figure, the old outline in magenta, and the
+// points. Accept stores the points as an outline edit.
+function FixPanel(props: {
+  api: FigureApi;
+  id: string;
+  region: string;
+  label: string;
+  busy: boolean;
+  onClose: () => void;
+  onAccept: (positive: Point[], negative: Point[]) => Promise<void>;
+}) {
+  const { api, id, region, label, busy, onClose, onAccept } = props;
+  const [positive, setPositive] = useState<Point[]>([]);
+  const [negative, setNegative] = useState<Point[]>([]);
+  const [order, setOrder] = useState<("positive" | "negative")[]>([]);
+  const [negativeMode, setNegativeMode] = useState(false);
+  const [view, setView] = useState<FixPreview | null>(null);
+  const [pending, setPending] = useState(true);
+  const [message, setMessage] = useState("Loading the figure.");
+
+  const ask = async (pos: Point[], neg: Point[], kinds: ("positive" | "negative")[]) => {
+    setPending(true);
+    setMessage(pos.length ? "Asking SAM for the outline." : "Loading the figure.");
+    try {
+      const v = await api.fixPreview(id, region, pos, neg);
+      setPositive(pos);
+      setNegative(neg);
+      setOrder(kinds);
+      setView(v);
+      setMessage(describeFix(v));
+    } catch (err) {
+      setMessage(err instanceof ApiError ? err.message : "The outline could not be fetched.");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  useEffect(() => {
+    let live = true;
+    api.fixPreview(id, region, [], [])
+      .then((v) => {
+        if (!live) return;
+        setView(v);
+        setMessage(describeFix(v));
+        setPending(false);
+      })
+      .catch((err: unknown) => {
+        if (!live) return;
+        setMessage(err instanceof ApiError ? err.message : "The figure could not be loaded.");
+        setPending(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, [api, id, region]);
+
+  const click = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (!view || pending) return;
+    const box = e.currentTarget.getBoundingClientRect();
+    const p: Point = [
+      Math.min(view.width - 1, Math.max(0, Math.round(((e.clientX - box.left) / box.width) * view.width))),
+      Math.min(view.height - 1, Math.max(0, Math.round(((e.clientY - box.top) / box.height) * view.height))),
+    ];
+    if (negativeMode || e.shiftKey) void ask(positive, [...negative, p], [...order, "negative"]);
+    else void ask([...positive, p], negative, [...order, "positive"]);
+  };
+
+  const undo = () => {
+    const last = order[order.length - 1];
+    if (!last) return;
+    const kinds = order.slice(0, -1);
+    if (last === "positive") void ask(positive.slice(0, -1), negative, kinds);
+    else void ask(positive, negative.slice(0, -1), kinds);
+  };
+
+  const ready = view !== null && positive.length > 0 && !view.empty && !pending;
+  const spills = view !== null && view.spill.length > 0;
+  return (
+    <section aria-label={`Fix outline of ${label}`} style={{ border: "2px solid #333", padding: "0.5rem" }}>
+      <h3>Fix outline of {label}</h3>
+      <p>Click inside {label} to add a point. Turn on Negative points, or hold Shift, to mark what is not {label}.</p>
+      {view && (
+        <img src={view.image} alt={`${label}: the new outline over the faded figure, the old outline in magenta`}
+          onClick={click} style={{ width: "100%", cursor: pending ? "progress" : "crosshair", opacity: pending ? 0.6 : 1 }} />
+      )}
+      <p role="status" aria-live="polite">{message}</p>
+      {view?.warnings.map((w, i) => <p key={i}>Warning: {w}</p>)}
+      {spills && (
+        <p role="alert">
+          This outline holds the points of {view.spill.join(", ")}. You may accept it anyway; it will be marked as set by you.
+        </p>
+      )}
+      <p>
+        Positive points: {positive.length ? positive.map(([x, y]) => `(${x}, ${y})`).join(", ") : "none"}.
+        Negative points: {negative.length ? negative.map(([x, y]) => `(${x}, ${y})`).join(", ") : "none"}.
+      </p>
+      <p>
+        <button type="button" aria-pressed={negativeMode} onClick={() => { setNegativeMode(!negativeMode); }}>Negative points</button>{" "}
+        <button type="button" disabled={pending || order.length === 0} onClick={undo}>Undo last point</button>{" "}
+        <button type="button" disabled={!ready || busy} onClick={() => void onAccept(positive, negative)}>
+          {spills ? `Accept the outline of ${label} anyway` : `Accept the outline of ${label}`}
+        </button>{" "}
+        <button type="button" onClick={onClose}>Cancel</button>
+      </p>
+    </section>
+  );
+}
+
+function describeFix(v: FixPreview): string {
+  if (v.outcome === null) return `Click inside ${v.part} to add a point.`;
+  if (v.empty) return "SAM found no outline at these points. Add another point or undo.";
+  const how = v.outcome === "cached" ? "From the cache, no new call." : `SAM answered in ${Math.round(v.latency_ms ?? 0)} ms.`;
+  const calls = v.calls === null ? "" : ` Fix calls for this version: ${v.calls} of ${v.call_cap}.`;
+  return `${how}${calls}`;
 }
 
 function AddPart({ busy, onAdd }: { busy: boolean; onAdd: (name: string) => Promise<void> }) {

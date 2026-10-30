@@ -67,6 +67,9 @@ class FakeLive:
     def for_job(self) -> "FakeLive":
         return self
 
+    def cap_calls(self, cap: int) -> None:
+        self.cap = cap
+
     async def understand(
         self, image: Any, figure_id: str, prompt: Any, locate: Any
     ) -> Understanding:
@@ -98,8 +101,19 @@ class FakeLive:
         )
 
     async def segment_points(
-        self, image: Any, figure_id: str, part: str, objects: Any, prompt: Any, retry: bool = False
+        self,
+        image: Any,
+        figure_id: str,
+        part: str,
+        objects: Any,
+        prompt: Any,
+        retry: bool = False,
+        kind: str = "s2",
     ) -> list[ObjectMask]:
+        if kind == "fix":  # a teacher's points: the part's true mask
+            self.calls.append(f"fix {part}")
+            await asyncio.sleep(0)
+            return [ObjectMask(1, 0.9, MASKS[part])]
         self.calls.append(f"{part}{' retry' if retry else ''}")
         mask = MASKS[part]
         if part == "right chamber":

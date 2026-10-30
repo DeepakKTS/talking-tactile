@@ -41,7 +41,18 @@ def replay_client(root: Path) -> LiveMetaClient:
             transport=ReplayTransport.from_files(files),
         )
 
-    return LiveMetaClient(RULES.meta, caller)
+    return CappedAt25(RULES.meta, caller)
+
+
+class CappedAt25(LiveMetaClient):
+    """The run was made under the 25-call cap of the time; the cap decides which retries the
+    recordings hold, so the replay keeps it."""
+
+    def cap_calls(self, cap: int) -> None:
+        super().cap_calls(RULES.meta.live_call_cap)
+
+    def for_job(self) -> "CappedAt25":
+        return CappedAt25(self._rules, self._make_caller, self._record_prefix)
 
 
 async def author_and_publish(root: Path) -> dict[str, Any]:

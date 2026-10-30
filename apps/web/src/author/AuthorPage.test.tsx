@@ -26,6 +26,7 @@ class FakeServer {
   polls = 0;
   stage = "s2";
   published = 0;
+  fixCalls = 0;
 
   fetch = (url: string, init?: RequestInit): Promise<Response> => Promise.resolve(this.answer(url, init));
 
@@ -46,6 +47,15 @@ class FakeServer {
     }
     if (path === `/api/figures/${ID}/regions.json`) return json(this.regions);
     if (path === `/api/figures/${ID}/report.json`) return json(this.report);
+    const fix = new RegExp(`^/api/figures/${ID}/regions/(\\w+)/fix$`).exec(path);
+    if (method === "POST" && fix) {
+      const { positive, negative } = body as { positive: number[][]; negative: number[][] };
+      this.fixCalls++;
+      return json({ part: "septum", region: fix[1], width: 1000, height: 800, scale: 0.9, image: "data:image/png;base64,AA==",
+        warnings: positive.length > 1 ? ["The positive point at (500, 400) is on label text."] : [],
+        spill: positive.length && !negative.length ? ["mitral valve"] : [], empty: false, area_px: positive.length ? 900 : 0,
+        outcome: positive.length ? "ran" : null, latency_ms: positive.length ? 1234 : null, calls: this.fixCalls - 1, call_cap: 30 });
+    }
     const edit = new RegExp(`^/api/figures/${ID}/regions/(\\w+)$`).exec(path);
     if (method === "PATCH" && edit) {
       const r = this.regions.regions.find((x) => x.id === edit[1]);
@@ -171,6 +181,34 @@ describe("author page", () => {
     expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // both pieces
     fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
+  });
+
+  it("fixes an outline by clicks, shows the spill warning, and accepts the points as an edit", async () => {
+    server.regions.needs_teacher = [{ id: "n1", label: "septum", reason: "no_mask", detail: "SAM's mask holds none of the part's points" }];
+    await upload();
+    fireEvent.click(screen.getByRole("button", { name: "Fix outline of septum" }));
+    const panel = await screen.findByRole("region", { name: "Fix outline of septum" });
+    const img = await within(panel).findByRole("img");
+    img.getBoundingClientRect = () => ({ left: 0, top: 0, width: 500, height: 400, right: 500, bottom: 400, x: 0, y: 0, toJSON: () => ({}) });
+    expect(within(panel).getByRole("button", { name: "Accept the outline of septum" }).hasAttribute("disabled")).toBe(true);
+    fireEvent.click(img, { clientX: 250, clientY: 200 });
+    expect(await within(panel).findByText("SAM answered in 1234 ms. Fix calls for this version: 1 of 30.")).toBeTruthy();
+    expect(within(panel).getByRole("alert").textContent).toContain("holds the points of mitral valve");
+    expect(within(panel).getByText(/Positive points: \(500, 400\)/)).toBeTruthy();
+    fireEvent.click(img, { clientX: 100, clientY: 100, shiftKey: true });
+    await within(panel).findByText(/Negative points: \(200, 200\)/);
+    expect(within(panel).queryByRole("alert")).toBeNull();
+    fireEvent.click(within(panel).getByRole("button", { name: "Undo last point" }));
+    await within(panel).findByText(/Negative points: none/);
+    fireEvent.click(within(panel).getByRole("button", { name: "Negative points" }));
+    fireEvent.click(img, { clientX: 50, clientY: 50 });
+    await within(panel).findByText(/Negative points: \(100, 100\)/);
+    fireEvent.click(within(panel).getByRole("button", { name: "Accept the outline of septum" }));
+    await waitFor(() => { expect(server.calls.some((c) => c.method === "PATCH")).toBe(true); });
+    const patch = server.calls.find((c) => c.method === "PATCH");
+    expect(patch?.url).toBe(`/api/figures/${ID}/regions/n1`);
+    expect(patch?.body).toEqual({ op: "outline", positive: [[500, 400]], negative: [[100, 100]] });
+    await waitFor(() => { expect(screen.queryByRole("region", { name: "Fix outline of septum" })).toBeNull(); });
   });
 
   it("marks a part checked, renames one and describes one, each as an edit", async () => {

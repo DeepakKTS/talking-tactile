@@ -42,11 +42,31 @@ export interface Publication {
   files: Record<string, { url: string; sha256: string }>;
 }
 
+export type Point = [number, number]; // pixels of the normalized figure
+
 export type Edit =
   | { op: "label"; label: string }
   | { op: "describe"; description: string }
   | { op: "merge"; into: string }
-  | { op: "delete" };
+  | { op: "delete" }
+  | { op: "outline"; positive: Point[]; negative: Point[] };
+
+/** Fix outline: SAM's mask for the teacher's points, drawn over the figure. */
+export interface FixPreview {
+  part: string;
+  region: string;
+  width: number;
+  height: number;
+  image: string; // data URL: the figure at 30%, the new mask, the old outline, the points
+  warnings: string[];
+  spill: string[]; // parts whose prompt points the new mask holds
+  empty: boolean; // SAM found nothing at the points
+  area_px: number;
+  outcome: "ran" | "cached" | null;
+  latency_ms: number | null;
+  calls: number | null;
+  call_cap: number;
+}
 
 export class ApiError extends Error {
   override name = "ApiError";
@@ -114,6 +134,14 @@ export class FigureApi {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(edit),
+    });
+  }
+
+  fixPreview(id: string, region: string, positive: Point[], negative: Point[]) {
+    return this.json<FixPreview>(`/api/figures/${id}/regions/${region}/fix`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ positive, negative }),
     });
   }
 

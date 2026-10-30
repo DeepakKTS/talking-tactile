@@ -10,7 +10,14 @@ from fastapi import APIRouter, Body, File, Form, Request, Response, UploadFile
 from pydantic import ValidationError
 
 from app.errors import ApiError
-from app.figures import DRAFT_ONLY_TYPES, MEDIA_TYPES, FigureService, Publication, job_json
+from app.figures import (
+    DRAFT_ONLY_TYPES,
+    MEDIA_TYPES,
+    FigureService,
+    FixPoints,
+    Publication,
+    job_json,
+)
 from app.models.regions import GradeBand, PageSize
 from app.pipeline.cache import is_figure_id
 from app.pipeline.edits import EDIT, AddEdit, Edit
@@ -90,14 +97,41 @@ async def edit_region(
     request: Request, figure_id: str, region_id: str, body: Annotated[dict[str, Any], Body()]
 ) -> dict[str, object]:
     fid = _fid(figure_id)
+    if body.get("op") == "outline":
+        return await _accept_outline(request, fid, region_id, body)
     if body.get("op") not in _REGION_OPS or "region" in body:
-        raise ApiError(422, "invalid_request", "op is one of label, describe, merge or delete.")
+        raise ApiError(
+            422, "invalid_request", "op is one of label, describe, merge, delete or outline."
+        )
     try:
         edit: Edit = EDIT.validate_python({**body, "region": region_id})
     except ValidationError as exc:
         raise ApiError(422, "invalid_request", _first_error(exc)) from exc
     version, job = await _service(request).edit(fid, edit)
     return {"edit_version": version, "job": job_json(job)}
+
+
+def _points(body: dict[str, Any]) -> FixPoints:
+    try:
+        return FixPoints.model_validate({k: v for k, v in body.items() if k != "op"})
+    except ValidationError as exc:
+        raise ApiError(422, "invalid_request", _first_error(exc)) from exc
+
+
+async def _accept_outline(
+    request: Request, fid: str, region_id: str, body: dict[str, Any]
+) -> dict[str, object]:
+    version, job = await _service(request).fix_accept(fid, region_id, _points(body))
+    return {"edit_version": version, "job": job_json(job)}
+
+
+@router.post("/{figure_id}/regions/{region_id}/fix")
+async def fix_preview(
+    request: Request, figure_id: str, region_id: str, body: Annotated[dict[str, Any], Body()]
+) -> dict[str, object]:
+    """Fix outline: SAM's mask for the teacher's points, previewed. Live (LIVE=1); each call
+    counts against the figure's fix cap and goes to the ledger. Accept with PATCH op outline."""
+    return await _service(request).fix_preview(_fid(figure_id), region_id, _points(body))
 
 
 @router.post("/{figure_id}/regions", status_code=202)

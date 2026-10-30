@@ -119,6 +119,7 @@ def test_s1_lists_then_locates_and_merges_by_exact_name(tmp_path: Path) -> None:
     assert (left.kind, left.parent, len(left.instances[0].points)) == ("area", "boxes", 2)
     assert right.kind is None and right.instances == ()  # not in the answer: the teacher's
     assert (group.kind, group.members) == ("group", ("left box", "right box"))
+    assert live._caller.cap == 2 + 2 * 3  # set once the listing names 3 parts
 
 
 def test_a_describe_only_figure_is_not_located(tmp_path: Path) -> None:

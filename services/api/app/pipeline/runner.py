@@ -21,6 +21,8 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any, get_args
 
+import numpy as np
+
 from app.braille.louis import BrailleUnavailableError, Translator
 from app.config import ExploreConfig, TactileRules, load_explore, load_tactile_rules
 from app.geometry.reconcile import Reconciled, ReconciledPart
@@ -31,7 +33,7 @@ from app.meta.live import Ledger
 from app.meta.live_client import SPARK_EFFORT
 from app.meta.mock import MockFixtureMissingError
 from app.meta.types import Understanding
-from app.models.mask import Mask
+from app.models.mask import BoolImage, Mask
 from app.models.regions import GradeBand, PageSize
 from app.paths import FIGURES_DIR, JOBS_DB
 from app.pipeline import (
@@ -43,7 +45,7 @@ from app.pipeline import (
     s4_layout,
     s5_render,
 )
-from app.pipeline.cache import FigureCache, code_digest, stage_key
+from app.pipeline.cache import FigureCache, code_digest, load_mask, save_mask, stage_key
 from app.pipeline.edits import (
     Edit,
     EditError,
@@ -52,8 +54,13 @@ from app.pipeline.edits import (
     annotations,
     apply_edits,
     edits_digest,
+    outlines,
+    outlines_digest,
 )
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore, StageOutcome, StageRun
+from app.pipeline.outlines import keep as keep_outline
+from app.pipeline.outlines import with_outlines
+from app.pipeline.s2_types import Grounded
 from app.prompts import PROMPTS_DIR, load_prompt
 
 log = logging.getLogger(__name__)
@@ -84,6 +91,8 @@ _SAVE: dict[str, Callable[[Any, Path], None]] = {
     "s5": s5_render.save,
 }
 _ADDED = "added"  # cache stage for SAM answers to parts a teacher adds by name
+_OUTLINE = "outline"  # cache stage for SAM answers to a teacher's points (Fix outline)
+Point = tuple[int, int]
 _META_STAGES = ("s1", "s2")  # stages whose cached output spares Meta calls
 _MS_PER_S = 1000
 _ERROR_CODES: dict[type[Exception], str] = {
@@ -142,7 +151,9 @@ class Runner:
 
     # Keys
 
-    def _inputs(self, stage: str, options: JobOptions, edits: str) -> dict[str, object]:
+    def _inputs(
+        self, stage: str, options: JobOptions, edits: str, outlined: str = ""
+    ) -> dict[str, object]:
         meta = self.rules.meta
         if stage == "s1":
             return {
@@ -163,6 +174,7 @@ class Runner:
                 **sam,
                 "text_phrase": meta.text_phrase,
                 "points": s2_points.SETTINGS,
+                "job_calls": meta.job_calls.model_dump(mode="json"),  # the cap decides retries
                 "fill_delta": self.rules.layout.color_group_max_delta,
                 "speck_mm2": self.rules.reconcile.speck_max_area_mm2,
                 "page": self.rules.page.model_dump(mode="json"),
@@ -173,16 +185,19 @@ class Runner:
             "explore": self.explore.model_dump(mode="json"),
             "options": options.model_dump(mode="json"),
         }
+        if stage == "s3":
+            return {**free, **sam, "outlines": outlined}  # a teacher's outline is a SAM call
         if stage == "s4":
             return {**free, **sam, "edits": edits}  # an added part is a SAM call
         if stage == "s5":
             return {**free, "edits": edits}
         return free
 
-    def _key(self, walk: _Walk, stage: str, options: JobOptions, edits: str) -> str:
+    def _key(self, walk: _Walk, stage: str, options: JobOptions, edits: str, outlined: str) -> str:
         previous = walk.keys[STAGES[STAGES.index(stage) - 1]]
         upstream = {m: walk.digests[m] for m in _CONSUMES[stage]}
-        return stage_key(stage, previous, upstream=upstream, **self._inputs(stage, options, edits))
+        inputs = self._inputs(stage, options, edits, outlined)
+        return stage_key(stage, previous, upstream=upstream, **inputs)
 
     @staticmethod
     def _key0(figure_id: str) -> str:
@@ -276,7 +291,7 @@ class Runner:
         self, walk: _Walk, stage: str, job: JobRecord, edits: Sequence[Edit], client: MetaClient
     ) -> None:
         t0 = time.perf_counter()
-        key = self._key(walk, stage, job.options, edits_digest(edits))
+        key = self._key(walk, stage, job.options, edits_digest(edits), outlines_digest(edits))
         walk.keys[stage] = key
         digest = await asyncio.to_thread(walk.cache.digest, stage, key)
         if digest is not None:
@@ -316,8 +331,9 @@ class Runner:
             )
         if stage == "s3":
             fit = await self._fit(walk, job.options)
+            grounded = await self._grounded(walk, edits, client)
             return await asyncio.to_thread(
-                s3_reconcile.reconcile_masks, await v("s2"), fit, self.rules.reconcile
+                s3_reconcile.reconcile_masks, grounded, fit, self.rules.reconcile
             )
         if stage == "s4":
             fit = await self._fit(walk, job.options)
@@ -334,8 +350,9 @@ class Runner:
                 self.translator,
             )
         fit = await self._fit(walk, job.options)
+        grounded = await self._grounded(walk, edits, client)  # outlines come from the cache
         teacher = await asyncio.to_thread(
-            s5_render.teacher_info, await v("s2"), await v("s3"), fit, self.rules
+            s5_render.teacher_info, grounded, await v("s3"), fit, self.rules
         )
         return await asyncio.to_thread(
             s5_render.render,
@@ -394,14 +411,85 @@ class Runner:
     async def check_edits(self, job: JobRecord, edits: Sequence[Edit]) -> None:
         """Replays the edits on the S3 parts the job used. Raises EditError when one cannot
         be applied, and NotReadyError when the job has not been through S3."""
+        walk = await self._through_s3(job)
+        await self._edited_parts(walk, edits, self.client.for_job())
+
+    async def _through_s3(self, job: JobRecord) -> _Walk:
+        """The walk to the job's own S3 output, with the outlines it ran with."""
         walk = await self._start(job)
+        outlined = outlines_digest(self.edits.list(job.figure_id, job.edit_version))
         for stage in ("s1", "s2", "s3"):
-            walk.keys[stage] = self._key(walk, stage, job.options, "")
+            walk.keys[stage] = self._key(walk, stage, job.options, "", outlined)
             digest = await asyncio.to_thread(walk.cache.digest, stage, walk.keys[stage])
             if digest is None:
                 raise NotReadyError("The figure is still being processed. Try again shortly.")
             walk.digests[stage] = digest
-        await self._edited_parts(walk, edits, self.client.for_job())
+        return walk
+
+    async def fix_context(
+        self, job: JobRecord
+    ) -> tuple[s0_ingest.Ingested, Understanding, Grounded, Reconciled]:
+        """What Fix outline needs from a finished job: the image, S1, S2 with the job's
+        outlines applied, and S3."""
+        walk = await self._through_s3(job)
+        g = await self._grounded(walk, self.edits.list(job.figure_id, job.edit_version), None)
+        return await walk.value("s0"), await walk.value("s1"), g, await walk.value("s3")
+
+    async def outline_mask(
+        self, figure_id: str, part: str, positive: Sequence[Point], negative: Sequence[Point],
+        client: MetaClient,
+    ) -> tuple[BoolImage, StageOutcome]:  # fmt: skip
+        """SAM's mask for a teacher's points, cached by the points: a preview pays for the
+        call, and accepting it does not pay again."""
+        return await self._outline_mask(
+            await self._walk_s0(figure_id), part, positive, negative, client
+        )
+
+    async def _outline_mask(
+        self, walk: _Walk, part: str, positive: Sequence[Point], negative: Sequence[Point],
+        client: MetaClient | None,
+    ) -> tuple[BoolImage, StageOutcome]:  # fmt: skip
+        key = stage_key(
+            _OUTLINE,
+            walk.keys["s0"],
+            upstream={"s0": walk.digests["s0"]},
+            positive=[list(p) for p in positive],
+            negative=[list(p) for p in negative],
+            client=self.client.cache_tag,
+            prompt=self.s2_prompt.digest,
+            floor=self.rules.reconcile.speck_max_area_mm2,
+        )
+        entry = walk.cache.dir(_OUTLINE, key)
+        if await asyncio.to_thread(walk.cache.digest, _OUTLINE, key) is not None:
+            self._hit("fix", f"outline, figure {walk.cache.root.name[:12]}, part: {part}")
+            return await asyncio.to_thread(load_mask, entry / "mask.png"), "cached"
+        if client is None:
+            raise NotReadyError(f"The outline for {part} is not in the cache.")
+        ing: s0_ingest.Ingested = await walk.value("s0")
+        answer = await client.segment_points(
+            ing.image, ing.figure_id, part, [(positive, negative)], self.s2_prompt, kind="fix"
+        )
+        mask = np.zeros(ing.image.shape[:2], bool)
+        for a in answer:
+            mask |= a.mask
+        kept = keep_outline(mask, positive, s2_points.speck_floor_px(ing.image, self.rules))
+        with walk.cache.write(_OUTLINE, key) as out:
+            await asyncio.to_thread(save_mask, out / "mask.png", kept)
+        return kept, "ran"
+
+    async def _grounded(
+        self, walk: _Walk, edits: Sequence[Edit], client: MetaClient | None
+    ) -> Grounded:
+        """S2's output with the teacher's outlines in place."""
+        g: Grounded = await walk.value("s2")
+        outlined = []
+        for e in outlines(edits):
+            pos = [(x, y) for x, y in e.positive]
+            neg = [(x, y) for x, y in e.negative]
+            mask, _ = await self._outline_mask(walk, e.part, pos, neg, client)
+            if mask.any():
+                outlined.append((e.part, mask))
+        return with_outlines(g, outlined) if outlined else g
 
     def _record(
         self, job_id: str, stage: str, outcome: StageOutcome, t0: float, cost_usd: float = 0.0

@@ -31,7 +31,7 @@ from app.geometry import part_masks as pm
 from app.geometry import points as gp
 from app.geometry import print_marks
 from app.geometry.scale import fit_to_page
-from app.meta.client import MetaClient
+from app.meta.client import MetaClient, job_cap
 from app.meta.live import LiveCallCapError, LiveCallError
 from app.meta.mock import MockFixtureMissingError
 from app.meta.types import PartPhrase, Understanding
@@ -269,4 +269,5 @@ class _Run:
 async def ground_points(
     client: MetaClient, ing: Ingested, u: Understanding, prompt: Prompt, rules: TactileRules
 ) -> Grounded:
+    client.cap_calls(job_cap(len(u.parts), rules.meta))  # also when S1 came from the cache
     return await _Run(client, ing, u, prompt, rules).ground()

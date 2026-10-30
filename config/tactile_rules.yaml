@@ -54,6 +54,11 @@ meta:                              # Meta Model API use. Prices from the pricing
   sam_concurrency: 4               # PLAN.md S2: four SAM calls at a time
   text_phrase: text label          # S2 also asks SAM for print text, so it can be cut out of the raised layer
   live_call_cap: 25                # live calls one run may make (LIVE=1); the run stops at the cap
+  job_calls:                       # a live pipeline job may make spark + per_part x parts calls, at most
+    spark: 2                       # ceiling. Decision Oct 30: the heart (19 parts) hit 25 and lost 3 retries
+    per_part: 2
+    ceiling: 60
+  fix_call_cap: 30                 # live SAM calls a teacher's outline fixes may make per figure and edit version
   models:                          # model ids, from the docs (spikes/*.md)
     spark: muse-spark-1.3
     sam: sam-3.1
