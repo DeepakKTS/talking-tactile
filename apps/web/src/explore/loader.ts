@@ -1,7 +1,7 @@
 // Loads the sheet Explore runs on. Only published versions, which the API locks after the
 // tactile rules pass; a draft URL is never built here. The last good copy of each version
 // is kept in localStorage, so the page can reopen a sheet with the network down.
-import { RegionsError, type RegionsFile, parseRegions, touchableOnly } from "../shared/regions";
+import { RegionsError, type RegionsFile, parseRegions, touchableOnly, untouchableNames } from "../shared/regions";
 
 export class LoadError extends Error {
   override name = "LoadError";
@@ -27,7 +27,7 @@ export async function loadPublished(
   figureId: string,
   version: Version,
   deps: LoaderDeps,
-): Promise<{ file: RegionsFile; from: "network" | "saved" }> {
+): Promise<Loaded> {
   if (!FIGURE_ID.test(figureId)) throw new LoadError("That is not a figure id.");
   if (version !== "latest" && !(Number.isInteger(version) && version >= 1)) {
     throw new LoadError("That is not a published version.");
@@ -37,25 +37,32 @@ export async function loadPublished(
     res = await deps.fetch(publishedUrl(figureId, version));
   } catch {
     const saved = read(deps.storage, key(figureId, version));
-    if (saved) return { file: saved, from: "saved" };
+    if (saved) return { ...saved, from: "saved" };
     throw new LoadError("The sheet could not be loaded. Check the network.");
   }
   if (res.status === NOT_FOUND) throw new LoadError("This figure is not published yet.");
   if (!res.ok) throw new LoadError(`The sheet could not be loaded (${res.status}).`);
   const text = await res.text();
-  const file = parse(text);
+  const sheet = parse(text);
   try {
     deps.storage?.setItem(key(figureId, version), text);
   } catch {
     // Storage full or blocked: the sheet still works, it just cannot reopen offline.
   }
-  return { file, from: "network" };
+  return { ...sheet, from: "network" };
 }
 
-// The file as Explore uses it: valid, and touchable regions only.
-function parse(text: string): RegionsFile {
+export interface Loaded {
+  file: RegionsFile; // touchable regions only
+  notTouchable: string[]; // the names Explore says once at the start
+  from: "network" | "saved";
+}
+
+// The file as Explore uses it: valid, touchable regions only, and the names of the rest.
+function parse(text: string): Omit<Loaded, "from"> {
   try {
-    return touchableOnly(parseRegions(JSON.parse(text)));
+    const file = parseRegions(JSON.parse(text));
+    return { file: touchableOnly(file), notTouchable: untouchableNames(file) };
   } catch (err) {
     if (err instanceof RegionsError || err instanceof SyntaxError) {
       throw new LoadError(`The sheet is damaged: ${err.message}`);
@@ -64,7 +71,7 @@ function parse(text: string): RegionsFile {
   }
 }
 
-function read(storage: LoaderDeps["storage"], k: string): RegionsFile | null {
+function read(storage: LoaderDeps["storage"], k: string): Omit<Loaded, "from"> | null {
   try {
     const text = storage?.getItem(k);
     return text ? parse(text) : null;

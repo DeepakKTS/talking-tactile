@@ -32,3 +32,13 @@ export function parseRegions(data: unknown): RegionsFile {
 export function touchableOnly(file: RegionsFile): RegionsFile {
   return { ...file, regions: file.regions.filter((r) => r.touchable) };
 }
+
+// The parts a student cannot touch, once each, in file order: suggestion regions (a part's
+// pieces share its label), then parts with no shape.
+export function untouchableNames(file: RegionsFile): string[] {
+  const names = [
+    ...file.regions.filter((r) => !r.touchable).map((r) => r.label),
+    ...(file.needs_teacher ?? []).map((t) => t.label),
+  ];
+  return [...new Set(names)];
+}

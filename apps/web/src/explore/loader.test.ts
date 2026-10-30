@@ -81,6 +81,7 @@ describe("published regions loader", () => {
     expect(got.file.regions.every((r) => r.touchable)).toBe(true);
     const labels = new Set(got.file.regions.map((r) => r.label));
     for (const spill of ["aorta", "mitral valve", "left ventricle", "septum"]) expect(labels.has(spill)).toBe(false);
+    expect(got.notTouchable).toEqual(["aorta", "mitral valve", "left ventricle", "septum"]);
   });
 
   it("says when the figure is not published, and does not fall back to a draft", async () => {

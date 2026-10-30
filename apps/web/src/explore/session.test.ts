@@ -3,7 +3,7 @@ import { EXPLORE } from "../shared/config";
 import type { AudioPort } from "./audio";
 import type { Pt } from "./homography";
 import { Metrics } from "./metrics";
-import { type AskRequest, ExploreSession, OFFLINE_ANSWER, keyAction } from "./session";
+import { type AskRequest, ExploreSession, OFFLINE_ANSWER, keyAction, notTouchableSentence } from "./session";
 import { SYNTHETIC } from "./testkit";
 
 class FakeAudio implements AudioPort {
@@ -45,7 +45,7 @@ const centroid = (label: string): Pt => {
   return [r.centroid_mm[0], r.centroid_mm[1]];
 };
 
-function setup(ask?: (r: AskRequest) => Promise<string>) {
+function setup(ask?: (r: AskRequest) => Promise<string>, notTouchable: string[] = []) {
   const audio = new FakeAudio();
   const metrics = new Metrics();
   const asked: AskRequest[] = [];
@@ -57,6 +57,7 @@ function setup(ask?: (r: AskRequest) => Promise<string>) {
       if (ask) return ask(r);
       throw new TypeError("Failed to fetch");
     },
+    notTouchable,
   });
   // Frame times run ahead of the clock; receivedAt is the real clock, as the code under
   // test reads it, so code time is measured for real.
@@ -72,6 +73,18 @@ describe("explore session", () => {
     const { audio, session } = setup();
     session.intro();
     expect(audio.said()).toEqual([`${SYNTHETIC.title}. ${SYNTHETIC.summary} Press H for help.`]);
+  });
+
+  it("names the parts that are not touchable, once, in the intro", () => {
+    const { audio, session, hold } = setup(undefined, ["aorta", "mitral valve", "septum"]);
+    session.intro();
+    expect(audio.said()).toEqual([
+      `${SYNTHETIC.title}. ${SYNTHETIC.summary} 3 parts are not touchable yet: aorta, mitral valve and septum. Press H for help.`,
+    ]);
+    hold(centroid("left lobe"), 1500);
+    expect(audio.said().filter((s) => s.includes("not touchable"))).toHaveLength(1);
+    expect(notTouchableSentence(["septum"])).toBe("One part is not touchable yet: septum. ");
+    expect(notTouchableSentence([])).toBe("");
   });
 
   it("plays the part's earcon on entry and says its label on dwell", () => {

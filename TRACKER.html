@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 155,
- "updated_at": "2026-10-30T05:07:22.425Z",
+ "rev": 157,
+ "updated_at": "2026-10-30T05:34:26.050Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2174,6 +2174,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "regions.json v2: a spill mask is a region with touchable false and a spill flag; a part with no shape is in needs_teacher. Explore drops both at load. Author lists them with the reason and names them at publish; publish refuses only tactile rule violations (409), as before.",
    "why": "S2 locked on Arm A v2f with flags (Oct 30). Live heart through the API: 15 of 19 parts touchable, 4 spill (aorta, mitral valve, left ventricle, septum), published with no rule violation.",
    "changed_at": "2026-10-30T05:07:22.350Z"
+  },
+  {
+   "id": "dec-mvujf4d1n0f0",
+   "date": "2026-10-30",
+   "title": "Publish default confirmed: flags do not block publish. At the start of an Explore session, if any parts are not touchable, Explore says how many and names them, once, under the same voice rules as the rest of Explore (local voice only, else the aria-live transcript).",
+   "decision": "Publish never waits for flags; Explore announces the parts that are not touchable once at session start",
+   "why": "Deepak, Oct 30, after the live heart run: 4 of 19 parts were spill suggestions.",
+   "changed_at": "2026-10-30T05:34:26.009Z"
+  },
+  {
+   "id": "dec-mvujf4e769t0",
+   "date": "2026-10-30",
+   "title": "Call cap per job: 2 Spark + 2 x number of parts, hard ceiling 60. The ledger and per-run reporting stay as they are.",
+   "decision": "Live pipeline jobs get min(60, 2 + 2 x parts) calls",
+   "why": "The live heart run (19 parts) hit the 25-call cap and 3 of 7 spill retries were refused.",
+   "changed_at": "2026-10-30T05:34:26.050Z"
   }
  ],
  "risks": [
@@ -2264,6 +2280,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T05:34:26.050Z",
+   "kind": "claude",
+   "text": "Decision: Call cap per job: 2 Spark + 2 x number of parts, hard ceiling 60. The ledger and per-run reporting stay as they are."
+  },
+  {
+   "ts": "2026-10-30T05:34:26.009Z",
+   "kind": "claude",
+   "text": "Decision: Publish default confirmed: flags do not block publish. At the start of an Explore session, if any parts are not touchable, Explore says how many and names them, once, under the same voice rules as the rest of Explore (local voice only, else the aria-live transcript)."
+  },
   {
    "ts": "2026-10-30T05:07:22.425Z",
    "kind": "claude",

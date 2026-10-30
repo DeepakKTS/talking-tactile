@@ -123,6 +123,7 @@ export function ExplorePage() {
   const [{ figure, version, scripted, stubMs, corners: given }] = useState(readParams);
 
   const [file, setFile] = useState<RegionsFile | null>(null);
+  const [notTouchable, setNotTouchable] = useState<string[]>([]);
   const [status, setStatus] = useState(figure ? "Loading the sheet." : "");
   const [started, setStarted] = useState(false);
   const [settings, setSettings] = useState<Settings>(loadSettings);
@@ -168,9 +169,10 @@ export function ExplorePage() {
     if (!figure) return;
     let live = true;
     loadPublished(figure, version, { fetch: (u) => fetch(u), storage: storage() })
-      .then(({ file: f, from }) => {
+      .then(({ file: f, from, notTouchable: missing }) => {
         if (!live) return;
         setFile(f);
+        setNotTouchable(missing);
         setStatus(`${f.title}. ${from === "saved" ? "Opened the saved copy; the network is down. " : ""}Press Start.`);
         trace.current.ready = true;
       })
@@ -232,7 +234,7 @@ export function ExplorePage() {
     eng.onVoiceChange = () => { setNoLocalVoice(eng.noLocalVoice); };
     const port = new TracingAudio(eng, trace.current.log);
     audio.current = port;
-    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi });
+    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, notTouchable });
     session.current = s;
     await eng.start(s.pitches);
     setStarted(true);
@@ -268,7 +270,7 @@ export function ExplorePage() {
     const saved = given ?? loadCorners(storage(), v.videoWidth, v.videoHeight);
     if (saved) setCorners(saved, v.videoWidth, v.videoHeight);
     else startCorners();
-  }, [file, started, settings.voice, scripted, stubMs, given, onHands, say, setCorners, startCorners]);
+  }, [file, notTouchable, started, settings.voice, scripted, stubMs, given, onHands, say, setCorners, startCorners]);
 
   // Keys work everywhere except while typing, where only Escape does.
   useEffect(() => {

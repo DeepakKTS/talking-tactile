@@ -33,6 +33,8 @@ export interface SessionDeps {
   /** The answer text. Throws AskError with a sentence to say when the service fails, or
    * anything else when the network is not there. */
   ask: (req: AskRequest) => Promise<string>;
+  /** Parts on the sheet a student cannot touch yet, said once in the intro. */
+  notTouchable?: readonly string[];
 }
 
 export interface FingerSample {
@@ -76,6 +78,14 @@ const RECENT = 2;
 
 const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+/** "2 parts are not touchable yet: aorta and septum. ", or nothing when all are. */
+export function notTouchableSentence(names: readonly string[]): string {
+  if (names.length === 0) return "";
+  const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  const count = names.length === 1 ? "One part is" : `${names.length} parts are`;
+  return `${count} not touchable yet: ${list}. `;
+}
+
 const NEIGHBOR_WORDS: Record<string, string> = {
   up: "above", down: "below", left: "to the left", right: "to the right",
   up_left: "above and to the left", up_right: "above and to the right",
@@ -114,7 +124,8 @@ export class ExploreSession {
   }
 
   intro(): void {
-    this.deps.audio.say(`${this.file.title}. ${this.file.summary} Press H for help.`);
+    const missing = notTouchableSentence(this.deps.notTouchable ?? []);
+    this.deps.audio.say(`${this.file.title}. ${this.file.summary} ${missing}Press H for help.`);
   }
 
   help(): void {
