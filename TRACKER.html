@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 220,
- "updated_at": "2026-10-30T20:44:03.959Z",
+ "rev": 222,
+ "updated_at": "2026-10-30T20:50:33.025Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1634,6 +1634,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-30T20:44:03.959Z"
   },
   {
+   "id": "d5-28",
+   "day": 5,
+   "title": "No retention: /api/ask leaves no audio, transcript or question text on disk or in logs",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "tests/test_ask_retention.py: a spoken and a typed question through the real route and the real live client (fake network transport, ledger in a temp folder, Python's temp dir redirected into the test folder). Every file written under the test folder (data dir, job database, ledger, temp files) and every log record is searched for the transcript, the question text, distinctive words of each and the audio's PCM bytes: none found; the ledger holds its 3 lines (transcribe, two answers); both responses carry the transcript. Checked that it catches a leak: with the old ledger line (question text in describe) it fails on 'written to disk'.",
+   "done_at": "2026-10-30T20:50:33.025Z",
+   "tags": [
+    "privacy",
+    "tests"
+   ],
+   "changed_at": "2026-10-30T20:50:33.025Z"
+  },
+  {
    "id": "d6-1",
    "day": 6,
    "title": "Voice capture and proxy",
@@ -2718,6 +2734,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T20:50:33.025Z",
+   "kind": "claude",
+   "text": "Task d5-28 \"No retention: /api/ask leaves no audio, transcript or question text on disk or in logs\" is now done. Note: tests/test_ask_retention.py: a spoken and a typed question through the real route and the real live client (fake network transport, ledger in a temp folder, Python's temp dir redirected into the test folder). Every file written under the test folder (data dir, job database, ledger, temp files) and every log record is searched for the transcript, the question text, distinctive words of each and the audio's PCM bytes: none found; the ledger holds its 3 lines (transcribe, two answers); both responses carry the transcript. Checked that it catches a leak: with the old ledger line (question text in describe) it fails on 'written to disk'."
+  },
+  {
+   "ts": "2026-10-30T20:50:32.976Z",
+   "kind": "claude",
+   "text": "Task d5-28 \"No retention: /api/ask leaves no audio, transcript or question text on disk or in logs\" added to day 5."
+  },
   {
    "ts": "2026-10-30T20:44:03.959Z",
    "kind": "claude",

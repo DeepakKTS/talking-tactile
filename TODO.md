@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 220, updated 2026-10-30T20:44:03.959Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 222, updated 2026-10-30T20:50:33.025Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -213,6 +213,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: VoiceAsk keeps the microphone recording POST_ROLL_MS (250) after the finger lets go, then stops it and encodes; the falling release earcon plays after the capture so it is not in the WAV (250 ms later than before). releasedAt stays the release, so latency includes the post-roll. The AudioWorklet now posts each 128-sample quantum, not 2048-sample blocks, so stopping loses at most one quantum (under 3 ms) instead of up to 43 ms. Test: a fake microphone on the clock (0.25 before release, 0.75 after): nothing is sent before 250 ms, the WAV ends with 4000 samples of 0.75, the earcon follows the stop. Headless hold of 2.5 s: WAV 2.41 s (was 2.14).
 - [x] d5-27 Meta docs on Standard and Contributor mode (RULES.md 1.4); Standard models enforced
   - Note: Read dev.meta.ai on Oct 30 (docs/models, docs/pricing-rate-limits, legal/terms-of-service, legal/geographic-use-policy). The mode is set by the model id in each request, not by a request field or (outside coding harness subscriptions) an account setting: muse-spark-1.3 Standard, muse-spark-1.3-contributor Contributor; Muse Voice Transcribe has no Contributor mode; SAM 3.1 and Muse Voice Transcribe are Standard Models. Standard: content not used to train Meta models (Terms 5.1). Contributor: prompts, files, context and responses may train future models; no personal information; no way to exclude traffic (6.2). Coding harness subscriptions default to Contributor unless the account setting is changed (3.3). The docs do not tie free or promotional credits to content use; the earlier README claim was withdrawn. This build already sent only Standard models; config now refuses any Contributor model id (MetaModels, test_config). README Privacy rewritten with quotes and the teacher's steps; retention and zero data retention left as questions for Meta.
+- [x] d5-28 No retention: /api/ask leaves no audio, transcript or question text on disk or in logs
+  - Note: tests/test_ask_retention.py: a spoken and a typed question through the real route and the real live client (fake network transport, ledger in a temp folder, Python's temp dir redirected into the test folder). Every file written under the test folder (data dir, job database, ledger, temp files) and every log record is searched for the transcript, the question text, distinctive words of each and the audio's PCM bytes: none found; the ledger holds its 3 lines (transcribe, two answers); both responses carry the transcript. Checked that it catches a leak: with the old ledger line (question text in describe) it fails on 'written to disk'.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
