@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 139, updated 2026-10-29T20:35:16.196Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 140, updated 2026-10-30T00:01:27.383Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -66,9 +66,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d1-12 Meta client interface, mock and SAM adapter stub (1.5 h)
   - MetaClient protocol (understand, segment), MockMetaClient serving the synthetic figure's truth, cost meter with budget warnings, app/meta/sam_adapter.py as a documented stub. The real client is d1-8 and waits for the spikes.
   - Note: Commit 9eab058. MetaClient protocol, MockMetaClient (synthetic S1 answer with 9 phrases incl. a duplicate proposal, every SAM instance per phrase incl. the sliver, zero matches as [], unknown image refused), CostMeter (Spark with cached input, SAM per image, voice per hour; warns at 0.7 and 0.9; refuses calls past the budget), sam_adapter stub with the documented format, boundary test that no other app module mentions the SAM encoding. Live mode refuses with a pointer to MOCK_META=1. 13 tests.
-- [ ] Gate A: Models answer [Pending]
+- [x] Gate A: Models answer [Passed]
   - Pass when: Muse Spark, SAM 3.1 and Muse Voice all return real results. p50 and p95 latency written in spikes/.
   - Fallback: Weak SAM on line art: local SAM 3.1 checkpoint with point prompts, same day.
+  - Evidence: Criteria as written met: Spark, SAM and Voice returned real results; p50/p95 in spikes/. SAM numbers are from point prompts; text-prompt part segmentation returned zero instances on line art. Realtime Voice untested. S2 quality is decided by the bake-off grading, not by this gate.
 
 ## Day 2: Tue Oct 27. Gate B
 
