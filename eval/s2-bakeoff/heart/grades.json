@@ -1,0 +1,210 @@
+{
+ "figure": "heart",
+ "source": "Deepak and Claude review, 2026-10-29",
+ "numbering": "parts numbered 1 to 19 in Spark's listing order, results.json parts",
+ "ungraded": [
+  "right pulmonary veins",
+  "inferior vena cava",
+  "aorta",
+  "left pulmonary veins",
+  "left atrium"
+ ],
+ "grades": [
+  {
+   "part": "brachiocephalic artery",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": "tip only"
+  },
+  {
+   "part": "brachiocephalic artery",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "label",
+   "note": "inside letter"
+  },
+  {
+   "part": "superior vena cava",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": "spill",
+   "note": "onto right pulmonary arteries"
+  },
+  {
+   "part": "superior vena cava",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": "top ellipse"
+  },
+  {
+   "part": "right pulmonary arteries",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "right pulmonary arteries",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "right atrium",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "right atrium",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "tricuspid valve",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "noise",
+   "note": ""
+  },
+  {
+   "part": "tricuspid valve",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "chordae tendineae",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "spill",
+   "note": "right atrium and ventricle"
+  },
+  {
+   "part": "chordae tendineae",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "right ventricle",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": null,
+   "note": "specks in other chambers"
+  },
+  {
+   "part": "right ventricle",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "left common carotid artery",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "left common carotid artery",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "label",
+   "note": "inside letter"
+  },
+  {
+   "part": "left subclavian artery",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "whole",
+   "note": "aortic arch and branches"
+  },
+  {
+   "part": "left subclavian artery",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "left pulmonary arteries",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": "includes unlabeled pulmonary trunk"
+  },
+  {
+   "part": "left pulmonary arteries",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "semilunar valves",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "line",
+   "note": ""
+  },
+  {
+   "part": "semilunar valves",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "line",
+   "note": "wedge between leader lines"
+  },
+  {
+   "part": "mitral valve",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "spill",
+   "note": "left atrium, ventricle, aorta"
+  },
+  {
+   "part": "mitral valve",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "left ventricle",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": "spill",
+   "note": "into left atrium"
+  },
+  {
+   "part": "left ventricle",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "septum",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "spill",
+   "note": "whole heart wall"
+  },
+  {
+   "part": "septum",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  }
+ ]
+}
