@@ -1,0 +1,1607 @@
+{
+ "summaries": [
+  "flower, 16 parts. Arm A: point outside its mask 6, over 50% of the object 0, overlapping pairs 6. Arm B: no regions 6, over 50% of the object 0, overlapping pairs 10.",
+  "heart, 19 parts. Arm A: point outside its mask 0, over 50% of the object 0, overlapping pairs 14. Arm B: no regions 10, over 50% of the object 0, overlapping pairs 0.",
+  "japan_regions, 9 parts. Arm A: point outside its mask 0, over 50% of the object 0, overlapping pairs 0. Arm B: no regions 0, over 50% of the object 1, overlapping pairs 0."
+ ],
+ "rules": {
+  "object_diff": 40,
+  "whole_object": 0.5,
+  "overlap": 0.2,
+  "object_area": "pixels more than object_diff from the median border color in some channel"
+ },
+ "figures": {
+  "flower": {
+   "figure": "flower",
+   "object_px": 529277,
+   "parts": [
+    {
+     "part": "ovules",
+     "print_label": "ovules",
+     "a": {
+      "confidence": 0.5390625,
+      "point_px": [
+       163,
+       361
+      ],
+      "point_outside": false,
+      "area_px": 323,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       28
+      ],
+      "no_regions": false,
+      "area_px": 22843,
+      "of_object": 0.043,
+      "whole_object": false,
+      "overlaps": [
+       "pistil group",
+       "ovary"
+      ]
+     }
+    },
+    {
+     "part": "pistil group",
+     "print_label": "pistil",
+     "a": {
+      "confidence": 0.55859375,
+      "point_px": [
+       423,
+       192
+      ],
+      "point_outside": false,
+      "area_px": 711,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       21,
+       27,
+       28
+      ],
+      "no_regions": false,
+      "area_px": 25381,
+      "of_object": 0.048,
+      "whole_object": false,
+      "overlaps": [
+       "ovules",
+       "ovary"
+      ]
+     }
+    },
+    {
+     "part": "stigma",
+     "print_label": "stigma",
+     "a": {
+      "confidence": 0.7109375,
+      "point_px": [
+       1067,
+       442
+      ],
+      "point_outside": true,
+      "area_px": 304,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "style",
+     "print_label": "style",
+     "a": {
+      "confidence": 0.359375,
+      "point_px": [
+       1044,
+       520
+      ],
+      "point_outside": true,
+      "area_px": 316,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": [
+       "ovary"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "ovary",
+     "print_label": "ovary",
+     "a": {
+      "confidence": 0.431640625,
+      "point_px": [
+       995,
+       710
+      ],
+      "point_outside": false,
+      "area_px": 36381,
+      "of_object": 0.069,
+      "whole_object": false,
+      "overlaps": [
+       "style"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       21,
+       27,
+       28
+      ],
+      "no_regions": false,
+      "area_px": 25381,
+      "of_object": 0.048,
+      "whole_object": false,
+      "overlaps": [
+       "ovules",
+       "pistil group"
+      ]
+     }
+    },
+    {
+     "part": "petal",
+     "print_label": "petal/corolla",
+     "a": {
+      "confidence": 0.6953125,
+      "point_px": [
+       817,
+       636
+      ],
+      "point_outside": false,
+      "area_px": 916,
+      "of_object": 0.002,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       9,
+       11,
+       12,
+       13,
+       14,
+       17,
+       18,
+       24
+      ],
+      "no_regions": false,
+      "area_px": 91042,
+      "of_object": 0.172,
+      "whole_object": false,
+      "overlaps": [
+       "perianth group"
+      ]
+     }
+    },
+    {
+     "part": "sepal",
+     "print_label": "sepal/calyx",
+     "a": {
+      "confidence": 0.3515625,
+      "point_px": [
+       849,
+       800
+      ],
+      "point_outside": false,
+      "area_px": 3727,
+      "of_object": 0.007,
+      "whole_object": false,
+      "overlaps": [
+       "nectary"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "perianth group",
+     "print_label": "perianth",
+     "a": {
+      "confidence": 0.69921875,
+      "point_px": [
+       438,
+       941
+      ],
+      "point_outside": false,
+      "area_px": 123752,
+      "of_object": 0.234,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       9,
+       11,
+       12,
+       13,
+       14,
+       17,
+       18,
+       24
+      ],
+      "no_regions": false,
+      "area_px": 91042,
+      "of_object": 0.172,
+      "whole_object": false,
+      "overlaps": [
+       "petal"
+      ]
+     }
+    },
+    {
+     "part": "nectary",
+     "print_label": "nectary",
+     "a": {
+      "confidence": 0.21484375,
+      "point_px": [
+       919,
+       874
+      ],
+      "point_outside": true,
+      "area_px": 1358,
+      "of_object": 0.003,
+      "whole_object": false,
+      "overlaps": [
+       "sepal"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "floral axis",
+     "print_label": "floral axis",
+     "a": {
+      "confidence": 0.2451171875,
+      "point_px": [
+       960,
+       863
+      ],
+      "point_outside": true,
+      "area_px": 185,
+      "of_object": 0.0,
+      "whole_object": false,
+      "overlaps": [
+       "pedicel"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "pedicel",
+     "print_label": "pedicel",
+     "a": {
+      "confidence": 0.439453125,
+      "point_px": [
+       917,
+       1031
+      ],
+      "point_outside": false,
+      "area_px": 24768,
+      "of_object": 0.047,
+      "whole_object": false,
+      "overlaps": [
+       "floral axis"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "connective",
+     "print_label": "connective",
+     "a": {
+      "confidence": 0.25,
+      "point_px": [
+       1794,
+       640
+      ],
+      "point_outside": true,
+      "area_px": 245,
+      "of_object": 0.0,
+      "whole_object": false,
+      "overlaps": [
+       "pollen sac"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       19
+      ],
+      "no_regions": false,
+      "area_px": 1587,
+      "of_object": 0.003,
+      "whole_object": false,
+      "overlaps": [
+       "anther",
+       "stamen group"
+      ]
+     }
+    },
+    {
+     "part": "pollen sac",
+     "print_label": "microsporangium",
+     "a": {
+      "confidence": 0.67578125,
+      "point_px": [
+       1699,
+       746
+      ],
+      "point_outside": false,
+      "area_px": 44865,
+      "of_object": 0.085,
+      "whole_object": false,
+      "overlaps": [
+       "connective",
+       "anther",
+       "filament stalk"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       20,
+       22,
+       23,
+       25,
+       26,
+       29
+      ],
+      "no_regions": false,
+      "area_px": 10070,
+      "of_object": 0.019,
+      "whole_object": false,
+      "overlaps": [
+       "anther",
+       "stamen group"
+      ]
+     }
+    },
+    {
+     "part": "anther",
+     "print_label": "anther",
+     "a": {
+      "confidence": 0.49609375,
+      "point_px": [
+       1730,
+       684
+      ],
+      "point_outside": false,
+      "area_px": 281,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": [
+       "pollen sac"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       6,
+       7,
+       10,
+       15,
+       16,
+       19,
+       20,
+       22,
+       23,
+       25,
+       26,
+       29
+      ],
+      "no_regions": false,
+      "area_px": 26511,
+      "of_object": 0.05,
+      "whole_object": false,
+      "overlaps": [
+       "connective",
+       "pollen sac",
+       "stamen group"
+      ]
+     }
+    },
+    {
+     "part": "filament stalk",
+     "print_label": "filament",
+     "a": {
+      "confidence": 0.71875,
+      "point_px": [
+       1519,
+       921
+      ],
+      "point_outside": false,
+      "area_px": 10179,
+      "of_object": 0.019,
+      "whole_object": false,
+      "overlaps": [
+       "pollen sac"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       8
+      ],
+      "no_regions": false,
+      "area_px": 557,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": [
+       "stamen group"
+      ]
+     }
+    },
+    {
+     "part": "stamen group",
+     "print_label": "stamen",
+     "a": {
+      "confidence": 0.77734375,
+      "point_px": [
+       1638,
+       1057
+      ],
+      "point_outside": true,
+      "area_px": 8498,
+      "of_object": 0.016,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       6,
+       7,
+       8,
+       10,
+       15,
+       16,
+       19,
+       20,
+       22,
+       23,
+       25,
+       26,
+       29
+      ],
+      "no_regions": false,
+      "area_px": 27068,
+      "of_object": 0.051,
+      "whole_object": false,
+      "overlaps": [
+       "connective",
+       "pollen sac",
+       "anther",
+       "filament stalk"
+      ]
+     }
+    }
+   ],
+   "pairs": {
+    "a": [
+     {
+      "parts": [
+       "style",
+       "ovary"
+      ],
+      "overlap_px": 88,
+      "of_smaller": 0.278
+     },
+     {
+      "parts": [
+       "sepal",
+       "nectary"
+      ],
+      "overlap_px": 313,
+      "of_smaller": 0.23
+     },
+     {
+      "parts": [
+       "floral axis",
+       "pedicel"
+      ],
+      "overlap_px": 144,
+      "of_smaller": 0.778
+     },
+     {
+      "parts": [
+       "connective",
+       "pollen sac"
+      ],
+      "overlap_px": 245,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "pollen sac",
+       "anther"
+      ],
+      "overlap_px": 281,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "pollen sac",
+       "filament stalk"
+      ],
+      "overlap_px": 7437,
+      "of_smaller": 0.731
+     }
+    ],
+    "b": [
+     {
+      "parts": [
+       "ovules",
+       "pistil group"
+      ],
+      "overlap_px": 22843,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "ovules",
+       "ovary"
+      ],
+      "overlap_px": 22843,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "pistil group",
+       "ovary"
+      ],
+      "overlap_px": 25381,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "petal",
+       "perianth group"
+      ],
+      "overlap_px": 91042,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "connective",
+       "anther"
+      ],
+      "overlap_px": 1587,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "connective",
+       "stamen group"
+      ],
+      "overlap_px": 1587,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "pollen sac",
+       "anther"
+      ],
+      "overlap_px": 10070,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "pollen sac",
+       "stamen group"
+      ],
+      "overlap_px": 10070,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "anther",
+       "stamen group"
+      ],
+      "overlap_px": 26511,
+      "of_smaller": 1.0
+     },
+     {
+      "parts": [
+       "filament stalk",
+       "stamen group"
+      ],
+      "overlap_px": 557,
+      "of_smaller": 1.0
+     }
+    ]
+   },
+   "counts": {
+    "a_point_outside": 6,
+    "a_whole_object": 0,
+    "a_overlap_pairs": 6,
+    "b_whole_object": 0,
+    "b_overlap_pairs": 10,
+    "b_no_regions": 6
+   },
+   "summary": "flower, 16 parts. Arm A: point outside its mask 6, over 50% of the object 0, overlapping pairs 6. Arm B: no regions 6, over 50% of the object 0, overlapping pairs 10."
+  },
+  "heart": {
+   "figure": "heart",
+   "object_px": 964761,
+   "parts": [
+    {
+     "part": "brachiocephalic artery",
+     "print_label": "Brachiocephalic artery",
+     "a": {
+      "confidence": 0.8203125,
+      "point_px": [
+       933,
+       203
+      ],
+      "point_outside": false,
+      "area_px": 529,
+      "of_object": 0.001,
+      "whole_object": false,
+      "overlaps": [
+       "aorta"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       2
+      ],
+      "no_regions": false,
+      "area_px": 322,
+      "of_object": 0.0,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "superior vena cava",
+     "print_label": "Superior vena cava",
+     "a": {
+      "confidence": 0.76171875,
+      "point_px": [
+       835,
+       554
+      ],
+      "point_outside": false,
+      "area_px": 42950,
+      "of_object": 0.045,
+      "whole_object": false,
+      "overlaps": [
+       "right pulmonary arteries"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       3
+      ],
+      "no_regions": false,
+      "area_px": 2104,
+      "of_object": 0.002,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "right pulmonary arteries",
+     "print_label": "Right pulmonary arteries",
+     "a": {
+      "confidence": 0.6796875,
+      "point_px": [
+       718,
+       540
+      ],
+      "point_outside": false,
+      "area_px": 6789,
+      "of_object": 0.007,
+      "whole_object": false,
+      "overlaps": [
+       "superior vena cava"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       5
+      ],
+      "no_regions": false,
+      "area_px": 4981,
+      "of_object": 0.005,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "right pulmonary veins",
+     "print_label": "Right pulmonary veins",
+     "a": {
+      "confidence": 0.671875,
+      "point_px": [
+       681,
+       723
+      ],
+      "point_outside": false,
+      "area_px": 8137,
+      "of_object": 0.008,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       8
+      ],
+      "no_regions": false,
+      "area_px": 5871,
+      "of_object": 0.006,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "right atrium",
+     "print_label": "Right atrium",
+     "a": {
+      "confidence": 0.67578125,
+      "point_px": [
+       851,
+       851
+      ],
+      "point_outside": false,
+      "area_px": 48475,
+      "of_object": 0.05,
+      "whole_object": false,
+      "overlaps": [
+       "chordae tendineae"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "tricuspid valve",
+     "print_label": "Atrioventricular (tricuspid) valve",
+     "a": {
+      "confidence": 0.0888671875,
+      "point_px": [
+       876,
+       986
+      ],
+      "point_outside": false,
+      "area_px": 51250,
+      "of_object": 0.053,
+      "whole_object": false,
+      "overlaps": [
+       "chordae tendineae",
+       "right ventricle"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "chordae tendineae",
+     "print_label": "Chordae tendineae",
+     "a": {
+      "confidence": 0.3671875,
+      "point_px": [
+       1079,
+       1110
+      ],
+      "point_outside": false,
+      "area_px": 138895,
+      "of_object": 0.144,
+      "whole_object": false,
+      "overlaps": [
+       "right atrium",
+       "tricuspid valve",
+       "right ventricle"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "right ventricle",
+     "print_label": "Right ventricle",
+     "a": {
+      "confidence": 0.486328125,
+      "point_px": [
+       1040,
+       1212
+      ],
+      "point_outside": false,
+      "area_px": 147319,
+      "of_object": 0.153,
+      "whole_object": false,
+      "overlaps": [
+       "tricuspid valve",
+       "chordae tendineae"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "inferior vena cava",
+     "print_label": "Inferior vena cava",
+     "a": {
+      "confidence": 0.1826171875,
+      "point_px": [
+       907,
+       1360
+      ],
+      "point_outside": false,
+      "area_px": 2235,
+      "of_object": 0.002,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       10
+      ],
+      "no_regions": false,
+      "area_px": 15373,
+      "of_object": 0.016,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "left common carotid artery",
+     "print_label": "Left common carotid artery",
+     "a": {
+      "confidence": 0.6875,
+      "point_px": [
+       1105,
+       169
+      ],
+      "point_outside": false,
+      "area_px": 10962,
+      "of_object": 0.011,
+      "whole_object": false,
+      "overlaps": [
+       "left subclavian artery",
+       "aorta"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       1
+      ],
+      "no_regions": false,
+      "area_px": 327,
+      "of_object": 0.0,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "left subclavian artery",
+     "print_label": "Left subclavian artery",
+     "a": {
+      "confidence": 0.400390625,
+      "point_px": [
+       1191,
+       191
+      ],
+      "point_outside": false,
+      "area_px": 104735,
+      "of_object": 0.109,
+      "whole_object": false,
+      "overlaps": [
+       "left common carotid artery",
+       "aorta"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "aorta",
+     "print_label": "Aorta",
+     "a": {
+      "confidence": 0.94140625,
+      "point_px": [
+       1091,
+       459
+      ],
+      "point_outside": false,
+      "area_px": 136157,
+      "of_object": 0.141,
+      "whole_object": false,
+      "overlaps": [
+       "brachiocephalic artery",
+       "left common carotid artery",
+       "left subclavian artery"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       11
+      ],
+      "no_regions": false,
+      "area_px": 14570,
+      "of_object": 0.015,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "left pulmonary arteries",
+     "print_label": "Left pulmonary arteries",
+     "a": {
+      "confidence": 0.443359375,
+      "point_px": [
+       1331,
+       520
+      ],
+      "point_outside": false,
+      "area_px": 49838,
+      "of_object": 0.052,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "left pulmonary veins",
+     "print_label": "Left pulmonary veins",
+     "a": {
+      "confidence": 0.875,
+      "point_px": [
+       1462,
+       693
+      ],
+      "point_outside": false,
+      "area_px": 3195,
+      "of_object": 0.003,
+      "whole_object": false,
+      "overlaps": [
+       "mitral valve"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       7
+      ],
+      "no_regions": false,
+      "area_px": 1838,
+      "of_object": 0.002,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "left atrium",
+     "print_label": "Left atrium",
+     "a": {
+      "confidence": 0.734375,
+      "point_px": [
+       1370,
+       762
+      ],
+      "point_outside": false,
+      "area_px": 15840,
+      "of_object": 0.016,
+      "whole_object": false,
+      "overlaps": [
+       "mitral valve",
+       "left ventricle"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "semilunar valves",
+     "print_label": "Semilunar valves",
+     "a": {
+      "confidence": 0.054931640625,
+      "point_px": [
+       1259,
+       836
+      ],
+      "point_outside": false,
+      "area_px": 2245,
+      "of_object": 0.002,
+      "whole_object": false,
+      "overlaps": [
+       "septum"
+      ]
+     },
+     "b": {
+      "region_ids": [
+       9
+      ],
+      "no_regions": false,
+      "area_px": 3089,
+      "of_object": 0.003,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "mitral valve",
+     "print_label": "Atrioventricular (mitral) valve",
+     "a": {
+      "confidence": 0.4296875,
+      "point_px": [
+       1376,
+       922
+      ],
+      "point_outside": false,
+      "area_px": 117496,
+      "of_object": 0.122,
+      "whole_object": false,
+      "overlaps": [
+       "left pulmonary veins",
+       "left atrium",
+       "left ventricle"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "left ventricle",
+     "print_label": "Left ventricle",
+     "a": {
+      "confidence": 0.2177734375,
+      "point_px": [
+       1452,
+       1088
+      ],
+      "point_outside": false,
+      "area_px": 105629,
+      "of_object": 0.109,
+      "whole_object": false,
+      "overlaps": [
+       "left atrium",
+       "mitral valve"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "septum",
+     "print_label": "Septum",
+     "a": {
+      "confidence": 0.44140625,
+      "point_px": [
+       1288,
+       1150
+      ],
+      "point_outside": false,
+      "area_px": 152982,
+      "of_object": 0.159,
+      "whole_object": false,
+      "overlaps": [
+       "semilunar valves"
+      ]
+     },
+     "b": {
+      "region_ids": [],
+      "no_regions": true,
+      "area_px": null,
+      "of_object": null,
+      "whole_object": false,
+      "overlaps": []
+     }
+    }
+   ],
+   "pairs": {
+    "a": [
+     {
+      "parts": [
+       "brachiocephalic artery",
+       "aorta"
+      ],
+      "overlap_px": 493,
+      "of_smaller": 0.932
+     },
+     {
+      "parts": [
+       "superior vena cava",
+       "right pulmonary arteries"
+      ],
+      "overlap_px": 4723,
+      "of_smaller": 0.696
+     },
+     {
+      "parts": [
+       "right atrium",
+       "chordae tendineae"
+      ],
+      "overlap_px": 22389,
+      "of_smaller": 0.462
+     },
+     {
+      "parts": [
+       "tricuspid valve",
+       "chordae tendineae"
+      ],
+      "overlap_px": 35353,
+      "of_smaller": 0.69
+     },
+     {
+      "parts": [
+       "tricuspid valve",
+       "right ventricle"
+      ],
+      "overlap_px": 29988,
+      "of_smaller": 0.585
+     },
+     {
+      "parts": [
+       "chordae tendineae",
+       "right ventricle"
+      ],
+      "overlap_px": 121714,
+      "of_smaller": 0.876
+     },
+     {
+      "parts": [
+       "left common carotid artery",
+       "left subclavian artery"
+      ],
+      "overlap_px": 10250,
+      "of_smaller": 0.935
+     },
+     {
+      "parts": [
+       "left common carotid artery",
+       "aorta"
+      ],
+      "overlap_px": 10834,
+      "of_smaller": 0.988
+     },
+     {
+      "parts": [
+       "left subclavian artery",
+       "aorta"
+      ],
+      "overlap_px": 102417,
+      "of_smaller": 0.978
+     },
+     {
+      "parts": [
+       "left pulmonary veins",
+       "mitral valve"
+      ],
+      "overlap_px": 677,
+      "of_smaller": 0.212
+     },
+     {
+      "parts": [
+       "left atrium",
+       "mitral valve"
+      ],
+      "overlap_px": 14258,
+      "of_smaller": 0.9
+     },
+     {
+      "parts": [
+       "left atrium",
+       "left ventricle"
+      ],
+      "overlap_px": 12083,
+      "of_smaller": 0.763
+     },
+     {
+      "parts": [
+       "semilunar valves",
+       "septum"
+      ],
+      "overlap_px": 598,
+      "of_smaller": 0.266
+     },
+     {
+      "parts": [
+       "mitral valve",
+       "left ventricle"
+      ],
+      "overlap_px": 101368,
+      "of_smaller": 0.96
+     }
+    ],
+    "b": []
+   },
+   "counts": {
+    "a_point_outside": 0,
+    "a_whole_object": 0,
+    "a_overlap_pairs": 14,
+    "b_whole_object": 0,
+    "b_overlap_pairs": 0,
+    "b_no_regions": 10
+   },
+   "summary": "heart, 19 parts. Arm A: point outside its mask 0, over 50% of the object 0, overlapping pairs 14. Arm B: no regions 10, over 50% of the object 0, overlapping pairs 0."
+  },
+  "japan_regions": {
+   "figure": "japan_regions",
+   "object_px": 410477,
+   "parts": [
+    {
+     "part": "Hokkaido region",
+     "print_label": "Hokkaid\u014d",
+     "a": {
+      "confidence": 0.9609375,
+      "point_px": [
+       1355,
+       358
+      ],
+      "point_outside": false,
+      "area_px": 74185,
+      "of_object": 0.181,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       1,
+       2,
+       3
+      ],
+      "no_regions": false,
+      "area_px": 74903,
+      "of_object": 0.182,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Tohoku region",
+     "print_label": "T\u014dhoku",
+     "a": {
+      "confidence": 0.7109375,
+      "point_px": [
+       1217,
+       829
+      ],
+      "point_outside": false,
+      "area_px": 14966,
+      "of_object": 0.036,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       4,
+       5,
+       6,
+       7,
+       8,
+       10
+      ],
+      "no_regions": false,
+      "area_px": 84961,
+      "of_object": 0.207,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Kanto region",
+     "print_label": "Kant\u014d",
+     "a": {
+      "confidence": 0.84765625,
+      "point_px": [
+       1131,
+       1157
+      ],
+      "point_outside": false,
+      "area_px": 28421,
+      "of_object": 0.069,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       15,
+       19
+      ],
+      "no_regions": false,
+      "area_px": 12223,
+      "of_object": 0.03,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Chubu region",
+     "print_label": "Ch\u016bbu",
+     "a": {
+      "confidence": 0.51171875,
+      "point_px": [
+       960,
+       1142
+      ],
+      "point_outside": false,
+      "area_px": 55742,
+      "of_object": 0.136,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       9,
+       11,
+       12,
+       13,
+       14,
+       16,
+       17,
+       18,
+       24,
+       25
+      ],
+      "no_regions": false,
+      "area_px": 44543,
+      "of_object": 0.109,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Kansai region",
+     "print_label": "Kansai",
+     "a": {
+      "confidence": 0.5234375,
+      "point_px": [
+       797,
+       1298
+      ],
+      "point_outside": false,
+      "area_px": 30050,
+      "of_object": 0.073,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       22,
+       23,
+       29,
+       31
+      ],
+      "no_regions": false,
+      "area_px": 30525,
+      "of_object": 0.074,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Chugoku region",
+     "print_label": "Ch\u016bgoku",
+     "a": {
+      "confidence": 0.80859375,
+      "point_px": [
+       535,
+       1273
+      ],
+      "point_outside": false,
+      "area_px": 27887,
+      "of_object": 0.068,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       20,
+       21,
+       26,
+       28,
+       30
+      ],
+      "no_regions": false,
+      "area_px": 26480,
+      "of_object": 0.065,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Shikoku region",
+     "print_label": "Shikoku",
+     "a": {
+      "confidence": 0.9375,
+      "point_px": [
+       594,
+       1398
+      ],
+      "point_outside": false,
+      "area_px": 17392,
+      "of_object": 0.042,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       32,
+       33,
+       34,
+       35
+      ],
+      "no_regions": false,
+      "area_px": 15752,
+      "of_object": 0.038,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Kyushu region",
+     "print_label": "Ky\u016bsh\u016b",
+     "a": {
+      "confidence": 0.87109375,
+      "point_px": [
+       364,
+       1495
+      ],
+      "point_outside": false,
+      "area_px": 34875,
+      "of_object": 0.085,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       27,
+       36,
+       37,
+       38,
+       39,
+       40,
+       41,
+       42,
+       43,
+       44,
+       45,
+       47
+      ],
+      "no_regions": false,
+      "area_px": 36568,
+      "of_object": 0.089,
+      "whole_object": false,
+      "overlaps": []
+     }
+    },
+    {
+     "part": "Okinawa inset region",
+     "print_label": "(Okinawa)",
+     "a": {
+      "confidence": 0.85546875,
+      "point_px": [
+       1646,
+       1687
+      ],
+      "point_outside": false,
+      "area_px": 1948,
+      "of_object": 0.005,
+      "whole_object": false,
+      "overlaps": []
+     },
+     "b": {
+      "region_ids": [
+       46
+      ],
+      "no_regions": false,
+      "area_px": 352526,
+      "of_object": 0.859,
+      "whole_object": true,
+      "overlaps": []
+     }
+    }
+   ],
+   "pairs": {
+    "a": [],
+    "b": []
+   },
+   "counts": {
+    "a_point_outside": 0,
+    "a_whole_object": 0,
+    "a_overlap_pairs": 0,
+    "b_whole_object": 1,
+    "b_overlap_pairs": 0,
+    "b_no_regions": 0
+   },
+   "summary": "japan_regions, 9 parts. Arm A: point outside its mask 0, over 50% of the object 0, overlapping pairs 0. Arm B: no regions 0, over 50% of the object 1, overlapping pairs 0."
+  }
+ }
+}
