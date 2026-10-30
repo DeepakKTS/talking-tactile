@@ -113,6 +113,13 @@ def test_labels_with_the_same_letters_still_get_different_abbreviations() -> Non
     assert all(v.isalpha() for v in got.values())
 
 
+def test_a_suffixed_stream_never_equals_another_labels_own() -> None:
+    """Hypothesis seed 8 hung here (Oct 30): "a", "aa" and a second "a"-letter label made two
+    streams "aa", which no length could tell apart."""
+    got = abbreviations(["a", "aa", "a-"], 1)
+    assert len(set(got.values())) == 3
+
+
 @settings(max_examples=200, deadline=None)
 @given(st.lists(st.text(alphabet="abcdefghijkl -(2)", min_size=0, max_size=14), max_size=25))
 def test_abbreviations_are_always_unique_letters(labels: list[str]) -> None:

@@ -30,13 +30,19 @@ def abbreviations(labels: Sequence[str], start: int) -> dict[str, str]:
     unique = list(dict.fromkeys(labels))
     streams: dict[str, str] = {}
     twins: dict[str, int] = {}
+    used: set[str] = set()
     for label in unique:
         # Labels with the same letters ("T-cell", "t cell") get distinct letter suffixes,
-        # so every stream is distinct and the growth below always ends.
+        # so every stream is distinct and the growth below always ends. A suffixed stream can
+        # equal another label's own ("a" + "a" is the label "aa"), so the suffix moves on
+        # until the stream is unused.
         stream = _letter_stream(label)
         k = twins.get(stream, 0)
+        while stream + _suffix(k) in used:
+            k += 1
         twins[stream] = k + 1
         streams[label] = stream + _suffix(k)
+        used.add(streams[label])
     length = {label: start for label in unique}
     while True:
         current = {label: streams[label][: length[label]] for label in unique}
