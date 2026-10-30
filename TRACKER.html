@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 148,
- "updated_at": "2026-10-30T03:07:17.994Z",
+ "rev": 149,
+ "updated_at": "2026-10-30T03:14:13.225Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2153,10 +2153,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   {
    "id": "dec-mvue5wlfpemk",
    "date": "2026-10-29",
-   "title": "SAM confidence is not a review trigger: label and line masks scored 0.70 to 0.78",
+   "title": "SAM confidence is not a review trigger on its own: some fails scored high (brachiocephalic sliver 0.820, stamen label 0.777) and some passes scored low (left pulmonary arteries 0.443).",
    "decision": "Do not use SAM confidence to decide which masks a person reviews",
-   "why": "v1 Arm A masks graded fail: stamen group (label) 0.777, perianth group (label) 0.699, petal (line) 0.695, stigma (sliver) 0.711, brachiocephalic artery (sliver) 0.820, Tohoku (partial) 0.711. Other label and line fails scored low (pistil group 0.559, nectary 0.215, semilunar valves 0.055), so confidence neither finds nor clears them.",
-   "changed_at": "2026-10-30T03:07:17.958Z"
+   "why": "v1 Arm A, graded Oct 29. Fails at 0.70 or higher: brachiocephalic artery (sliver) 0.820, stamen group (label) 0.777, stigma (sliver) 0.711, Tohoku (partial) 0.711. A pass at 0.443: left pulmonary arteries.",
+   "changed_at": "2026-10-30T03:14:13.225Z"
   }
  ],
  "risks": [
@@ -2247,6 +2247,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T03:14:13.225Z",
+   "kind": "claude",
+   "text": "Decision edited: SAM confidence is not a review trigger: label and line masks scored 0.70 to 0.78. Now: SAM confidence is not a review trigger on its own: some fails scored high (brachiocephalic sliver 0.820, stamen label 0.777) and some passes scored low (left pulmonary arteries 0.443).."
+  },
   {
    "ts": "2026-10-30T03:07:17.994Z",
    "kind": "claude",

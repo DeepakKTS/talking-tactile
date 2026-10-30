@@ -322,6 +322,23 @@ class TestDecision(TrackerTestCase):
         self.assert_fails_unchanged("decision", "T", "--chose", "x")
 
 
+    def test_decision_edit(self) -> None:
+        s = self.assert_ok_write("decision", "Old title", "--chose", "A", "--why", "B")
+        dec = s["decisions"][-1]
+        s = self.assert_ok_write("decision-edit", dec["id"], "--title", "New title", "--why", "C")
+        d = s["decisions"][-1]
+        self.assertEqual((d["id"], d["title"], d["decision"], d["why"], d["date"]), (dec["id"], "New title", "A", "C", dec["date"]))
+        self.assertEqual(len(s["decisions"]), len(self.initial["decisions"]) + 1)
+        self.assertEqual(s["log"][0]["text"], "Decision edited: Old title. Now: New title.")
+
+    def test_decision_edit_needs_a_known_id_and_a_change(self) -> None:
+        self.assert_fails_unchanged("decision-edit", "dec-nope", "--title", "x")
+        s = self.assert_ok_write("decision", "T", "--chose", "A", "--why", "B")
+        dec_id = s["decisions"][-1]["id"]
+        self.assert_fails_unchanged("decision-edit", dec_id)
+        self.assert_fails_unchanged("decision-edit", dec_id, "--title", " ")
+
+
 class TestGate(TrackerTestCase):
     def test_gate_with_and_without_evidence(self) -> None:
         s = self.assert_ok_write("gate", "A", "pass", "--evidence", "spikes/ p50 and p95 written")

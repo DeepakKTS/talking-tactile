@@ -368,6 +368,23 @@ def cmd_decision(state: dict, args: argparse.Namespace) -> str | None:
     return text
 
 
+def cmd_decision_edit(state: dict, args: argparse.Namespace) -> str | None:
+    decision = find(state["decisions"], args.decision_id, "decision")
+    changes = {"title": args.title, "decision": args.chose, "why": args.why}
+    changes = {k: v for k, v in changes.items() if v is not None}
+    if not changes:
+        raise TrackerError("Give at least one of --title, --chose or --why.")
+    if any(not v.strip() for k, v in changes.items() if k != "why"):
+        raise TrackerError("A decision's title and what was chosen cannot be empty.")
+    old = decision["title"]
+    decision.update(changes)
+    text = f"Decision edited: {old}."
+    if "title" in changes and changes["title"] != old:
+        text += f" Now: {changes['title']}."
+    commit(state, decision, text)
+    return text
+
+
 def cmd_gate(state: dict, args: argparse.Namespace) -> str | None:
     g = find(state["gates"], args.gate_id, "gate")
     g["status"] = args.status
@@ -571,6 +588,13 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--chose", required=True)
     s.add_argument("--why", required=True)
     s.set_defaults(func=cmd_decision)
+
+    s = sub.add_parser("decision-edit", help="correct a recorded decision")
+    s.add_argument("decision_id")
+    s.add_argument("--title")
+    s.add_argument("--chose")
+    s.add_argument("--why")
+    s.set_defaults(func=cmd_decision_edit)
 
     s = sub.add_parser("gate", help="set a gate status")
     s.add_argument("gate_id", choices=["A", "B", "C", "D"])
