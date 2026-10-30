@@ -566,8 +566,9 @@ def v2_facts(row: dict[str, Any]) -> list[str]:
     for i in row["instances"]:
         moved = [g for g in i["points"] if g["on"] and not g["dropped"]]
         conf = i.get("confidence")
+        n = sum(1 for g in i["points"] if g["sent"])
         out.append(
-            f"{i['where']}: {sum(1 for g in i['points'] if g['sent'])} points sent"
+            f"{i['where']}: {n} point{'' if n == 1 else 's'} sent"
             + (f", {len(moved)} moved" if moved else "")
             + ("" if conf is None else f", confidence {conf:.3f}")
         )
