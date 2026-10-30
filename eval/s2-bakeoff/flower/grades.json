@@ -1,0 +1,232 @@
+{
+ "figure": "flower",
+ "source": "Deepak and Claude review, 2026-10-29",
+ "numbering": "parts numbered 1 to 16 in Spark's listing order, results.json parts",
+ "ungraded": [],
+ "grades": [
+  {
+   "part": "ovules",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": "dot in inset"
+  },
+  {
+   "part": "ovules",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "spill",
+   "note": "inner ovary, takes ovary area"
+  },
+  {
+   "part": "pistil group",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "label",
+   "note": ""
+  },
+  {
+   "part": "pistil group",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "partial",
+   "note": "ovary only"
+  },
+  {
+   "part": "stigma",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": ""
+  },
+  {
+   "part": "stigma",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "style",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": ""
+  },
+  {
+   "part": "style",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "ovary",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": "spill",
+   "note": "whole pistil"
+  },
+  {
+   "part": "ovary",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "petal",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "line",
+   "note": ""
+  },
+  {
+   "part": "petal",
+   "arm": "B",
+   "grade": "conditional",
+   "reason": "partial",
+   "note": ""
+  },
+  {
+   "part": "sepal",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": null,
+   "note": "specks on leader line"
+  },
+  {
+   "part": "sepal",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "perianth group",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "label",
+   "note": "label circle"
+  },
+  {
+   "part": "perianth group",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "partial",
+   "note": "no sepals"
+  },
+  {
+   "part": "nectary",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "line",
+   "note": ""
+  },
+  {
+   "part": "nectary",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "floral axis",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": ""
+  },
+  {
+   "part": "floral axis",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "pedicel",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": "spill",
+   "note": "onto floral axis"
+  },
+  {
+   "part": "pedicel",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "missing",
+   "note": ""
+  },
+  {
+   "part": "connective",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": ""
+  },
+  {
+   "part": "connective",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "pollen sac",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "whole",
+   "note": "entire stamen"
+  },
+  {
+   "part": "pollen sac",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "anther",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "sliver",
+   "note": ""
+  },
+  {
+   "part": "anther",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": "inset and both main anthers"
+  },
+  {
+   "part": "filament stalk",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "filament stalk",
+   "arm": "B",
+   "grade": "conditional",
+   "reason": null,
+   "note": "main-drawing filament, not the labeled one"
+  },
+  {
+   "part": "stamen group",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "label",
+   "note": ""
+  },
+  {
+   "part": "stamen group",
+   "arm": "B",
+   "grade": "conditional",
+   "reason": null,
+   "note": "no inset filament"
+  }
+ ]
+}

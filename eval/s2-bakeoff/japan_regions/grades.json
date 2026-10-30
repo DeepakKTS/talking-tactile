@@ -1,0 +1,133 @@
+{
+ "figure": "japan_regions",
+ "source": "Deepak and Claude review, 2026-10-29",
+ "ungraded": [],
+ "grades": [
+  {
+   "part": "Hokkaido region",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Hokkaido region",
+   "arm": "B",
+   "grade": "conditional",
+   "reason": null,
+   "note": "includes differently shaded island chain"
+  },
+  {
+   "part": "Tohoku region",
+   "arm": "A",
+   "grade": "fail",
+   "reason": "partial",
+   "note": "one prefecture"
+  },
+  {
+   "part": "Tohoku region",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "spill",
+   "note": "includes Kanto"
+  },
+  {
+   "part": "Kanto region",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Kanto region",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "wrong",
+   "note": "a Chubu prefecture"
+  },
+  {
+   "part": "Chubu region",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Chubu region",
+   "arm": "B",
+   "grade": "conditional",
+   "reason": null,
+   "note": "missing one prefecture"
+  },
+  {
+   "part": "Kansai region",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": null,
+   "note": "specks in Chugoku"
+  },
+  {
+   "part": "Kansai region",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Chugoku region",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Chugoku region",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Shikoku region",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Shikoku region",
+   "arm": "B",
+   "grade": "pass",
+   "reason": null,
+   "note": ""
+  },
+  {
+   "part": "Kyushu region",
+   "arm": "A",
+   "grade": "pass",
+   "reason": null,
+   "note": "main island; small islands omitted"
+  },
+  {
+   "part": "Kyushu region",
+   "arm": "B",
+   "grade": "conditional",
+   "reason": null,
+   "note": "includes outlying islands, one apparently in the Okinawa inset; unverified"
+  },
+  {
+   "part": "Okinawa inset region",
+   "arm": "A",
+   "grade": "conditional",
+   "reason": "partial",
+   "note": "main inset island only"
+  },
+  {
+   "part": "Okinawa inset region",
+   "arm": "B",
+   "grade": "fail",
+   "reason": "spill",
+   "note": "whole inset box, sea included"
+  }
+ ]
+}

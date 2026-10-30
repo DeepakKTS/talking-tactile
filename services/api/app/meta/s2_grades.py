@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 GRADES = ("pass", "conditional", "fail")
-REASONS = ("sliver", "label", "line", "noise", "spill", "whole", "missing")
+REASONS = ("sliver", "label", "line", "noise", "spill", "whole", "missing", "partial", "wrong")
 ARMS = ("A", "B")
 
 

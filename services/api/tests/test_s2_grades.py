@@ -18,7 +18,7 @@ def parts_of(name: str) -> list[str]:
 
 
 def test_there_are_grades() -> None:
-    assert "heart" in GRADED
+    assert sorted(bake.FIGURES) == GRADED
 
 
 @pytest.mark.parametrize("name", GRADED)
@@ -60,3 +60,21 @@ def test_the_heart_tally_is_the_graders() -> None:
     assert t["strict"] == {"both": 1, "a_only": 3, "b_only": 0, "neither": 10}
     assert t["arms"]["A"] == {"pass": 4, "conditional": 3, "fail": 7}
     assert t["arms"]["B"] == {"pass": 1, "conditional": 0, "fail": 13}
+
+
+def test_the_flower_tally() -> None:
+    t = grades.tally(grades.load(bake.OUT_ROOT / "flower"))
+    assert t["graded"] == 16
+    assert t["arms"]["A"] == {"pass": 1, "conditional": 3, "fail": 12}
+    assert t["arms"]["B"] == {"pass": 4, "conditional": 3, "fail": 9}
+    assert t["strict"] == {"both": 0, "a_only": 1, "b_only": 4, "neither": 11}
+
+
+def test_the_japan_tally_is_the_graders() -> None:
+    """9 regions. A: 6 pass, 2 conditional, 1 fail. B: 3 pass, 3 conditional, 3 fail.
+    Four-way strict: both 2, A only 4, B only 1, neither 2."""
+    t = grades.tally(grades.load(bake.OUT_ROOT / "japan_regions"))
+    assert t["graded"] == 9
+    assert t["arms"]["A"] == {"pass": 6, "conditional": 2, "fail": 1}
+    assert t["arms"]["B"] == {"pass": 3, "conditional": 3, "fail": 3}
+    assert t["strict"] == {"both": 2, "a_only": 4, "b_only": 1, "neither": 2}
