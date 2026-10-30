@@ -26,6 +26,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -54,6 +55,7 @@
      "text_share": 1.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -84,6 +86,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 0,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -112,6 +115,7 @@
      "text_share": 0.0,
      "line_share": 0.133,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "ovary"
@@ -144,6 +148,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 3,
+     "instances": 1,
      "reference": {
       "arm": "B",
       "iou": 0.594,
@@ -180,6 +185,7 @@
      "text_share": 0.0,
      "line_share": 0.816,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -210,6 +216,7 @@
      "text_share": 0.0,
      "line_share": 0.071,
      "fragments": 2,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "nectary"
@@ -242,6 +249,7 @@
      "text_share": 0.337,
      "line_share": 0.001,
      "fragments": 3,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -272,6 +280,7 @@
      "text_share": 0.0,
      "line_share": 0.426,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "sepal"
@@ -304,6 +313,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 0,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "pedicel"
@@ -335,6 +345,7 @@
      "text_share": 0.0,
      "line_share": 0.003,
      "fragments": 2,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "floral axis"
@@ -366,6 +377,7 @@
      "text_share": 0.0,
      "line_share": 0.078,
      "fragments": 0,
+     "instances": 1,
      "reference": {
       "arm": "B",
       "iou": 0.154,
@@ -402,6 +414,7 @@
      "text_share": 0.0,
      "line_share": 0.01,
      "fragments": 2,
+     "instances": 1,
      "reference": {
       "arm": "B",
       "iou": 0.223,
@@ -440,6 +453,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 0,
+     "instances": 1,
      "reference": {
       "arm": "B",
       "iou": 0.009,
@@ -476,6 +490,7 @@
      "text_share": 0.031,
      "line_share": 0.003,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -510,6 +525,7 @@
      "text_share": 1.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -625,6 +641,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "aorta"
@@ -656,6 +673,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "right pulmonary arteries"
@@ -686,6 +704,7 @@
      "text_share": 0.0,
      "line_share": 0.035,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -720,6 +739,7 @@
      "text_share": 0.0,
      "line_share": 0.017,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -748,6 +768,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -782,6 +803,7 @@
      "text_share": 0.0,
      "line_share": 0.002,
      "fragments": 8,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "chordae tendineae",
@@ -814,6 +836,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 3,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "right atrium",
@@ -847,6 +870,7 @@
      "text_share": 0.0,
      "line_share": 0.001,
      "fragments": 4,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "tricuspid valve",
@@ -879,6 +903,7 @@
      "text_share": 0.0,
      "line_share": 0.591,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -908,6 +933,7 @@
      "text_share": 0.0,
      "line_share": 0.003,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -943,6 +969,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 3,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "left common carotid artery",
@@ -975,6 +1002,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "brachiocephalic artery",
@@ -1007,6 +1035,7 @@
      "text_share": 0.0,
      "line_share": 0.001,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1037,6 +1066,7 @@
      "text_share": 0.0,
      "line_share": 0.017,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "mitral valve"
@@ -1068,6 +1098,7 @@
      "text_share": 0.0,
      "line_share": 0.004,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "mitral valve",
@@ -1099,6 +1130,7 @@
      "text_share": 0.0,
      "line_share": 0.207,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "septum"
@@ -1131,6 +1163,7 @@
      "text_share": 0.0,
      "line_share": 0.007,
      "fragments": 5,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "left pulmonary veins",
@@ -1164,6 +1197,7 @@
      "text_share": 0.0,
      "line_share": 0.005,
      "fragments": 5,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "left atrium",
@@ -1196,6 +1230,7 @@
      "text_share": 0.0,
      "line_share": 0.002,
      "fragments": 27,
+     "instances": 1,
      "reference": null,
      "overlaps": [
       "semilunar valves"
@@ -1372,6 +1407,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1402,6 +1438,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 2,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [
@@ -1430,6 +1467,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1460,6 +1498,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1490,6 +1529,7 @@
      "text_share": 0.032,
      "line_share": 0.0,
      "fragments": 2,
+     "instances": 1,
      "reference": {
       "arm": "B",
       "iou": 0.829,
@@ -1522,6 +1562,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1552,6 +1593,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1582,6 +1624,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": {
       "arm": "A",
       "iou": 1.0,
@@ -1612,6 +1655,7 @@
      "text_share": 0.0,
      "line_share": 0.0,
      "fragments": 1,
+     "instances": 1,
      "reference": null,
      "overlaps": [],
      "points": [

@@ -14,9 +14,10 @@ Per part:
   to feel as an area, because S4 could only draw it as a point symbol.
 - text and line: the share of the mask on label text and on leader lines, found in code
   (app/geometry/print_marks.py). Over ON_MARKS is flagged.
-- fragments: 8-connected pieces at or over the speck floor.
+- fragments: 8-connected pieces at or over the speck floor; flagged when there are more
+  pieces than instances (v2 lists each instance; v1 has one), never for a group.
 - sibling overlap: as in overlaps.json, another part of the run covering more than 20% of the
-  smaller mask.
+  smaller mask. Groups are left out: a group's mask is its members'.
 - points: whether each prompt point is on text, a leader line or ink.
 Sizes are on a letter page, as S3 would print the figure."""
 
@@ -103,7 +104,10 @@ def score(
     speck_mm2, symbol_mm2 = floors_mm2()
     floor_px = speck_mm2 / mm**2
     masks: dict[str, Mask] = run["masks"]
-    pairs = grading.overlap_pairs({p: m for p, m in masks.items() if m.any()})
+    kinds = run.get("kind", {})
+    pairs = grading.overlap_pairs(
+        {p: m for p, m in masks.items() if m.any() and kinds.get(p) != "group"}
+    )
     rows = []
     for part in run["parts"]:
         m = masks.get(part, np.zeros(image.shape[:2], bool))
@@ -123,6 +127,7 @@ def score(
             "text_share": round(text_px / area, 3) if area else None,
             "line_share": round(line_px / area, 3) if area else None,
             "fragments": fragments(m, floor_px) if area else 0,
+            "instances": run.get("instances", {}).get(part, 1),
             "reference": None if ref is None else reference(m, ref),
             "overlaps": [
                 q for pr in pairs for q in pr["parts"] if part in pr["parts"] and q != part
@@ -140,7 +145,7 @@ def score(
         "under_point_symbol": sum(r["under_point_symbol"] for r in rows),
         "on_text": sum(1 for r in rows if (r["text_share"] or 0) > ON_MARKS),
         "on_line": sum(1 for r in rows if (r["line_share"] or 0) > ON_MARKS),
-        "fragmented": sum(1 for r in rows if r["fragments"] > 1),
+        "fragmented": sum(1 for r in rows if fragmented(r)),
         "overlap_pairs": len(pairs),
         "points": sum(len(r["points"]) for r in rows),
         "points_on_text": sum(p["on_text"] for r in rows for p in r["points"]),
@@ -163,6 +168,11 @@ def reference(mask: Mask, ref: dict[str, Any]) -> dict[str, Any]:
     return {"arm": ref["arm"], "iou": v, "regression": v < REGRESSION_IOU}
 
 
+def fragmented(row: dict[str, Any]) -> bool:
+    """More pieces than instances; a group's pieces are its members'."""
+    return bool(row["kind"] != "group" and row["fragments"] > max(1, row["instances"]))
+
+
 def flags(row: dict[str, Any]) -> list[str]:
     out = []
     if not row["area_px"]:
@@ -178,7 +188,7 @@ def flags(row: dict[str, Any]) -> list[str]:
         out.append(f"{row['text_share']:.0%} on text")
     if (row["line_share"] or 0) > ON_MARKS:
         out.append(f"{row['line_share']:.0%} on leader lines")
-    if row["fragments"] > 1:
+    if fragmented(row):
         out.append(f"{row['fragments']} fragments")
     if row["overlaps"]:
         out.append("overlaps " + ", ".join(row["overlaps"]))
@@ -295,6 +305,7 @@ def v2_run(name: str, result: dict[str, Any], final: dict[str, Mask]) -> dict[st
         },
         "confidence": conf,
         "kind": {r["part"]: r["kind"] for r in rows},
+        "instances": {r["part"]: sum(1 for i in r["instances"] if i.get("kept_px")) for r in rows},
     }
 
 
@@ -319,7 +330,8 @@ def main() -> None:
     for name, (image, run, v1) in runs.items():
         g = grades.load(bake.OUT_ROOT / name)
         s = score(run, image, print_marks.find(image), references(g, v1))
-        s["confident_fails"] = confident_fails(s, g)
+        if args.run == "v1":  # the grades are of the v1 masks
+            s["confident_fails"] = confident_fails(s, g)
         scored[name] = s
         tables.append(f"## {name}\n\n{summary(s)}\n\n{table(s, g)}")
         print(f"{name}: {summary(s)}")
@@ -328,14 +340,17 @@ def main() -> None:
 
 def summary(s: dict[str, Any]) -> str:
     c = s["counts"]
-    fails = s.get("confident_fails", [])
+    fails = s.get("confident_fails")
+    graded = (
+        "" if fails is None else f" Graded fail at confidence {CONFIDENT} or higher: {len(fails)}."
+    )
     return (
         f"{c['parts']} parts, no mask {c['no_mask']}, regressions {c['regression']} of "
         f"{c['references']} references, specks {c['speck']}, under a point symbol "
         f"{c['under_point_symbol']}, on text {c['on_text']}, on leader lines {c['on_line']}, "
         f"fragmented {c['fragmented']}, overlapping pairs {c['overlap_pairs']}. Points "
         f"{c['points']}: on text {c['points_on_text']}, on lines {c['points_on_line']}, on ink "
-        f"{c['points_on_ink']}. Graded fail at confidence {CONFIDENT} or higher: {len(fails)}."
+        f"{c['points_on_ink']}.{graded}"
     )
 
 

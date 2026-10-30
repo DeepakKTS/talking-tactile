@@ -130,9 +130,34 @@ def test_the_committed_v1_scores_count_their_own_rows(name: str) -> None:
     rows, c = s["parts"], s["counts"]
     assert c["parts"] == len(rows)
     assert c["speck"] == sum(r["speck"] for r in rows)
-    assert c["fragmented"] == sum(1 for r in rows if r["fragments"] > 1)
+    assert c["fragmented"] == sum(1 for r in rows if score.fragmented(r))
     assert c["points_on_text"] == sum(p["on_text"] for r in rows for p in r["points"])
     g = grades.load(bake.OUT_ROOT / name)
     assert score.confident_fails(s, g) == s["confident_fails"]
     live = json.loads((bake.OUT_ROOT / name / "results.json").read_text())
     assert [r["part"] for r in rows] == [p["phrase"] for p in live["parts"]]
+
+
+def test_groups_are_not_siblings_and_instances_explain_pieces() -> None:
+    r = run() | {
+        "kind": {"chamber": "area", "label": "group"},
+        "instances": {"chamber": 2},
+    }
+    r["masks"]["label"] = box(40, 80, 40, 80)  # a group over its member
+    s = score.score(r, np.zeros((H, W, 3), np.uint8), marks(), {})
+    by = {x["part"]: x for x in s["parts"]}
+    assert s["pairs"] == [] and by["chamber"]["overlaps"] == []
+    assert by["chamber"]["fragments"] == 2 and not score.fragmented(by["chamber"])
+    assert s["counts"]["fragmented"] == 0
+
+
+@pytest.mark.parametrize("name", sorted(bake.FIGURES))
+def test_the_committed_v2_scores_count_their_own_rows(name: str) -> None:
+    s = json.loads((bake.OUT_ROOT / "scores_v2.json").read_text())["figures"][name]
+    rows, c = s["parts"], s["counts"]
+    assert "confident_fails" not in s  # the grades are of v1's masks
+    assert c["fragmented"] == sum(1 for r in rows if score.fragmented(r))
+    assert c["points"] == sum(len(r["points"]) for r in rows)
+    v2 = json.loads((bake.OUT_ROOT / name / "results_v2.json").read_text())
+    assert [r["part"] for r in rows] == [r["part"] for r in v2["rows"]]
+    assert [r["area_px"] for r in rows] == [r["final_px"] for r in v2["rows"]]

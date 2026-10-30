@@ -1,0 +1,1744 @@
+{
+ "rules": {
+  "regression_iou": 0.8,
+  "speck_mm2": 2.0,
+  "point_symbol_mm2": 32.2,
+  "on_marks_share": 0.1,
+  "confident": 0.7,
+  "overlap": 0.2,
+  "page": "letter"
+ },
+ "figures": {
+  "flower": {
+   "figure": "flower",
+   "mm_per_px": 0.08062,
+   "speck_floor_px": 307.7,
+   "point_symbol_px": 4950.1,
+   "parts": [
+    {
+     "part": "ovules",
+     "kind": "area",
+     "confidence": 0.9296875,
+     "area_px": 5432,
+     "area_mm2": 35.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 3,
+     "instances": 2,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        163,
+        269
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        161,
+        341
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        229,
+        385
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        980,
+        700
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "3 fragments"
+     ]
+    },
+    {
+     "part": "pistil group",
+     "kind": "group",
+     "confidence": null,
+     "area_px": 127611,
+     "area_mm2": 829.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 2,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "points": [],
+     "flags": []
+    },
+    {
+     "part": "stigma",
+     "kind": "area",
+     "confidence": 0.5625,
+     "area_px": 32164,
+     "area_mm2": 209.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.001,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1081,
+        411
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "style",
+     "kind": "thin",
+     "confidence": 0.390625,
+     "area_px": 17747,
+     "area_mm2": 115.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 4,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1071,
+        508
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1019,
+        597
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "4 fragments"
+     ]
+    },
+    {
+     "part": "ovary",
+     "kind": "area",
+     "confidence": 0.84765625,
+     "area_px": 72268,
+     "area_mm2": 469.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 2,
+     "reference": {
+      "arm": "B",
+      "iou": 0.0,
+      "regression": true
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        933,
+        706
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1030,
+        706
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        96,
+        300
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        266,
+        443
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "regression: IoU 0.0 with the passing Arm B mask"
+     ]
+    },
+    {
+     "part": "petal",
+     "kind": "area",
+     "confidence": 0.55859375,
+     "area_px": 210400,
+     "area_mm2": 1367.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.003,
+     "fragments": 4,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        737,
+        496
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        645,
+        567
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1228,
+        591
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1351,
+        650
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "4 fragments"
+     ]
+    },
+    {
+     "part": "sepal",
+     "kind": "area",
+     "confidence": 0.54296875,
+     "area_px": 7031,
+     "area_mm2": 45.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.032,
+     "fragments": 2,
+     "instances": 2,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        843,
+        768
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1101,
+        830
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "perianth group",
+     "kind": "group",
+     "confidence": null,
+     "area_px": 217431,
+     "area_mm2": 1413.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.004,
+     "fragments": 5,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "points": [],
+     "flags": []
+    },
+    {
+     "part": "nectary",
+     "kind": "area",
+     "confidence": 0.4296875,
+     "area_px": 572,
+     "area_mm2": 3.7,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.266,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        907,
+        868
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "under a point symbol's area",
+      "27% on leader lines"
+     ]
+    },
+    {
+     "part": "floral axis",
+     "kind": "thin",
+     "confidence": 0.78125,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        962,
+        851
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "no mask"
+     ]
+    },
+    {
+     "part": "pedicel",
+     "kind": "area",
+     "confidence": 0.75,
+     "area_px": 16940,
+     "area_mm2": 110.1,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        915,
+        1031
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        907,
+        1084
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "connective",
+     "kind": "area",
+     "confidence": 0.37109375,
+     "area_px": 33691,
+     "area_mm2": 219.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.002,
+     "line_share": 0.003,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "B",
+      "iou": 0.042,
+      "regression": true
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1751,
+        636
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "regression: IoU 0.042 with the passing Arm B mask"
+     ]
+    },
+    {
+     "part": "pollen sac",
+     "kind": "area",
+     "confidence": 0.6796875,
+     "area_px": 15372,
+     "area_mm2": 99.9,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.023,
+     "fragments": 3,
+     "instances": 3,
+     "reference": {
+      "arm": "B",
+      "iou": 0.353,
+      "regression": true
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1677,
+        741
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1726,
+        720
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1705,
+        700
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1197,
+        519
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        926,
+        443
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "regression: IoU 0.353 with the passing Arm B mask"
+     ]
+    },
+    {
+     "part": "anther",
+     "kind": "area",
+     "confidence": 0.88671875,
+     "area_px": 3367,
+     "area_mm2": 21.9,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.121,
+     "fragments": 3,
+     "instances": 3,
+     "reference": {
+      "arm": "B",
+      "iou": 0.043,
+      "regression": true
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1652,
+        641
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1781,
+        661
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1173,
+        501
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        898,
+        436
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "regression: IoU 0.043 with the passing Arm B mask",
+      "under a point symbol's area",
+      "12% on leader lines"
+     ]
+    },
+    {
+     "part": "filament stalk",
+     "kind": "thin",
+     "confidence": 0.89453125,
+     "area_px": 308912,
+     "area_mm2": 2007.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.127,
+     "line_share": 0.002,
+     "fragments": 15,
+     "instances": 2,
+     "reference": {
+      "arm": "A",
+      "iou": 0.003,
+      "regression": true
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1525,
+        828
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1515,
+        922
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1097,
+        626
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        866,
+        591
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "regression: IoU 0.003 with the passing Arm A mask",
+      "13% on text",
+      "15 fragments"
+     ]
+    },
+    {
+     "part": "stamen group",
+     "kind": "group",
+     "confidence": null,
+     "area_px": 361342,
+     "area_mm2": 2348.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.109,
+     "line_share": 0.004,
+     "fragments": 13,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "points": [],
+     "flags": [
+      "11% on text"
+     ]
+    }
+   ],
+   "pairs": [],
+   "counts": {
+    "parts": 16,
+    "no_mask": 1,
+    "regression": 5,
+    "references": 5,
+    "speck": 0,
+    "under_point_symbol": 2,
+    "on_text": 2,
+    "on_line": 2,
+    "fragmented": 4,
+    "overlap_pairs": 0,
+    "points": 35,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   }
+  },
+  "heart": {
+   "figure": "heart",
+   "mm_per_px": 0.08062,
+   "speck_floor_px": 307.7,
+   "point_symbol_px": 4950.1,
+   "parts": [
+    {
+     "part": "brachiocephalic artery",
+     "kind": "area",
+     "confidence": 0.8984375,
+     "area_px": 8206,
+     "area_mm2": 53.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        964,
+        216
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1003,
+        293
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "superior vena cava",
+     "kind": "area",
+     "confidence": 0.87109375,
+     "area_px": 37719,
+     "area_mm2": 245.1,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        839,
+        483
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        849,
+        612
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "right pulmonary arteries",
+     "kind": "area",
+     "confidence": 0.67578125,
+     "area_px": 6674,
+     "area_mm2": 43.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.04,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.95,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        710,
+        528
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        696,
+        581
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "right pulmonary veins",
+     "kind": "area",
+     "confidence": 0.73828125,
+     "area_px": 8509,
+     "area_mm2": 55.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.025,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        700,
+        647
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        686,
+        723
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "right atrium",
+     "kind": "area",
+     "confidence": 0.7890625,
+     "area_px": 49427,
+     "area_mm2": 321.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.98,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        864,
+        838
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "tricuspid valve",
+     "kind": "area",
+     "confidence": 0.263671875,
+     "area_px": 1833,
+     "area_mm2": 11.9,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        849,
+        988
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "under a point symbol's area"
+     ]
+    },
+    {
+     "part": "chordae tendineae",
+     "kind": "thin",
+     "confidence": 0.5390625,
+     "area_px": 5630,
+     "area_mm2": 36.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1064,
+        1057
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1124,
+        1142
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "right ventricle",
+     "kind": "area",
+     "confidence": 0.283203125,
+     "area_px": 77237,
+     "area_mm2": 501.9,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.01,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        919,
+        1157
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1116,
+        1241
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "inferior vena cava",
+     "kind": "area",
+     "confidence": 0.7265625,
+     "area_px": 16812,
+     "area_mm2": 109.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.003,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        909,
+        1321
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "left common carotid artery",
+     "kind": "area",
+     "confidence": 0.875,
+     "area_px": 11292,
+     "area_mm2": 73.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.001,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.929,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1116,
+        201
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "left subclavian artery",
+     "kind": "area",
+     "confidence": 0.22265625,
+     "area_px": 0,
+     "area_mm2": 0.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": null,
+     "line_share": null,
+     "fragments": 0,
+     "instances": 0,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1212,
+        233
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "no mask"
+     ]
+    },
+    {
+     "part": "aorta",
+     "kind": "area",
+     "confidence": 0.9296875,
+     "area_px": 113973,
+     "area_mm2": 740.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1150,
+        419
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1009,
+        610
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "left pulmonary arteries",
+     "kind": "area",
+     "confidence": 0.90234375,
+     "area_px": 48287,
+     "area_mm2": 313.8,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.002,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.951,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1374,
+        483
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1368,
+        570
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "left pulmonary veins",
+     "kind": "area",
+     "confidence": 0.83984375,
+     "area_px": 6709,
+     "area_mm2": 43.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.009,
+     "fragments": 2,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1396,
+        654
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1458,
+        699
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "2 fragments"
+     ]
+    },
+    {
+     "part": "left atrium",
+     "kind": "area",
+     "confidence": 0.546875,
+     "area_px": 15850,
+     "area_mm2": 103.0,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.007,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1351,
+        751
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "semilunar valves",
+     "kind": "area",
+     "confidence": 0.25390625,
+     "area_px": 20554,
+     "area_mm2": 133.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.012,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1202,
+        823
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "mitral valve",
+     "kind": "area",
+     "confidence": 0.14453125,
+     "area_px": 50405,
+     "area_mm2": 327.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.021,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1366,
+        898
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "left ventricle",
+     "kind": "area",
+     "confidence": 0.41796875,
+     "area_px": 8111,
+     "area_mm2": 52.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1380,
+        1034
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1398,
+        1168
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "septum",
+     "kind": "area",
+     "confidence": 0.50390625,
+     "area_px": 130531,
+     "area_mm2": 848.3,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.027,
+     "fragments": 7,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1271,
+        997
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1310,
+        1157
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1372,
+        1312
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "7 fragments"
+     ]
+    }
+   ],
+   "pairs": [],
+   "counts": {
+    "parts": 19,
+    "no_mask": 1,
+    "regression": 0,
+    "references": 4,
+    "speck": 0,
+    "under_point_symbol": 1,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 2,
+    "overlap_pairs": 0,
+    "points": 31,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   }
+  },
+  "japan_regions": {
+   "figure": "japan_regions",
+   "mm_per_px": 0.09193,
+   "speck_floor_px": 236.7,
+   "point_symbol_px": 3806.9,
+   "parts": [
+    {
+     "part": "Hokkaido region",
+     "kind": "area",
+     "confidence": 0.96484375,
+     "area_px": 72846,
+     "area_mm2": 615.6,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.981,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1348,
+        344
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1251,
+        454
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Tohoku region",
+     "kind": "area",
+     "confidence": 0.8828125,
+     "area_px": 51797,
+     "area_mm2": 437.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1233,
+        757
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1170,
+        929
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Kanto region",
+     "kind": "area",
+     "confidence": 0.875,
+     "area_px": 28659,
+     "area_mm2": 242.2,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.966,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1142,
+        1136
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1167,
+        1222
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Chubu region",
+     "kind": "area",
+     "confidence": 0.84375,
+     "area_px": 59351,
+     "area_mm2": 501.5,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.938,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        919,
+        1144
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        994,
+        1216
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1074,
+        1001
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Kansai region",
+     "kind": "area",
+     "confidence": 0.796875,
+     "area_px": 28128,
+     "area_mm2": 237.7,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.033,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "B",
+      "iou": 0.842,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        802,
+        1282
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        765,
+        1239
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Chugoku region",
+     "kind": "area",
+     "confidence": 0.84765625,
+     "area_px": 27635,
+     "area_mm2": 233.5,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.94,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        538,
+        1257
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        472,
+        1288
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Shikoku region",
+     "kind": "area",
+     "confidence": 0.9296875,
+     "area_px": 17439,
+     "area_mm2": 147.4,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.982,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        556,
+        1390
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        650,
+        1378
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Kyushu region",
+     "kind": "area",
+     "confidence": 0.9140625,
+     "area_px": 34531,
+     "area_mm2": 291.8,
+     "speck": false,
+     "under_point_symbol": false,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 1,
+     "instances": 1,
+     "reference": {
+      "arm": "A",
+      "iou": 0.985,
+      "regression": false
+     },
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        366,
+        1464
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        355,
+        1585
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": []
+    },
+    {
+     "part": "Okinawa inset region",
+     "kind": "area",
+     "confidence": 0.162109375,
+     "area_px": 2449,
+     "area_mm2": 20.7,
+     "speck": false,
+     "under_point_symbol": true,
+     "text_share": 0.0,
+     "line_share": 0.0,
+     "fragments": 2,
+     "instances": 1,
+     "reference": null,
+     "overlaps": [],
+     "points": [
+      {
+       "xy": [
+        1648,
+        1685
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      },
+      {
+       "xy": [
+        1293,
+        1910
+       ],
+       "on_text": false,
+       "on_line": false,
+       "on_ink": false
+      }
+     ],
+     "flags": [
+      "under a point symbol's area",
+      "2 fragments"
+     ]
+    }
+   ],
+   "pairs": [],
+   "counts": {
+    "parts": 9,
+    "no_mask": 0,
+    "regression": 0,
+    "references": 7,
+    "speck": 0,
+    "under_point_symbol": 1,
+    "on_text": 0,
+    "on_line": 0,
+    "fragmented": 1,
+    "overlap_pairs": 0,
+    "points": 19,
+    "points_on_text": 0,
+    "points_on_line": 0,
+    "points_on_ink": 0
+   }
+  }
+ }
+}
