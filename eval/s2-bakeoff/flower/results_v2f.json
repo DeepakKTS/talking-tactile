@@ -1,0 +1,2430 @@
+{
+ "figure": "flower",
+ "image": "fixtures/eval/flower.png",
+ "size": [
+  2048,
+  1183
+ ],
+ "cap": 25,
+ "version": "armav2f",
+ "guard_px": 15,
+ "clearance_px": 6,
+ "fill_delta": 40.0,
+ "floor_px": 307.7,
+ "print_marks": {
+  "words": 36,
+  "leader_segments": 30
+ },
+ "spark": {
+  "latency_ms": 35797.6,
+  "cost_usd": 0.03439275,
+  "usage": {
+   "completion_tokens": 7063,
+   "prompt_tokens": 3500,
+   "total_tokens": 10563,
+   "completion_tokens_details": {
+    "reasoning_tokens": 5931
+   },
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   }
+  },
+  "answer": {
+   "parts": [
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 79,
+         "y": 261
+        },
+        {
+         "x": 79,
+         "y": 308
+        },
+        {
+         "x": 120,
+         "y": 324
+        }
+       ],
+       "where": "left inset"
+      },
+      {
+       "points": [
+        {
+         "x": 491,
+         "y": 557
+        },
+        {
+         "x": 491,
+         "y": 590
+        },
+        {
+         "x": 491,
+         "y": 619
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "ovary",
+     "part": "ovules"
+    },
+    {
+     "instances": [],
+     "kind": "group",
+     "members": [
+      "ovules",
+      "stigma",
+      "style",
+      "ovary"
+     ],
+     "parent": "",
+     "part": "pistil group"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 529,
+         "y": 351
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "pistil group",
+     "part": "stigma"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 519,
+         "y": 431
+        },
+        {
+         "x": 508,
+         "y": 490
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "thin",
+     "members": [],
+     "parent": "pistil group",
+     "part": "style"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 464,
+         "y": 587
+        },
+        {
+         "x": 518,
+         "y": 587
+        }
+       ],
+       "where": "main"
+      },
+      {
+       "points": [
+        {
+         "x": 46,
+         "y": 230
+        },
+        {
+         "x": 132,
+         "y": 383
+        }
+       ],
+       "where": "left inset"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "pistil group",
+     "part": "ovary"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 365,
+         "y": 390
+        },
+        {
+         "x": 510,
+         "y": 300
+        },
+        {
+         "x": 670,
+         "y": 490
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "perianth group",
+     "part": "petal"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 418,
+         "y": 630
+        }
+       ],
+       "where": "main left"
+      },
+      {
+       "points": [
+        {
+         "x": 547,
+         "y": 682
+        }
+       ],
+       "where": "main right"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "perianth group",
+     "part": "sepal"
+    },
+    {
+     "instances": [],
+     "kind": "group",
+     "members": [
+      "petal",
+      "sepal"
+     ],
+     "parent": "",
+     "part": "perianth group"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 438,
+         "y": 735
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "nectary"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 484,
+         "y": 708
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "floral axis"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 446,
+         "y": 830
+        },
+        {
+         "x": 444,
+         "y": 880
+        }
+       ],
+       "where": "main"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "",
+     "part": "pedicel"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 855,
+         "y": 532
+        }
+       ],
+       "where": "right inset"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "anther",
+     "part": "connective"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 579,
+         "y": 438
+        }
+       ],
+       "where": "main"
+      },
+      {
+       "points": [
+        {
+         "x": 830,
+         "y": 606
+        },
+        {
+         "x": 850,
+         "y": 587
+        },
+        {
+         "x": 865,
+         "y": 594
+        }
+       ],
+       "where": "right inset"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "anther",
+     "part": "pollen sac"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 451,
+         "y": 368
+        }
+       ],
+       "where": "main left"
+      },
+      {
+       "points": [
+        {
+         "x": 574,
+         "y": 427
+        }
+       ],
+       "where": "main right"
+      },
+      {
+       "points": [
+        {
+         "x": 809,
+         "y": 534
+        },
+        {
+         "x": 870,
+         "y": 562
+        }
+       ],
+       "where": "right inset"
+      }
+     ],
+     "kind": "area",
+     "members": [],
+     "parent": "stamen group",
+     "part": "anther"
+    },
+    {
+     "instances": [
+      {
+       "points": [
+        {
+         "x": 430,
+         "y": 500
+        },
+        {
+         "x": 425,
+         "y": 560
+        }
+       ],
+       "where": "main left"
+      },
+      {
+       "points": [
+        {
+         "x": 557,
+         "y": 560
+        },
+        {
+         "x": 545,
+         "y": 650
+        }
+       ],
+       "where": "main right"
+      },
+      {
+       "points": [
+        {
+         "x": 750,
+         "y": 700
+        },
+        {
+         "x": 741,
+         "y": 769
+        }
+       ],
+       "where": "right inset"
+      }
+     ],
+     "kind": "thin",
+     "members": [],
+     "parent": "stamen group",
+     "part": "filament stalk"
+    },
+    {
+     "instances": [],
+     "kind": "group",
+     "members": [
+      "connective",
+      "pollen sac",
+      "anther",
+      "filament stalk"
+     ],
+     "parent": "",
+     "part": "stamen group"
+    }
+   ]
+  }
+ },
+ "rows": [
+  {
+   "part": "ovules",
+   "print_label": "ovules",
+   "flags": [
+    "spill onto ovary, style",
+    "needs teacher: spill",
+    "spill: holds points of ovary, style; after a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "ovary",
+   "instances": [
+    {
+     "where": "left inset",
+     "grid": [
+      {
+       "x": 79,
+       "y": 261
+      },
+      {
+       "x": 79,
+       "y": 308
+      },
+      {
+       "x": 120,
+       "y": 324
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        161,
+        308
+       ],
+       "on": [],
+       "sent": [
+        161,
+        308
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        161,
+        364
+       ],
+       "on": [],
+       "sent": [
+        161,
+        364
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        245,
+        383
+       ],
+       "on": [],
+       "sent": [
+        245,
+        383
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.9296875,
+     "raw_px": 78651,
+     "kept_px": 78150,
+     "pieces_dropped": 3,
+     "points_in_mask": [
+      true,
+      true,
+      true
+     ]
+    },
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 491,
+       "y": 557
+      },
+      {
+       "x": 491,
+       "y": 590
+      },
+      {
+       "x": 491,
+       "y": 619
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1005,
+        658
+       ],
+       "on": [],
+       "sent": [
+        1005,
+        658
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1005,
+        697
+       ],
+       "on": [],
+       "sent": [
+        1005,
+        697
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1005,
+        732
+       ],
+       "on": [],
+       "sent": [
+        1005,
+        732
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.5,
+     "raw_px": 39294,
+     "kept_px": 35127,
+     "pieces_dropped": 15,
+     "points_in_mask": [
+      true,
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1431.8,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 113277,
+   "retry": {
+    "spilled_onto": [
+     "ovary",
+     "style"
+    ],
+    "negatives_added": {
+     "style": [
+      1040,
+      579
+     ],
+     "ovary": [
+      950,
+      694
+     ]
+    },
+    "sam": {
+     "latency_ms": 1528.1,
+     "cost_usd": 0.0025,
+     "instances": 2
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.8125,
+      "raw_px": 74406,
+      "kept_px": 74168,
+      "pieces_dropped": 4,
+      "points_in_mask": [
+       true,
+       true,
+       true
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.427734375,
+      "raw_px": 23816,
+      "kept_px": 23753,
+      "pieces_dropped": 3,
+      "points_in_mask": [
+       true,
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 97921,
+    "still_onto": [
+     "ovary",
+     "style"
+    ],
+    "used": true
+   },
+   "spill": "holds points of ovary, style; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "pistil group",
+   "print_label": "pistil",
+   "flags": [],
+   "kind": "group",
+   "members": [
+    "ovules",
+    "stigma",
+    "style",
+    "ovary"
+   ],
+   "parent": "",
+   "instances": [],
+   "unknown_members": [],
+   "final_px": 89807
+  },
+  {
+   "part": "stigma",
+   "print_label": "stigma",
+   "flags": [
+    "spill onto style",
+    "needs teacher: spill",
+    "spill: holds points of style; after a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "pistil group",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 529,
+       "y": 351
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1083,
+        415
+       ],
+       "on": [],
+       "sent": [
+        1083,
+        415
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.5859375,
+     "raw_px": 34556,
+     "kept_px": 32344,
+     "pieces_dropped": 16,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2273.5,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 32344,
+   "retry": {
+    "spilled_onto": [
+     "ovary",
+     "ovules",
+     "style"
+    ],
+    "negatives_added": {
+     "ovules": [
+      1005,
+      658
+     ],
+     "style": [
+      1051,
+      500
+     ],
+     "ovary": [
+      950,
+      694
+     ]
+    },
+    "sam": {
+     "latency_ms": 625.2,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.32421875,
+      "raw_px": 7450,
+      "kept_px": 6582,
+      "pieces_dropped": 11,
+      "points_in_mask": [
+       true
+      ]
+     }
+    ],
+    "kept_px": 6582,
+    "still_onto": [
+     "style"
+    ],
+    "used": true
+   },
+   "spill": "holds points of style; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "style",
+   "print_label": "style",
+   "flags": [
+    "spill onto ovary, ovules, stigma",
+    "needs teacher: spill",
+    "spill: holds points of ovary, ovules, stigma; after a retry",
+    "thin: kept for the record, sheet use decided later"
+   ],
+   "kind": "thin",
+   "members": [],
+   "parent": "pistil group",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 519,
+       "y": 431
+      },
+      {
+       "x": 508,
+       "y": 490
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1062,
+        509
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1051,
+        500
+       ],
+       "moved_px": 14.2,
+       "dropped": false
+      },
+      {
+       "px": [
+        1040,
+        579
+       ],
+       "on": [],
+       "sent": [
+        1040,
+        579
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.43359375,
+     "raw_px": 42865,
+     "kept_px": 39814,
+     "pieces_dropped": 38,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1160.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 39814,
+   "retry": {
+    "spilled_onto": [
+     "ovary",
+     "ovules",
+     "stigma"
+    ],
+    "negatives_added": {
+     "ovules": [
+      1005,
+      658
+     ],
+     "stigma": [
+      1083,
+      415
+     ],
+     "ovary": [
+      950,
+      694
+     ]
+    },
+    "sam": {
+     "latency_ms": 1815.0,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.43359375,
+      "raw_px": 25593,
+      "kept_px": 22572,
+      "pieces_dropped": 34,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 22572,
+    "still_onto": [
+     "ovary",
+     "ovules",
+     "stigma"
+    ],
+    "used": true
+   },
+   "spill": "holds points of ovary, ovules, stigma; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "ovary",
+   "print_label": "ovary",
+   "flags": [
+    "spill onto style cleared by a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "pistil group",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 464,
+       "y": 587
+      },
+      {
+       "x": 518,
+       "y": 587
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        950,
+        694
+       ],
+       "on": [],
+       "sent": [
+        950,
+        694
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1060,
+        694
+       ],
+       "on": [],
+       "sent": [
+        1060,
+        694
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.5,
+     "raw_px": 28451,
+     "kept_px": 28226,
+     "pieces_dropped": 6,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    },
+    {
+     "where": "left inset",
+     "grid": [
+      {
+       "x": 46,
+       "y": 230
+      },
+      {
+       "x": 132,
+       "y": 383
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        94,
+        272
+       ],
+       "on": [],
+       "sent": [
+        94,
+        272
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        270,
+        453
+       ],
+       "on": [],
+       "sent": [
+        270,
+        453
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.8359375,
+     "raw_px": 71286,
+     "kept_px": 71286,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "ovules",
+     "xy": [
+      1005,
+      658
+     ]
+    },
+    {
+     "of": "stigma",
+     "xy": [
+      1083,
+      415
+     ]
+    },
+    {
+     "of": "style",
+     "xy": [
+      1040,
+      579
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1305.0,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 99512,
+   "retry": {
+    "spilled_onto": [
+     "style"
+    ],
+    "negatives_added": {
+     "style": [
+      1040,
+      579
+     ]
+    },
+    "sam": {
+     "latency_ms": 1058.0,
+     "cost_usd": 0.0025,
+     "instances": 2
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.51171875,
+      "raw_px": 26668,
+      "kept_px": 26328,
+      "pieces_dropped": 7,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.8359375,
+      "raw_px": 66770,
+      "kept_px": 63588,
+      "pieces_dropped": 12,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 89916,
+    "still_onto": [],
+    "used": true
+   },
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {
+    "floral axis": 105
+   },
+   "lost_px": 105,
+   "respeck_px": 4,
+   "final_px": 89807
+  },
+  {
+   "part": "petal",
+   "print_label": "petal/corolla",
+   "flags": [
+    "spill onto filament stalk",
+    "needs teacher: spill",
+    "spill: holds points of filament stalk; after a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "perianth group",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 365,
+       "y": 390
+      },
+      {
+       "x": 510,
+       "y": 300
+      },
+      {
+       "x": 670,
+       "y": 490
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        747,
+        461
+       ],
+       "on": [],
+       "sent": [
+        747,
+        461
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1044,
+        354
+       ],
+       "on": [],
+       "sent": [
+        1044,
+        354
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1372,
+        579
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1371,
+        583
+       ],
+       "moved_px": 4.1,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.7734375,
+     "raw_px": 331801,
+     "kept_px": 316146,
+     "pieces_dropped": 55,
+     "points_in_mask": [
+      true,
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 872.6,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 316146,
+   "retry": {
+    "spilled_onto": [
+     "anther",
+     "filament stalk",
+     "floral axis",
+     "nectary",
+     "ovary",
+     "ovules",
+     "pedicel",
+     "pollen sac",
+     "sepal",
+     "stigma",
+     "style"
+    ],
+    "negatives_added": {
+     "ovules": [
+      1005,
+      658
+     ],
+     "stigma": [
+      1083,
+      415
+     ],
+     "style": [
+      1051,
+      500
+     ],
+     "ovary": [
+      950,
+      694
+     ],
+     "sepal": [
+      866,
+      743
+     ],
+     "nectary": [
+      897,
+      869
+     ],
+     "floral axis": [
+      991,
+      837
+     ],
+     "pedicel": [
+      913,
+      981
+     ],
+     "pollen sac": [
+      1188,
+      513
+     ],
+     "anther": [
+      923,
+      435
+     ],
+     "filament stalk": [
+      890,
+      595
+     ]
+    },
+    "sam": {
+     "latency_ms": 1106.7,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.58203125,
+      "raw_px": 193218,
+      "kept_px": 129010,
+      "pieces_dropped": 84,
+      "points_in_mask": [
+       true,
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 129010,
+    "still_onto": [
+     "filament stalk"
+    ],
+    "used": true
+   },
+   "spill": "holds points of filament stalk; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "sepal",
+   "print_label": "sepal/calyx",
+   "flags": [
+    "a point of instance 2 is outside its SAM mask",
+    "spill onto anther, filament stalk, floral axis, ovary, ovules, petal, stigma, style cleared by a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "perianth group",
+   "instances": [
+    {
+     "where": "main left",
+     "grid": [
+      {
+       "x": 418,
+       "y": 630
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        856,
+        745
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        866,
+        743
+       ],
+       "moved_px": 10.2,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.5078125,
+     "raw_px": 218009,
+     "kept_px": 200384,
+     "pieces_dropped": 54,
+     "points_in_mask": [
+      true
+     ]
+    },
+    {
+     "where": "main right",
+     "grid": [
+      {
+       "x": 547,
+       "y": 682
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1120,
+        806
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": [
+        1125,
+        811
+       ],
+       "moved_px": 7.1,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.31640625,
+     "raw_px": 746,
+     "kept_px": 0,
+     "pieces_dropped": 24,
+     "points_in_mask": [
+      false
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "nectary",
+     "xy": [
+      897,
+      869
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 817.9,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 200384,
+   "retry": {
+    "spilled_onto": [
+     "anther",
+     "filament stalk",
+     "floral axis",
+     "ovary",
+     "ovules",
+     "petal",
+     "stigma",
+     "style"
+    ],
+    "negatives_added": {
+     "ovules": [
+      1005,
+      658
+     ],
+     "stigma": [
+      1083,
+      415
+     ],
+     "style": [
+      1051,
+      500
+     ],
+     "ovary": [
+      950,
+      694
+     ],
+     "petal": [
+      747,
+      461
+     ],
+     "floral axis": [
+      991,
+      837
+     ],
+     "anther": [
+      923,
+      435
+     ],
+     "filament stalk": [
+      865,
+      664
+     ]
+    },
+    "sam": {
+     "latency_ms": 1239.8,
+     "cost_usd": 0.0025,
+     "instances": 2
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.24803954362869263,
+      "raw_px": 2257,
+      "kept_px": 0,
+      "pieces_dropped": 11,
+      "points_in_mask": [
+       false
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.25195053219795227,
+      "raw_px": 16434,
+      "kept_px": 3375,
+      "pieces_dropped": 113,
+      "points_in_mask": [
+       true
+      ]
+     }
+    ],
+    "kept_px": 3375,
+    "still_onto": [],
+    "used": true
+   },
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 3375
+  },
+  {
+   "part": "perianth group",
+   "print_label": "perianth",
+   "flags": [],
+   "kind": "group",
+   "members": [
+    "petal",
+    "sepal"
+   ],
+   "parent": "",
+   "instances": [],
+   "unknown_members": [],
+   "final_px": 3375
+  },
+  {
+   "part": "nectary",
+   "print_label": "nectary",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 438,
+       "y": 735
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        897,
+        869
+       ],
+       "on": [],
+       "sent": [
+        897,
+        869
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.5546875,
+     "raw_px": 3374,
+     "kept_px": 2246,
+     "pieces_dropped": 8,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 1404.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 2246,
+   "won_from": {
+    "pedicel": 3
+   },
+   "won_px": 3,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 2246
+  },
+  {
+   "part": "floral axis",
+   "print_label": "floral axis",
+   "flags": [
+    "spill onto anther, filament stalk, nectary, ovary, ovules, pedicel, petal, pollen sac, sepal, stigma, style cleared by a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 484,
+       "y": 708
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        991,
+        837
+       ],
+       "on": [],
+       "sent": [
+        991,
+        837
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.63671875,
+     "raw_px": 223067,
+     "kept_px": 184562,
+     "pieces_dropped": 64,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2444.0,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 184562,
+   "retry": {
+    "spilled_onto": [
+     "anther",
+     "filament stalk",
+     "nectary",
+     "ovary",
+     "ovules",
+     "pedicel",
+     "petal",
+     "pollen sac",
+     "sepal",
+     "stigma",
+     "style"
+    ],
+    "negatives_added": {
+     "ovules": [
+      1005,
+      658
+     ],
+     "stigma": [
+      1083,
+      415
+     ],
+     "style": [
+      1051,
+      500
+     ],
+     "ovary": [
+      950,
+      694
+     ],
+     "petal": [
+      1044,
+      354
+     ],
+     "sepal": [
+      866,
+      743
+     ],
+     "nectary": [
+      897,
+      869
+     ],
+     "pedicel": [
+      913,
+      981
+     ],
+     "pollen sac": [
+      1188,
+      513
+     ],
+     "anther": [
+      923,
+      435
+     ],
+     "filament stalk": [
+      865,
+      664
+     ]
+    },
+    "sam": {
+     "latency_ms": 1385.2,
+     "cost_usd": 0.0025,
+     "instances": 1
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.1366516500711441,
+      "raw_px": 23872,
+      "kept_px": 4824,
+      "pieces_dropped": 131,
+      "points_in_mask": [
+       true
+      ]
+     }
+    ],
+    "kept_px": 4824,
+    "still_onto": [],
+    "used": true
+   },
+   "won_from": {
+    "ovary": 105,
+    "pedicel": 595
+   },
+   "won_px": 700,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 4824
+  },
+  {
+   "part": "pedicel",
+   "print_label": "pedicel",
+   "flags": [],
+   "kind": "area",
+   "members": [],
+   "parent": "",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 446,
+       "y": 830
+      },
+      {
+       "x": 444,
+       "y": 880
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        913,
+        981
+       ],
+       "on": [],
+       "sent": [
+        913,
+        981
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        909,
+        1041
+       ],
+       "on": [],
+       "sent": [
+        909,
+        1041
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.73828125,
+     "raw_px": 21701,
+     "kept_px": 21307,
+     "pieces_dropped": 9,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "sepal",
+     "xy": [
+      1125,
+      811
+     ]
+    },
+    {
+     "of": "floral axis",
+     "xy": [
+      991,
+      837
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 1503.3,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 21307,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {
+    "nectary": 3,
+    "floral axis": 595
+   },
+   "lost_px": 598,
+   "respeck_px": 55,
+   "final_px": 20654
+  },
+  {
+   "part": "connective",
+   "print_label": "connective",
+   "flags": [
+    "a point of instance 1 is outside its SAM mask",
+    "needs teacher: no mask"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "anther",
+   "instances": [
+    {
+     "where": "right inset",
+     "grid": [
+      {
+       "x": 855,
+       "y": 532
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1751,
+        629
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1750,
+        619
+       ],
+       "moved_px": 10.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.55078125,
+     "raw_px": 47994,
+     "kept_px": 0,
+     "pieces_dropped": 5,
+     "points_in_mask": [
+      false
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 865.5,
+    "cost_usd": 0.0025,
+    "instances": 1
+   },
+   "kept_px": 0,
+   "final_px": 0
+  },
+  {
+   "part": "pollen sac",
+   "print_label": "microsporangium",
+   "flags": [
+    "a point of instance 1 is outside its SAM mask"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "anther",
+   "instances": [
+    {
+     "where": "main",
+     "grid": [
+      {
+       "x": 579,
+       "y": 438
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1185,
+        518
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1188,
+        513
+       ],
+       "moved_px": 5.8,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.2578125,
+     "raw_px": 3663,
+     "kept_px": 0,
+     "pieces_dropped": 10,
+     "points_in_mask": [
+      false
+     ]
+    },
+    {
+     "where": "right inset",
+     "grid": [
+      {
+       "x": 830,
+       "y": 606
+      },
+      {
+       "x": 850,
+       "y": 587
+      },
+      {
+       "x": 865,
+       "y": 594
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1699,
+        716
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1701,
+        711
+       ],
+       "moved_px": 5.4,
+       "dropped": false
+      },
+      {
+       "px": [
+        1740,
+        694
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1739,
+        690
+       ],
+       "moved_px": 4.1,
+       "dropped": false
+      },
+      {
+       "px": [
+        1771,
+        702
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1765,
+        696
+       ],
+       "moved_px": 8.5,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.44140625,
+     "raw_px": 8099,
+     "kept_px": 8018,
+     "pieces_dropped": 2,
+     "points_in_mask": [
+      true,
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "anther",
+     "xy": [
+      1656,
+      631
+     ]
+    },
+    {
+     "of": "filament stalk",
+     "xy": [
+      1547,
+      833
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 2429.1,
+    "cost_usd": 0.0025,
+    "instances": 2
+   },
+   "kept_px": 8018,
+   "won_from": {},
+   "won_px": 0,
+   "lost_to": {},
+   "lost_px": 0,
+   "respeck_px": 0,
+   "final_px": 8018
+  },
+  {
+   "part": "anther",
+   "print_label": "anther",
+   "flags": [
+    "point [1781, 664] dropped: on ink",
+    "spill onto filament stalk",
+    "needs teacher: spill",
+    "spill: holds points of filament stalk; after a retry"
+   ],
+   "kind": "area",
+   "members": [],
+   "parent": "stamen group",
+   "instances": [
+    {
+     "where": "main left",
+     "grid": [
+      {
+       "x": 451,
+       "y": 368
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        923,
+        435
+       ],
+       "on": [],
+       "sent": [
+        923,
+        435
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.703125,
+     "raw_px": 2881,
+     "kept_px": 2881,
+     "pieces_dropped": 0,
+     "points_in_mask": [
+      true
+     ]
+    },
+    {
+     "where": "main right",
+     "grid": [
+      {
+       "x": 574,
+       "y": 427
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1175,
+        505
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1171,
+        502
+       ],
+       "moved_px": 5.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.8125,
+     "raw_px": 1746,
+     "kept_px": 1690,
+     "pieces_dropped": 1,
+     "points_in_mask": [
+      true
+     ]
+    },
+    {
+     "where": "right inset",
+     "grid": [
+      {
+       "x": 809,
+       "y": 534
+      },
+      {
+       "x": 870,
+       "y": 562
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1656,
+        631
+       ],
+       "on": [],
+       "sent": [
+        1656,
+        631
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      },
+      {
+       "px": [
+        1781,
+        664
+       ],
+       "on": [
+        "ink"
+       ],
+       "sent": null,
+       "moved_px": null,
+       "dropped": true
+      }
+     ],
+     "object_id": 3,
+     "confidence": 0.82421875,
+     "raw_px": 46132,
+     "kept_px": 45662,
+     "pieces_dropped": 6,
+     "points_in_mask": [
+      true
+     ]
+    }
+   ],
+   "negatives": [
+    {
+     "of": "pollen sac",
+     "xy": [
+      1739,
+      690
+     ]
+    }
+   ],
+   "sam": {
+    "latency_ms": 2112.8,
+    "cost_usd": 0.0025,
+    "instances": 3
+   },
+   "kept_px": 50233,
+   "retry": {
+    "spilled_onto": [
+     "filament stalk"
+    ],
+    "negatives_added": {
+     "filament stalk": [
+      1547,
+      833
+     ]
+    },
+    "sam": {
+     "latency_ms": 1834.7,
+     "cost_usd": 0.0025,
+     "instances": 3
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.7109375,
+      "raw_px": 2545,
+      "kept_px": 2545,
+      "pieces_dropped": 0,
+      "points_in_mask": [
+       true
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.79296875,
+      "raw_px": 2031,
+      "kept_px": 1952,
+      "pieces_dropped": 2,
+      "points_in_mask": [
+       true
+      ]
+     },
+     {
+      "object_id": 3,
+      "confidence": 0.6484375,
+      "raw_px": 44881,
+      "kept_px": 44696,
+      "pieces_dropped": 5,
+      "points_in_mask": [
+       true
+      ]
+     }
+    ],
+    "kept_px": 49193,
+    "still_onto": [
+     "filament stalk"
+    ],
+    "used": true
+   },
+   "spill": "holds points of filament stalk; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "filament stalk",
+   "print_label": "filament",
+   "flags": [
+    "a point of instance 1 is outside its SAM mask",
+    "a point of instance 2 is outside its SAM mask",
+    "spill onto sepal",
+    "needs teacher: spill",
+    "spill: holds points of sepal; after a retry",
+    "thin: kept for the record, sheet use decided later"
+   ],
+   "kind": "thin",
+   "members": [],
+   "parent": "stamen group",
+   "instances": [
+    {
+     "where": "main left",
+     "grid": [
+      {
+       "x": 430,
+       "y": 500
+      },
+      {
+       "x": 425,
+       "y": 560
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        880,
+        591
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        890,
+        595
+       ],
+       "moved_px": 10.8,
+       "dropped": false
+      },
+      {
+       "px": [
+        870,
+        662
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        865,
+        664
+       ],
+       "moved_px": 5.4,
+       "dropped": false
+      }
+     ],
+     "object_id": 1,
+     "confidence": 0.1689453125,
+     "raw_px": 111968,
+     "kept_px": 51517,
+     "pieces_dropped": 141,
+     "points_in_mask": [
+      false,
+      true
+     ]
+    },
+    {
+     "where": "main right",
+     "grid": [
+      {
+       "x": 557,
+       "y": 560
+      },
+      {
+       "x": 545,
+       "y": 650
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1140,
+        662
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1143,
+        660
+       ],
+       "moved_px": 3.6,
+       "dropped": false
+      },
+      {
+       "px": [
+        1116,
+        768
+       ],
+       "on": [],
+       "sent": [
+        1116,
+        768
+       ],
+       "moved_px": 0.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 2,
+     "confidence": 0.447265625,
+     "raw_px": 158743,
+     "kept_px": 106935,
+     "pieces_dropped": 274,
+     "points_in_mask": [
+      true,
+      false
+     ]
+    },
+    {
+     "where": "right inset",
+     "grid": [
+      {
+       "x": 750,
+       "y": 700
+      },
+      {
+       "x": 741,
+       "y": 769
+      }
+     ],
+     "points": [
+      {
+       "px": [
+        1536,
+        828
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1547,
+        833
+       ],
+       "moved_px": 12.1,
+       "dropped": false
+      },
+      {
+       "px": [
+        1517,
+        909
+       ],
+       "on": [
+        "near a mark"
+       ],
+       "sent": [
+        1526,
+        909
+       ],
+       "moved_px": 9.0,
+       "dropped": false
+      }
+     ],
+     "object_id": 3,
+     "confidence": 0.5234375,
+     "raw_px": 10430,
+     "kept_px": 10403,
+     "pieces_dropped": 1,
+     "points_in_mask": [
+      true,
+      true
+     ]
+    }
+   ],
+   "negatives": [],
+   "sam": {
+    "latency_ms": 2173.9,
+    "cost_usd": 0.0025,
+    "instances": 3
+   },
+   "kept_px": 168645,
+   "retry": {
+    "spilled_onto": [
+     "anther",
+     "floral axis",
+     "ovary",
+     "ovules",
+     "petal",
+     "pollen sac",
+     "sepal"
+    ],
+    "negatives_added": {
+     "ovules": [
+      1005,
+      658
+     ],
+     "ovary": [
+      950,
+      694
+     ],
+     "petal": [
+      1044,
+      354
+     ],
+     "sepal": [
+      866,
+      743
+     ],
+     "floral axis": [
+      991,
+      837
+     ],
+     "pollen sac": [
+      1188,
+      513
+     ],
+     "anther": [
+      1171,
+      502
+     ]
+    },
+    "sam": {
+     "latency_ms": 830.8,
+     "cost_usd": 0.0025,
+     "instances": 3
+    },
+    "sent": true,
+    "instances": [
+     {
+      "object_id": 1,
+      "confidence": 0.482421875,
+      "raw_px": 48774,
+      "kept_px": 17819,
+      "pieces_dropped": 67,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     },
+     {
+      "object_id": 2,
+      "confidence": 0.38671875,
+      "raw_px": 58124,
+      "kept_px": 32466,
+      "pieces_dropped": 77,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     },
+     {
+      "object_id": 3,
+      "confidence": 0.68359375,
+      "raw_px": 15773,
+      "kept_px": 11144,
+      "pieces_dropped": 49,
+      "points_in_mask": [
+       true,
+       true
+      ]
+     }
+    ],
+    "kept_px": 61429,
+    "still_onto": [
+     "sepal"
+    ],
+    "used": true
+   },
+   "spill": "holds points of sepal; after a retry",
+   "final_px": 0
+  },
+  {
+   "part": "stamen group",
+   "print_label": "stamen",
+   "flags": [],
+   "kind": "group",
+   "members": [
+    "connective",
+    "pollen sac",
+    "anther",
+    "filament stalk"
+   ],
+   "parent": "",
+   "instances": [],
+   "unknown_members": [],
+   "final_px": 8018
+  }
+ ],
+ "calls": 23,
+ "spent_usd": 0.089393
+}
