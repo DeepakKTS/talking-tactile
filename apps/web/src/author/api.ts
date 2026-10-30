@@ -44,6 +44,13 @@ export interface Publication {
 
 export type Point = [number, number]; // pixels of the normalized figure
 
+/** Something S4 changed on the sheet to keep it readable, such as a speck left out. */
+export interface Repair {
+  region_id: string;
+  part: string;
+  text: string;
+}
+
 /** An outline that also covers the drawn region where another part's point is: a
  * warning, never a gate (services/api/app/geometry/overlap.py). */
 export interface OverlapWarning {
@@ -138,6 +145,16 @@ export class FigureApi {
 
   report(id: string) {
     return this.json<Violation[]>(`/api/figures/${id}/report.json`);
+  }
+
+  /** S4's repairs on the sheet (pieces left out), for the teacher; older drafts have none. */
+  async repairs(id: string): Promise<Repair[]> {
+    try {
+      return await this.json<Repair[]>(`/api/figures/${id}/repairs.json`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) return [];
+      throw err;
+    }
   }
 
   /** Overlap warnings for the teacher; a draft made before Oct 30 has none. */

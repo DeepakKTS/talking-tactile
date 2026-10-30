@@ -81,8 +81,8 @@ describe("published regions loader", () => {
     }
     const { f } = fetcher(() => new Response(JSON.stringify(checked)));
     const got = await loadPublished(ID, 1, { fetch: f, storage: null });
-    expect(heart.regions).toHaveLength(17);
-    expect(got.file.regions).toHaveLength(16);
+    expect(heart.regions).toHaveLength(15); // 14 parts, one piece each since Oct 30, and the septum's suggestion
+    expect(got.file.regions).toHaveLength(14);
     expect(got.file.regions.every((r) => r.touchable)).toBe(true);
     const labels = new Set(got.file.regions.map((r) => r.label));
     expect(labels.has("septum")).toBe(false);

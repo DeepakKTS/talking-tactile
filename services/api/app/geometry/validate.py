@@ -18,7 +18,7 @@ from shapely.geometry import box
 from shapely.ops import unary_union
 
 from app.config import TactileRules
-from app.geometry.layout import LayoutRegion, size_mm
+from app.geometry.layout import LayoutRegion, enterable_area, size_mm, symbol_area
 from app.geometry.plan import band
 from app.geometry.sheet import Sheet
 from app.models.regions import MAX_POLYGON_POINTS, MIN_POLYGON_POINTS, RegionsFile
@@ -139,6 +139,8 @@ def _gaps(sheet: Sheet, rules: TactileRules) -> list[Violation]:
 
 def _point_sizes(sheet: Sheet, rules: TactileRules) -> list[Violation]:
     minimum = rules.spacing.point_symbol_min_mm
+    inset = rules.render.outline_width_mm / 2
+    floor = symbol_area(rules.spacing, rules.layout, inset)
     out: list[Violation] = []
     for r in sheet.regions:
         if r.kind == "point":
@@ -147,6 +149,18 @@ def _point_sizes(sheet: Sheet, rules: TactileRules) -> list[Violation]:
         else:
             measured = size_mm(r.polygon)
             what = "area is"
+            enter = enterable_area(r.polygon, inset)
+            if measured >= minimum - _EPS and enter < floor - _EPS:
+                out.append(
+                    Violation(
+                        rule="point_symbol",
+                        regions=[r.id],
+                        measured=enter,
+                        limit=floor,
+                        message=f"{r.id}: {enter:.1f} mm2 to enter, a point symbol has {floor:.1f}",
+                    )
+                )
+                continue
         if measured < minimum - _EPS:
             out.append(
                 Violation(

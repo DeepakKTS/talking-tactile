@@ -111,22 +111,116 @@ def point_symbol(center: tuple[float, float], width_mm: float, vertices: int) ->
     )
 
 
-def make_point_symbols(
-    regions: Sequence[LayoutRegion], spacing: Spacing, layout: Layout
+def symbol_area(spacing: Spacing, layout: Layout, inset_mm: float) -> float:
+    """The enterable area of a point symbol point_symbol_min_mm wide: inside its outline."""
+    sym = point_symbol((0.0, 0.0), spacing.point_symbol_min_mm, layout.point_symbol_vertices)
+    return float(sym.buffer(-inset_mm).area)
+
+
+def enterable_area(poly: Polygon, inset_mm: float) -> float:
+    """What a fingertip can enter: the area inside the raised outline, which takes half its
+    width from the edge."""
+    return float(poly.buffer(-inset_mm).area)
+
+
+def under_floor(
+    poly: Polygon, spacing: Spacing, layout: Layout, inset_mm: float, floor_mm2: float
+) -> bool:
+    """Smaller than a point symbol: the longest side under point_symbol_min_mm, or the
+    enterable area under a point symbol's (a long thin sliver passes the first)."""
+    return size_mm(poly) < spacing.point_symbol_min_mm or (
+        enterable_area(poly, inset_mm) < floor_mm2 - _EPS
+    )
+
+
+def drop_small_pieces(
+    regions: Sequence[LayoutRegion], spacing: Spacing, layout: Layout, inset_mm: float
 ) -> list[LayoutRegion]:
+    """A part with a piece at or above the floor loses its pieces under it; its main piece
+    records the repair (on its first piece left). A part with every piece under the floor
+    keeps them all, as point symbols."""
+    floor = symbol_area(spacing, layout, inset_mm)
+    small = {
+        r.id
+        for r in regions
+        if r.kind == "area" and under_floor(r.polygon, spacing, layout, inset_mm, floor)
+    }
+    parts: dict[str, list[LayoutRegion]] = {}
+    for r in regions:
+        parts.setdefault(r.group_key, []).append(r)
+    drop: set[str] = set()
+    for pieces in parts.values():
+        if len(pieces) > 1 and any(p.id not in small for p in pieces):
+            drop |= {p.id for p in pieces if p.id in small}
     out: list[LayoutRegion] = []
     for r in regions:
-        size = size_mm(r.polygon)
-        if r.kind == "area" and size < spacing.point_symbol_min_mm:
+        if r.id in drop:
+            continue
+        pieces = parts[r.group_key]
+        gone = [p for p in pieces if p.id in drop]
+        first_left = next(p for p in pieces if p.id not in drop)
+        if gone and r is first_left:
+            out.append(
+                r.noted(
+                    f"repair: {len(gone)} piece{'s' if len(gone) > 1 else ''} smaller than a "
+                    f"{spacing.point_symbol_min_mm} mm point symbol left out; the part keeps "
+                    "its main piece"
+                )
+            )
+        else:
+            out.append(r)
+    return out
+
+
+def make_point_symbols(
+    regions: Sequence[LayoutRegion], spacing: Spacing, layout: Layout, inset_mm: float = 0.0
+) -> list[LayoutRegion]:
+    floor = symbol_area(spacing, layout, inset_mm)
+    out: list[LayoutRegion] = []
+    for r in regions:
+        if r.kind == "area" and under_floor(r.polygon, spacing, layout, inset_mm, floor):
+            size = size_mm(r.polygon)
             center = inside_point(r.polygon, layout.inside_point_tolerance_mm)
             poly = point_symbol(center, spacing.point_symbol_min_mm, layout.point_symbol_vertices)
             note = (
                 f"point symbol: {size:.1f} mm part is below the "
                 f"{spacing.point_symbol_min_mm} mm minimum"
+                if size < spacing.point_symbol_min_mm
+                else f"point symbol: {enterable_area(r.polygon, inset_mm):.1f} mm2 to enter is "
+                f"below a point symbol's {floor:.1f} mm2"
             )
             out.append(r.noted(note, polygon=poly, kind="point"))
         else:
             out.append(r)
+    return out
+
+
+def one_symbol_per_spot(regions: Sequence[LayoutRegion], min_gap_mm: float) -> list[LayoutRegion]:
+    """Point symbols of one part closer than the minimum gap to one kept before are left out,
+    recorded as a repair on the part's first piece: two pieces of a thin part (two veins
+    under one label) can both fall under the floor side by side."""
+    kept: dict[str, list[LayoutRegion]] = {}
+    gone: dict[str, int] = {}
+    for r in regions:
+        mine = kept.setdefault(r.group_key, [])
+        near = r.kind == "point" and any(
+            q.kind == "point" and r.polygon.distance(q.polygon) < min_gap_mm for q in mine
+        )
+        if near:
+            gone[r.group_key] = gone.get(r.group_key, 0) + 1
+        else:
+            mine.append(r)
+    out = []
+    for r in regions:
+        mine = kept[r.group_key]
+        if r not in mine:
+            continue
+        n = gone.get(r.group_key, 0)
+        note = (
+            f"repair: {n} more point symbol{'s' if n > 1 else ''} of this part left out, "
+            f"closer than {min_gap_mm} mm to this one"
+        )
+        out.append(r.noted(note) if n and r is mine[0] else r)
     return out
 
 

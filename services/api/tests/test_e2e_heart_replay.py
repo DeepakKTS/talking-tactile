@@ -7,11 +7,12 @@ same files (fixtures/recorded/replays.json), so the replay client here is the mo
 
 1. Upload with no grade band, as the live run did; the draft Author shows must equal
    fixtures/pipeline/heart_regions.json, which the web tests read.
-   Its rules report holds the left subclavian artery's point symbol, so publishing waits
-   for a merge (the aortic arch proposal) or an edit.
+   Its rules report is empty since Oct 30: the aorta's speck and the second left pulmonary
+   vein symbol are repairs (S4 leaves out a part's pieces under the point symbol floor when
+   it keeps one valid piece, and a part's point symbols closer than the gap), so it publishes.
 2. Fix outline: three previews per part with the recorded masks and today's spill answers,
-   accept, and the final draft must equal fixtures/pipeline/heart_fixed_draft.json. Its
-   rules report still refuses publishing (409)."""
+   accept, and the final draft must equal fixtures/pipeline/heart_fixed_draft.json. It
+   publishes."""
 
 import asyncio
 import json
@@ -86,8 +87,7 @@ def test_the_heart_through_the_api_on_replay() -> None:
         ("aortic arch", ["r1", "r8", "r9", "r10"])
     ]
     assert draft.subject is not None and draft.subject.label == "heart"
-    assert [(v["rule"], v["regions"]) for v in got["report"]] == [("point_symbol", ["r9"])]
-    assert got["publish"] == 409  # the left subclavian artery is under a point symbol
+    assert got["report"] == [] and got["publish"] == 201
     assert got["draft"] == DRAFT
 
 
@@ -127,5 +127,4 @@ def test_fix_outline_on_replay_gives_the_live_fixes() -> None:
     teacher = {r.label for r in fixed.regions if r.source == "teacher"}
     assert teacher == {"aorta", "left ventricle"}
     assert {r.label for r in fixed.regions if r.touchable} == {"aorta", "left ventricle"}
-    assert [(v["rule"], v["regions"][0]) for v in got["report"]] == [("point_symbol", "r9")]
-    assert got["publish"]["error"]["code"] == "rules_violated"  # the 409 rule still applies
+    assert got["report"] == [] and got["publish"]["version"] == 1

@@ -29,6 +29,7 @@ PDF_FILE = "print.pdf"
 REGIONS_FILE = "regions.json"
 REPORT_FILE = "report.json"
 WARNINGS_FILE = "warnings.json"
+REPAIRS_FILE = "repairs.json"
 
 
 class Rendered(BaseModel):
@@ -39,6 +40,7 @@ class Rendered(BaseModel):
     regions: RegionsFile
     report: list[Violation]
     warnings: list[OverlapWarning] = []
+    repairs: list[dict[str, str]] = []  # S4's repairs, for the teacher: region_id, part, text
 
 
 THIN = "Spark marked it thin; how the sheet shows it is decided later"
@@ -91,7 +93,15 @@ def render(
         c.sheet, c.braille, info, rules, notes.descriptions, notes.verified, teacher
     )
     report = validate_sheet(c.sheet, rules) + check_svg_ids(svg, regions)
-    return Rendered(svg=svg, pdf=render_pdf([svg, *keys]), regions=regions, report=report)
+    repairs = [
+        {"region_id": r.id, "part": r.label, "text": note.removeprefix("repair: ")}
+        for r in c.sheet.regions
+        for note in r.notes
+        if note.startswith("repair: ")
+    ]
+    return Rendered(
+        svg=svg, pdf=render_pdf([svg, *keys]), regions=regions, report=report, repairs=repairs
+    )
 
 
 def save(r: Rendered, out: Path) -> None:
@@ -102,6 +112,7 @@ def save(r: Rendered, out: Path) -> None:
     (out / REPORT_FILE).write_text(json.dumps(report, indent=1) + "\n", "utf-8")
     warnings = [{**w.model_dump(mode="json"), "text": w.text} for w in r.warnings]
     (out / WARNINGS_FILE).write_text(json.dumps(warnings, indent=1) + "\n", "utf-8")
+    (out / REPAIRS_FILE).write_text(json.dumps(r.repairs, indent=1) + "\n", "utf-8")
 
 
 def load(src: Path) -> Rendered:
@@ -109,10 +120,13 @@ def load(src: Path) -> Rendered:
     report = json.loads((src / REPORT_FILE).read_text("utf-8"))
     path = src / WARNINGS_FILE
     warned = json.loads(path.read_text("utf-8")) if path.exists() else []
+    fixed = src / REPAIRS_FILE
+    repairs = json.loads(fixed.read_text("utf-8")) if fixed.exists() else []
     return Rendered(
         svg=(src / SVG_FILE).read_text("utf-8"),
         pdf=(src / PDF_FILE).read_bytes(),
         regions=RegionsFile.from_json_obj(regions),
         report=[Violation.model_validate(v) for v in report],
         warnings=[OverlapWarning.model_validate(w) for w in warned],
+        repairs=repairs,
     )

@@ -40,7 +40,14 @@ from app.pipeline.edits import MAX_POINTS, Edit, EditError, EditStore, OutlineEd
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore
 from app.pipeline.outlines import OutlineError, check_points, old_outline, spill_of
 from app.pipeline.runner import NotReadyError, Runner
-from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, REPORT_FILE, SVG_FILE, WARNINGS_FILE
+from app.pipeline.s5_render import (
+    PDF_FILE,
+    REGIONS_FILE,
+    REPAIRS_FILE,
+    REPORT_FILE,
+    SVG_FILE,
+    WARNINGS_FILE,
+)
 from app.prompts import load_prompt
 from app.render.preview import preview
 
@@ -54,6 +61,7 @@ SOURCE_FILE = "source.png"
 DRAFT_ONLY_TYPES = {
     REPORT_FILE: "application/json",
     WARNINGS_FILE: "application/json",
+    REPAIRS_FILE: "application/json",
     SOURCE_FILE: "image/png",
 }
 _RETRYABLE_JOB_ERRORS = {"stage_failed"}

@@ -9,7 +9,7 @@
 // violation in words. After publishing: print and explore.
 import { useEffect, useState } from "react";
 import { type MergeProposal, partId, type Region, type RegionsFile } from "../shared/regions";
-import { ApiError, type Edit, type FigureApi, type FixPreview, type OverlapWarning, type Point, type Publication, type Status, type Violation, describeViolation } from "./api";
+import { ApiError, type Edit, type FigureApi, type FixPreview, type OverlapWarning, type Point, type Repair, type Publication, type Status, type Violation, describeViolation } from "./api";
 
 interface Props {
   api: FigureApi;
@@ -22,6 +22,7 @@ export function Review({ api, id, status, onEdited }: Props) {
   const [file, setFile] = useState<RegionsFile | null>(null);
   const [report, setReport] = useState<Violation[]>([]);
   const [warnings, setWarnings] = useState<OverlapWarning[]>([]);
+  const [repairs, setRepairs] = useState<Repair[]>([]);
   const [area, setArea] = useState<OverlapWarning | null>(null);
   const [confirmAll, setConfirmAll] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -37,12 +38,13 @@ export function Review({ api, id, status, onEdited }: Props) {
   useEffect(() => {
     if (!settled) return;
     let live = true;
-    Promise.all([api.regions(id), api.report(id), api.warnings(id)])
-      .then(([f, r, w]) => {
+    Promise.all([api.regions(id), api.report(id), api.warnings(id), api.repairs(id)])
+      .then(([f, r, w, fixes]) => {
         if (!live) return;
         setFile(f);
         setReport(r);
         setWarnings(w);
+        setRepairs(fixes);
         setArea(null);
       })
       .catch((err: unknown) => {
@@ -108,7 +110,10 @@ export function Review({ api, id, status, onEdited }: Props) {
   const waiting = notCheckedYet(file);
   const unchecking = new Set(waiting.map((r) => partId(r.id)));
   const warned = warnings.filter((w) => unchecking.has(partId(w.region_id)));
-  const notes = forYourInformation(file);
+  const notes = [
+    ...forYourInformation(file),
+    ...repairs.map((x, i) => ({ key: `repair ${String(i)}`, label: x.part, text: `${capitalize(x.text)}.` })),
+  ];
 
   return (
     <section aria-label="Review">
@@ -643,3 +648,5 @@ function PrintPanel({ id, pub }: { id: string; pub: Publication }) {
     </section>
   );
 }
+
+const capitalize = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);

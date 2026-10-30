@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import heart from "../../../../fixtures/pipeline/heart_regions.json";
 import synthetic from "../../../../fixtures/synthetic/regions.json";
 import type { RegionsFile } from "../shared/regions";
-import { FigureApi, type OverlapWarning, type Violation, describeViolation } from "./api";
+import { FigureApi, type OverlapWarning, type Repair, type Violation, describeViolation } from "./api";
 import { AuthorPage } from "./AuthorPage";
 
 const ID = "b".repeat(64);
@@ -21,6 +21,7 @@ class FakeServer {
   regions: RegionsFile = draft(synthetic as unknown as RegionsFile);
   report: Violation[] = [];
   warnings: OverlapWarning[] | null = null; // null: a draft from before warnings, 404
+  repairs: Repair[] | null = null;
   refuse: Violation[] | null = null;
   editVersion = 0;
   jobVersion = 0;
@@ -48,6 +49,9 @@ class FakeServer {
     }
     if (path === `/api/figures/${ID}/regions.json`) return json(this.regions);
     if (path === `/api/figures/${ID}/report.json`) return json(this.report);
+    if (path === `/api/figures/${ID}/repairs.json`) {
+      return this.repairs ? json(this.repairs) : json({ error: { code: "not_found", message: "x", retryable: false } }, 404);
+    }
     if (path === `/api/figures/${ID}/warnings.json`) {
       return this.warnings ? json(this.warnings) : json({ error: { code: "not_found", message: "x", retryable: false } }, 404);
     }
@@ -188,7 +192,7 @@ describe("author page", () => {
     fireEvent.change(input, { target: { files: [new File([new Uint8Array([137, 80])], "heart.png", { type: "image/png" })] } });
     fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
     await screen.findByRole("heading", { name: heart.title });
-    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(16);
+    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(14);
     const needs = within(screen.getByRole("list", { name: "Needs you" })).getAllByRole("listitem");
     expect(needs.map((li) => li.querySelector("strong")?.textContent)).toEqual(["septum"]);
     const info = within(screen.getByRole("list", { name: "For your information" })).getAllByRole("listitem");
@@ -197,7 +201,7 @@ describe("author page", () => {
       "chordae tendineae A line. Not raised; listed in the key.",
       "semilunar valves A line between left ventricle and aorta. Not raised; Explore says it when a finger crosses from one to the other, once you check both.",
       "mitral valve A line between left atrium and left ventricle. Not raised; Explore says it when a finger crosses from one to the other, once you check both.",
-      "aorta Smaller than a point symbol, so the sheet shows it as one.", // its second piece
+      "left pulmonary veins Smaller than a point symbol, so the sheet shows it as one.", // thin: under the area floor
     ]);
     const atPublish = within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem");
     expect(atPublish.map((li) => li.textContent.split(":")[0])[0]).toBe("septum");
@@ -249,6 +253,13 @@ describe("author page", () => {
     fireEvent.click(within(row).getByRole("button", { name: `Show where ${b.label} is on the sheet` }));
     expect(document.querySelectorAll("figure svg polygon[data-kind='overlap']")).toHaveLength(1);
     expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // and the part's outline
+  });
+
+  it("lists S4's repairs for the teacher's information", async () => {
+    server.repairs = [{ region_id: "r1", part: "aorta", text: "1 piece smaller than a 6.4 mm point symbol left out; the part keeps its main piece" }];
+    await upload();
+    const info = within(screen.getByRole("list", { name: "For your information" })).getAllByRole("listitem");
+    expect(info.map((li) => li.textContent)).toContain("aorta 1 piece smaller than a 6.4 mm point symbol left out; the part keeps its main piece.");
   });
 
   it("marks every part checked in one edit, after a confirm that lists the parts with a warning", async () => {

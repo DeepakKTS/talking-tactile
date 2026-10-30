@@ -10,7 +10,13 @@ from pydantic import BaseModel, ConfigDict
 from app.braille.louis import Translator
 from app.braille.place import BrailleLayout, Translations, place_braille, translate_for_sheet
 from app.config import Earcons, TactileRules
-from app.geometry.layout import enforce_gaps, make_point_symbols, regions_from_parts
+from app.geometry.layout import (
+    drop_small_pieces,
+    enforce_gaps,
+    make_point_symbols,
+    one_symbol_per_spot,
+    regions_from_parts,
+)
 from app.geometry.plan import SheetPlan, contour, silhouette_polygon
 from app.geometry.reconcile import ReconciledPart
 from app.geometry.scale import PageFit
@@ -44,7 +50,10 @@ def build_sheet(  # noqa: PLR0913  keyword-only inputs, each from S4
     The silhouette's contour is raised last, clear of every outline and braille block."""
     plan = plan or SheetPlan()
     regions = regions_from_parts(parts, fit, rules.vectorize)
-    regions = make_point_symbols(regions, rules.spacing, rules.layout)
+    inset = rules.render.outline_width_mm / 2  # the raised outline takes this from the edge
+    regions = drop_small_pieces(regions, rules.spacing, rules.layout, inset)
+    regions = make_point_symbols(regions, rules.spacing, rules.layout, inset)
+    regions = one_symbol_per_spot(regions, rules.spacing.min_gap_mm)
     regions, unresolved = enforce_gaps(
         regions, rules.spacing.min_gap_mm, rules.layout, rules.render.outline_width_mm
     )

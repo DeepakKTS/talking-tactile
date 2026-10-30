@@ -12,10 +12,14 @@ from shapely.geometry import Polygon, box
 from app.config import load_explore, load_tactile_rules
 from app.geometry.layout import (
     LayoutRegion,
+    drop_small_pieces,
     enforce_gaps,
+    enterable_area,
     make_point_symbols,
+    one_symbol_per_spot,
     regions_from_parts,
     size_mm,
+    symbol_area,
 )
 from app.geometry.reconcile import reconcile
 from app.geometry.scale import fit_to_page
@@ -247,3 +251,66 @@ def test_synthetic_layout_fixes_every_planted_problem(fig: SyntheticFigure, laid
     gap = labels["left lobe"].polygon.distance(labels["right lobe"].polygon)
     assert gap >= G
     assert np.isfinite(gap)
+
+
+# The floor by enterable area, small pieces left out, one symbol per spot (Oct 30)
+
+INSET = LINE / 2
+
+
+def piece(rid: str, part: str, poly: Polygon) -> LayoutRegion:
+    return LayoutRegion(id=rid, label=part, polygon=poly, score=0.9, source="sam",
+                        part_id=None if rid == part else part)  # fmt: skip
+
+
+def test_a_long_thin_sliver_is_a_point_symbol_by_its_enterable_area() -> None:
+    """20 mm long passes the 6.4 mm side test, but 1.6 mm wide leaves under a point symbol's
+    area to enter once the outline takes half its width from each edge."""
+    floor = symbol_area(RULES.spacing, RULES.layout, INSET)
+    sliver = box(0, 0, 20, 1.6)
+    assert size_mm(sliver) >= POINT and enterable_area(sliver, INSET) < floor
+    square = box(40, 0, 48, 8)
+    out = by_id(make_point_symbols([region("a", sliver), region("b", square)], RULES.spacing,
+                                   RULES.layout, INSET))  # fmt: skip
+    assert out["a"].kind == "point" and "mm2 to enter" in out["a"].notes[0]
+    assert out["b"].kind == "area"
+    assert 22 < floor < 23.5
+
+
+def test_a_parts_small_pieces_are_left_out_when_it_keeps_a_valid_one() -> None:
+    regions = [
+        piece("r1", "r1", box(0, 0, 20, 20)),
+        piece("r1_2", "r1", box(30, 0, 32, 2)),
+        piece("r2", "r2", box(60, 0, 62, 2)),
+        piece("r2_2", "r2", box(70, 0, 72, 2)),
+    ]
+    out = by_id(drop_small_pieces(regions, RULES.spacing, RULES.layout, INSET))
+    assert set(out) == {"r1", "r2", "r2_2"}  # r2 has no valid piece: both stay, as symbols later
+    (note,) = out["r1"].notes
+    assert note == (
+        "repair: 1 piece smaller than a 6.4 mm point symbol left out; the part keeps its main piece"
+    )
+    assert out["r2"].notes == ()
+
+
+def test_two_point_symbols_of_one_part_closer_than_the_gap_become_one() -> None:
+    near = [
+        piece("r2", "r2", box(60, 0, 62, 2)),
+        piece("r2_2", "r2", box(64, 0, 66, 2)),
+        piece("r3", "r3", box(100, 0, 102, 2)),
+        piece("r3_2", "r3", box(140, 0, 142, 2)),
+    ]
+    symbols = make_point_symbols(near, RULES.spacing, RULES.layout, INSET)
+    out = by_id(one_symbol_per_spot(symbols, G))
+    assert set(out) == {"r2", "r3", "r3_2"}  # r3's two symbols are far apart: both stay
+    assert out["r2"].notes[-1].startswith("repair: 1 more point symbol of this part left out")
+
+
+def test_the_rules_check_flags_an_area_under_a_point_symbols_enterable_area() -> None:
+    from app.geometry.sheet import Sheet  # noqa: PLC0415
+    from app.geometry.validate import validate_sheet  # noqa: PLC0415
+
+    sheet = Sheet(page="letter", grade_band=None, textures=[],
+                  regions=[region("a", box(40, 40, 60, 41.6))])  # fmt: skip
+    (v,) = [x for x in validate_sheet(sheet, RULES) if x.rule == "point_symbol"]
+    assert v.regions == ["a"] and v.measured < v.limit
