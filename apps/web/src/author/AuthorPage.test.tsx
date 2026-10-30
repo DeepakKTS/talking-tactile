@@ -166,17 +166,17 @@ describe("author page", () => {
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
   });
 
-  it("shows the live heart's spill parts as not touchable and still publishes", async () => {
+  it("shows the live heart's spill part as not touchable and still publishes", async () => {
     server.regions = structuredClone(heart) as unknown as RegionsFile;
     page();
     const input = screen.getByLabelText(/Figure \(PNG, JPEG or a PDF page\)/);
     fireEvent.change(input, { target: { files: [new File([new Uint8Array([137, 80])], "heart.png", { type: "image/png" })] } });
     fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
     await screen.findByRole("heading", { name: heart.title });
-    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(17);
+    expect(within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")).toHaveLength(20);
     const flagged = within(screen.getByRole("list", { name: "Not touchable yet" })).getAllByRole("listitem");
-    expect(flagged.map((li) => li.querySelector("strong")?.textContent)).toEqual(["aorta", "mitral valve", "left ventricle", "septum"]);
-    expect(within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem")).toHaveLength(4);
+    expect(flagged.map((li) => li.querySelector("strong")?.textContent)).toEqual(["aorta"]);
+    expect(within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem")).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "Show the suggested outline of aorta" }));
     expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // both pieces
     fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));

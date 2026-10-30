@@ -1,0 +1,6 @@
+{
+ "description": "Figures mock mode answers from live recordings (app/meta/mock.py). The heart: S1 from the live API run of Oct 30 under the 25-call cap, S2 and the Fix outline calls from the run under the per-job cap (2 + 2 per part).",
+ "figures": {
+  "913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada": {"name": "heart", "prefixes": ["pipeline_heart_s1_", "pipeline_heart2_"]}
+ }
+}
