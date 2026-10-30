@@ -149,13 +149,16 @@ def scattered_boxes(draw: st.DrawFn) -> list[LayoutRegion]:
 def test_gap_enforcement_only_shrinks_and_leaves_every_gap_clear(
     regions: list[LayoutRegion],
 ) -> None:
-    # Overlapping inputs cannot come out of reconcile; separate them the same way first.
+    # Overlapping inputs cannot come out of reconcile; separate them the same way first, and,
+    # as reconcile does, drop slivers: a 0.5 mm strip left between two near-identical boxes
+    # (Hypothesis found three on Oct 30) has no gap to give.
+    sliver = RULES.reconcile.sliver_max_width_mm
     flat: list[LayoutRegion] = []
     for r in regions:
         poly = r.polygon
         for f in flat:
             poly = poly.difference(f.polygon)
-        if poly.geom_type == "Polygon" and poly.area > 1:
+        if poly.geom_type == "Polygon" and poly.area > 1 and not poly.buffer(-sliver / 2).is_empty:
             flat.append(r.model_copy(update={"polygon": poly}))
     out, unresolved = enforce_gaps(flat, G, RULES.layout, LINE)
     assert unresolved == []
