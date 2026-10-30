@@ -1,6 +1,6 @@
-"""The S2 bake-off (Gate A step 4.1b) with no network: Spark's 0-1000 grid points mapped to
-source pixels, the SAM point prompt, the call budget, and a whole run on a small figure
-with answers from a mock transport."""
+"""The S2 bake-off's Arm A (Gate A step 4.1b) with no network: Spark's 0-1000 grid points
+mapped to source pixels, the SAM point prompt, a run on a small figure with answers from a
+mock transport, and the live runs replayed. Arm B's code is gone; its results stay as data."""
 
 import asyncio
 import json
@@ -56,11 +56,6 @@ def test_a_point_prompt_names_one_object_in_source_pixels_and_no_phrase() -> Non
     assert body["stream"] is True and body["metadata"] == {"a": "b"}
 
 
-def test_a_run_needs_three_calls_plus_one_per_part() -> None:
-    assert bake.calls_needed(19) == 22
-    assert bake.calls_needed(23) > RULES.meta.live_call_cap
-
-
 def small_figure(tmp_path: Path) -> bake.Figure:
     """Two outlined boxes on white, 200 x 120, saved as a PNG."""
     img = np.full((120, 200, 3), 255, np.uint8)
@@ -99,8 +94,6 @@ def mock_caller(tmp_path: Path, parts: list[str], seen: list[str]) -> LiveCaller
         seen.append(fmt or "points")
         if fmt == "FigureUnderstanding":
             return chat(json.dumps(understanding))
-        if fmt == "RegionNames":
-            return chat(json.dumps({"parts": [{"part": "left box", "region_ids": [1, 99]}]}))
         return chat(json.dumps([{"object_name": "left box", "x": 250, "y": 500}]))
 
     return LiveCaller(
@@ -113,18 +106,13 @@ def mock_caller(tmp_path: Path, parts: list[str], seen: list[str]) -> LiveCaller
     )
 
 
-def test_a_whole_run_measures_both_arms_and_writes_the_sheet(tmp_path: Path) -> None:
+def test_a_run_lists_points_and_segments_each_part_spark_pointed_to(tmp_path: Path) -> None:
     seen: list[str] = []
     live = mock_caller(tmp_path, ["left box", "right box"], seen)
-    out = tmp_path / "out"
-    result = asyncio.run(bake.bake(live, small_figure(tmp_path), record=False, out_dir=out))
-    # list, points, one SAM call for the one part Spark pointed to, naming
-    assert seen == [
-        "FigureUnderstanding",
-        "points",
-        "<0f>1<|point;x=50;y=60;w=200;h=120|>",
-        "RegionNames",
-    ]
+    run = bake.Bakeoff(live, small_figure(tmp_path))
+    result = asyncio.run(run.run())
+    # list, points, one SAM call for the one part Spark pointed to
+    assert seen == ["FigureUnderstanding", "points", "<0f>1<|point;x=50;y=60;w=200;h=120|>"]
     a = {r["part"]: r for r in result["arm_a_rows"]}
     assert a["right box"] == {
         "part": "right box",
@@ -134,26 +122,7 @@ def test_a_whole_run_measures_both_arms_and_writes_the_sheet(tmp_path: Path) -> 
     }
     assert a["left box"]["point_px"] == [50, 60] and a["left box"]["instances"] == 1
     assert a["left box"]["masks"][0]["raster_is_bounds_size"] is True
-    b = {r["part"]: r for r in result["arm_b_rows"]}
-    assert b["left box"]["region_ids"] == [1, 99] and b["left box"]["invalid_ids"] == [99]
-    assert b["right box"]["region_ids"] is None
-    assert (result["arm_b"]["regions"], result["arm_b"]["regions_assigned"]) == (2, 1)
-    assert result["arm_b"]["regions_unassigned"] == 1
-    assert result["calls"] == 4
-    sheet = (out / "index.html").read_text()
-    assert "left box" in sheet and "pass/fail" in sheet and "—" not in sheet
-    for img in ("b_regions", "a_left_box", "b_left_box"):
-        assert (out / "img" / f"{img}.jpg").is_file()
-    assert json.loads((out / "results.json").read_text())["calls"] == 4
-
-
-def test_a_figure_with_too_many_parts_stops_after_the_listing(tmp_path: Path) -> None:
-    seen: list[str] = []
-    live = mock_caller(tmp_path, [f"part {i}" for i in range(23)], seen)
-    out = tmp_path / "out"
-    result = asyncio.run(bake.bake(live, small_figure(tmp_path), record=False, out_dir=out))
-    assert seen == ["FigureUnderstanding"] and "stopped" in result
-    assert not (out / "index.html").exists()
+    assert list(run.masks) == ["left box"] and result["calls"] == 3
 
 
 @pytest.mark.parametrize("name", sorted(bake.FIGURES))
@@ -171,16 +140,12 @@ def measured(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 @pytest.mark.parametrize("name", sorted(bake.FIGURES))
-def test_replay_of_the_live_bakeoff_gives_the_same_measurements(name: str, tmp_path: Path) -> None:
+def test_replay_of_the_live_bakeoff_gives_arm_a_as_measured(name: str) -> None:
     """The Oct 29 live runs, replayed: every request matches its recording (image digests
-    included), and the points, instances, masks and region ids come out as in results.json."""
+    included), and the points, instances and masks come out as in results.json."""
     live_result = json.loads((bake.OUT_ROOT / name / "results.json").read_text())
-    fig = bake.load_figure(name, bake.FIGURES[name])
-    result = asyncio.run(bake.bake(bake.replayer(name), fig, False, tmp_path, images_only=True))
-    assert result["calls"] == live_result["calls"]
+    _, result, masks = asyncio.run(bake.replay_arm_a(name))
     assert result["parts"] == live_result["parts"]
     assert measured(result["arm_a_rows"]) == measured(live_result["arm_a_rows"])
-    assert measured(result["arm_b_rows"]) == measured(live_result["arm_b_rows"])
-    for key in ("regions", "regions_assigned", "regions_unassigned", "floor_px"):
-        assert result["arm_b"][key] == live_result["arm_b"][key]
-    assert not (tmp_path / "results.json").exists()
+    assert result["calls"] == 2 + sum(1 for r in live_result["arm_a_rows"] if r["point_px"])
+    assert set(masks) == {r["part"] for r in live_result["arm_a_rows"] if r.get("instances")}

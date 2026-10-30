@@ -1,53 +1,35 @@
-"""S2 bake-off, Gate A step 4.1b: two ways to find a figure's parts, run on one figure.
+"""The S2 bake-off of Oct 29 (Gate A step 4.1b), kept to replay v1 Arm A for the scorer.
 
-    LIVE=1 uv run python -m app.meta.s2_bakeoff FIGURE [--record]
+The bake-off compared two ways to find a figure's parts. Arm A: one Spark call points to
+each part on the docs' 0-1000 grid, code maps the point to source pixels, and one SAM point
+prompt per part segments it. Arm B: code found closed regions and Spark named them. S2 is
+locked on Arm A v2f (app/pipeline/s2_points.py); Arm B's code is deleted, and its results,
+grades and sheets stay under eval/s2-bakeoff/ as data. The passing masks of both arms are
+saved there too (FIGURE/reference/).
 
-FIGURE is heart, flower or japan_regions. First Spark lists the parts with the S1 prompt
-and schema (one call). Then:
+Here: the S1 listing and Arm A, replayed from fixtures/recorded/bakeoff_*.json with
+replay_arm_a, never live."""
 
-Arm A, Spark points and SAM segments. One Spark call returns a point inside each part on
-the docs' 0-1000 grid of the image it was sent. Code maps it to integer source pixels,
-floor(v * size / 1000) clamped to the image, which is the space SAM object prompts use.
-One SAM point-prompt call per part.
-
-Arm B, code finds regions and Spark names them. app.geometry.closed_regions finds closed
-regions with no model; one Spark call, given the figure and the regions numbered on an
-overlay, maps each part to region ids. No SAM call.
-
-Writes eval/s2-bakeoff/FIGURE/: results.json with the counts and measurements, index.html
-with each part's mask from each arm side by side and a blank pass/fail column, and the
-images under img/ (git-ignored). Nothing here grades quality. A run needs 3 + parts calls
-and stops after the listing if that would pass the run's call cap."""
-
-import argparse
-import asyncio
 import base64
-import html
-import io
 import json
 import math
 import re
-import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import cv2
 import numpy as np
 import numpy.typing as npt
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 from app.config import MetaModels, load_tactile_rules
-from app.geometry.closed_regions import Region, closed_regions
-from app.geometry.scale import fit_to_page
 from app.meta import sam_adapter
 from app.meta.cost import CostMeter
-from app.meta.live import DEFAULT_BASE, Ledger, LiveCaller, LiveCallError, spark_units
-from app.meta.record import Recorder, ReplayTransport
+from app.meta.live import DEFAULT_BASE, Ledger, LiveCaller, spark_units
+from app.meta.record import ReplayTransport
 from app.meta.sam_diagnostic import checks
 from app.meta.smoke import HEART
-from app.models.regions import PageSize
 from app.paths import FIXTURES_DIR, RECORDED_DIR, REPO_ROOT
 from app.pipeline import s2_ground
 from app.prompts import load_prompt
@@ -61,11 +43,6 @@ OUT_ROOT = REPO_ROOT / "eval" / "s2-bakeoff"
 CALLER = "s2_bakeoff"
 EFFORT = "medium"  # the S1 spike's effort for reading a figure (spikes/muse-spark.md)
 GRID = 1000  # Spark's grounding grid, docs: image-understanding
-
-# Arm B constants, chosen Oct 29 on heart.png, flower.png and japan_regions.png:
-INK_BELOW = 64  # black outlines and borders are under it; fills, red leader lines are not
-CLOSE_PX = 5  # seals breaks under 5 px, about 0.5 mm on the sheet, far under min_gap_mm
-PAGE: PageSize = "letter"
 
 # The S1 schema from the Spark spike (spikes/spark_spike.py), so the list is the one S1
 # would make.
@@ -114,26 +91,6 @@ S1_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
-NAMING_SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "properties": {
-        "parts": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "part": {"type": "string"},
-                    "region_ids": {"type": "array", "items": {"type": "integer"}},
-                },
-                "required": ["part", "region_ids"],
-                "additionalProperties": False,
-            },
-        }
-    },
-    "required": ["parts"],
-    "additionalProperties": False,
-}
-
 
 def quoted(parts: list[str]) -> str:
     return ", ".join(f'"{p}"' for p in parts)
@@ -146,16 +103,6 @@ def points_prompt(parts: list[str]) -> str:
         'For each object, answer in the format {"object_name": "<name>", "x": <int>, "y": <int>}. '
         "The coordinates should be in the 0-1000 range. Return a JSON array of results. "
         "If you cannot find an object, omit it from the results."
-    )
-
-
-def naming_prompt(parts: list[str], n_regions: int) -> str:
-    return (
-        "The first image is a science figure. The second is the same figure with its closed "
-        f"regions tinted and numbered 1 to {n_regions}. The parts of the figure are: "
-        f"{quoted(parts)}. For each part, give the numbers of the regions that make it up. "
-        "A part may span several regions. Leave out any region that belongs to none of these "
-        "parts, and any part you cannot find."
     )
 
 
@@ -177,16 +124,6 @@ def parse_points(content: str, parts: list[str]) -> dict[str, tuple[float, float
         if name in parts and name not in out:
             out[name] = (float(item["x"]), float(item["y"]))
     return out
-
-
-def calls_needed(n_parts: int) -> int:
-    return 1 + 1 + n_parts + 1  # list, points, one SAM call per part, naming
-
-
-def png_of(image: npt.NDArray[np.uint8]) -> bytes:
-    buf = io.BytesIO()
-    Image.fromarray(image).save(buf, format="PNG")
-    return buf.getvalue()
 
 
 def data_url(png: bytes) -> str:
@@ -244,83 +181,6 @@ def load_figure(name: str, path: Path) -> Figure:
     return Figure(name, path, np.asarray(Image.open(path).convert("RGB")))
 
 
-def floor_px(fig: Figure) -> float:
-    """S3's speck floor, speck_max_area_mm2, in pixels of this figure on a letter page."""
-    rules = load_tactile_rules()
-    w, h = fig.size
-    mm_per_px = fit_to_page(w, h, PAGE, rules.page).mm_per_px
-    return rules.reconcile.speck_max_area_mm2 / mm_per_px**2
-
-
-def font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    return ImageFont.load_default(size=size)
-
-
-def numbered_overlay(
-    fig: Figure, labels: npt.NDArray[np.int32], regions: list[Region]
-) -> npt.NDArray[np.uint8]:
-    """Each region tinted a color of its own, its id at its anchor in black on white."""
-    rng = np.random.default_rng(7)
-    colors = rng.integers(60, 230, size=(len(regions) + 1, 3)).astype(np.float32)
-    out = fig.image.astype(np.float32)
-    inside = labels > 0
-    out[inside] = out[inside] * 0.45 + colors[labels[inside]] * 0.55
-    img = Image.fromarray(out.astype(np.uint8))
-    draw = ImageDraw.Draw(img)
-    f = font(max(14, fig.size[0] // 70))
-    for r in regions:
-        draw.text(
-            r.anchor,
-            str(r.id),
-            fill=(0, 0, 0),
-            font=f,
-            anchor="mm",
-            stroke_width=3,
-            stroke_fill=(255, 255, 255),
-        )
-    return np.asarray(img)
-
-
-def part_view(
-    fig: Figure, mask: npt.NDArray[np.bool_] | None, point: tuple[int, int] | None
-) -> Image.Image:
-    """The figure with everything outside one mask faded, the mask's edge in cyan and, for
-    Arm A, its prompt point in magenta. Colors in the figure itself cannot hide the mask."""
-    out = fig.image.astype(np.float32)
-    if mask is not None:
-        out[~mask] = out[~mask] * 0.3 + 255.0 * 0.7
-        k = 2 * max(2, fig.size[0] // 400) + 1
-        inner = cv2.erode(mask.astype(np.uint8), np.ones((k, k), np.uint8)).astype(bool)
-        out[mask & ~inner] = (0.0, 200.0, 255.0)
-    img = Image.fromarray(out.astype(np.uint8))
-    if point is not None:
-        draw = ImageDraw.Draw(img)
-        r = max(8, fig.size[0] // 120)
-        x, y = point
-        pink = (230, 0, 200)
-        draw.ellipse((x - r, y - r, x + r, y + r), outline=pink, width=max(3, r // 3))
-        draw.line((x - 2 * r, y, x + 2 * r, y), fill=pink, width=3)
-        draw.line((x, y - 2 * r, x, y + 2 * r), fill=pink, width=3)
-    scale = 720 / max(img.size)
-    return img.resize(
-        (round(img.width * scale), round(img.height * scale)), Image.Resampling.LANCZOS
-    )
-
-
-def full_mask(inst: sam_adapter.Decoded, size: tuple[int, int]) -> npt.NDArray[np.bool_]:
-    """A decoded raster scaled to its bounds, nearest pixel, on a full-size array."""
-    w, h = size
-    out = np.zeros((h, w), bool)
-    if inst.raster is None:
-        return out
-    left, top, right, bottom = inst.bounds
-    rh, rw = inst.raster.shape
-    rows = np.arange(bottom - top) * rh // (bottom - top)
-    cols = np.arange(right - left) * rw // (right - left)
-    out[top:bottom, left:right] = inst.raster[rows][:, cols][: h - top, : w - left]
-    return out
-
-
 def shown(path: Path) -> str:
     """A path as the ledger and the sheet show it: from the repo root when it is inside."""
     return str(path.relative_to(REPO_ROOT)) if path.is_relative_to(REPO_ROOT) else path.name
@@ -331,17 +191,13 @@ def slug(text: str) -> str:
 
 
 class Bakeoff:
-    def __init__(self, live: LiveCaller, fig: Figure, record: bool, out_dir: Path) -> None:
+    """The listing and Arm A, as the live run made them."""
+
+    def __init__(self, live: LiveCaller, fig: Figure) -> None:
         self.live = live
         self.fig = fig
-        self.record = record
-        self.out_dir = out_dir
         self.models = load_tactile_rules().meta.models
-        # Each part's full-size mask per arm, kept for grading (app/meta/s2_grading.py).
-        self.masks: dict[str, dict[str, npt.NDArray[np.bool_]]] = {"a": {}, "b": {}}
-
-    def _name(self, what: str) -> str | None:
-        return f"bakeoff_{self.fig.name}_{what}" if self.record else None
+        self.masks: dict[str, npt.NDArray[np.bool_]] = {}  # Arm A's full-size mask per part
 
     def _describe(self, what: str) -> str:
         w, h = self.fig.size
@@ -355,7 +211,6 @@ class Bakeoff:
             model=self.models.spark,
             describe=self._describe(what),
             units=spark_units,
-            record_as=self._name(what),
         )
         content = str(res.body["choices"][0]["message"]["content"])
         line = res.ledger_line
@@ -395,7 +250,6 @@ class Bakeoff:
                 model=self.models.sam,
                 describe=self._describe(f"point {point[0]},{point[1]} for {part}"),
                 units=lambda _usage: {"images": 1},
-                record_as=self._name(f"sam_{slug(part)}"),
             )
             row |= {
                 "point_px": list(point),
@@ -410,7 +264,7 @@ class Bakeoff:
             insts = sam_adapter.decoded(parsed)
             mask = np.zeros((h, w), bool)
             for inst in insts:
-                mask |= full_mask(inst, (w, h))
+                mask |= sam_adapter.full_mask(inst, (w, h))
             row |= {
                 "instances": sam_adapter.instance_count(parsed),
                 "confidences": [i.confidence for i in insts],
@@ -419,358 +273,27 @@ class Bakeoff:
                 "point_in_mask": bool(mask[point[1], point[0]]),
             }
             if insts:
-                self.masks["a"][part] = mask
-            self._save(f"a_{slug(part)}", part_view(self.fig, mask if insts else None, point))
+                self.masks[part] = mask
             rows.append(row)
         return rows, meta
-
-    async def arm_b(self, parts: list[str]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        floor = floor_px(self.fig)
-        labels, regions = closed_regions(
-            self.fig.image, ink_below=INK_BELOW, close_px=CLOSE_PX, floor_px=floor
-        )
-        overlay = numbered_overlay(self.fig, labels, regions)
-        self._save("b_regions", Image.fromarray(overlay), full=True)
-        body = spark_body(
-            self.models,
-            None,
-            naming_prompt(parts, len(regions)),
-            [self.fig.png, png_of(overlay)],
-            ("RegionNames", NAMING_SCHEMA),
-        )
-        content, meta = await self._spark("name_regions", body)
-        valid = {r.id for r in regions}
-        named: dict[str, list[int]] = {}
-        for item in json.loads(content)["parts"]:
-            if item["part"] in parts and item["part"] not in named:
-                named[item["part"]] = [int(i) for i in item["region_ids"]]
-        rows = []
-        for part in parts:
-            ids = named.get(part)
-            row: dict[str, Any] = {"part": part, "region_ids": ids}
-            if ids:
-                good = [i for i in ids if i in valid]
-                mask = np.isin(labels, good)
-                row |= {
-                    "invalid_ids": [i for i in ids if i not in valid],
-                    "mask_px": int(mask.sum()),
-                }
-                self.masks["b"][part] = mask
-                self._save(f"b_{slug(part)}", part_view(self.fig, mask, None))
-            rows.append(row)
-        assigned = {i for ids in named.values() for i in ids if i in valid}
-        meta |= {
-            "ink_below": INK_BELOW,
-            "close_px": CLOSE_PX,
-            "floor_px": round(floor, 1),
-            "regions": len(regions),
-            "regions_assigned": len(assigned),
-            "regions_unassigned": len(valid - assigned),
-            "answer": json.loads(content),
-        }
-        return rows, meta
-
-    def _save(self, name: str, img: Image.Image, full: bool = False) -> None:
-        d = self.out_dir / "img"
-        d.mkdir(parents=True, exist_ok=True)
-        if full:
-            scale = 1400 / max(img.size)
-            img = img.resize(
-                (round(img.width * scale), round(img.height * scale)), Image.Resampling.LANCZOS
-            )
-        img.convert("RGB").save(d / f"{name}.jpg", quality=82)
 
     async def run(self) -> dict[str, Any]:
         parts_full, listing = await self.list_parts()
         parts = [p["phrase"] for p in parts_full]
-        result: dict[str, Any] = {
+        rows, meta = await self.arm_a(parts)
+        return {
             "figure": self.fig.name,
-            "image": shown(self.fig.path),
-            "size": list(self.fig.size),
             "parts": parts_full,
             "listing": listing,
-            "calls_needed": calls_needed(len(parts)),
-            "cap": self.live.cap,
+            "arm_a_rows": rows,
+            "arm_a": meta,
+            "calls": self.live.calls,
         }
-        if calls_needed(len(parts)) > self.live.cap:
-            return result | {"stopped": "the parts need more calls than the run cap"}
-        result["arm_a_rows"], result["arm_a"] = await self.arm_a(parts)
-        result["arm_b_rows"], result["arm_b"] = await self.arm_b(parts)
-        result["spent_usd"] = round(self.live.meter.spent_usd, 6)
-        result["calls"] = self.live.calls
-        return result
-
-
-def flag_lines(g: dict[str, Any] | None, arm: str) -> list[str]:
-    """The flags one part raised in one arm, as the sheet words them."""
-    if g is None:
-        return []
-    x = g[arm]
-    out = []
-    if x.get("point_outside"):
-        out.append("FLAG: point not inside its own mask")
-    if x["whole_object"]:
-        out.append(f"FLAG: mask is {x['of_object']:.0%} of the object area, over 50%")
-    if x.get("no_regions"):
-        out.append("FLAG: no regions assigned")
-    if x["overlaps"]:
-        out.append("FLAG: overlaps more than 20% with " + ", ".join(x["overlaps"]))
-    return out
-
-
-def area_fact(arm: dict[str, Any]) -> str:
-    if arm["area_px"] is None:
-        return "no mask"
-    return f"mask {arm['area_px']} px, {arm['of_object']:.1%} of the object area"
-
-
-def stepper(grading: dict[str, Any]) -> str:
-    """One part at a time: Arm A and Arm B side by side, next and previous by button or arrow
-    key. The data rides in the page as JSON."""
-    steps = [
-        {
-            "part": p["part"],
-            "label": p["print_label"] or "none",
-            "a": f"img/focus_a_{slug(p['part'])}.jpg",
-            "b": f"img/focus_b_{slug(p['part'])}.jpg",
-            "a_facts": [
-                "confidence "
-                + ("none" if p["a"]["confidence"] is None else f"{p['a']['confidence']:.3f}"),
-                area_fact(p["a"]),
-                *flag_lines(p, "a"),
-            ],
-            "b_facts": [
-                f"region ids {p['b']['region_ids']}",
-                area_fact(p["b"]),
-                *flag_lines(p, "b"),
-            ],
-        }
-        for p in grading["parts"]
-    ]
-    return step_view(
-        steps,
-        ("Arm A: Spark point, SAM mask", "Arm B: code regions named by Spark"),
-        "The figure is at 30%, the part's mask at full strength with a 2 px outline, and the "
-        "Arm A prompt point is the crosshair in both views.",
-        ("Arm A", "Arm B"),
-    )
-
-
-def step_view(
-    steps: list[dict[str, Any]], titles: tuple[str, str], about: str, alts: tuple[str, str]
-) -> str:
-    """Steps of part, label, a and b image paths, and a_facts and b_facts, shown one at a
-    time with the a and b images side by side. alts name the two images for alt text."""
-    data = json.dumps(steps).replace("<", "\\u003c")
-    left, right = (html.escape(t) for t in titles)
-    alt_a, alt_b = (json.dumps(a + " mask for ") for a in alts)
-    return f"""<section id="step" aria-label="One part at a time">
-<h2>One part at a time</h2>
-<p>Left and right arrow keys, or the buttons. {html.escape(about, quote=False)}</p>
-<div class="nav"><button id="prev" type="button">Previous</button>
-<span id="count"></span><button id="next" type="button">Next</button></div>
-<p id="name" aria-live="polite"></p><p id="label"></p>
-<div class="pair"><figure><figcaption>{left}</figcaption>
-<img id="ia" alt=""><ul id="fa"></ul></figure>
-<figure><figcaption>{right}</figcaption>
-<img id="ib" alt=""><ul id="fb"></ul></figure></div>
-</section>
-<script>
-const STEPS = {data};
-let at = 0;
-function list(id, items) {{
-  const ul = document.getElementById(id);
-  ul.replaceChildren(...items.map(t => {{
-    const li = document.createElement("li");
-    li.textContent = t;
-    if (t.startsWith("FLAG")) li.className = "flag";
-    return li;
-  }}));
-}}
-function show(i) {{
-  at = (i + STEPS.length) % STEPS.length;
-  const s = STEPS[at];
-  document.getElementById("count").textContent = (at + 1) + " of " + STEPS.length;
-  document.getElementById("name").textContent = s.part;
-  document.getElementById("label").textContent = "label: " + s.label;
-  document.getElementById("ia").src = s.a;
-  document.getElementById("ia").alt = {alt_a} + s.part;
-  document.getElementById("ib").src = s.b;
-  document.getElementById("ib").alt = {alt_b} + s.part;
-  list("fa", s.a_facts);
-  list("fb", s.b_facts);
-}}
-document.getElementById("prev").onclick = () => show(at - 1);
-document.getElementById("next").onclick = () => show(at + 1);
-document.addEventListener("keydown", e => {{
-  if (e.key === "ArrowLeft") show(at - 1);
-  if (e.key === "ArrowRight") show(at + 1);
-}});
-show(0);
-</script>"""
-
-
-def pairs_list(grading: dict[str, Any]) -> str:
-    out = []
-    for arm, title in (("a", "Arm A"), ("b", "Arm B")):
-        pairs = grading["pairs"][arm]
-        items = "".join(
-            f"<li>{html.escape(p['parts'][0])} and {html.escape(p['parts'][1])}: "
-            f"{p['overlap_px']} px, {p['of_smaller']:.0%} of the smaller</li>"
-            for p in pairs
-        )
-        out.append(f"<h3>{title}: {len(pairs)}</h3><ul>{items or '<li>none</li>'}</ul>")
-    return "<h2>Pairs overlapping more than 20% of the smaller mask</h2>" + "".join(out)
-
-
-SORT_SCRIPT = """<script>
-const body = document.querySelector("#parts tbody");
-const original = [...body.rows];
-let order = 0;
-document.getElementById("sort").onclick = () => {
-  order = (order + 1) % 3;
-  const key = r => r.dataset.conf === "" ? -1 : Number(r.dataset.conf);
-  const rows = order === 0 ? original
-    : [...original].sort((x, y) => order === 1 ? key(x) - key(y) : key(y) - key(x));
-  body.replaceChildren(...rows);
-  document.getElementById("sort").textContent =
-    ["Sort by confidence", "Confidence, lowest first", "Confidence, highest first"][order];
-};
-</script>"""
-
-
-def write_sheet(
-    result: dict[str, Any], out_dir: Path, grading: dict[str, Any] | None = None
-) -> None:
-    """index.html: one row per part, each arm's mask and numbers, a blank pass/fail column.
-    With grading (app/meta/s2_grading.py), also the flags, a one part at a time view, the
-    overlapping pairs, and rows sortable by Arm A confidence."""
-    esc = html.escape
-    a_rows = {r["part"]: r for r in result.get("arm_a_rows", [])}
-    b_rows = {r["part"]: r for r in result.get("arm_b_rows", [])}
-    graded = {g["part"]: g for g in grading["parts"]} if grading else {}
-
-    def cell(img: str | None, facts: list[str]) -> str:
-        pic = (
-            f'<a href="img/{img}.jpg"><img src="img/{img}.jpg" alt=""></a>'
-            if img
-            else "<p>no mask</p>"
-        )
-        lis = "".join(
-            f"<li{' class=flag' if f.startswith('FLAG') else ''}>{esc(f)}</li>" for f in facts
-        )
-        return f"<td>{pic}<ul>{lis}</ul></td>"
-
-    rows = []
-    for p in result["parts"]:
-        part = p["phrase"]
-        a, b, g = a_rows.get(part, {}), b_rows.get(part, {}), graded.get(part)
-        a_facts = [f"grid point {a.get('grid_point')}", f"pixel point {a.get('point_px')}"]
-        if a.get("instances") is not None:
-            a_facts += [
-                f"instances {a['instances']}",
-                f"confidence {[round(c, 3) for c in a['confidences'] if c is not None]}",
-                f"point inside the mask {a['point_in_mask']}",
-                f"mask px {a['mask_px']}",
-                f"latency {a['latency_ms']} ms, cost ${a['cost_usd']}",
-            ]
-            for m in a["masks"]:
-                a_facts.append(
-                    f"raster {m.get('raster_hw')} for bounds {m.get('bounds')}, "
-                    f"scale {m.get('raster_scale')}"
-                )
-        b_facts = [f"region ids {b.get('region_ids')}"]
-        if b.get("region_ids"):
-            b_facts += [f"invalid ids {b['invalid_ids']}", f"mask px {b['mask_px']}"]
-        a_facts += flag_lines(g, "a")
-        b_facts += flag_lines(g, "b")
-        a_img = f"a_{slug(part)}" if a.get("instances") else None
-        b_img = f"b_{slug(part)}" if b.get("region_ids") else None
-        conf_cell, conf_attr = "", ""
-        if grading is not None:
-            conf = g["a"]["confidence"] if g else None
-            conf_attr = f' data-conf="{"" if conf is None else conf}"'
-            conf_cell = f"<td>{'none' if conf is None else f'{conf:.3f}'}</td>"
-        rows.append(
-            f"<tr{conf_attr}><th>{esc(part)}<br><small>label: "
-            f"{esc(p['print_label'] or 'none')}</small></th>{conf_cell}"
-            f"{cell(a_img, a_facts)}{cell(b_img, b_facts)}<td></td><td></td></tr>"
-        )
-    b = result.get("arm_b", {})
-    a = result.get("arm_a", {})
-    summary = [
-        f"Image {result['image']}, {result['size'][0]} x {result['size'][1]} px",
-        f"Parts listed by Spark: {len(result['parts'])}. Calls {result.get('calls')}, "
-        f"spent ${result.get('spent_usd')}",
-        f"Arm A points call: {a.get('latency_ms')} ms, ${a.get('cost_usd')}",
-        f"Arm B: ink below {b.get('ink_below')}, closing {b.get('close_px')} px square, floor "
-        f"{b.get('floor_px')} px. Regions {b.get('regions')}, assigned "
-        f"{b.get('regions_assigned')}, unassigned {b.get('regions_unassigned')}. Naming call "
-        f"{b.get('latency_ms')} ms, ${b.get('cost_usd')}",
-    ]
-    extra_top, extra_pairs, conf_head, sort = "", "", "", ""
-    if grading is not None:
-        summary.append(
-            f"Flags: {grading['summary']} Object area {grading['object_px']} px: pixels more "
-            "than 40 from the border color in some channel."
-        )
-        extra_top = stepper(grading)
-        extra_pairs = pairs_list(grading)
-        conf_head = '<th><button id="sort" type="button">Sort by confidence</button></th>'
-        sort = SORT_SCRIPT
-    page = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>S2 bake-off: {esc(result["figure"])}</title>
-<style>
-body {{ font: 15px/1.4 system-ui, sans-serif; margin: 16px; background: #fff; color: #111; }}
-table {{ border-collapse: collapse; }}
-th, td {{ border: 1px solid #999; padding: 6px; vertical-align: top; }}
-td img {{ width: 360px; display: block; }}
-ul {{ margin: 4px 0; padding-left: 18px; font-size: 13px; }}
-.regions {{ max-width: 100%; }}
-.flag {{ color: #a00; font-weight: 600; }}
-#step {{ border: 2px solid #333; padding: 12px; margin-bottom: 24px; }}
-#name {{ font-size: 40px; font-weight: 700; margin: 8px 0 0; }}
-#label {{ margin: 0 0 8px; color: #444; }}
-.nav {{ display: flex; gap: 12px; align-items: center; }}
-.nav button {{ font-size: 18px; padding: 6px 16px; }}
-.pair {{ display: flex; gap: 16px; flex-wrap: wrap; }}
-.pair figure {{ margin: 0; flex: 1 1 420px; }}
-.pair img {{ width: 100%; border: 1px solid #999; }}
-</style></head><body>
-<h1>S2 bake-off: {esc(result["figure"])}</h1>
-<ul>{"".join(f"<li>{esc(s)}</li>" for s in summary)}</ul>
-{extra_top}
-<h2>Arm B regions as sent to Spark</h2>
-<img class="regions" src="img/b_regions.jpg" alt="The figure with its regions numbered">
-{extra_pairs}
-<h2>Parts</h2>
-<table id="parts"><thead><tr><th>Part</th>{conf_head}<th>Arm A: Spark point, SAM mask</th>
-<th>Arm B: code regions named by Spark</th><th>Arm A pass/fail</th><th>Arm B pass/fail</th></tr>
-</thead><tbody>
-{"".join(rows)}
-</tbody></table>{sort}</body></html>
-"""
-    (out_dir / "index.html").write_text(page, encoding="utf-8")
-
-
-async def bake(
-    live: LiveCaller, fig: Figure, record: bool, out_dir: Path, images_only: bool = False
-) -> dict[str, Any]:
-    """One figure through both arms. images_only redraws img/ and leaves results.json and
-    index.html alone: a replay has its own latencies, not the live ones."""
-    out_dir.mkdir(parents=True, exist_ok=True)
-    result = await Bakeoff(live, fig, record, out_dir).run()
-    if images_only:
-        return result
-    (out_dir / "results.json").write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8")
-    if "stopped" not in result:
-        write_sheet(result, out_dir)
-    return result
 
 
 def replayer(figure: str) -> LiveCaller:
-    """A caller that answers from fixtures/recorded/bakeoff_FIGURE_*.json, never the network."""
+    """A caller that answers from fixtures/recorded/bakeoff_FIGURE_*.json, never the network.
+    The Arm B naming call is recorded there too and never asked for now."""
     rules = load_tactile_rules().meta
     return LiveCaller(
         key="unused-in-replay",
@@ -782,33 +305,10 @@ def replayer(figure: str) -> LiveCaller:
     )
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("figure", choices=sorted(FIGURES))
-    ap.add_argument("--record", action="store_true", help="save each call to fixtures/recorded/")
-    ap.add_argument(
-        "--replay", action="store_true", help="redraw the images from the recorded calls, offline"
-    )
-    args = ap.parse_args()
-    fig = load_figure(args.figure, FIGURES[args.figure])
-    if args.replay:
-        asyncio.run(bake(replayer(args.figure), fig, False, OUT_ROOT / args.figure, True))
-        print(f"redrew {OUT_ROOT / args.figure / 'img'} from the recorded calls")
-        return
-    live = LiveCaller.from_env(load_tactile_rules().meta, recorder=Recorder())
-    try:
-        result = asyncio.run(bake(live, fig, args.record, OUT_ROOT / args.figure))
-    except LiveCallError as exc:
-        print(f"stopped: {exc}", file=sys.stderr)
-        sys.exit(1)
-    if "stopped" in result:
-        print(
-            f"stopped after the listing: {result['stopped']} "
-            f"({result['calls_needed']} > {result['cap']})"
-        )
-    print(json.dumps({k: result.get(k) for k in ("figure", "calls", "spent_usd")}))
-    print(f"spent ${live.meter.spent_usd:.5f} on {live.calls} calls")
-
-
-if __name__ == "__main__":
-    main()
+async def replay_arm_a(
+    name: str,
+) -> tuple[Figure, dict[str, Any], dict[str, npt.NDArray[np.bool_]]]:
+    """A figure, its replayed run, and Arm A's mask per part."""
+    fig = load_figure(name, FIGURES[name])
+    run = Bakeoff(replayer(name), fig)
+    return fig, await run.run(), run.masks

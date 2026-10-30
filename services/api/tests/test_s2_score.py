@@ -1,6 +1,6 @@
 """The S2 mask scorer with no network: IoU against a passing mask, the size floors, text and
-line shares, fragments, sibling overlap, the prompt points, confident fails, and the
-committed v1 scores."""
+line shares, fragments, sibling overlap, the prompt points, confident fails. And the
+committed bake-off eval data: scores, references and overlaps.json."""
 
 import json
 from typing import Any
@@ -177,11 +177,6 @@ def test_overlap_is_reported_before_and_after_resolution() -> None:
 
 
 def test_a_part_left_for_the_teacher_says_why() -> None:
-    assert score.teacher(["x", "needs teacher: spill", "spill: covers 112% of it"]) == (
-        "spill, covers 112% of it"
-    )
-    assert score.teacher(["needs teacher: no mask"]) == "no mask"
-    assert score.teacher(["thin"]) is None
     r = run() | {"teacher": {"missing": "spill, holds points of a, b"}}
     s = score.score(r, np.zeros((H, W, 3), np.uint8), marks(), {})
     by = {x["part"]: x for x in s["parts"]}
@@ -200,3 +195,20 @@ def test_each_passing_grade_has_its_saved_reference(name: str) -> None:
     }
     assert {p: r["arm"] for p, r in refs.items()} == passed
     assert all(r["mask"].any() for r in refs.values())
+
+
+@pytest.mark.parametrize("name", sorted(bake.FIGURES))
+def test_the_committed_overlaps_file_counts_its_own_rows(name: str) -> None:
+    g = json.loads((bake.OUT_ROOT / "overlaps.json").read_text())["figures"][name]
+    parts = g["parts"]
+    assert g["counts"] == {
+        "a_point_outside": sum(p["a"]["point_outside"] for p in parts),
+        "a_whole_object": sum(p["a"]["whole_object"] for p in parts),
+        "a_overlap_pairs": len(g["pairs"]["a"]),
+        "b_whole_object": sum(p["b"]["whole_object"] for p in parts),
+        "b_overlap_pairs": len(g["pairs"]["b"]),
+        "b_no_regions": sum(p["b"]["no_regions"] for p in parts),
+    }
+    live = json.loads((bake.OUT_ROOT / name / "results.json").read_text())
+    outside = {r["part"] for r in live["arm_a_rows"] if r.get("point_in_mask") is False}
+    assert {p["part"] for p in parts if p["a"]["point_outside"]} == outside

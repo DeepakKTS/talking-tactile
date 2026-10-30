@@ -1,11 +1,10 @@
 """S2 mask scorer: numbers per part from a run's masks, with no live calls.
 
-    uv run python -m app.meta.s2_score v1|v2|v2f
+    uv run python -m app.meta.s2_score
 
-v1 is the bake-off's Arm A, its masks replayed from fixtures/recorded/bakeoff_*.json; v2 is
-Arm A v2 (app/meta/s2_armav2.py), replayed from fixtures/recorded/armav2_*.json; v2f is
-v2 with the fixes (point clearance, empty-mask rule, spill retry), replayed from
-armav2f_*.json, for the figures it ran on. Writes
+Scores v1, the bake-off's Arm A, its masks replayed from fixtures/recorded/bakeoff_*.json.
+The v2 and v2f scores (scores_v2*.json) were written by the Arm A v2 harness, deleted once
+v2f moved into the pipeline (app/pipeline/s2_points.py); they stay as eval data. Writes
 eval/s2-bakeoff/scores_RUN.json and scores_RUN.md. Nothing here grades a mask.
 
 Per part:
@@ -31,6 +30,7 @@ import argparse
 import asyncio
 import json
 import math
+from itertools import combinations
 from pathlib import Path
 from typing import Any
 
@@ -41,15 +41,16 @@ import numpy.typing as npt
 from app.config import load_tactile_rules
 from app.geometry import print_marks
 from app.geometry.scale import fit_to_page
-from app.meta import s2_armav2
 from app.meta import s2_bakeoff as bake
 from app.meta import s2_grades as grades
-from app.meta import s2_grading as grading
+from app.models.regions import PageSize
 from app.pipeline.cache import load_mask
 
 Mask = npt.NDArray[np.bool_]
 
 REGRESSION_IOU = 0.8
+OVERLAP = 0.2
+PAGE: PageSize = "letter"  # sizes as S3 would print the figure
 ON_MARKS = 0.1
 CONFIDENT = 0.7
 
@@ -97,7 +98,7 @@ def load_references(name: str) -> dict[str, dict[str, Any]]:
 def page_scale(image: npt.NDArray[np.uint8]) -> float:
     rules = load_tactile_rules()
     h, w = image.shape[:2]
-    return fit_to_page(w, h, bake.PAGE, rules.page).mm_per_px
+    return fit_to_page(w, h, PAGE, rules.page).mm_per_px
 
 
 def floors_mm2() -> tuple[float, float]:
@@ -180,10 +181,21 @@ def score(
     }
 
 
+def overlap_pairs(masks: dict[str, Mask]) -> list[dict[str, Any]]:
+    """Pairs of parts whose masks share more than OVERLAP of the smaller mask."""
+    out = []
+    for (p, a), (q, b) in combinations(masks.items(), 2):
+        smaller = min(int(a.sum()), int(b.sum()))
+        shared = int((a & b).sum())
+        if smaller and shared / smaller > OVERLAP:
+            out.append(
+                {"parts": [p, q], "overlap_px": shared, "of_smaller": round(shared / smaller, 3)}
+            )
+    return out
+
+
 def sibling_pairs(masks: dict[str, Mask], kinds: dict[str, str]) -> list[dict[str, Any]]:
-    return grading.overlap_pairs(
-        {p: m for p, m in masks.items() if m.any() and kinds.get(p) != "group"}
-    )
+    return overlap_pairs({p: m for p, m in masks.items() if m.any() and kinds.get(p) != "group"})
 
 
 def partners(pairs: list[dict[str, Any]], part: str) -> list[str]:
@@ -295,9 +307,9 @@ async def v1_runs() -> dict[
 ]:
     out = {}
     for name in sorted(bake.FIGURES):
-        fig, masks = await grading.replay_masks(name)
+        fig, _, masks = await bake.replay_arm_a(name)
         result = json.loads((bake.OUT_ROOT / name / "results.json").read_text(encoding="utf-8"))
-        out[name] = (fig.image, v1_run(name, result, masks["a"]), masks)
+        out[name] = (fig.image, v1_run(name, result, masks), {"a": masks})
     return out
 
 
@@ -309,8 +321,8 @@ def write(run_name: str, scored: dict[str, dict[str, Any]], tables: list[str]) -
         "point_symbol_mm2": round(symbol_mm2, 1),
         "on_marks_share": ON_MARKS,
         "confident": CONFIDENT,
-        "overlap": grading.OVERLAP,
-        "page": bake.PAGE,
+        "overlap": OVERLAP,
+        "page": PAGE,
     }
     path = bake.OUT_ROOT / f"scores_{run_name}.json"
     path.write_text(json.dumps({"rules": rules, "figures": scored}, indent=1) + "\n", "utf-8")
@@ -319,76 +331,19 @@ def write(run_name: str, scored: dict[str, dict[str, Any]], tables: list[str]) -
     return path
 
 
-def teacher(flags: list[str]) -> str | None:
-    """Why a v2f part needs the teacher: "spill" with its reason, or "no mask"."""
-    for f in flags:
-        if f.startswith("spill: "):
-            return "spill, " + f.removeprefix("spill: ")
-    for reason in ("no points", "no mask"):
-        if f"needs teacher: {reason}" in flags:
-            return reason
-    return None
-
-
-def v2_run(
-    name: str, result: dict[str, Any], final: dict[str, Mask], kept: dict[str, Mask]
-) -> dict[str, Any]:
-    """A v2 result as the scorer reads it: the points are the ones sent to SAM."""
-    rows = result["rows"]
-    conf: dict[str, float | None] = {}
-    for r in rows:
-        c = [i["confidence"] for i in r["instances"] if i.get("confidence") is not None]
-        conf[r["part"]] = max(c) if c else None
-    return {
-        "figure": name,
-        "parts": [r["part"] for r in rows],
-        "masks": final,
-        "points": {
-            r["part"]: [g["sent"] for i in r["instances"] for g in i["points"] if g["sent"]]
-            for r in rows
-        },
-        "confidence": conf,
-        "kind": {r["part"]: r["kind"] for r in rows},
-        "instances": {r["part"]: sum(1 for i in r["instances"] if i.get("kept_px")) for r in rows},
-        "masks_before": kept,
-        "teacher": {r["part"]: teacher(r["flags"]) for r in rows if teacher(r["flags"])},
-    }
-
-
-async def v2_runs(
-    v1: dict[str, tuple[npt.NDArray[np.uint8], dict[str, Any], dict[str, dict[str, Mask]]]],
-    fixes: bool = False,
-) -> dict[str, tuple[npt.NDArray[np.uint8], dict[str, Any], dict[str, dict[str, Mask]]]]:
-    """v2, or with fixes v2f, replayed: v2f only for the figures it ran live on."""
-    out = {}
-    for name, (image, _, masks) in v1.items():
-        rec = s2_armav2.prefix(fixes)
-        if fixes and not (bake.OUT_ROOT / name / "results_v2f.json").exists():
-            continue
-        run, result = await s2_armav2.run_figure(
-            s2_armav2.replayer(name, rec), name, False, "none", fixes
-        )
-        out[name] = (image, v2_run(name, result, run.final, run.kept), masks)
-    return out
-
-
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("run", choices=["v1", "v2", "v2f"])
-    args = ap.parse_args()
+    ap.parse_args()
     runs = asyncio.run(v1_runs())
-    if args.run != "v1":
-        runs = asyncio.run(v2_runs(runs, fixes=args.run == "v2f"))
-    scored, tables = {}, [f"# S2 scores, {args.run}\n"]
+    scored, tables = {}, ["# S2 scores, v1\n"]
     for name, (image, run, _) in runs.items():
         g = grades.load(bake.OUT_ROOT / name)
         s = score(run, image, print_marks.find(image), load_references(name))
-        if args.run == "v1":  # the grades are of the v1 masks
-            s["confident_fails"] = confident_fails(s, g)
+        s["confident_fails"] = confident_fails(s, g)
         scored[name] = s
         tables.append(f"## {name}\n\n{summary(s)}\n\n{table(s, g)}")
         print(f"{name}: {summary(s)}")
-    print(f"wrote {bake.shown(write(args.run, scored, tables))}")
+    print(f"wrote {bake.shown(write('v1', scored, tables))}")
 
 
 def summary(s: dict[str, Any]) -> str:
