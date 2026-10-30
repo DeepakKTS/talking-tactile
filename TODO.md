@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 176, updated 2026-10-30T17:25:13.407Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 179, updated 2026-10-30T17:37:16.247Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -177,6 +177,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: S2 no longer unites group masks; runner._grounded drops groups for S3 and S5 (s3_reconcile.without_groups), S3's key holds S1. plan.sheet_groups maps each member's part id to the group that lists it; regions.json region.group (optional, within v3, PLAN.md note; golden fixture has one). Explore: dwell, 'what is here', guidance arrival and a line crossing say 'anther, part of the stamen'. Author: For your information lists 'stamen A group of anther and filament'. Flower rule violations, replay of the live recordings: 2 before, 0 after (all from the perianth group); with last phase's S2 (no boundary evidence) 31 before, 7 after, none from a group (style pieces, connective and microsporangium, anther pieces, two point symbols). Flower: pistil no longer needs the teacher. Heart, Japan, both brains unchanged. Tests: S2, plan, render, contract (Python and Ajv), Explore session, Author; plan_e2e, fix_e2e, explore_e2e pass.
 - [x] d5-9 Republish the demo figures on regions.json v3: heart after the aortic arch merge, the Commons brain (this phase)
   - Note: Published into the dev data dir (data/, what make dev serves) through Author in headless Chrome on a mock-mode API answering from the live recordings: no network, no spend. A repeated upload returns the figure's existing job unless it failed, so the heart's two done jobs from before the plan's merge proposals were marked failed (error_code superseded) in the git-ignored dev database first (backed up). Heart: one press of 'Merge brachiocephalic artery, left common carotid artery, left subclavian artery and aorta as aortic arch' (3 merges and a rename), rules pass, published version 1, schema 3: 11 touchable parts, septum a suggestion, 4 lines, subject heart, no proposal left. Commons brain (fixtures/recorded/replays.json now indexes it; grade band 6_8 as recorded): no rule failure, published version 1, schema 3: 5 touchable, olfactory bulb in needs_teacher (no points), subject brain. Explore loads both versions (ready, intro names the one untouchable part), no page errors.
+- [x] d5-10 Job identity includes the pipeline version: a re-upload after a pipeline change is a new job from the cached stages (this phase)
+  - Note: Runner.pipeline_version(options); jobs.pipeline (db schema 3, migrated from 2 in place: tables, rows and publications kept; checked on a copy of the dev database: 2 publications kept, old jobs pipeline None). FigureService.submit and JobStore.find_live match on it; edit runs record it. Tests: an upload after a code change is a new job with S0 to S2 cached, S3 to S5 run, no Meta call, and a third upload returns that job; a version 2 database migrates and its jobs are not reused. No hand edit to the dev database.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

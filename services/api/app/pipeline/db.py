@@ -7,7 +7,7 @@ from contextlib import closing, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
-SCHEMA_VERSION = 2  # bump with any change below; an older file is refused, not migrated
+SCHEMA_VERSION = 3  # bump with any change below; older files: _MIGRATIONS, else refused
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS jobs (
@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS jobs (
   error_code TEXT,
   error_message TEXT,
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+  updated_at TEXT NOT NULL,
+  pipeline TEXT
 );
 CREATE INDEX IF NOT EXISTS jobs_by_figure ON jobs (figure_id);
 CREATE TABLE IF NOT EXISTS stage_runs (
@@ -52,6 +53,11 @@ CREATE TABLE IF NOT EXISTS publications (
 """
 
 
+# From version N to N + 1. Version 3 (Oct 30): a job records the pipeline version it ran
+# with; jobs from before have none, so a repeated upload starts a new job.
+_MIGRATIONS = {2: "ALTER TABLE jobs ADD COLUMN pipeline TEXT"}
+
+
 class DatabaseVersionError(Exception):
     """The file was made by an older schema."""
 
@@ -73,6 +79,9 @@ def init(path: Path) -> None:
     with connect(path) as db:
         version = db.execute("PRAGMA user_version").fetchone()[0]
         empty = db.execute("SELECT COUNT(*) FROM sqlite_master").fetchone()[0] == 0
+        while not empty and version in _MIGRATIONS:
+            db.execute(_MIGRATIONS[version])
+            version += 1
         if not empty and version != SCHEMA_VERSION:
             raise DatabaseVersionError(
                 f"{path} has schema {version}, this code needs {SCHEMA_VERSION}. "

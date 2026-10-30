@@ -45,6 +45,7 @@ class JobRecord(BaseModel):
     created_at: str
     updated_at: str
     stages: list[StageRun]
+    pipeline: str | None = None  # Runner.pipeline_version when it was made; None before Oct 30
 
 
 class JobStore:
@@ -52,13 +53,15 @@ class JobStore:
         self.path = path
         db.init(path)
 
-    def create(self, figure_id: str, options: JobOptions, edit_version: int = 0) -> JobRecord:
+    def create(
+        self, figure_id: str, options: JobOptions, edit_version: int = 0, pipeline: str = ""
+    ) -> JobRecord:
         job_id, now = uuid.uuid4().hex, db.now()
         with db.connect(self.path) as conn:
             conn.execute(
                 "INSERT INTO jobs (id, figure_id, status, options, edit_version, created_at, "
-                "updated_at) VALUES (?, ?, 'queued', ?, ?, ?, ?)",
-                (job_id, figure_id, options.model_dump_json(), edit_version, now, now),
+                "updated_at, pipeline) VALUES (?, ?, 'queued', ?, ?, ?, ?, ?)",
+                (job_id, figure_id, options.model_dump_json(), edit_version, now, now, pipeline),
             )
         return self.must_get(job_id)
 
@@ -123,10 +126,13 @@ class JobStore:
             "figure_id = ? AND status = 'done' AND edit_version = ?", (figure_id, edit_version)
         )
 
-    def find_live(self, figure_id: str, options: JobOptions, edit_version: int) -> JobRecord | None:
-        """The newest job for this figure, options and edits that has not failed: what a
-        repeated upload gets back instead of a new job."""
+    def find_live(
+        self, figure_id: str, options: JobOptions, edit_version: int, pipeline: str = ""
+    ) -> JobRecord | None:
+        """The newest job for this figure, options, edits and pipeline version that has not
+        failed: what a repeated upload gets back instead of a new job."""
         return self._latest(
-            "figure_id = ? AND options = ? AND edit_version = ? AND status != 'failed'",
-            (figure_id, options.model_dump_json(), edit_version),
+            "figure_id = ? AND options = ? AND edit_version = ? AND pipeline = ? "
+            "AND status != 'failed'",
+            (figure_id, options.model_dump_json(), edit_version, pipeline),
         )

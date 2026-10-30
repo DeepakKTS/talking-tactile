@@ -369,12 +369,14 @@ class FigureService(FixMixin):
         self, data: bytes, page_index: int, options: JobOptions
     ) -> tuple[JobRecord, bool]:
         """The job for this image and options, and whether it is new. The same image again
-        gets the job it already has unless that job failed."""
+        gets the job it already has, unless that job failed or ran on another pipeline
+        version (Runner.pipeline_version)."""
         ing, s0 = await asyncio.to_thread(self.runner.ingest, data, page_index)
         fid = ing.figure_id
         async with self._admit[fid]:
             edit_version = self.edits.version(fid)
-            live = self.jobs.find_live(fid, options, edit_version)
+            pipeline = self.runner.pipeline_version(options)
+            live = self.jobs.find_live(fid, options, edit_version, pipeline)
             if live is not None:
                 return live, False
             job = self.runner.create_job(fid, options, edit_version, s0)

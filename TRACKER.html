@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 176,
- "updated_at": "2026-10-30T17:25:13.407Z",
+ "rev": 179,
+ "updated_at": "2026-10-30T17:37:16.247Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1347,6 +1347,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "demo"
    ],
    "changed_at": "2026-10-30T17:25:13.407Z"
+  },
+  {
+   "id": "d5-10",
+   "day": 5,
+   "title": "Job identity includes the pipeline version: a re-upload after a pipeline change is a new job from the cached stages",
+   "detail": "",
+   "timebox": "this phase",
+   "fallback": "",
+   "status": "done",
+   "note": "Runner.pipeline_version(options); jobs.pipeline (db schema 3, migrated from 2 in place: tables, rows and publications kept; checked on a copy of the dev database: 2 publications kept, old jobs pipeline None). FigureService.submit and JobStore.find_live match on it; edit runs record it. Tests: an upload after a code change is a new job with S0 to S2 cached, S3 to S5 run, no Meta call, and a third upload returns that job; a version 2 database migrates and its jobs are not reused. No hand edit to the dev database.",
+   "done_at": "2026-10-30T17:37:16.247Z",
+   "tags": [
+    "pipeline"
+   ],
+   "changed_at": "2026-10-30T17:37:16.247Z"
   },
   {
    "id": "d6-1",
@@ -2311,6 +2326,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "S2 makes no group mask, S3 and S5 drop any a cached S2 output holds, and no member nests in a group. Each member's region carries its group's name (optional region.group, added within regions.json v3); Explore says 'anther, part of the stamen'; Author lists the group with its members under For your information.",
    "why": "A group's mask was the union of its members, so S3 nested the members in it and S4's gap enforcement left them partly outside: on the flower every remaining rule violation after the boundary change came from that (sepal in perianth). With groups not drawn the flower has 0 violations (2 before); on the S2 of the last phase it has 7 (31 before), none from a group. region.group is additive: v3 readers ignore unknown properties, so no version bump, and the heart and Commons brain can be republished on v3.",
    "changed_at": "2026-10-30T17:16:35.898Z"
+  },
+  {
+   "id": "dec-mvv98p0j2in3",
+   "date": "2026-10-30",
+   "title": "Job identity includes pipeline version",
+   "decision": "A job is figure hash, options, edit version and Runner.pipeline_version: a hash of every stage's own cache key inputs, without upstream digests or edits. A repeated upload reuses a job only on the same pipeline version; otherwise it starts a new job, whose unchanged stages come from the cache. The job database gains jobs.pipeline by a migration from version 2.",
+   "why": "A re-upload returned the figure's old finished job forever, so code changes never reached figures already run, and republishing on Oct 30 needed hand edits to the dev database. Deriving the version from the cache keys means it moves exactly when some stage's output could change; S1 and S2 keys hold no code, so a code change never pays for a Meta call again.",
+   "changed_at": "2026-10-30T17:37:16.202Z"
   }
  ],
  "risks": [
@@ -2401,6 +2424,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T17:37:16.247Z",
+   "kind": "claude",
+   "text": "Task d5-10 \"Job identity includes the pipeline version: a re-upload after a pipeline change is a new job from the cached stages\" is now done. Note: Runner.pipeline_version(options); jobs.pipeline (db schema 3, migrated from 2 in place: tables, rows and publications kept; checked on a copy of the dev database: 2 publications kept, old jobs pipeline None). FigureService.submit and JobStore.find_live match on it; edit runs record it. Tests: an upload after a code change is a new job with S0 to S2 cached, S3 to S5 run, no Meta call, and a third upload returns that job; a version 2 database migrates and its jobs are not reused. No hand edit to the dev database."
+  },
+  {
+   "ts": "2026-10-30T17:37:16.202Z",
+   "kind": "claude",
+   "text": "Decision: Job identity includes pipeline version."
+  },
+  {
+   "ts": "2026-10-30T17:37:03.789Z",
+   "kind": "claude",
+   "text": "Task d5-10 \"Job identity includes the pipeline version: a re-upload after a pipeline change is a new job from the cached stages\" added to day 5."
+  },
   {
    "ts": "2026-10-30T17:25:13.407Z",
    "kind": "claude",

@@ -231,6 +231,59 @@ def test_publish_waits_for_pending_edits(tmp_path: Path) -> None:
     run(tmp_path, body)
 
 
+def test_an_upload_after_a_pipeline_change_is_a_new_job_from_the_cached_meta_stages(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A code change moves the pipeline version: the same image again starts a new job, and
+    S1 and S2, whose keys do not hold the code, come from the cache with no Meta call."""
+
+    async def body(api: Api) -> None:
+        first = await api.upload()
+        fid = first.json()["figure_id"]
+        await api.wait(fid)
+        calls = len(api.client.calls)
+        monkeypatch.setattr("app.pipeline.runner.code_digest", lambda: "changed")
+        second = await api.upload()
+        assert second.status_code == 202 and second.json()["created"] is True
+        assert second.json()["job"]["id"] != first.json()["job"]["id"]
+        done = await api.wait(fid)
+        outcomes = {s["stage"]: s["outcome"] for s in done["job"]["stages"]}
+        assert outcomes == {"s0": "cached", "s1": "cached", "s2": "cached",
+                            "s3": "ran", "s4": "ran", "s5": "ran"}  # fmt: skip
+        assert len(api.client.calls) == calls
+        third = await api.upload()  # the same pipeline again: that job
+        assert third.json()["created"] is False
+        assert third.json()["job"]["id"] == second.json()["job"]["id"]
+
+    run(tmp_path, body)
+
+
+def test_a_version_2_job_database_is_migrated_and_its_jobs_are_not_reused(tmp_path: Path) -> None:
+    """The dev database from before Oct 30: its tables and rows stay; its jobs have no
+    pipeline version, so an upload of the same figure starts a new one."""
+    import sqlite3  # noqa: PLC0415
+
+    from app.pipeline.jobs import JobOptions, JobStore  # noqa: PLC0415
+
+    path = tmp_path / "jobs.sqlite"
+    with sqlite3.connect(path) as db:
+        db.executescript(
+            "CREATE TABLE jobs (id TEXT PRIMARY KEY, figure_id TEXT NOT NULL, status TEXT NOT "
+            "NULL, stage TEXT, options TEXT NOT NULL, edit_version INTEGER NOT NULL, result_key "
+            "TEXT, error_code TEXT, error_message TEXT, created_at TEXT NOT NULL, updated_at "
+            "TEXT NOT NULL);"
+            "INSERT INTO jobs VALUES ('old', '" + "f" * 64 + "', 'done', NULL, "
+            "'{\"page\":\"letter\",\"grade_band\":null}', 0, 'k', NULL, NULL, 't', 't');"
+            "PRAGMA user_version = 2;"
+        )
+    store = JobStore(path)
+    old = store.get("old")
+    assert old is not None and old.status == "done" and old.pipeline is None
+    assert store.find_live("f" * 64, JobOptions(), 0, "now") is None
+    new = store.create("f" * 64, JobOptions(), 0, "now")
+    assert store.find_live("f" * 64, JobOptions(), 0, "now") == new
+
+
 def test_a_duplicate_upload_returns_the_existing_job(tmp_path: Path) -> None:
     async def body(api: Api) -> None:
         first = await api.upload()

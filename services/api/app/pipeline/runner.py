@@ -197,6 +197,15 @@ class Runner:
             return {**free, "edits": edits}
         return free
 
+    def pipeline_version(self, options: JobOptions) -> str:
+        """The pipeline a job with these options runs: a hash of every stage's own cache key
+        inputs (prompts, schemas, settings, the client's cache tag, rules, and for the stages
+        that cost nothing the code), without what flows between stages or the teacher's
+        edits. A change to any of them makes a repeated upload a new job; the stages whose
+        keys did not change come from the cache."""
+        inputs = {stage: self._inputs(stage, options, "", "") for stage in STAGES[1:]}
+        return stage_key("pipeline", "", **inputs)
+
     def _key(self, walk: _Walk, stage: str, options: JobOptions, edits: str, outlined: str) -> str:
         previous = walk.keys[STAGES[STAGES.index(stage) - 1]]
         upstream = {m: walk.digests[m] for m in _CONSUMES[stage]}
@@ -235,7 +244,7 @@ class Runner:
     def create_job(
         self, figure_id: str, options: JobOptions, edit_version: int, s0: StageRun | None = None
     ) -> JobRecord:
-        job = self.jobs.create(figure_id, options, edit_version)
+        job = self.jobs.create(figure_id, options, edit_version, self.pipeline_version(options))
         if s0 is not None:
             self.jobs.record_stage(job.id, s0)
             _log_stage(job.id, s0)

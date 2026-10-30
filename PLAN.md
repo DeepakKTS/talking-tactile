@@ -184,6 +184,7 @@ Backend
 - Async throughout. SAM calls run four at a time.
 - Images capped at 2048 px. Masks stored as 1-bit PNG. Polygons capped at 200 points.
 - Content hash cache for every stage. Prompt prefix for answers kept identical so it can be cached.
+- Job identity (Oct 30, d5-10): figure hash, options, edit version and the pipeline version, a hash of every stage's own cache key inputs (prompts, schemas, settings, client cache tag, rules, and the code for the stages that cost nothing). A re-upload after any of those changes starts a new job; the stages whose keys did not move come from the cache, so S1 and S2 are not paid for again. The job database migrates itself from version 2 (adds `jobs.pipeline`); never edit it by hand.
 
 Cost estimate per figure, to confirm on Day 1: about 10 to 25 SAM calls, so roughly $0.03 to $0.06, plus two Spark calls with an image. Each question is a short text call. Thirty figures and several hundred questions should stay well under a quarter of the credits.
 
