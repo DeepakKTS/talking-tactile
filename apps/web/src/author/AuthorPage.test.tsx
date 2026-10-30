@@ -200,9 +200,12 @@ describe("author page", () => {
       ["r9", { op: "merge", into: "r10" }],
       ["r10", { op: "label", label: "aortic arch" }],
     ]);
-    const publish = screen.getByRole("button", { name: "Publish for students" });
-    await waitFor(() => { expect(publish.hasAttribute("disabled")).toBe(false); });
-    fireEvent.click(publish);
+    // The review reloads after the rename; publish from the reloaded page, once enabled.
+    await screen.findByRole("button", { name: "Edit aortic arch" });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Publish for students" }).hasAttribute("disabled")).toBe(false);
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
   });
 
