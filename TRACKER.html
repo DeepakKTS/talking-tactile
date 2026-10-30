@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 204,
- "updated_at": "2026-10-30T19:32:43.285Z",
+ "rev": 207,
+ "updated_at": "2026-10-30T19:42:50.601Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1463,15 +1463,15 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "",
    "timebox": "phase B",
    "fallback": "",
-   "status": "doing",
-   "note": "Route, prompt, transcribe and answer calls, code's last word and session cap in place with unit and route tests (fake client); live eval and replay tests to come (d5 B4, B5).",
-   "done_at": null,
+   "status": "done",
+   "note": "Route, prompt ask_answer.v1, transcribe and answer calls, code's last word, session cap of 50; live eval and replay tests in d5-20 and d5-21.",
+   "done_at": "2026-10-30T19:42:50.601Z",
    "tags": [
     "explore",
     "voice",
     "spark"
    ],
-   "changed_at": "2026-10-30T19:00:00.773Z"
+   "changed_at": "2026-10-30T19:42:50.601Z"
   },
   {
    "id": "d5-18",
@@ -1522,6 +1522,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "voice"
    ],
    "changed_at": "2026-10-30T19:32:43.285Z"
+  },
+  {
+   "id": "d5-21",
+   "day": 5,
+   "title": "Tests: /api/ask replays, WAV encoder, hold-to-talk, offline and denied, questions e2e",
+   "detail": "",
+   "timebox": "phase B",
+   "fallback": "",
+   "status": "done",
+   "note": "services/api/tests/test_ask_replay.py: all 58 eval questions get their live answer, source and cites back from the recordings on fixtures/qa/*_v3_regions.json with the image S0 makes (byte-identical to the live run's); the transcribe clips with and without keywords; the route on replay (a typed teacher-description answer, an off-figure deflection, an unrecorded question 502 with the spoken failure sentence). Web: voice.test.ts (WAV header and samples, clipping, resampling 48 to 16 kHz and 8 to 16 kHz, HoldToTalk tap, hold, too short, max, busy; VoiceAsk earcons, thinking tone, 16 kHz WAV, mic denied said once and not asked again, offline said with no recording), session tests for the spoken path and its timing. apps/web/e2e/ask_e2e.py: Author publishes the heart as version 3 had it (equal file), Explore answers 'What does the left ventricle do?' from the teacher's description and deflects 'What does the right ventricle do?'; PASS. make check: 686 API, 309 web.",
+   "done_at": "2026-10-30T19:42:50.557Z",
+   "tags": [
+    "tests",
+    "voice"
+   ],
+   "changed_at": "2026-10-30T19:42:50.557Z"
   },
   {
    "id": "d6-1",
@@ -2608,6 +2624,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T19:42:50.601Z",
+   "kind": "claude",
+   "text": "Task d5-17 \"POST /api/ask: spoken or typed questions answered by Spark from the published figure alone\" is now done. Note: Route, prompt ask_answer.v1, transcribe and answer calls, code's last word, session cap of 50; live eval and replay tests in d5-20 and d5-21."
+  },
+  {
+   "ts": "2026-10-30T19:42:50.557Z",
+   "kind": "claude",
+   "text": "Task d5-21 \"Tests: /api/ask replays, WAV encoder, hold-to-talk, offline and denied, questions e2e\" is now done. Note: services/api/tests/test_ask_replay.py: all 58 eval questions get their live answer, source and cites back from the recordings on fixtures/qa/*_v3_regions.json with the image S0 makes (byte-identical to the live run's); the transcribe clips with and without keywords; the route on replay (a typed teacher-description answer, an off-figure deflection, an unrecorded question 502 with the spoken failure sentence). Web: voice.test.ts (WAV header and samples, clipping, resampling 48 to 16 kHz and 8 to 16 kHz, HoldToTalk tap, hold, too short, max, busy; VoiceAsk earcons, thinking tone, 16 kHz WAV, mic denied said once and not asked again, offline said with no recording), session tests for the spoken path and its timing. apps/web/e2e/ask_e2e.py: Author publishes the heart as version 3 had it (equal file), Explore answers 'What does the left ventricle do?' from the teacher's description and deflects 'What does the right ventricle do?'; PASS. make check: 686 API, 309 web."
+  },
+  {
+   "ts": "2026-10-30T19:42:50.512Z",
+   "kind": "claude",
+   "text": "Task d5-21 \"Tests: /api/ask replays, WAV encoder, hold-to-talk, offline and denied, questions e2e\" added to day 5."
+  },
   {
    "ts": "2026-10-30T19:32:43.285Z",
    "kind": "claude",
