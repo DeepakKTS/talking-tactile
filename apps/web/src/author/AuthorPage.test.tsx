@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import heart from "../../../../fixtures/pipeline/heart_regions.json";
 import synthetic from "../../../../fixtures/synthetic/regions.json";
 import type { RegionsFile } from "../shared/regions";
-import { FigureApi, type Violation, describeViolation } from "./api";
+import { FigureApi, type OverlapWarning, type Violation, describeViolation } from "./api";
 import { AuthorPage } from "./AuthorPage";
 
 const ID = "b".repeat(64);
@@ -20,6 +20,7 @@ class FakeServer {
   calls: Call[] = [];
   regions: RegionsFile = draft(synthetic as unknown as RegionsFile);
   report: Violation[] = [];
+  warnings: OverlapWarning[] | null = null; // null: a draft from before warnings, 404
   refuse: Violation[] | null = null;
   editVersion = 0;
   jobVersion = 0;
@@ -47,6 +48,9 @@ class FakeServer {
     }
     if (path === `/api/figures/${ID}/regions.json`) return json(this.regions);
     if (path === `/api/figures/${ID}/report.json`) return json(this.report);
+    if (path === `/api/figures/${ID}/warnings.json`) {
+      return this.warnings ? json(this.warnings) : json({ error: { code: "not_found", message: "x", retryable: false } }, 404);
+    }
     const fix = new RegExp(`^/api/figures/${ID}/regions/(\\w+)/fix$`).exec(path);
     if (method === "POST" && fix) {
       const { positive, negative } = body as { positive: number[][]; negative: number[][] };
@@ -231,6 +235,20 @@ describe("author page", () => {
     const texts = info.map((li) => li.textContent);
     expect(texts).toContain(`${b.label} Inside ${a.label}, raised within its outline.`);
     expect(texts).toContain(`${b.label} Smaller than a point symbol, so the sheet shows it as one.`);
+  });
+
+  it("warns on an outline that covers another part's area, and shows that area on the sheet", async () => {
+    const [a, b] = server.regions.regions;
+    if (!a || !b) throw new Error("the fixture has regions");
+    server.warnings = [{ region_id: a.id, part: a.label, other: b.label, text: `This outline also covers the area where ${b.label} is`,
+      area_mm: [[[10, 10], [20, 10], [20, 20]]] }];
+    await upload();
+    const row = within(screen.getByRole("list", { name: "Parts" })).getAllByRole("listitem")[0];
+    if (!row) throw new Error("no row");
+    expect(row.textContent).toContain(`This outline also covers the area where ${b.label} is.`);
+    fireEvent.click(within(row).getByRole("button", { name: `Show where ${b.label} is on the sheet` }));
+    expect(document.querySelectorAll("figure svg polygon[data-kind='overlap']")).toHaveLength(1);
+    expect(document.querySelectorAll("figure svg polygon")).toHaveLength(2); // and the part's outline
   });
 
   it("lists each group with its members for the teacher's information, never as a part", async () => {

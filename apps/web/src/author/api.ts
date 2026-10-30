@@ -44,6 +44,16 @@ export interface Publication {
 
 export type Point = [number, number]; // pixels of the normalized figure
 
+/** An outline that also covers the drawn region where another part's point is: a
+ * warning, never a gate (services/api/app/geometry/overlap.py). */
+export interface OverlapWarning {
+  region_id: string;
+  part: string;
+  other: string;
+  area_mm: [number, number][][];
+  text: string;
+}
+
 export type Edit =
   | { op: "label"; label: string }
   | { op: "check"; also?: string[] }
@@ -128,6 +138,16 @@ export class FigureApi {
 
   report(id: string) {
     return this.json<Violation[]>(`/api/figures/${id}/report.json`);
+  }
+
+  /** Overlap warnings for the teacher; a draft made before Oct 30 has none. */
+  async warnings(id: string): Promise<OverlapWarning[]> {
+    try {
+      return await this.json<OverlapWarning[]>(`/api/figures/${id}/warnings.json`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) return [];
+      throw err;
+    }
   }
 
   edit(id: string, region: string, edit: Edit) {

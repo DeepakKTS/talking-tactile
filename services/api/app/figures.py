@@ -38,7 +38,7 @@ from app.pipeline.edits import MAX_POINTS, Edit, EditError, EditStore, OutlineEd
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore
 from app.pipeline.outlines import OutlineError, check_points, old_outline, spill_of
 from app.pipeline.runner import NotReadyError, Runner
-from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, REPORT_FILE, SVG_FILE
+from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, REPORT_FILE, SVG_FILE, WARNINGS_FILE
 from app.render.preview import preview
 
 MEDIA_TYPES = {
@@ -48,7 +48,11 @@ MEDIA_TYPES = {
 }
 SOURCE_FILE = "source.png"
 # For the teacher's review only: never copied into a published version.
-DRAFT_ONLY_TYPES = {REPORT_FILE: "application/json", SOURCE_FILE: "image/png"}
+DRAFT_ONLY_TYPES = {
+    REPORT_FILE: "application/json",
+    WARNINGS_FILE: "application/json",
+    SOURCE_FILE: "image/png",
+}
 _RETRYABLE_JOB_ERRORS = {"stage_failed"}
 _READ_ONLY = stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
 

@@ -9,7 +9,7 @@
 // violation in words. After publishing: print and explore.
 import { useEffect, useState } from "react";
 import { type MergeProposal, partId, type Region, type RegionsFile } from "../shared/regions";
-import { ApiError, type Edit, type FigureApi, type FixPreview, type Point, type Publication, type Status, type Violation, describeViolation } from "./api";
+import { ApiError, type Edit, type FigureApi, type FixPreview, type OverlapWarning, type Point, type Publication, type Status, type Violation, describeViolation } from "./api";
 
 interface Props {
   api: FigureApi;
@@ -21,6 +21,8 @@ interface Props {
 export function Review({ api, id, status, onEdited }: Props) {
   const [file, setFile] = useState<RegionsFile | null>(null);
   const [report, setReport] = useState<Violation[]>([]);
+  const [warnings, setWarnings] = useState<OverlapWarning[]>([]);
+  const [area, setArea] = useState<OverlapWarning | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [refused, setRefused] = useState<Violation[] | null>(null);
@@ -34,11 +36,13 @@ export function Review({ api, id, status, onEdited }: Props) {
   useEffect(() => {
     if (!settled) return;
     let live = true;
-    Promise.all([api.regions(id), api.report(id)])
-      .then(([f, r]) => {
+    Promise.all([api.regions(id), api.report(id), api.warnings(id)])
+      .then(([f, r, w]) => {
         if (!live) return;
         setFile(f);
         setReport(r);
+        setWarnings(w);
+        setArea(null);
       })
       .catch((err: unknown) => {
         if (live) setMessage(err instanceof Error ? err.message : "The sheet could not be loaded.");
@@ -135,6 +139,8 @@ export function Review({ api, id, status, onEdited }: Props) {
               // Keyed on the saved text too, so the fields start over after an edit lands.
               <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={parts} busy={busy || !settled} selected={selected === r.id}
                 onSelect={() => { setSelected(selected === r.id ? null : r.id); }} onEdit={edit}
+                warnings={warnings.filter((w) => w.region_id === r.id)} shown={area}
+                onShowArea={(w) => { setArea(area === w ? null : w); setSelected(area === w ? null : r.id); }}
                 onFix={() => { setFixing({ region: r.id, label: r.label }); }} />
             ))}
           </ul>
@@ -192,7 +198,7 @@ export function Review({ api, id, status, onEdited }: Props) {
         </div>
         <figure style={{ position: "relative", margin: 0 }}>
           <img src={api.draftUrl(id, "tactile.svg", version)} alt="Preview of the tactile sheet" style={{ width: "100%", display: "block" }} />
-          {selected && <Highlight file={file} ids={flagged.find((f) => f.id === selected)?.outlines ?? [selected]} />}
+          {selected && <Highlight file={file} ids={flagged.find((f) => f.id === selected)?.outlines ?? [selected]} areas={area?.area_mm ?? []} />}
           <figcaption>Tactile sheet{selected ? `, ${labelOf(selected)} outlined` : ""}</figcaption>
         </figure>
       </div>
@@ -370,8 +376,11 @@ function PartRow(props: {
   onSelect: () => void;
   onEdit: (r: Region, e: Edit, what: string) => Promise<void>;
   onFix: () => void;
+  warnings: readonly OverlapWarning[];
+  shown: OverlapWarning | null;
+  onShowArea: (w: OverlapWarning) => void;
 }) {
-  const { region: r, all, busy, selected, onSelect, onEdit, onFix } = props;
+  const { region: r, all, busy, selected, onSelect, onEdit, onFix, warnings, shown, onShowArea } = props;
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState(r.label);
   const [description, setDescription] = useState(r.description ?? "");
@@ -392,6 +401,14 @@ function PartRow(props: {
         </button>
       )}{" "}
       {r.source === "teacher" && <span>Outline set by teacher. </span>}
+      {warnings.map((w) => (
+        <span key={w.other} style={{ display: "block", color: "#8a4b00" }}>
+          {w.text}.{" "}
+          <button type="button" aria-label={`Show where ${w.other} is on the sheet`} aria-pressed={shown === w} onClick={() => { onShowArea(w); }}>
+            Show on sheet
+          </button>
+        </span>
+      ))}
       <button type="button" onClick={() => { setOpen(!open); }} aria-expanded={open}>Edit {r.label}</button>{" "}
       <button type="button" disabled={busy} onClick={onFix}>Fix outline of {r.label}</button>
       {open && (
@@ -564,15 +581,20 @@ function AddPart({ busy, onAdd }: { busy: boolean; onAdd: (name: string) => Prom
 
 // The selected part's outline drawn over the preview, from regions.json polygons in page mm.
 // A suggestion may have several pieces; each is drawn.
-function Highlight({ file, ids }: { file: RegionsFile; ids: string[] }) {
+// With an overlap warning shown, the area it names is filled in orange too.
+function Highlight({ file, ids, areas = [] }: { file: RegionsFile; ids: string[]; areas?: readonly [number, number][][] }) {
   const shown = file.regions.filter((x) => ids.includes(x.id));
-  if (shown.length === 0) return null;
+  if (shown.length === 0 && areas.length === 0) return null;
   return (
     <svg viewBox={`0 0 ${file.page.width_mm} ${file.page.height_mm}`} aria-hidden="true"
       style={{ position: "absolute", left: 0, top: 0, width: "100%", pointerEvents: "none" }}>
       {shown.map((r) => (
         <polygon key={r.id} points={r.polygon_mm.map(([x, y]) => `${x},${y}`).join(" ")}
           fill="none" stroke="#d500f9" strokeWidth={1.5} strokeDasharray="3 1.5" />
+      ))}
+      {areas.map((ring, i) => (
+        <polygon key={`area ${String(i)}`} data-kind="overlap" points={ring.map(([x, y]) => `${x},${y}`).join(" ")}
+          fill="#ff9800" fillOpacity={0.45} stroke="#e65100" strokeWidth={0.8} />
       ))}
     </svg>
   );

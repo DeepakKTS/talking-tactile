@@ -310,6 +310,11 @@ def test_a_part_is_touchable_only_once_the_teacher_checks_it(tmp_path: Path) -> 
                                    json={"op": "check", "also": ["r99"]})  # fmt: skip
         assert_envelope(bad, 422, "edit_invalid")
         assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
+        # Author's overlap warnings are a draft file for the teacher, never published.
+        warned = await api.http.get(f"/api/figures/{fid}/warnings.json")
+        assert warned.status_code == 200 and isinstance(warned.json(), list)
+        pub = (await api.http.get(f"/api/figures/{fid}/published")).json()
+        assert "warnings.json" not in json.dumps(pub)
 
     run(tmp_path, body)
 

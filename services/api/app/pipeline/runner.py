@@ -25,6 +25,9 @@ import numpy as np
 
 from app.braille.louis import BrailleUnavailableError, Translator
 from app.config import ExploreConfig, TactileRules, load_explore, load_tactile_rules
+from app.geometry import points as gp
+from app.geometry.boundaries import Drawn
+from app.geometry.overlap import OverlapWarning, overlaps
 from app.geometry.reconcile import Reconciled, ReconciledPart
 from app.geometry.scale import PageFit, fit_to_page
 from app.meta.client import MetaClient, make_client
@@ -59,7 +62,7 @@ from app.pipeline.edits import (
 )
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore, StageOutcome, StageRun
 from app.pipeline.outlines import keep as keep_outline
-from app.pipeline.outlines import with_outlines
+from app.pipeline.outlines import prompt_points, with_outlines
 from app.pipeline.s2_types import Grounded
 from app.prompts import PROMPTS_DIR, load_prompt
 
@@ -145,6 +148,7 @@ class Runner:
         self.jobs = jobs
         self.edits = edits
         self.figures_dir = figures_dir
+        self._drawn: dict[str, Drawn] = {}  # drawn regions of the last figure, for S5
         self.s1_prompt = load_prompt(s1_understand.PROMPT, prompts_dir)
         self.s1_locate = load_prompt(s1_understand.LOCATE_PROMPT, prompts_dir)
         self.s2_prompt = load_prompt(s2_ground.PROMPT, prompts_dir)
@@ -374,7 +378,8 @@ class Runner:
         teacher = await asyncio.to_thread(
             s5_render.teacher_info, grounded, await v("s3"), fit, self.rules
         )
-        return await asyncio.to_thread(
+        warnings = await self._overlaps(walk, edits, client, grounded, fit)
+        rendered: s5_render.Rendered = await asyncio.to_thread(
             s5_render.render,
             await v("s4"),
             await v("s1"),
@@ -383,6 +388,24 @@ class Runner:
             self.rules,
             self.explore,
             teacher,
+        )
+        return rendered.model_copy(update={"warnings": warnings})
+
+    async def _overlaps(
+        self, walk: _Walk, edits: Sequence[Edit], client: MetaClient, g: Grounded, fit: PageFit
+    ) -> list[OverlapWarning]:
+        """Author's overlap warnings on the parts as edited (app/geometry/overlap.py)."""
+        parts = await self._edited_parts(walk, edits, client)
+        rec: Reconciled = await walk.value("s3")
+        u: Understanding = await walk.value("s1")
+        ing: s0_ingest.Ingested = await walk.value("s0")
+        drawn = self._drawn.get(ing.figure_id)
+        if drawn is None:
+            scene = await asyncio.to_thread(gp.scene_of, ing.image, 0.0)
+            drawn = await asyncio.to_thread(Drawn, ing.image, scene.marks, scene.obj)
+            self._drawn = {ing.figure_id: drawn}  # one figure at a time is plenty
+        return await asyncio.to_thread(
+            overlaps, parts, rec.parts, u, prompt_points(g), g.nested, drawn, fit, self.rules
         )
 
     # Teacher edits

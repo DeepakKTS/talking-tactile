@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 189,
- "updated_at": "2026-10-30T18:23:29.009Z",
+ "rev": 190,
+ "updated_at": "2026-10-30T18:36:06.978Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1402,13 +1402,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "",
    "timebox": "phase A",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "app/geometry/overlap.py: the minimal-clip region logic as a detector only. On the parts as edited, each listed phrase maps to its sheet part (renames and merges kept); a part owns the drawn regions of its own and its nested children's points; covering a region that holds another part's point is a warning. Inside a region the part also owns, only when the fills are within FILL_DELTA (shaded lobes are one drawn region). S5 writes warnings.json (draft only, never published); Author shows 'This outline also covers the area where X is' on the part with Show on sheet (the covered area in orange). Replay counts: heart 14 (the 4 aortic arch members pairwise, right and left ventricle over the septum), flower 2, Japan 1, uploaded brain 7 (postcentral gyrus over parietal lobe, cerebellum over pons, spinal cord over pons and medulla, ...), Commons brain 4 (cerebellum and brainstem into the lobes; 16 before the fill rule). Tests: test_overlap.py, Author warning, API draft-only.",
+   "done_at": "2026-10-30T18:36:06.978Z",
    "tags": [
     "author"
    ],
-   "changed_at": "2026-10-30T18:20:53.735Z"
+   "changed_at": "2026-10-30T18:36:06.978Z"
   },
   {
    "id": "d5-14",
@@ -2495,6 +2495,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T18:36:06.978Z",
+   "kind": "claude",
+   "text": "Task d5-13 \"Author warning: an outline that covers the drawn region of another part's point, with Show on sheet\" is now done. Note: app/geometry/overlap.py: the minimal-clip region logic as a detector only. On the parts as edited, each listed phrase maps to its sheet part (renames and merges kept); a part owns the drawn regions of its own and its nested children's points; covering a region that holds another part's point is a warning. Inside a region the part also owns, only when the fills are within FILL_DELTA (shaded lobes are one drawn region). S5 writes warnings.json (draft only, never published); Author shows 'This outline also covers the area where X is' on the part with Show on sheet (the covered area in orange). Replay counts: heart 14 (the 4 aortic arch members pairwise, right and left ventricle over the septum), flower 2, Japan 1, uploaded brain 7 (postcentral gyrus over parietal lobe, cerebellum over pons, spinal cord over pons and medulla, ...), Commons brain 4 (cerebellum and brainstem into the lobes; 16 before the fill rule). Tests: test_overlap.py, Author warning, API draft-only."
+  },
   {
    "ts": "2026-10-30T18:23:29.009Z",
    "kind": "claude",
