@@ -41,6 +41,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area"
      ]
@@ -71,6 +72,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "100% on text",
@@ -103,6 +105,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "speck"
      ]
@@ -137,6 +140,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "13% on leader lines",
@@ -177,6 +181,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "regression: IoU 0.594 with the passing Arm B mask",
       "3 fragments",
@@ -209,6 +214,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "82% on leader lines",
@@ -245,6 +251,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "2 fragments",
@@ -277,6 +284,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "34% on text",
       "3 fragments",
@@ -313,6 +321,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "43% on leader lines",
@@ -349,6 +358,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "speck",
       "overlaps pedicel"
@@ -384,6 +394,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "2 fragments",
       "overlaps floral axis"
@@ -423,6 +434,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "regression: IoU 0.154 with the passing Arm B mask",
       "speck",
@@ -467,6 +479,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "regression: IoU 0.223 with the passing Arm B mask",
       "2 fragments",
@@ -507,6 +520,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "regression: IoU 0.009 with the passing Arm B mask",
       "speck",
@@ -547,6 +561,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps pollen sac"
      ]
@@ -577,6 +592,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "100% on text",
       "point [1638, 1057] on text"
@@ -686,6 +702,7 @@
    "counts": {
     "parts": 16,
     "no_mask": 0,
+    "needs_teacher": 0,
     "regression": 4,
     "references": 5,
     "speck": 4,
@@ -749,6 +766,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "overlaps aorta"
@@ -784,6 +802,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps right pulmonary arteries"
      ]
@@ -822,6 +841,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps superior vena cava"
      ]
@@ -852,6 +872,7 @@
        "on_ink": true
       }
      ],
+     "teacher": null,
      "flags": [
       "point [681, 723] on ink"
      ]
@@ -890,6 +911,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps chordae tendineae"
      ]
@@ -926,6 +948,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "8 fragments",
       "overlaps chordae tendineae, right ventricle"
@@ -965,6 +988,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "3 fragments",
       "overlaps right atrium, tricuspid valve, right ventricle"
@@ -1002,6 +1026,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "4 fragments",
       "overlaps tricuspid valve, chordae tendineae"
@@ -1033,6 +1058,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "59% on leader lines"
@@ -1074,6 +1100,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps left subclavian artery, aorta"
      ]
@@ -1110,6 +1137,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "3 fragments",
       "overlaps left common carotid artery, aorta"
@@ -1149,6 +1177,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps brachiocephalic artery, left common carotid artery, left subclavian artery"
      ]
@@ -1183,6 +1212,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1215,6 +1245,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "overlaps mitral valve"
@@ -1252,6 +1283,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "overlaps mitral valve, left ventricle"
      ]
@@ -1286,6 +1318,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area",
       "21% on leader lines",
@@ -1326,6 +1359,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "5 fragments",
       "overlaps left pulmonary veins, left atrium, left ventricle"
@@ -1363,6 +1397,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "5 fragments",
       "overlaps left atrium, mitral valve"
@@ -1398,6 +1433,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "27 fragments",
       "overlaps semilunar valves"
@@ -1635,6 +1671,7 @@
    "counts": {
     "parts": 19,
     "no_mask": 0,
+    "needs_teacher": 0,
     "regression": 0,
     "references": 4,
     "speck": 0,
@@ -1693,6 +1730,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1721,6 +1759,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "2 fragments"
      ]
@@ -1755,6 +1794,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1787,6 +1827,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1819,6 +1860,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "2 fragments"
      ]
@@ -1853,6 +1895,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1885,6 +1928,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1917,6 +1961,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": []
     },
     {
@@ -1945,6 +1990,7 @@
        "on_ink": false
       }
      ],
+     "teacher": null,
      "flags": [
       "under a point symbol's area"
      ]
@@ -1955,6 +2001,7 @@
    "counts": {
     "parts": 9,
     "no_mask": 0,
+    "needs_teacher": 0,
     "regression": 0,
     "references": 7,
     "speck": 0,

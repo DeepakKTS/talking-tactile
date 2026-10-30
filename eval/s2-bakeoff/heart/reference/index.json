@@ -1,0 +1,18 @@
+{
+ "right pulmonary arteries": {
+  "arm": "A",
+  "file": "right_pulmonary_arteries.png"
+ },
+ "right atrium": {
+  "arm": "A",
+  "file": "right_atrium.png"
+ },
+ "left common carotid artery": {
+  "arm": "A",
+  "file": "left_common_carotid_artery.png"
+ },
+ "left pulmonary arteries": {
+  "arm": "A",
+  "file": "left_pulmonary_arteries.png"
+ }
+}

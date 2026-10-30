@@ -45,6 +45,7 @@ from app.meta import s2_armav2
 from app.meta import s2_bakeoff as bake
 from app.meta import s2_grades as grades
 from app.meta import s2_grading as grading
+from app.pipeline.cache import load_mask
 
 Mask = npt.NDArray[np.bool_]
 
@@ -83,6 +84,14 @@ def references(g: dict[str, Any], v1: dict[str, dict[str, Mask]]) -> dict[str, d
                 out[part] = {"arm": arm, "mask": m}
                 break
     return out
+
+
+def load_references(name: str) -> dict[str, dict[str, Any]]:
+    """The passing masks saved as eval data, eval/s2-bakeoff/FIGURE/reference/: written once
+    from the v1 replays while Arm B's code still existed, so Arm B's passes stay usable."""
+    d = bake.OUT_ROOT / name / "reference"
+    index = json.loads((d / "index.json").read_text(encoding="utf-8"))
+    return {p: {"arm": i["arm"], "mask": load_mask(d / i["file"])} for p, i in index.items()}
 
 
 def page_scale(image: npt.NDArray[np.uint8]) -> float:
@@ -371,9 +380,9 @@ def main() -> None:
     if args.run != "v1":
         runs = asyncio.run(v2_runs(runs, fixes=args.run == "v2f"))
     scored, tables = {}, [f"# S2 scores, {args.run}\n"]
-    for name, (image, run, v1) in runs.items():
+    for name, (image, run, _) in runs.items():
         g = grades.load(bake.OUT_ROOT / name)
-        s = score(run, image, print_marks.find(image), references(g, v1))
+        s = score(run, image, print_marks.find(image), load_references(name))
         if args.run == "v1":  # the grades are of the v1 masks
             s["confident_fails"] = confident_fails(s, g)
         scored[name] = s

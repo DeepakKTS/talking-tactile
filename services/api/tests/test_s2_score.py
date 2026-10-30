@@ -187,3 +187,16 @@ def test_a_part_left_for_the_teacher_says_why() -> None:
     by = {x["part"]: x for x in s["parts"]}
     assert by["missing"]["flags"] == ["needs teacher: spill, holds points of a, b"]
     assert s["counts"]["needs_teacher"] == 1
+
+
+@pytest.mark.parametrize("name", sorted(bake.FIGURES))
+def test_each_passing_grade_has_its_saved_reference(name: str) -> None:
+    refs = score.load_references(name)
+    per = grades.by_part(grades.load(bake.OUT_ROOT / name))
+    passed = {
+        p: next(a for a in grades.ARMS if e.get(a, {}).get("grade") == "pass")
+        for p, e in per.items()
+        if any(x.get("grade") == "pass" for x in e.values())
+    }
+    assert {p: r["arm"] for p, r in refs.items()} == passed
+    assert all(r["mask"].any() for r in refs.values())

@@ -1,0 +1,30 @@
+{
+ "Hokkaido region": {
+  "arm": "A",
+  "file": "hokkaido_region.png"
+ },
+ "Kanto region": {
+  "arm": "A",
+  "file": "kanto_region.png"
+ },
+ "Chubu region": {
+  "arm": "A",
+  "file": "chubu_region.png"
+ },
+ "Kansai region": {
+  "arm": "B",
+  "file": "kansai_region.png"
+ },
+ "Chugoku region": {
+  "arm": "A",
+  "file": "chugoku_region.png"
+ },
+ "Shikoku region": {
+  "arm": "A",
+  "file": "shikoku_region.png"
+ },
+ "Kyushu region": {
+  "arm": "A",
+  "file": "kyushu_region.png"
+ }
+}

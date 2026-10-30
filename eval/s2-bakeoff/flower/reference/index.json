@@ -1,0 +1,22 @@
+{
+ "ovary": {
+  "arm": "B",
+  "file": "ovary.png"
+ },
+ "connective": {
+  "arm": "B",
+  "file": "connective.png"
+ },
+ "pollen sac": {
+  "arm": "B",
+  "file": "pollen_sac.png"
+ },
+ "anther": {
+  "arm": "B",
+  "file": "anther.png"
+ },
+ "filament stalk": {
+  "arm": "A",
+  "file": "filament_stalk.png"
+ }
+}
