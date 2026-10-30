@@ -10,6 +10,7 @@ from app.config import load_explore, load_tactile_rules
 from app.geometry.compose import ComposedSheet, build_sheet
 from app.geometry.reconcile import reconcile
 from app.geometry.scale import fit_to_page
+from app.meta import sam_adapter
 from app.meta.live import live_enabled
 from app.synthetic.load import SyntheticFigure, load_synthetic
 from tests import network_guard
@@ -18,10 +19,12 @@ from tests import network_guard
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "live: makes real Meta calls; runs only with LIVE=1")
     network_guard.install()
+    sam_adapter.cache_decodes(True)  # a recorded mask is decoded once per test session
 
 
 def pytest_unconfigure(config: pytest.Config) -> None:
     network_guard.uninstall()
+    sam_adapter.cache_decodes(False)
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

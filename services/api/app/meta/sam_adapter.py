@@ -163,7 +163,7 @@ class Decoded:
 # Decoding is pure Python and re-encodes each mask to check it, about 0.3 to 0.9 s for a
 # mask a few hundred px a side. The test session turns this cache on (tests/conftest.py), so a
 # recorded mask replayed by several tests is decoded once. Off in the app.
-_decode_cache: dict[tuple[int, int, str], npt.NDArray[np.bool_]] | None = None
+_decode_cache: dict[tuple[int, int, str], npt.NDArray[np.bool_]] | None = None  # by payload
 
 
 def cache_decodes(on: bool) -> None:
@@ -172,7 +172,11 @@ def cache_decodes(on: bool) -> None:
 
 
 def _raster(mask: Any) -> npt.NDArray[np.bool_]:
-    key = (mask.height, mask.width, str(mask.data)) if _decode_cache is not None else None
+    key = (
+        (mask.height, mask.width, f"{mask.encoding}:{mask.payload}")
+        if _decode_cache is not None
+        else None
+    )
     if key is not None and key in _decode_cache:  # type: ignore[operator]
         return _decode_cache[key]  # type: ignore[index]
     flat = sam.decode_mask_to_raster(mask)
