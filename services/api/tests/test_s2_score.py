@@ -1,0 +1,138 @@
+"""The S2 mask scorer with no network: IoU against a passing mask, the size floors, text and
+line shares, fragments, sibling overlap, the prompt points, confident fails, and the
+committed v1 scores."""
+
+import json
+from typing import Any
+
+import numpy as np
+import numpy.typing as npt
+import pytest
+
+from app.geometry.print_marks import PrintMarks
+from app.meta import s2_bakeoff as bake
+from app.meta import s2_grades as grades
+from app.meta import s2_score as score
+
+H = W = 200  # on a letter page, 0.8255 mm per px: a speck is under 2.9 px, a symbol 47.2 px
+
+
+def box(y0: int, y1: int, x0: int, x1: int) -> npt.NDArray[np.bool_]:
+    m = np.zeros((H, W), bool)
+    m[y0:y1, x0:x1] = True
+    return m
+
+
+def marks() -> PrintMarks:
+    return PrintMarks(
+        text=box(0, 10, 0, 50),
+        line=box(100, 102, 0, 200),
+        ink=box(150, 151, 0, 200),
+        words=[(0, 0, 50, 10)],
+        segments=[(0, 100, 199, 100)],
+    )
+
+
+def test_iou_and_fragments() -> None:
+    assert score.iou(box(0, 10, 0, 10), box(0, 10, 5, 15)) == pytest.approx(50 / 150)
+    two = box(20, 30, 20, 30) | box(60, 70, 60, 70) | box(90, 91, 90, 92)  # 2 px is a speck
+    assert score.fragments(two, floor_px=2.9) == 2
+
+
+def test_references_prefer_arm_a_and_need_a_pass() -> None:
+    g: dict[str, Any] = {
+        "grades": [
+            {"part": "x", "arm": "A", "grade": "pass"},
+            {"part": "x", "arm": "B", "grade": "pass"},
+            {"part": "y", "arm": "A", "grade": "fail"},
+            {"part": "y", "arm": "B", "grade": "pass"},
+            {"part": "z", "arm": "A", "grade": "conditional"},
+            {"part": "z", "arm": "B", "grade": "fail"},
+        ]
+    }
+    a, b = box(0, 5, 0, 5), box(5, 9, 5, 9)
+    refs = score.references(g, {"a": {"x": a, "y": a, "z": a}, "b": {"x": b, "y": b}})
+    assert {p: r["arm"] for p, r in refs.items()} == {"x": "A", "y": "B"}
+    assert refs["y"]["mask"] is b
+
+
+def run() -> dict[str, Any]:
+    return {
+        "figure": "fake",
+        "parts": ["chamber", "label", "speck", "lined", "missing"],
+        "masks": {
+            "chamber": box(40, 80, 40, 80) | box(120, 140, 120, 140),
+            "label": box(0, 4, 0, 10),  # 40 px, under a point symbol
+            "speck": box(190, 191, 190, 192),
+            "lined": box(95, 105, 60, 70),
+        },
+        "points": {"chamber": [[60, 60]], "label": [[5, 5]], "lined": [[65, 101]]},
+        "confidence": {"chamber": 0.9, "label": 0.75, "speck": 0.71, "lined": None},
+    }
+
+
+def test_each_number_comes_from_the_masks() -> None:
+    refs = {"chamber": {"arm": "A", "mask": box(40, 80, 40, 80)}}
+    s = score.score(run(), np.zeros((H, W, 3), np.uint8), marks(), refs)
+    by = {r["part"]: r for r in s["parts"]}
+    chamber = by["chamber"]
+    assert chamber["reference"] == {"arm": "A", "iou": 0.8, "regression": False}
+    assert chamber["fragments"] == 2 and not chamber["under_point_symbol"]
+    assert by["label"]["text_share"] == 1.0 and by["label"]["under_point_symbol"]
+    assert by["speck"]["speck"] and by["speck"]["fragments"] == 0
+    assert by["lined"]["line_share"] == 0.2
+    assert by["missing"]["area_px"] == 0 and by["missing"]["flags"] == ["no mask"]
+    assert by["label"]["points"] == [
+        {"xy": [5, 5], "on_text": True, "on_line": False, "on_ink": False}
+    ]
+    assert "point [65, 101] on line" in by["lined"]["flags"]
+    assert s["counts"] == {
+        "parts": 5,
+        "no_mask": 1,
+        "regression": 0,
+        "references": 1,
+        "speck": 1,
+        "under_point_symbol": 2,
+        "on_text": 1,
+        "on_line": 1,
+        "fragmented": 1,
+        "overlap_pairs": 0,
+        "points": 3,
+        "points_on_text": 1,
+        "points_on_line": 1,
+        "points_on_ink": 0,
+    }
+
+
+def test_a_mask_far_from_its_passing_mask_is_a_regression() -> None:
+    refs = {"chamber": {"arm": "B", "mask": box(0, 40, 0, 40)}}
+    s = score.score(run(), np.zeros((H, W, 3), np.uint8), marks(), refs)
+    assert s["parts"][0]["reference"] == {"arm": "B", "iou": 0.0, "regression": True}
+    assert s["parts"][0]["flags"][0] == "regression: IoU 0.0 with the passing Arm B mask"
+
+
+def test_confident_fails_are_arm_a_fails_at_or_over_0_7() -> None:
+    s = score.score(run(), np.zeros((H, W, 3), np.uint8), marks(), {})
+    g: dict[str, Any] = {
+        "grades": [
+            {"part": "chamber", "arm": "A", "grade": "pass", "reason": None},
+            {"part": "label", "arm": "A", "grade": "fail", "reason": "label"},
+            {"part": "speck", "arm": "B", "grade": "fail", "reason": "sliver"},
+            {"part": "lined", "arm": "A", "grade": "fail", "reason": "line"},
+        ]
+    }
+    assert score.confident_fails(s, g) == [{"part": "label", "confidence": 0.75, "reason": "label"}]
+
+
+@pytest.mark.parametrize("name", sorted(bake.FIGURES))
+def test_the_committed_v1_scores_count_their_own_rows(name: str) -> None:
+    s = json.loads((bake.OUT_ROOT / "scores_v1.json").read_text())["figures"][name]
+    rows, c = s["parts"], s["counts"]
+    assert c["parts"] == len(rows)
+    assert c["speck"] == sum(r["speck"] for r in rows)
+    assert c["fragmented"] == sum(1 for r in rows if r["fragments"] > 1)
+    assert c["points_on_text"] == sum(p["on_text"] for r in rows for p in r["points"])
+    g = grades.load(bake.OUT_ROOT / name)
+    assert score.confident_fails(s, g) == s["confident_fails"]
+    live = json.loads((bake.OUT_ROOT / name / "results.json").read_text())
+    assert [r["part"] for r in rows] == [p["phrase"] for p in live["parts"]]
