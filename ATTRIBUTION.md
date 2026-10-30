@@ -83,6 +83,16 @@ Credit line: "Blausen 0111 BrainLobes.png by BruceBlaus (Blausen.com staff, Medi
 
 The voice is Apple's macOS speech synthesis, so Apple's terms for its system voices apply. Replace this clip with a recording of our own voice before anything built from it is shown publicly.
 
+## fixtures/audio/question_left_ventricle.wav, question_superior_vena_cava.wav, question_left_pulmonary_veins.wav
+
+| | |
+|---|---|
+| Content | "What does the left ventricle do?" (1.53 s), "Where is the superior vena cava?" (1.72 s), "What is next to the left pulmonary veins?" (2.19 s), 16 kHz mono 16-bit PCM |
+| Made by | This project, on Oct 30, 2026, with the macOS `say` command (system default voice, rate 160) and `afconvert -f WAVE -d LEI16@16000 -c 1` |
+| Use | Synthetic test audio: the transcribe path with and without keyword hints, and the headless hold-to-talk check (Chrome's fake microphone) |
+
+The same terms apply as for the clip above.
+
 ## apps/web/public/models/hand_landmarker.task
 
 | | |

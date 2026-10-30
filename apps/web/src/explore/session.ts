@@ -17,6 +17,14 @@ export interface AskRequest {
   question: string;
   region_id: string | null;
   recent_region_ids: string[];
+  session_id?: string;
+}
+
+/** What /api/ask answers: the sentence to say, what was heard, and the server's times. */
+export interface AskReply {
+  answer: string;
+  transcript: string;
+  timings_ms: { transcribe?: number; spark?: number; server?: number };
 }
 
 /** A failed question, with the sentence to say instead of an answer. */
@@ -33,6 +41,8 @@ export interface SessionDeps {
   /** The answer text. Throws AskError with a sentence to say when the service fails, or
    * anything else when the network is not there. */
   ask: (req: AskRequest) => Promise<string>;
+  /** A spoken question: the WAV and the touch context. Throws like ask. */
+  askAudio?: (wav: Uint8Array, req: AskRequest) => Promise<AskReply>;
   /** Parts on the sheet a student cannot touch yet, said once in the intro. */
   notTouchable?: readonly string[];
 }
@@ -69,7 +79,7 @@ export function keyAction(key: string): KeyAction | null {
 export const HELP =
   "Touch the sheet to hear a part. Rest your finger to hear its name. " +
   "Press M for more, period to repeat, W for what is here. " +
-  "Escape stops speech. R sets the corners again. Type a question and press Enter.";
+  "Escape stops speech. R sets the corners again. Hold the screen and ask a question, then let go. Or type a question and press Enter.";
 export const OFFLINE_ANSWER = "Questions need the network. Labels still work.";
 const OFF_SHEET = "Your finger is off the sheet. Press R to set the corners again.";
 const CANNOT_SEE = "The camera cannot see the sheet.";
@@ -104,6 +114,11 @@ export class ExploreSession {
   private last: Pt | null = null;
   private lastAt = 0;
   private recent: IndexedRegion[] = [];
+  /** Counts this session's questions on the server (at most 50). */
+  readonly sessionId = newSessionId();
+  /** What the server heard for the last spoken question. */
+  heard = "";
+  private spokenAnswer: { text: string; releasedAt: number; sayAt: number } | null = null;
   private offSheet = 0;
   private warnedOffSheet = false;
   private darkSince: number | null = null;
@@ -276,14 +291,52 @@ export class ExploreSession {
     }
   }
 
-  private async ask(question: string): Promise<void> {
+  private request(question: string): AskRequest {
     const current = this.touch.region;
-    const req: AskRequest = {
+    return {
       figure_id: this.file.figure_id,
       question,
       region_id: current?.id ?? null,
       recent_region_ids: this.recent.filter((r) => r !== current).slice(-RECENT).map((r) => r.id),
+      session_id: this.sessionId,
     };
+  }
+
+  /** A held question: sent as a WAV with the touch context, the answer spoken. releasedAt
+   * is when the finger let go of the screen; encodeMs the WAV's encoding time. */
+  async askSpoken(wav: Uint8Array, releasedAt: number, encodeMs = NaN): Promise<void> {
+    const { audio, metrics } = this.deps;
+    const sent = performance.now();
+    let answer: string;
+    try {
+      if (!this.deps.askAudio) throw new TypeError("no spoken questions here");
+      const reply = await this.deps.askAudio(wav, this.request(""));
+      answer = reply.answer;
+      this.heard = reply.transcript;
+      const t = reply.timings_ms;
+      metrics.askTranscribeMs.push(t.transcribe ?? NaN);
+      metrics.askSparkMs.push(t.spark ?? NaN);
+      metrics.askNetworkMs.push(performance.now() - sent - (t.transcribe ?? 0) - (t.spark ?? 0));
+    } catch (err) {
+      answer = err instanceof AskError ? err.spoken : OFFLINE_ANSWER;
+    }
+    metrics.askEncodeMs.push(encodeMs);
+    metrics.askReleaseToSayMs.push(performance.now() - releasedAt);
+    this.spokenAnswer = { text: answer, releasedAt, sayAt: performance.now() };
+    audio.say(answer);
+  }
+
+  /** The app voice started a sentence; for a spoken answer, its first word is timed. */
+  speechStarted(at: number, text: string): void {
+    const a = this.spokenAnswer;
+    if (!a || a.text !== text) return;
+    this.spokenAnswer = null;
+    this.deps.metrics.askReleaseToSpeechMs.push(at - a.releasedAt);
+    this.deps.metrics.askLocalMs.push(at - a.sayAt + (this.deps.metrics.askEncodeMs.last ?? 0));
+  }
+
+  private async ask(question: string): Promise<void> {
+    const req = this.request(question);
     let answer: string;
     try {
       answer = await this.deps.ask(req);
@@ -307,4 +360,10 @@ export class ExploreSession {
       this.deps.audio.say(OFF_SHEET);
     }
   }
+}
+
+function newSessionId(): string {
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }

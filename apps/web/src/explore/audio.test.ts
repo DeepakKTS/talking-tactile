@@ -109,11 +109,11 @@ function setup(mode: "app" | "screen_reader" = "app", voices?: FakeSpeech["voice
 const pitches = [...Object.values(EXPLORE.earcons.texture_hz), EXPLORE.earcons.default_hz];
 
 describe("audio engine", () => {
-  it("renders every earcon, the tick, the beep and the chime once, at start", async () => {
+  it("renders every earcon, the tick, the beep, the chime and the three question sounds once, at start", async () => {
     const { ctx, engine } = setup();
     await engine.start(pitches);
     const rendered = ctx.buffers.length;
-    expect(rendered).toBe(new Set(pitches).size + 3);
+    expect(rendered).toBe(new Set(pitches).size + 6);
     for (let i = 0; i < 50; i++) {
       engine.earcon(EXPLORE.earcons.texture_hz.dots);
       engine.exitTick();

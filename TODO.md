@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 197, updated 2026-10-30T19:00:00.773Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 199, updated 2026-10-30T19:12:04.500Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -193,6 +193,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Through Author in headless Chrome on a mock-mode API on the dev data dir; the re-upload started new jobs by pipeline version (no database edit). Heart: the aortic arch merge replayed from the earlier edits; Mark all parts checked (confirm listed right and left ventricle covering the septum's area); published version 2, schema 3: 11 touchable, septum not touchable, rules pass; Explore loads it, intro names the septum. Commons brain: Mark all (confirm listed cerebellum and brainstem against the 4 lobes); published version 2: 5 touchable, olfactory bulb in needs_teacher; Explore loads it.
 - [ ] d5-17 POST /api/ask: spoken or typed questions answered by Spark from the published figure alone (phase B) [doing]
   - Note: Route, prompt, transcribe and answer calls, code's last word and session cap in place with unit and route tests (fake client); live eval and replay tests to come (d5 B4, B5).
+- [x] d5-18 Explore: hold anywhere to ask out loud; 16 kHz WAV encoded in the browser; earcons and a thinking tone (phase B)
+  - Note: apps/web/src/explore/voice.ts: HoldToTalk state machine (idle, pressed, listening after HOLD_MS 300, busy; under MIN_MS 400 too short; MAX_MS 15 s sends), WebAudioMic (getUserMedia into an AudioWorklet, opened on the first hold and kept, no MediaRecorder), resample to 16 kHz (box filter down, linear up), encodeWav (RIFF, mono 16-bit PCM). Rising earcon on listening, falling on release, a soft 392 Hz blip every 1.1 s until the answer is said. Hold anywhere except a text field or a select; the click after a hold is swallowed; no long-press menu. Typed Ask form kept. Mic denied: spoken 'The microphone is not allowed...' and not asked again; offline: 'Questions need the network. Labels still work.'; server errors are spoken as sent. Headless check (Chrome, fake microphone playing a say clip, mouse held 2.5 s): events stop, listen_start, listen_end, thinking_on, POST /api/ask, answer said, thinking_off, speech_start; WAV RIFF mono 16 kHz 16-bit, 2.14 s, peak 32715; encode 4.2 ms. VoiceOver's double tap and hold could not be checked headless: for the iPhone test.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

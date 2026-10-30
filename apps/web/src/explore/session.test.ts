@@ -3,7 +3,7 @@ import { EXPLORE } from "../shared/config";
 import type { AudioPort } from "./audio";
 import type { Pt } from "./homography";
 import { Metrics } from "./metrics";
-import { type AskRequest, ExploreSession, OFFLINE_ANSWER, keyAction, notTouchableSentence } from "./session";
+import { AskError, type AskRequest, ExploreSession, OFFLINE_ANSWER, keyAction, notTouchableSentence } from "./session";
 import { untouchableNames } from "../shared/regions";
 import { SYNTHETIC, sheet, square } from "./testkit";
 
@@ -26,6 +26,17 @@ class FakeAudio implements AudioPort {
   chime() {
     this.log.push("chime");
     return performance.now();
+  }
+  listenStart() {
+    this.log.push("listen start");
+    return performance.now();
+  }
+  listenEnd() {
+    this.log.push("listen end");
+    return performance.now();
+  }
+  thinking(on: boolean) {
+    this.log.push(on ? "thinking" : "thinking off");
   }
   say(text: string) {
     this.log.push(`say ${text}`);
@@ -171,6 +182,7 @@ describe("explore session", () => {
       question: "What does the stem connect to?",
       region_id: SYNTHETIC.regions.find((r) => r.label === "left lobe")?.id,
       recent_region_ids: ["r8"],
+      session_id: session.sessionId,
     }]);
     expect(audio.said().at(-1)).toBe("It joins the two lobes.");
   });
@@ -287,5 +299,52 @@ describe("groups in speech", () => {
       if (p[0] === 70) session.here();
     }
     expect(audio.said()).toEqual(["Anther, part of the stamen", "Anther, part of the stamen", "Petal"]);
+  });
+});
+
+describe("spoken questions", () => {
+  const wav = new Uint8Array(44);
+
+  it("sends the WAV with the touch context, says the answer and times it from the release", async () => {
+    const audio = new FakeAudio();
+    const metrics = new Metrics();
+    const sent: AskRequest[] = [];
+    const session = new ExploreSession(SYNTHETIC, EXPLORE, {
+      audio, metrics, ask: () => Promise.resolve(""),
+      askAudio: (_w, req) => {
+        sent.push(req);
+        return Promise.resolve({ answer: "This is the stem.", transcript: "what is this", timings_ms: { transcribe: 300, spark: 900 } });
+      },
+    });
+    const released = performance.now() - 50;
+    await session.askSpoken(wav, released, 4);
+    expect(audio.said()).toEqual(["This is the stem."]);
+    expect(session.heard).toBe("what is this");
+    expect(sent[0]?.question).toBe("");
+    expect(sent[0]?.session_id).toBe(session.sessionId);
+    expect(metrics.askTranscribeMs.p50).toBe(300);
+    expect(metrics.askSparkMs.p50).toBe(900);
+    expect(metrics.askEncodeMs.p50).toBe(4);
+    expect(metrics.askReleaseToSayMs.p50).toBeGreaterThanOrEqual(50);
+    session.speechStarted(performance.now() + 120, "This is the stem.");
+    expect(metrics.askReleaseToSpeechMs.count).toBe(1);
+    expect(metrics.askReleaseToSpeechMs.p50).toBeGreaterThanOrEqual(170);
+    session.speechStarted(performance.now(), "This is the stem."); // only the first word counts
+    expect(metrics.askReleaseToSpeechMs.count).toBe(1);
+  });
+
+  it("says the server's sentence when the question fails, and the offline one with no network", async () => {
+    const audio = new FakeAudio();
+    const failing = new ExploreSession(SYNTHETIC, EXPLORE, {
+      audio, metrics: new Metrics(), ask: () => Promise.resolve(""),
+      askAudio: () => Promise.reject(new AskError("That is 50 questions for this session. Ask your teacher.")),
+    });
+    await failing.askSpoken(wav, performance.now());
+    const offline = new ExploreSession(SYNTHETIC, EXPLORE, {
+      audio, metrics: new Metrics(), ask: () => Promise.resolve(""),
+      askAudio: () => Promise.reject(new TypeError("offline")),
+    });
+    await offline.askSpoken(wav, performance.now());
+    expect(audio.said()).toEqual(["That is 50 questions for this session. Ask your teacher.", OFFLINE_ANSWER]);
   });
 });

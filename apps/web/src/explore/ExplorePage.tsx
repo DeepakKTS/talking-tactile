@@ -8,7 +8,7 @@ import { EXPLORE } from "../shared/config";
 import type { RegionsFile } from "../shared/regions";
 import type { WorkerHand } from "../workers/protocol";
 import { AudioEngine, type AudioPort, NO_LOCAL_VOICE, type VoiceMode, browserAudioDeps } from "./audio";
-import { CameraLoop, type HandsFrame, askApi } from "./camera";
+import { CameraLoop, type HandsFrame, askApi, askAudioApi } from "./camera";
 import { CornerClicks, loadCorners, parseQuad, saveCorners } from "./corners";
 import { FingertipTracker } from "./fingertip";
 import type { Side } from "./hands";
@@ -17,6 +17,7 @@ import { LoadError, type Version, loadPublished } from "./loader";
 import { Metrics } from "./metrics";
 import type { PumpStats } from "./pump";
 import { ExploreSession, keyAction } from "./session";
+import { VoiceAsk, WebAudioMic } from "./voice";
 
 interface Settings {
   voice: VoiceMode;
@@ -60,6 +61,8 @@ interface Trace {
   camera: { readonly backend: string; readonly stats: PumpStats } | null;
   inject: (hands: WorkerHand[], width: number, height: number, brightness?: number) => void;
   command: (text: string) => Promise<void>;
+  /** The last spoken question's WAV, for a headless check of the encoding. */
+  lastWav: Uint8Array | null;
 }
 
 declare global {
@@ -96,9 +99,22 @@ class TracingAudio implements AudioPort {
   chime() {
     return this.note("chime", this.inner.chime());
   }
+  listenStart() {
+    return this.note("listen_start", this.inner.listenStart());
+  }
+  listenEnd() {
+    return this.note("listen_end", this.inner.listenEnd());
+  }
+  thinking(on: boolean) {
+    this.inner.thinking(on);
+    this.note(on ? "thinking_on" : "thinking_off", performance.now());
+  }
   say(text: string) {
     this.inner.say(text);
     this.note("say", performance.now(), { text });
+  }
+  spoke(at: number, text: string) {
+    this.note("speech_start", at, { text });
   }
   stop() {
     this.inner.stop();
@@ -129,6 +145,8 @@ export function ExplorePage() {
   const [settings, setSettings] = useState<Settings>(loadSettings);
   const [question, setQuestion] = useState("");
   const [noLocalVoice, setNoLocalVoice] = useState(false);
+  const [heard, setHeard] = useState("");
+  const voice = useRef<VoiceAsk | null>(null);
 
   const mirror = useRef<HTMLDivElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
@@ -157,6 +175,7 @@ export function ExplorePage() {
     camera: null,
     inject: () => undefined,
     command: () => Promise.resolve(),
+    lastWav: null,
   });
 
   const say = useCallback((text: string) => {
@@ -234,8 +253,23 @@ export function ExplorePage() {
     eng.onVoiceChange = () => { setNoLocalVoice(eng.noLocalVoice); };
     const port = new TracingAudio(eng, trace.current.log);
     audio.current = port;
-    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, notTouchable });
+    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, askAudio: askAudioApi, notTouchable });
     session.current = s;
+    eng.onSpeechStart = (at, text) => {
+      s.speechStarted(at, text);
+      port.spoke(at, text);
+    };
+    const asker: VoiceAsk = new VoiceAsk({
+      audio: port,
+      mic: new WebAudioMic(),
+      online: () => navigator.onLine,
+      send: async (wav, releasedAt) => {
+        trace.current.lastWav = wav;
+        await s.askSpoken(wav, releasedAt, asker.encodeMs);
+        setHeard(s.heard);
+      },
+    });
+    voice.current = asker;
     await eng.start(s.pitches);
     setStarted(true);
     setStatus(`${file.title}. Exploring.`);
@@ -292,6 +326,42 @@ export function ExplorePage() {
       document.removeEventListener("keydown", onKey);
     };
   }, [startCorners]);
+
+  // Hold anywhere to ask out loud (voice.ts), except in a text field or a list to choose
+  // from. A hold that started a question swallows the click its release would make.
+  useEffect(() => {
+    if (!started) return;
+    const typing = (t: EventTarget | null) =>
+      t instanceof HTMLInputElement || t instanceof HTMLSelectElement || t instanceof HTMLTextAreaElement;
+    let swallow = false;
+    const down = (e: PointerEvent) => {
+      if (e.isPrimary && !typing(e.target)) voice.current?.down();
+    };
+    const up = (e: PointerEvent) => {
+      if (!e.isPrimary || !voice.current) return;
+      swallow = voice.current.engaged;
+      voice.current.up();
+    };
+    const click = (e: MouseEvent) => {
+      if (!swallow) return;
+      swallow = false;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    const menu = (e: Event) => { e.preventDefault(); }; // a long press opens no menu
+    document.addEventListener("pointerdown", down);
+    document.addEventListener("pointerup", up);
+    document.addEventListener("pointercancel", up);
+    document.addEventListener("click", click, true);
+    document.addEventListener("contextmenu", menu);
+    return () => {
+      document.removeEventListener("pointerdown", down);
+      document.removeEventListener("pointerup", up);
+      document.removeEventListener("pointercancel", up);
+      document.removeEventListener("click", click, true);
+      document.removeEventListener("contextmenu", menu);
+    };
+  }, [started]);
 
   useEffect(() => {
     trace.current.command = (text) => session.current?.command(text) ?? Promise.resolve();
@@ -376,7 +446,7 @@ export function ExplorePage() {
   }
 
   return (
-    <main>
+    <main style={{ WebkitTouchCallout: "none", userSelect: "none", minHeight: "100vh" }}>
       <h1>Explore{file ? `: ${file.title}` : ""}</h1>
       <p>{status}</p>
       {!started && (
@@ -394,6 +464,8 @@ export function ExplorePage() {
             </label>
             <button type="submit">Ask</button>
           </form>
+          <p>Hold anywhere on the screen to ask out loud, and let go when you are done.</p>
+          {heard && <p aria-live="off">You asked: {heard}</p>}
           <p>Keys: Escape stops speech. R sets the corners. H help. M more. Period repeats. W what is here.</p>
           {!scripted && (
             <section aria-label="Camera view">

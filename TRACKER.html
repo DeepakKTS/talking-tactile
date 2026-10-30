@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 197,
- "updated_at": "2026-10-30T19:00:00.773Z",
+ "rev": 199,
+ "updated_at": "2026-10-30T19:12:04.500Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1472,6 +1472,23 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "spark"
    ],
    "changed_at": "2026-10-30T19:00:00.773Z"
+  },
+  {
+   "id": "d5-18",
+   "day": 5,
+   "title": "Explore: hold anywhere to ask out loud; 16 kHz WAV encoded in the browser; earcons and a thinking tone",
+   "detail": "",
+   "timebox": "phase B",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/voice.ts: HoldToTalk state machine (idle, pressed, listening after HOLD_MS 300, busy; under MIN_MS 400 too short; MAX_MS 15 s sends), WebAudioMic (getUserMedia into an AudioWorklet, opened on the first hold and kept, no MediaRecorder), resample to 16 kHz (box filter down, linear up), encodeWav (RIFF, mono 16-bit PCM). Rising earcon on listening, falling on release, a soft 392 Hz blip every 1.1 s until the answer is said. Hold anywhere except a text field or a select; the click after a hold is swallowed; no long-press menu. Typed Ask form kept. Mic denied: spoken 'The microphone is not allowed...' and not asked again; offline: 'Questions need the network. Labels still work.'; server errors are spoken as sent. Headless check (Chrome, fake microphone playing a say clip, mouse held 2.5 s): events stop, listen_start, listen_end, thinking_on, POST /api/ask, answer said, thinking_off, speech_start; WAV RIFF mono 16 kHz 16-bit, 2.14 s, peak 32715; encode 4.2 ms. VoiceOver's double tap and hold could not be checked headless: for the iPhone test.",
+   "done_at": "2026-10-30T19:12:04.500Z",
+   "tags": [
+    "explore",
+    "voice",
+    "a11y"
+   ],
+   "changed_at": "2026-10-30T19:12:04.500Z"
   },
   {
    "id": "d6-1",
@@ -2550,6 +2567,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T19:12:04.500Z",
+   "kind": "claude",
+   "text": "Task d5-18 \"Explore: hold anywhere to ask out loud; 16 kHz WAV encoded in the browser; earcons and a thinking tone\" is now done. Note: apps/web/src/explore/voice.ts: HoldToTalk state machine (idle, pressed, listening after HOLD_MS 300, busy; under MIN_MS 400 too short; MAX_MS 15 s sends), WebAudioMic (getUserMedia into an AudioWorklet, opened on the first hold and kept, no MediaRecorder), resample to 16 kHz (box filter down, linear up), encodeWav (RIFF, mono 16-bit PCM). Rising earcon on listening, falling on release, a soft 392 Hz blip every 1.1 s until the answer is said. Hold anywhere except a text field or a select; the click after a hold is swallowed; no long-press menu. Typed Ask form kept. Mic denied: spoken 'The microphone is not allowed...' and not asked again; offline: 'Questions need the network. Labels still work.'; server errors are spoken as sent. Headless check (Chrome, fake microphone playing a say clip, mouse held 2.5 s): events stop, listen_start, listen_end, thinking_on, POST /api/ask, answer said, thinking_off, speech_start; WAV RIFF mono 16 kHz 16-bit, 2.14 s, peak 32715; encode 4.2 ms. VoiceOver's double tap and hold could not be checked headless: for the iPhone test."
+  },
+  {
+   "ts": "2026-10-30T19:11:52.608Z",
+   "kind": "claude",
+   "text": "Task d5-18 \"Explore: hold anywhere to ask out loud; 16 kHz WAV encoded in the browser; earcons and a thinking tone\" added to day 5."
+  },
   {
    "ts": "2026-10-30T19:00:00.773Z",
    "kind": "claude",

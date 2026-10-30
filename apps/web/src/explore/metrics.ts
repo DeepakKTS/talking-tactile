@@ -12,6 +12,10 @@ export class Samples {
     if (this.values.length > RING) this.values.shift();
   }
 
+  get last(): number | undefined {
+    return this.values.at(-1);
+  }
+
   get count(): number {
     return this.values.length;
   }
@@ -49,6 +53,17 @@ export class Metrics {
   /** Landmarks of the frame that crosses a line into a part, to the line and part being
    * handed to speech. Code only. */
   readonly frameToBoundaryMs = new Samples();
+  /** Spoken questions, from letting go of the screen: to the answer handed to speech, and
+   * to its first spoken word (the app voice's start event). */
+  readonly askReleaseToSayMs = new Samples();
+  readonly askReleaseToSpeechMs = new Samples();
+  /** Their parts: transcribe and Spark on the server, the rest of the round trip (network
+   * and server code), and the time on this device (WAV encoding, then speech starting). */
+  readonly askTranscribeMs = new Samples();
+  readonly askSparkMs = new Samples();
+  readonly askNetworkMs = new Samples();
+  readonly askEncodeMs = new Samples();
+  readonly askLocalMs = new Samples();
 
   summary(): Record<string, { count: number; p50: number; p95: number }> {
     return {
@@ -58,6 +73,13 @@ export class Metrics {
       touchToEarconMs: this.touchToEarconMs.summary(),
       dwellToLabelMs: this.dwellToLabelMs.summary(),
       frameToBoundaryMs: this.frameToBoundaryMs.summary(),
+      askReleaseToSayMs: this.askReleaseToSayMs.summary(),
+      askReleaseToSpeechMs: this.askReleaseToSpeechMs.summary(),
+      askTranscribeMs: this.askTranscribeMs.summary(),
+      askSparkMs: this.askSparkMs.summary(),
+      askNetworkMs: this.askNetworkMs.summary(),
+      askEncodeMs: this.askEncodeMs.summary(),
+      askLocalMs: this.askLocalMs.summary(),
     };
   }
 }

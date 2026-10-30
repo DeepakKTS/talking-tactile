@@ -2,7 +2,7 @@
 // each result handed on with the time it was captured and the time it came back.
 import type { FromWorker, ToWorker, WorkerHand } from "../workers/protocol";
 import { FramePump } from "./pump";
-import { AskError } from "./session";
+import { AskError, type AskReply, type AskRequest } from "./session";
 
 export interface HandsFrame {
   hands: WorkerHand[];
@@ -99,6 +99,28 @@ export class CameraLoop {
   }
 }
 
+const NOT_WORKING = "Questions are not working right now. Labels still work.";
+
+// A server error's message is written to be spoken (services/api/app/routes/ask.py).
+async function spokenError(res: Response): Promise<AskError> {
+  const body = (await res.json().catch(() => ({}))) as { error?: { message?: unknown } };
+  const message = body.error?.message;
+  return new AskError(res.status !== 404 && typeof message === "string" ? message : NOT_WORKING);
+}
+
+/** A held question: the WAV and the touch context, as multipart. */
+export async function askAudioApi(wav: Uint8Array, req: AskRequest): Promise<AskReply> {
+  if (!navigator.onLine) throw new TypeError("offline");
+  const form = new FormData();
+  form.append("request", JSON.stringify({ ...req, question: undefined }));
+  form.append("audio", new Blob([new Uint8Array(wav)], { type: "audio/wav" }), "question.wav");
+  const res = await fetch("/api/ask", { method: "POST", body: form });
+  if (!res.ok) throw await spokenError(res);
+  const body = (await res.json()) as Partial<AskReply>;
+  if (typeof body.answer !== "string") throw new AskError(NOT_WORKING);
+  return { answer: body.answer, transcript: body.transcript ?? "", timings_ms: body.timings_ms ?? {} };
+}
+
 export async function askApi(req: unknown): Promise<string> {
   if (!navigator.onLine) throw new TypeError("offline");
   const res = await fetch("/api/ask", {
@@ -106,8 +128,8 @@ export async function askApi(req: unknown): Promise<string> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
   });
-  if (!res.ok) throw new AskError("Questions are not working right now. Labels still work.");
+  if (!res.ok) throw await spokenError(res);
   const body = (await res.json()) as { answer?: unknown };
-  if (typeof body.answer !== "string") throw new AskError("Questions are not working right now. Labels still work.");
+  if (typeof body.answer !== "string") throw new AskError(NOT_WORKING);
   return body.answer;
 }

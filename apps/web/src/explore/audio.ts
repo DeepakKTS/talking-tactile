@@ -18,6 +18,7 @@ export interface UtteranceLike {
   rate: number;
   lang: string;
   onend: ((e: SpeechSynthesisEvent) => void) | null;
+  onstart?: ((e: SpeechSynthesisEvent) => void) | null;
   onerror: ((e: SpeechSynthesisErrorEvent) => void) | null;
 }
 
@@ -43,6 +44,11 @@ export interface AudioPort {
   exitTick(): number;
   beep(): number;
   chime(): number;
+  /** The rising earcon when a held question starts listening, and the falling one at release. */
+  listenStart(): number;
+  listenEnd(): number;
+  /** A soft tone repeating until turned off or until something is said. */
+  thinking(on: boolean): void;
   say(text: string): void;
   stop(): void;
   readonly speaking: boolean;
@@ -50,6 +56,14 @@ export interface AudioPort {
 }
 
 const MIRROR_KEEP = 5;
+// Hold to talk (voice.ts): a rising two-note earcon on listening, falling on release, and a
+// soft low blip about once a second while the answer is on its way.
+const LISTEN_HZ = [523.25, 783.99];
+const LISTEN_NOTE_MS = 70;
+const THINK_HZ = 392;
+const THINK_MS = 90;
+const THINK_GAIN = 0.5;
+const THINK_EVERY_MS = 1100;
 const FADE_MS = 5;
 // Chrome lists its voices a moment after the page loads.
 const VOICES_WAIT_MS = 1000;
@@ -73,10 +87,16 @@ export class AudioEngine implements AudioPort {
   private tick: AudioBuffer | null = null;
   private beepTone: AudioBuffer | null = null;
   private chimeTone: AudioBuffer | null = null;
+  private listenUp: AudioBuffer | null = null;
+  private listenDown: AudioBuffer | null = null;
+  private thinkTone: AudioBuffer | null = null;
+  private thinkTimer: ReturnType<typeof setInterval> | null = null;
   private utterance: UtteranceLike | null = null;
   private said = "";
   private voice: SpeechSynthesisVoice | null = null;
   private voiceKnown = false;
+  /** Called when the app voice starts saying a sentence: the first spoken word. */
+  onSpeechStart: ((at: number, text: string) => void) | null = null;
   /** Called when noLocalVoice changes. */
   onVoiceChange: (() => void) | null = null;
 
@@ -119,6 +139,9 @@ export class AudioEngine implements AudioPort {
     this.tick ??= this.render([e.exit_tick_hz], e.exit_tick_ms, e.exit_tick_gain);
     this.beepTone ??= this.render([g.beep_hz], g.beep_ms, e.gain);
     this.chimeTone ??= this.render(g.chime_hz, g.chime_note_ms, e.gain);
+    this.listenUp ??= this.render(LISTEN_HZ, LISTEN_NOTE_MS, e.gain);
+    this.listenDown ??= this.render([...LISTEN_HZ].reverse(), LISTEN_NOTE_MS, e.gain);
+    this.thinkTone ??= this.render([THINK_HZ], THINK_MS, e.gain * THINK_GAIN);
     if (!this.voiceKnown) await this.findVoice();
   }
 
@@ -147,7 +170,23 @@ export class AudioEngine implements AudioPort {
     return this.play(this.chimeTone);
   }
 
+  listenStart(): number {
+    return this.play(this.listenUp);
+  }
+
+  listenEnd(): number {
+    return this.play(this.listenDown);
+  }
+
+  thinking(on: boolean): void {
+    if (this.thinkTimer !== null) clearInterval(this.thinkTimer);
+    this.thinkTimer = null;
+    if (!on) return;
+    this.thinkTimer = setInterval(() => { this.play(this.thinkTone); }, THINK_EVERY_MS);
+  }
+
   say(text: string): void {
+    this.thinking(false);
     this.said = text;
     this.writeMirror(text);
     const speech = this.deps.speech;
@@ -160,6 +199,7 @@ export class AudioEngine implements AudioPort {
       if (this.utterance === u) this.utterance = null;
     };
     u.onend = done;
+    u.onstart = () => this.onSpeechStart?.(performance.now(), text);
     u.onerror = done;
     this.utterance = u;
     speech.speak(u);
