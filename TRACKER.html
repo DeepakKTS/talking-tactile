@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 194,
- "updated_at": "2026-10-30T18:49:50.353Z",
+ "rev": 197,
+ "updated_at": "2026-10-30T19:00:00.773Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1455,6 +1455,23 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "demo"
    ],
    "changed_at": "2026-10-30T18:49:50.353Z"
+  },
+  {
+   "id": "d5-17",
+   "day": 5,
+   "title": "POST /api/ask: spoken or typed questions answered by Spark from the published figure alone",
+   "detail": "",
+   "timebox": "phase B",
+   "fallback": "",
+   "status": "doing",
+   "note": "Route, prompt, transcribe and answer calls, code's last word and session cap in place with unit and route tests (fake client); live eval and replay tests to come (d5 B4, B5).",
+   "done_at": null,
+   "tags": [
+    "explore",
+    "voice",
+    "spark"
+   ],
+   "changed_at": "2026-10-30T19:00:00.773Z"
   },
   {
    "id": "d6-1",
@@ -2435,6 +2452,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "touchable = checked by the teacher (Mark checked, an accepted Fix outline, or an accepted merge) and not a suggestion. Unchecked parts are listed at publish and named in Explore's intro; publish never blocks on them. The minimal-clip region logic only warns.",
    "why": "The touch-safety invariant as a gate regressed graded references on replay (aortic arch members overlap one another, shaded Blausen lobes are one drawn region, literal clipping cut Japan's regions by half). A teacher's look is the check that holds on every figure; the detector points the teacher at the outlines most likely to be wrong.",
    "changed_at": "2026-10-30T18:02:38.358Z"
+  },
+  {
+   "id": "dec-mvvc6vurja0f",
+   "date": "2026-10-30",
+   "title": "Answers come only from the figure and teacher descriptions.",
+   "decision": "The answer prompt (ask_answer.v1) gets the published regions.json in words (parts with neighbors and directions computed in code, nesting, groups, teacher descriptions, untouchable parts, lines), the touch context and the figure image; Spark answers at low effort in a fixed shape (answer_text, source, cited_part_ids). Code has the last word: off_figure and unsure get fixed wording that sends the student to the teacher, a teacher_description answer must cite a described part, two sentences at most, cites are the figure's ids.",
+   "why": "A student must never learn from an answer the figure and the teacher did not give: general knowledge from a model can be wrong for this figure's grade band and cannot be checked by the teacher. Positions come from code because the model must never guess geometry.",
+   "changed_at": "2026-10-30T18:59:50.600Z"
   }
  ],
  "risks": [
@@ -2525,6 +2550,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T19:00:00.773Z",
+   "kind": "claude",
+   "text": "Task d5-17 \"POST /api/ask: spoken or typed questions answered by Spark from the published figure alone\" is now doing. Note: Route, prompt, transcribe and answer calls, code's last word and session cap in place with unit and route tests (fake client); live eval and replay tests to come (d5 B4, B5)."
+  },
+  {
+   "ts": "2026-10-30T18:59:50.600Z",
+   "kind": "claude",
+   "text": "Decision: Answers come only from the figure and teacher descriptions."
+  },
+  {
+   "ts": "2026-10-30T18:59:50.554Z",
+   "kind": "claude",
+   "text": "Task d5-17 \"POST /api/ask: spoken or typed questions answered by Spark from the published figure alone\" added to day 5."
+  },
   {
    "ts": "2026-10-30T18:49:50.353Z",
    "kind": "claude",

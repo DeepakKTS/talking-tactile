@@ -14,9 +14,12 @@ name."""
 
 import asyncio
 import base64
+import hashlib
 import io
 import json
+import math
 import re
+import wave
 from collections.abc import Callable, Sequence
 from typing import Any, Literal
 
@@ -41,6 +44,7 @@ from app.models.mask import Mask
 from app.prompts import Prompt
 
 SPARK_EFFORT = "medium"  # spikes/muse-spark.md
+ASK_EFFORT = "low"  # Explore's answers: short, from the figure data given
 _PAIR = 2  # a line separates two areas; a shared region has two or more
 _SLUG = re.compile(r"[^a-z0-9]+")
 
@@ -61,6 +65,7 @@ def spark_body(
     text: str,
     png: bytes,
     schema: tuple[str, dict[str, Any]],
+    effort: str = SPARK_EFFORT,
 ) -> dict[str, Any]:
     url = "data:image/png;base64," + base64.b64encode(png).decode()
     content = [{"type": "text", "text": text}, {"type": "image_url", "image_url": {"url": url}}]
@@ -70,7 +75,7 @@ def spark_body(
     name, js = schema
     return {
         "model": model,
-        "reasoning_effort": SPARK_EFFORT,
+        "reasoning_effort": effort,
         "messages": messages,
         "response_format": {"type": "json_schema", "json_schema": {"name": name, "schema": js}},
     }
@@ -289,3 +294,50 @@ class LiveMetaClient:
         # Decoding is pure Python, about 1 s a mask: off the event loop, so the API answers
         # other requests meanwhile.
         return await asyncio.to_thread(object_masks, parsed, (w, h))
+
+    async def transcribe(self, figure_id: str, wav: bytes, keywords: Sequence[str]) -> str:
+        """Muse Voice Transcribe, the file endpoint, push to talk, with keyword hints."""
+        req: dict[str, Any] = {
+            "model": self._models.voice,
+            "audioEncoding": "WAV",
+            "mode": "PUSH_TO_TALK",
+            "languageBias": ["English"],
+        }
+        if keywords:
+            req["keywords"] = list(keywords)
+        with wave.open(io.BytesIO(wav)) as w:
+            seconds = w.getnframes() / w.getframerate()
+        files: dict[str, tuple[str | None, bytes | str, str]] = {
+            "request": (None, json.dumps(req), "application/json"),
+            "audio": ("question.wav", wav, "audio/wav"),
+        }
+        digest = hashlib.sha256(wav).hexdigest()[:8]
+        res = await self._caller.post_multipart(
+            "/asr/transcribe",
+            files,
+            caller="ask",
+            model=self._models.voice,
+            describe=f"figure {figure_id[:12]}, question audio, {len(keywords)} keywords",
+            units=lambda _usage: {"audio_seconds": float(math.ceil(seconds))},
+            record_as=self._name(f"ask_transcribe_{digest}_{'kw' if keywords else 'nokw'}"),
+        )
+        return str(res.body.get("transcript", "")).strip()
+
+    async def answer(
+        self, figure_id: str, png: bytes, system: str, user: str, schema: dict[str, Any], what: str
+    ) -> dict[str, Any]:
+        """Muse Spark answers one question about the figure, at low reasoning effort."""
+        body = spark_body(
+            self._models.spark, system, user, png, ("FigureAnswer", schema), effort=ASK_EFFORT
+        )
+        digest = hashlib.sha256(user.encode()).hexdigest()[:8]
+        res = await self._caller.post_json(
+            "/chat/completions",
+            body,
+            caller="ask",
+            model=self._models.spark,
+            describe=f"figure {figure_id[:12]}, question: {what[:60]}",
+            units=spark_units,
+            record_as=self._name(f"ask_{slug(what)[:40]}_{digest}"),
+        )
+        return dict(json.loads(res.body["choices"][0]["message"]["content"]))

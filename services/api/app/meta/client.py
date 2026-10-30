@@ -7,7 +7,7 @@ META_RECORD=NAME also saves each live call to fixtures/recorded/NAME_*.json."""
 
 import os
 from collections.abc import Sequence
-from typing import Literal, NamedTuple, Protocol
+from typing import Any, Literal, NamedTuple, Protocol
 
 from app.config import Meta
 from app.meta.cost import CostMeter
@@ -95,6 +95,16 @@ class MetaClient(Protocol):
     ) -> list[ObjectMask]:
         """SAM segments each object from its points, in one call. kind names the caller in
         the ledger and the recording: s2, or fix for a teacher's outline."""
+        ...
+
+    async def transcribe(self, figure_id: str, wav: bytes, keywords: Sequence[str]) -> str:
+        """Muse Voice Transcribe on a question's WAV, with the figure's names as hints."""
+        ...
+
+    async def answer(
+        self, figure_id: str, png: bytes, system: str, user: str, schema: dict[str, Any], what: str
+    ) -> dict[str, Any]:
+        """Muse Spark's structured answer to one question about the figure."""
         ...
 
 

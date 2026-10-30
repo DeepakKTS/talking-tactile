@@ -18,6 +18,7 @@ from app.paths import DATA_DIR, EXPLORE_YAML, TACTILE_RULES_YAML
 from app.pipeline.edits import EditStore
 from app.pipeline.jobs import JobStore
 from app.pipeline.runner import Runner
+from app.routes import ask as ask_route
 from app.routes import figures
 
 # The Vite dev server. In development the web app reaches the API through its proxy, so
@@ -75,6 +76,7 @@ def create_app(
     app.state.figure_service = _figure_service(tactile_rules, explore, data_dir, client)
     errors.install(app)
     app.include_router(figures.router)
+    app.include_router(ask_route.router)
 
     @app.get("/api/health")
     def health() -> dict[str, str]:

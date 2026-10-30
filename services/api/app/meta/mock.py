@@ -36,7 +36,7 @@ class MockFixtureMissingError(Exception):
 
 @dataclass(frozen=True)
 class CallRecord:
-    call: Literal["understand", "segment"]
+    call: Literal["understand", "segment", "transcribe", "answer"]
     figure_id: str
     phrase: str | None
 
@@ -201,3 +201,22 @@ class MockMetaClient:
             image, figure_id, part, objects, prompt, retry, kind
         )
         return answer
+
+    async def transcribe(self, figure_id: str, wav: bytes, keywords: Sequence[str]) -> str:
+        """Replayed from a figure's recordings; nothing for any other figure."""
+        replay = self._replay(figure_id)
+        if replay is None:
+            raise MockFixtureMissingError("Mock mode has no recorded questions for this figure.")
+        self.calls.append(CallRecord(call="transcribe", figure_id=figure_id, phrase=None))
+        text: str = await replay.transcribe(figure_id, wav, keywords)
+        return text
+
+    async def answer(
+        self, figure_id: str, png: bytes, system: str, user: str, schema: dict[str, Any], what: str
+    ) -> dict[str, Any]:
+        replay = self._replay(figure_id)
+        if replay is None:
+            raise MockFixtureMissingError("Mock mode has no recorded answers for this figure.")
+        self.calls.append(CallRecord(call="answer", figure_id=figure_id, phrase=what))
+        out: dict[str, Any] = await replay.answer(figure_id, png, system, user, schema, what)
+        return out

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 194, updated 2026-10-30T18:49:50.353Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 197, updated 2026-10-30T19:00:00.773Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -191,6 +191,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Author: 'Mark all parts checked' opens a confirm step: 'Mark all N parts checked?', the parts with an overlap warning listed first (or 'No part carries a warning.'), then 'Yes, mark all N checked' sends one check edit naming every unchecked part, or Cancel. The e2e runs (explore, plan, fix) use the button before publishing; all pass. Tests: Author confirm and cancel.
 - [x] d5-16 Republish heart and Commons brain with every part checked (phase A)
   - Note: Through Author in headless Chrome on a mock-mode API on the dev data dir; the re-upload started new jobs by pipeline version (no database edit). Heart: the aortic arch merge replayed from the earlier edits; Mark all parts checked (confirm listed right and left ventricle covering the septum's area); published version 2, schema 3: 11 touchable, septum not touchable, rules pass; Explore loads it, intro names the septum. Commons brain: Mark all (confirm listed cerebellum and brainstem against the 4 lobes); published version 2: 5 touchable, olfactory bulb in needs_teacher; Explore loads it.
+- [ ] d5-17 POST /api/ask: spoken or typed questions answered by Spark from the published figure alone (phase B) [doing]
+  - Note: Route, prompt, transcribe and answer calls, code's last word and session cap in place with unit and route tests (fake client); live eval and replay tests to come (d5 B4, B5).
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

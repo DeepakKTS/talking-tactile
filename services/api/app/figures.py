@@ -26,6 +26,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
+from app import ask
 from app.errors import ApiError
 from app.geometry import points as gp
 from app.geometry.layout import part_id_of
@@ -33,12 +34,14 @@ from app.geometry.validate import Violation
 from app.meta.client import MetaClient
 from app.meta.live import LiveCallCapError, LiveCallError
 from app.meta.mock import MockFixtureMissingError
+from app.models.regions import RegionsFile
 from app.pipeline import db
 from app.pipeline.edits import MAX_POINTS, Edit, EditError, EditStore, OutlineEdit
 from app.pipeline.jobs import JobOptions, JobRecord, JobStore
 from app.pipeline.outlines import OutlineError, check_points, old_outline, spill_of
 from app.pipeline.runner import NotReadyError, Runner
 from app.pipeline.s5_render import PDF_FILE, REGIONS_FILE, REPORT_FILE, SVG_FILE, WARNINGS_FILE
+from app.prompts import load_prompt
 from app.render.preview import preview
 
 MEDIA_TYPES = {
@@ -354,6 +357,25 @@ class FigureService(FixMixin):
         self._tasks: set[asyncio.Task[JobRecord]] = set()
         self._fix_clients: dict[tuple[str, int], MetaClient] = {}
         self._scenes: dict[str, gp.Scene] = {}
+        self._asker: ask.Asker | None = None
+
+    def asker(self) -> ask.Asker:
+        """Explore's questions, on the published figures and the pipeline's Meta client."""
+        if self._asker is None:
+            prompt = load_prompt(ask.PROMPT)
+            self._asker = ask.Asker(
+                self.runner.client,
+                str(prompt.template["system"]),
+                str(prompt.template["user"]),
+                self._published_figure,
+            )
+        return self._asker
+
+    def _published_figure(self, figure_id: str, version: int | None) -> tuple[RegionsFile, bytes]:
+        """A published version's regions.json and the figure image it was made from."""
+        pub = self.published(figure_id, version)
+        obj = json.loads(self.publications.path(pub, REGIONS_FILE).read_text("utf-8"))
+        return RegionsFile.from_json_obj(obj), self.runner.source_image(figure_id).read_bytes()
 
     def _start(self, job: JobRecord) -> None:
         task = asyncio.create_task(self._run_job(job))
