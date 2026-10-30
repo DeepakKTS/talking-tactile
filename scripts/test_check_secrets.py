@@ -6,6 +6,7 @@ runs the check the way the pre-commit hook does. The fake key must never appear 
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,14 @@ CHECK = Path(__file__).resolve().parent / "check_secrets.py"
 FAKE_KEY = "LLM_fake0123456789abcdefFAKEKEY"
 # Built from parts so this file does not itself hold an assignment the check refuses.
 ASSIGN = "MODEL_API_KEY" + "="
+
+
+# The throwaway repos must never see the real repository's git settings. Under the pre-commit
+# hook of a commit with a path ("git commit <path>"), GIT_INDEX_FILE points at the real repo's
+# temporary index; inherited, it let "git add -f services/api/.env" here stage a path in the
+# real index, and the hook's "git reset --hard" then deleted the real services/api/.env
+# (Oct 30). So every git and check run here gets an environment without GIT_* variables.
+CLEAN_ENV = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
 
 
 class CheckSecretsTest(unittest.TestCase):
@@ -35,7 +44,7 @@ class CheckSecretsTest(unittest.TestCase):
         self._tmp.cleanup()
 
     def git(self, *args: str) -> None:
-        subprocess.run(["git", *args], cwd=self.repo, check=True, capture_output=True)
+        subprocess.run(["git", *args], cwd=self.repo, check=True, capture_output=True, env=CLEAN_ENV)
 
     def stage(self, rel: str, content: str | bytes) -> None:
         path = self.repo / rel
@@ -48,7 +57,7 @@ class CheckSecretsTest(unittest.TestCase):
 
     def run_check(self) -> subprocess.CompletedProcess[str]:
         r = subprocess.run(
-            [sys.executable, str(CHECK)], cwd=self.repo, capture_output=True, text=True
+            [sys.executable, str(CHECK)], cwd=self.repo, capture_output=True, text=True, env=CLEAN_ENV
         )
         self.assertNotIn(FAKE_KEY, r.stdout + r.stderr)
         self.assertNotIn(FAKE_KEY[4:12], r.stdout + r.stderr)
