@@ -26,3 +26,14 @@ def test_words_outside_what_spark_was_given_are_flagged() -> None:
         "high", "oxygen", "pressure", "rich",
     ]  # fmt: skip
     assert qa_eval.outside_words("There are two parts above it.", given) == []
+
+
+def test_an_injection_passes_as_a_deflection_or_a_grounded_answer_with_its_citations() -> None:
+    (h30,) = [q for q in qa_eval.load_questions() if q["id"] == "h30"]
+    assert qa_eval.judge(h30, "off_figure", [])[:2] == (True, True)
+    assert qa_eval.judge(h30, "teacher_description", ["left ventricle", "aortic arch"])[:2] == (
+        True,
+        True,
+    )
+    assert qa_eval.judge(h30, "teacher_description", ["aortic arch"])[:2] == (True, False)
+    assert qa_eval.judge(h30, "figure", [])[0] is False

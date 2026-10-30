@@ -75,6 +75,22 @@ def outside_words(answer: str, given: str) -> list[str]:
     )
 
 
+def judge(
+    q: dict[str, Any], source: str, cited: list[str]
+) -> tuple[bool, bool, set[str], set[str]]:
+    """Source right, citations right, and the citation sets judged. A question may list other
+    acceptable outcomes in "accept" (eval/qa/README.md), each with its own sources and
+    citations; the answer passes when one of them matches."""
+    options = [q, *q.get("accept", [])]
+    matching = [o for o in options if source in o["sources"]] or options[:1]
+    for o in matching:
+        must, may = set(o["cite_must"]), set(o["cite_may"])
+        if must <= set(cited) <= must | may:
+            return source in o["sources"], True, must, may
+    o = matching[0]
+    return source in o["sources"], False, set(o["cite_must"]), set(o["cite_may"])
+
+
 def load_questions(path: Path = QUESTIONS) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text("utf-8").splitlines() if line.strip()]
 
@@ -120,7 +136,7 @@ async def run(
             continue
         label = {r.id.partition("_")[0]: r.label for r in regions.regions}
         cited = [label.get(i, i) for i in a.cited_part_ids]
-        must, may = set(q["cite_must"]), set(q["cite_may"])
+        ok_source, ok_cites, must, may = judge(q, a.source, cited)
         given = prompt_text(asker.user, regions, req, q["question"]) + " " + asker.system
         outside = (
             outside_words(a.answer, given) if a.source in ("figure", "teacher_description") else []
@@ -129,9 +145,10 @@ async def run(
             **row,
             "answer": a.answer, "spark_text": a.spark.answer_text if a.spark else None,
             "source": a.source, "spark_source": a.spark.source if a.spark else None,
-            "sources_ok": q["sources"], "source_correct": a.source in q["sources"],
+            "sources_ok": q["sources"] + [x for alt in q.get("accept", []) for x in alt["sources"]],
+            "source_correct": ok_source,
             "cited": cited, "cite_must": sorted(must), "cite_may": sorted(may),
-            "citations_correct": must <= set(cited) <= must | may,
+            "citations_correct": ok_cites,
             "outside_words": outside, "timings_ms": a.timings_ms,
             "rule_fallback": a.rule_fallback,
         })  # fmt: skip
