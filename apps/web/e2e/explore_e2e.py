@@ -330,6 +330,31 @@ def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fai
     return out
 
 
+def check_all(page: Page, base: str, api: str, fid: str) -> int:
+    """The teacher checks every part drawn on the sheet, as one check edit through the API,
+    and the review is opened again once it has run. A part is touchable only once checked.
+    Returns how many parts were checked."""
+    draft = json.loads(urllib.request.urlopen(f"{api}/api/figures/{fid}/regions.json").read())
+    ids = list(dict.fromkeys(
+        r["id"].partition("_")[0] for r in draft["regions"]
+        if not any(f["reason"] == "spill" for f in r.get("flags", []))
+    ))  # fmt: skip
+    body = json.dumps({"op": "check", "also": ids[1:]}).encode()
+    req = urllib.request.Request(f"{api}/api/figures/{fid}/regions/{ids[0]}", data=body, method="PATCH",
+                                 headers={"Content-Type": "application/json"})  # fmt: skip
+    version = json.loads(urllib.request.urlopen(req).read())["edit_version"]
+    for _ in range(600):
+        status = json.loads(urllib.request.urlopen(f"{api}/api/figures/{fid}").read())
+        job = status["job"]
+        if job["edit_version"] == version and job["status"] == "done":
+            break
+        time.sleep(0.2)
+    page.goto(f"{base}/author?figure={fid}")
+    page.get_by_role("list", name="Parts").wait_for(timeout=60000)
+    page.wait_for_function("() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
+    return len(ids)
+
+
 def author(page: Page, base: str, api: str, fail: list[str]) -> tuple[str, dict[str, Any]]:
     """The teacher's flow in the real UI: upload, review, two edits, publish."""
     out: dict[str, Any] = {}
@@ -360,7 +385,8 @@ def author(page: Page, base: str, api: str, fail: list[str]) -> tuple[str, dict[
     if out["not_checked_after_edits"] != out["not_checked_at_start"] - 2:
         fail.append(f"checked flags: {out['not_checked_at_start']} then {out['not_checked_after_edits']}")
     out["rules"] = page.get_by_text("All tactile rules pass.").count() == 1
-
+    out["checked"] = check_all(page, base, api, fid)
+    publish = page.get_by_role("button", name="Publish for students")
     publish.click()
     explore = page.get_by_role("link", name="Open version 1 in Explore")
     explore.wait_for(timeout=30000)

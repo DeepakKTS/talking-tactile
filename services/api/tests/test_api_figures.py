@@ -284,6 +284,36 @@ def test_a_version_2_job_database_is_migrated_and_its_jobs_are_not_reused(tmp_pa
     assert store.find_live("f" * 64, JobOptions(), 0, "now") == new
 
 
+def test_a_part_is_touchable_only_once_the_teacher_checks_it(tmp_path: Path) -> None:
+    """Touch requires the teacher's check (Oct 30): a fresh draft has no touchable part;
+    one check edit can name many regions; neighbors name touchable regions only."""
+    from app.models.regions import RegionsFile, check_references  # noqa: PLC0415
+
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        draft = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
+        assert not any(r["touchable"] or r["verified_by_teacher"] for r in draft["regions"])
+        assert all(not r.get("neighbors") for r in draft["regions"])
+        r = await api.http.patch(f"/api/figures/{fid}/regions/r1",
+                                 json={"op": "check", "also": ["r2", "r9"]})  # fmt: skip
+        assert r.status_code == 202, r.text
+        await api.wait(fid)
+        after = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
+        touch = {x["id"].partition("_")[0] for x in after["regions"] if x["touchable"]}
+        assert touch == {"r1", "r2", "r9"}
+        assert all(x["verified_by_teacher"] == x["touchable"] for x in after["regions"])
+        for x in after["regions"]:
+            assert {n["id"].partition("_")[0] for n in x.get("neighbors", [])} <= touch
+        assert check_references(RegionsFile.from_json_obj(after)) == []
+        bad = await api.http.patch(f"/api/figures/{fid}/regions/r1",
+                                   json={"op": "check", "also": ["r99"]})  # fmt: skip
+        assert_envelope(bad, 422, "edit_invalid")
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
+
+    run(tmp_path, body)
+
+
 def test_a_duplicate_upload_returns_the_existing_job(tmp_path: Path) -> None:
     async def body(api: Api) -> None:
         first = await api.upload()

@@ -46,6 +46,7 @@ export type Point = [number, number]; // pixels of the normalized figure
 
 export type Edit =
   | { op: "label"; label: string }
+  | { op: "check"; also?: string[] }
   | { op: "describe"; description: string }
   | { op: "merge"; into: string }
   | { op: "delete" }

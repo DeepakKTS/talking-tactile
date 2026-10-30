@@ -184,9 +184,9 @@ class RegionsFile(ContractModel):
 
 def check_references(regions_file: RegionsFile) -> list[str]:
     """Problems the schema cannot express: duplicate ids (regions, lines and needs_teacher
-    share them), parents that do not exist, and neighbors, the regions a line separates and
-    the regions of a merge proposal that are not touchable regions. Empty when the file is
-    consistent."""
+    share them), parents that do not exist, neighbors and the regions a line separates that
+    are not touchable regions, and regions of a merge proposal that are not drawn on the
+    sheet (a suggestion). Empty when the file is consistent."""
     problems: list[str] = []
     seen: set[str] = set()
     ids = (
@@ -212,6 +212,10 @@ def check_references(regions_file: RegionsFile) -> list[str]:
     return problems + _plan_references(regions_file, touchable)
 
 
+def _suggestion(r: Region) -> bool:
+    return any(f.reason == "spill" for f in r.flags or [])
+
+
 def _plan_references(regions_file: RegionsFile, touchable: set[str]) -> list[str]:
     problems: list[str] = []
     regions = {r.id for r in regions_file.regions}
@@ -221,8 +225,9 @@ def _plan_references(regions_file: RegionsFile, touchable: set[str]) -> list[str
                 problems.append(f"{line.id}: separates {rid}, which is not a touchable region")
         if line.parent is not None and line.parent not in regions:
             problems.append(f"{line.id}: parent {line.parent} does not exist")
+    drawn = {r.id for r in regions_file.regions if not _suggestion(r)}
     for m in regions_file.merge_proposals or []:
         for rid in m.region_ids:
-            if rid not in touchable:
-                problems.append(f"merge {m.name}: {rid} is not a touchable region")
+            if rid not in drawn:
+                problems.append(f"merge {m.name}: {rid} is not a region drawn on the sheet")
     return problems

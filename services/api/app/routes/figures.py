@@ -25,7 +25,7 @@ from app.pipeline.jobs import JobOptions
 
 router = APIRouter(prefix="/api/figures")
 
-_REGION_OPS = {"label", "describe", "merge", "delete"}
+_REGION_OPS = {"label", "check", "describe", "merge", "delete"}
 
 
 def _service(request: Request) -> FigureService:
@@ -101,7 +101,7 @@ async def edit_region(
         return await _accept_outline(request, fid, region_id, body)
     if body.get("op") not in _REGION_OPS or "region" in body:
         raise ApiError(
-            422, "invalid_request", "op is one of label, describe, merge, delete or outline."
+            422, "invalid_request", "op is one of label, check, describe, merge, delete or outline."
         )
     try:
         edit: Edit = EDIT.validate_python({**body, "region": region_id})

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 186, updated 2026-10-30T18:02:38.358Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 189, updated 2026-10-30T18:23:29.009Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -183,6 +183,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Phase A captured the exact requests S2 sends for the flower with no recording (mock run, nothing sent): stigma, style and ovary retries. Phase B sent only those live under caffeinate -i, META_RECORD=plan3_flower: 3 SAM calls, $0.0075. plan_eval replays them with the rest. Flower: 7 of 13 areas touchable (was 6; stigma cleared by its retry), rule violations 0; still needs you: style and ovary spill after their retries, ovules, connective, filament same outline, floral axis no mask. Reference verdicts unchanged (all 5 still below 0.8). Heart, Japan, both brains unchanged.
 - [ ] ~~d5-12 Touch-safety invariant: clip touchable masks to their drawn regions; overlaps go to the teacher~~ (this phase) [cut]
   - Note: Superseded on Oct 30 by teacher confirmation: the invariant is not committed as a gate. Its minimal-clip region logic stays as a detector for an Author warning (d5-13). The replay numbers in the blocked note above stand.
+- [ ] d5-13 Author warning: an outline that covers the drawn region of another part's point, with Show on sheet (phase A)
+- [x] d5-14 Touch requires the teacher's check: touchable only once checked; unchecked parts listed at publish and named in Explore's intro (phase A)
+  - Note: regions.json: touchable = checked by the teacher (check edit naming any number of regions, rename, describe, merge into, add, or an accepted Fix outline: mask source teacher) and not a spill suggestion; thin and under_point_symbol stay informative. Neighbors and line separates name touchable regions only; merge proposals name drawn regions, checked or not; svg_ids compares every drawn region. Author: Parts lists every drawn part; Needs you only suggestions and parts with no shape; Not touchable when published adds 'Not checked yet.' per part; a draft line says Explore will say it once both are checked. Explore: unchanged code; unchecked parts are dropped and named in the intro. Synthetic fixture regenerated as published with every part checked; heart draft fixtures regenerated (nothing touchable). e2e: explore, plan and fix check every part through the API before publishing; all pass. Publish never waits.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.

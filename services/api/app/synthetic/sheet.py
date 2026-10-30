@@ -45,7 +45,9 @@ def main(out: Path = OUT) -> None:
     keys = render_key_svgs(composed.sheet, composed.braille, composed.translations, rules)
     info = FigureInfo(figure_id="synthetic", title=fig.truth.title,
                       figure_type="labeled_diagram", summary=fig.truth.summary)  # fmt: skip
-    regions = build_regions_file(composed.sheet, composed.braille, info, rules)
+    # As published once the teacher has checked every part: Explore's tests touch them all.
+    checked = frozenset(r.group_key for r in composed.sheet.regions)
+    regions = build_regions_file(composed.sheet, composed.braille, info, rules, verified=checked)
     report = [v.model_dump() for v in validate_sheet(composed.sheet, rules)]
     report += [v.model_dump() for v in check_svg_ids(svg, regions)]
     out.mkdir(parents=True, exist_ok=True)

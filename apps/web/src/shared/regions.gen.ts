@@ -81,7 +81,7 @@ export interface TalkingTactileRegionsFile {
     confidence?: number;
     verified_by_teacher: boolean;
     /**
-     * False for a teacher suggestion: not raised on the sheet, and Explore never speaks it or guides to it.
+     * True only once the teacher has checked the part (Oct 30). False for a part not checked yet, which is raised on the sheet, and for a teacher suggestion, which is not. Explore never speaks an untouchable region or guides to it, and names it in the intro.
      */
     touchable: boolean;
     /**
@@ -129,7 +129,7 @@ export interface TalkingTactileRegionsFile {
     parent?: string | null;
   }[];
   /**
-   * Touchable regions drawn as one unbroken shape, which the teacher may merge under the suggested name.
+   * Regions drawn as one unbroken shape, checked or not (Oct 30: merging is how the teacher checks them), which the teacher may merge under the suggested name.
    */
   merge_proposals?: {
     name: string;

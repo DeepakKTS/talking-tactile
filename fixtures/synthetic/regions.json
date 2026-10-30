@@ -315,7 +315,7 @@
    ],
    "source": "sam",
    "confidence": 0.93,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -474,7 +474,7 @@
    ],
    "source": "sam",
    "confidence": 0.88,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true
   },
   {
@@ -604,7 +604,7 @@
    ],
    "source": "sam",
    "confidence": 0.95,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -655,7 +655,7 @@
    ],
    "source": "sam",
    "confidence": 0.9,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -701,7 +701,7 @@
    ],
    "source": "sam",
    "confidence": 0.87,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -747,7 +747,7 @@
    ],
    "source": "sam",
    "confidence": 0.86,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -897,7 +897,7 @@
    ],
    "source": "sam",
    "confidence": 0.74,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "flags": [
     {
@@ -942,7 +942,7 @@
    ],
    "source": "sam",
    "confidence": 0.81,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   }

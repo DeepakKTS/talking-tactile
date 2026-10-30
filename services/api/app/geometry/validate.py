@@ -295,10 +295,13 @@ def _silhouette(sheet: Sheet, rules: TactileRules) -> list[Violation]:
 
 
 def check_svg_ids(svg: str, regions_file: RegionsFile) -> list[Violation]:
-    """Every touchable region in regions.json is drawn in tactile.svg, and the reverse. A
-    teacher suggestion (touchable false) is not raised, so it is not drawn."""
+    """Every region of the sheet in regions.json is drawn in tactile.svg, and the reverse,
+    checked by the teacher (touchable) or not. A teacher suggestion is not raised, so it is
+    not drawn."""
     drawn = set(sheet_ids(svg))
-    listed = {r.id for r in regions_file.regions if r.touchable}
+    listed = {
+        r.id for r in regions_file.regions if not any(f.reason == "spill" for f in r.flags or [])
+    }
     out: list[Violation] = []
     for rid in sorted(listed - drawn):
         out.append(

@@ -202,30 +202,14 @@
      "direction": "down_right"
     },
     {
-     "id": "r8",
-     "direction": "right"
-    },
-    {
-     "id": "r2",
-     "direction": "down_left"
-    },
-    {
-     "id": "r9",
-     "direction": "right"
-    },
-    {
      "id": "r10_2",
      "direction": "up_right"
-    },
-    {
-     "id": "r11",
-     "direction": "down"
     }
    ],
    "source": "sam",
    "confidence": 0.87890625,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -491,44 +475,12 @@
     {
      "id": "r10",
      "direction": "right"
-    },
-    {
-     "id": "r4",
-     "direction": "down_left"
-    },
-    {
-     "id": "r5",
-     "direction": "down_right"
-    },
-    {
-     "id": "r3",
-     "direction": "down_left"
-    },
-    {
-     "id": "r1",
-     "direction": "up_right"
-    },
-    {
-     "id": "r6",
-     "direction": "down_right"
-    },
-    {
-     "id": "r11",
-     "direction": "right"
-    },
-    {
-     "id": "r8",
-     "direction": "up_right"
-    },
-    {
-     "id": "r9",
-     "direction": "up_right"
     }
    ],
    "source": "sam",
    "confidence": 0.84375,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -700,18 +652,6 @@
    "texture": "grid",
    "neighbors": [
     {
-     "id": "r2",
-     "direction": "up_right"
-    },
-    {
-     "id": "r4",
-     "direction": "down"
-    },
-    {
-     "id": "r5",
-     "direction": "down"
-    },
-    {
      "id": "r10",
      "direction": "right"
     }
@@ -719,7 +659,7 @@
    "source": "sam",
    "confidence": 0.76171875,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -967,18 +907,6 @@
    "texture": "lines",
    "neighbors": [
     {
-     "id": "r2",
-     "direction": "up_right"
-    },
-    {
-     "id": "r5",
-     "direction": "down_right"
-    },
-    {
-     "id": "r3",
-     "direction": "up"
-    },
-    {
      "id": "r10",
      "direction": "right"
     }
@@ -986,7 +914,7 @@
    "source": "sam",
    "confidence": 0.80078125,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -1344,32 +1272,12 @@
     {
      "id": "r10",
      "direction": "up_right"
-    },
-    {
-     "id": "r4",
-     "direction": "up_left"
-    },
-    {
-     "id": "r2",
-     "direction": "up_left"
-    },
-    {
-     "id": "r6",
-     "direction": "down_right"
-    },
-    {
-     "id": "r11",
-     "direction": "up_right"
-    },
-    {
-     "id": "r3",
-     "direction": "up"
     }
    ],
    "source": "sam",
    "confidence": 0.65234375,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -1937,34 +1845,14 @@
      "direction": "up_left"
     },
     {
-     "id": "r5",
-     "direction": "up_left"
-    },
-    {
      "id": "r14",
      "direction": "right"
-    },
-    {
-     "id": "r7",
-     "direction": "down_left"
-    },
-    {
-     "id": "r11",
-     "direction": "up"
-    },
-    {
-     "id": "r13",
-     "direction": "up_right"
-    },
-    {
-     "id": "r2",
-     "direction": "up_left"
     }
    ],
    "source": "sam",
    "confidence": 0.421875,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -2130,16 +2018,11 @@
     184.96
    ],
    "texture": "grid",
-   "neighbors": [
-    {
-     "id": "r6",
-     "direction": "up_right"
-    }
-   ],
+   "neighbors": [],
    "source": "sam",
    "confidence": 0.58984375,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -2285,28 +2168,12 @@
     {
      "id": "r10",
      "direction": "down_right"
-    },
-    {
-     "id": "r1",
-     "direction": "left"
-    },
-    {
-     "id": "r9",
-     "direction": "right"
-    },
-    {
-     "id": "r2",
-     "direction": "down_left"
-    },
-    {
-     "id": "r11",
-     "direction": "down"
     }
    ],
    "source": "sam",
    "confidence": 0.87890625,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -2404,28 +2271,12 @@
     {
      "id": "r10",
      "direction": "down"
-    },
-    {
-     "id": "r8",
-     "direction": "left"
-    },
-    {
-     "id": "r1",
-     "direction": "left"
-    },
-    {
-     "id": "r11",
-     "direction": "down"
-    },
-    {
-     "id": "r2",
-     "direction": "down_left"
     }
    ],
    "source": "sam",
    "confidence": 0.73046875,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -2909,57 +2760,13 @@
    "texture": "lines",
    "neighbors": [
     {
-     "id": "r2",
-     "direction": "left"
-    },
-    {
-     "id": "r5",
-     "direction": "down_left"
-    },
-    {
-     "id": "r11",
-     "direction": "right"
-    },
-    {
-     "id": "r1",
-     "direction": "up_left"
-    },
-    {
-     "id": "r6",
-     "direction": "down_right"
-    },
-    {
-     "id": "r9",
-     "direction": "up"
-    },
-    {
-     "id": "r8",
-     "direction": "up_left"
-    },
-    {
      "id": "r10_2",
      "direction": "up"
-    },
-    {
-     "id": "r3",
-     "direction": "left"
-    },
-    {
-     "id": "r4",
-     "direction": "left"
-    },
-    {
-     "id": "r12_2",
-     "direction": "down_right"
-    },
-    {
-     "id": "r13",
-     "direction": "down"
     }
    ],
    "source": "teacher",
    "confidence": 1.0,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -3103,25 +2910,13 @@
    ],
    "neighbors": [
     {
-     "id": "r8",
-     "direction": "up_left"
-    },
-    {
-     "id": "r9",
-     "direction": "down"
-    },
-    {
      "id": "r10",
      "direction": "down"
-    },
-    {
-     "id": "r1",
-     "direction": "down_left"
     }
    ],
    "source": "teacher",
    "confidence": 1.0,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "flags": [
     {
@@ -3428,42 +3223,6 @@
      "direction": "left"
     },
     {
-     "id": "r13",
-     "direction": "down_right"
-    },
-    {
-     "id": "r12_2",
-     "direction": "down"
-    },
-    {
-     "id": "r6",
-     "direction": "down"
-    },
-    {
-     "id": "r12",
-     "direction": "down_right"
-    },
-    {
-     "id": "r5",
-     "direction": "down_left"
-    },
-    {
-     "id": "r2",
-     "direction": "left"
-    },
-    {
-     "id": "r9",
-     "direction": "up"
-    },
-    {
-     "id": "r8",
-     "direction": "up"
-    },
-    {
-     "id": "r1",
-     "direction": "up"
-    },
-    {
      "id": "r14",
      "direction": "down_right"
     }
@@ -3471,7 +3230,7 @@
    "source": "sam",
    "confidence": 0.90234375,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -3555,18 +3314,6 @@
    "texture": "lines",
    "neighbors": [
     {
-     "id": "r13",
-     "direction": "down"
-    },
-    {
-     "id": "r12_2",
-     "direction": "up_left"
-    },
-    {
-     "id": "r11",
-     "direction": "up_left"
-    },
-    {
      "id": "r14",
      "direction": "down"
     }
@@ -3574,7 +3321,7 @@
    "source": "sam",
    "confidence": 0.83203125,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -3642,18 +3389,6 @@
    "texture": "lines",
    "neighbors": [
     {
-     "id": "r12",
-     "direction": "down_right"
-    },
-    {
-     "id": "r13",
-     "direction": "down_left"
-    },
-    {
-     "id": "r11",
-     "direction": "up"
-    },
-    {
      "id": "r14",
      "direction": "down"
     },
@@ -3665,7 +3400,7 @@
    "source": "sam",
    "confidence": 0.83203125,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -3877,24 +3612,8 @@
    "texture": "lines",
    "neighbors": [
     {
-     "id": "r12",
-     "direction": "up"
-    },
-    {
-     "id": "r11",
-     "direction": "up_left"
-    },
-    {
      "id": "r14",
      "direction": "down"
-    },
-    {
-     "id": "r12_2",
-     "direction": "up_right"
-    },
-    {
-     "id": "r6",
-     "direction": "down_left"
     },
     {
      "id": "r10",
@@ -3904,7 +3623,7 @@
    "source": "sam",
    "confidence": 0.57421875,
    "verified_by_teacher": false,
-   "touchable": true,
+   "touchable": false,
    "parent": null
   },
   {
@@ -4706,31 +4425,10 @@
     163.13
    ],
    "texture": "cross",
-   "neighbors": [
-    {
-     "id": "r13",
-     "direction": "up"
-    },
-    {
-     "id": "r6",
-     "direction": "left"
-    },
-    {
-     "id": "r12",
-     "direction": "up"
-    },
-    {
-     "id": "r12_2",
-     "direction": "up"
-    },
-    {
-     "id": "r11",
-     "direction": "up_left"
-    }
-   ],
+   "neighbors": [],
    "source": "teacher",
    "confidence": 1.0,
-   "verified_by_teacher": false,
+   "verified_by_teacher": true,
    "touchable": true,
    "parent": null
   },
@@ -6116,10 +5814,6 @@
   {
    "id": "l1",
    "label": "tricuspid valve",
-   "separates": [
-    "r5",
-    "r6"
-   ],
    "between": [
     "right atrium",
     "right ventricle"
@@ -6127,8 +5821,7 @@
   },
   {
    "id": "l2",
-   "label": "chordae tendineae",
-   "parent": "r6"
+   "label": "chordae tendineae"
   },
   {
    "id": "l3",
@@ -6145,10 +5838,6 @@
   {
    "id": "l4",
    "label": "mitral valve",
-   "separates": [
-    "r13",
-    "r14"
-   ],
    "between": [
     "left atrium",
     "left ventricle"

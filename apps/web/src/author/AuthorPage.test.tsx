@@ -18,7 +18,7 @@ interface Call {
 /** The figure API in memory: jobs finish on the second status poll after they start. */
 class FakeServer {
   calls: Call[] = [];
-  regions: RegionsFile = structuredClone(synthetic) as unknown as RegionsFile;
+  regions: RegionsFile = draft(synthetic as unknown as RegionsFile);
   report: Violation[] = [];
   refuse: Violation[] | null = null;
   editVersion = 0;
@@ -118,6 +118,13 @@ async function upload() {
   await screen.findByRole("heading", { name: synthetic.title });
 }
 
+// A draft as the pipeline writes it: no part checked by the teacher, so none touchable.
+function draft(file: RegionsFile): RegionsFile {
+  const out = structuredClone(file);
+  for (const r of out.regions) Object.assign(r, { touchable: false, verified_by_teacher: false });
+  return out;
+}
+
 describe("author page", () => {
   it("uploads with the options, shows the stages, then the review", async () => {
     page();
@@ -139,7 +146,7 @@ describe("author page", () => {
     await upload();
     const parts = screen.getByRole("list", { name: "Parts" });
     expect(within(parts).getAllByText(/Not checked/)).toHaveLength(synthetic.regions.length);
-    expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet.`)).toBeTruthy();
+    expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet. A student can touch a part only once you check it.`)).toBeTruthy();
   });
 
   it("lists parts that are not touchable apart, with the reason, and publish still goes ahead", async () => {
@@ -160,8 +167,12 @@ describe("author page", () => {
     expect(within(flagged).getByRole("button", { name: "Show the suggested outline of septum" })).toBeTruthy();
     expect(within(flagged).queryByRole("button", { name: /Edit/ })).toBeNull();
     const atPublish = screen.getByRole("list", { name: "Not touchable when published" });
-    expect(within(atPublish).getAllByRole("listitem").map((li) => li.textContent.split(":")[0])).toEqual(["septum", "okinawa"]);
-    expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet.`)).toBeTruthy();
+    // Needs you first, then every part not checked yet: none is touchable until checked.
+    const listed = within(atPublish).getAllByRole("listitem").map((li) => li.textContent);
+    expect(listed.slice(0, 2).map((t) => t.split(":")[0])).toEqual(["septum", "okinawa"]);
+    expect(listed.slice(2)).toHaveLength(synthetic.regions.length);
+    expect(listed.slice(2).every((t) => t.endsWith(": Not checked yet."))).toBe(true);
+    expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet. A student can touch a part only once you check it.`)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
     expect(await screen.findByText("Published as version 1.")).toBeTruthy();
   });
@@ -178,13 +189,15 @@ describe("author page", () => {
     expect(needs.map((li) => li.querySelector("strong")?.textContent)).toEqual(["septum"]);
     const info = within(screen.getByRole("list", { name: "For your information" })).getAllByRole("listitem");
     expect(info.map((li) => li.textContent)).toEqual([
-      "tricuspid valve A line between right atrium and right ventricle. Not raised; Explore says it when a finger crosses from one to the other.",
-      "chordae tendineae A line in right ventricle. Not raised; listed in the key.",
-      "semilunar valves A line between left ventricle and aorta. Not raised; Explore says it when a finger crosses from one to the other.",
-      "mitral valve A line between left atrium and left ventricle. Not raised; Explore says it when a finger crosses from one to the other.",
+      "tricuspid valve A line between right atrium and right ventricle. Not raised; Explore says it when a finger crosses from one to the other, once you check both.",
+      "chordae tendineae A line. Not raised; listed in the key.",
+      "semilunar valves A line between left ventricle and aorta. Not raised; Explore says it when a finger crosses from one to the other, once you check both.",
+      "mitral valve A line between left atrium and left ventricle. Not raised; Explore says it when a finger crosses from one to the other, once you check both.",
       "aorta Smaller than a point symbol, so the sheet shows it as one.", // its second piece
     ]);
-    expect(within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem")).toHaveLength(1);
+    const atPublish = within(screen.getByRole("list", { name: "Not touchable when published" })).getAllByRole("listitem");
+    expect(atPublish.map((li) => li.textContent.split(":")[0])[0]).toBe("septum");
+    expect(atPublish).toHaveLength(15); // the septum, then the 14 parts not checked yet
     fireEvent.click(screen.getByRole("button", { name: "Show the suggested outline of septum" }));
     expect(document.querySelectorAll("figure svg polygon")).toHaveLength(1);
     const before = server.calls.length;

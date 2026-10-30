@@ -168,9 +168,10 @@ def test_regions_json_marks_what_a_student_can_touch(
     _, runner, job, _ = done
     f = regions(runner, job)
     assert f.schema_version == 3 and check_references(f) == []
-    touch = {r.label for r in f.regions if r.touchable}
-    assert "right chamber" not in touch and {"outer chamber", "inner core", "stem"} <= touch
-    (sug,) = [r for r in f.regions if not r.touchable]
+    assert not any(r.touchable for r in f.regions)  # no part checked by the teacher yet
+    drawn = {r.label for r in f.regions if not r.flags or r.flags[0].reason != "spill"}
+    assert "right chamber" not in drawn and {"outer chamber", "inner core", "stem"} <= drawn
+    (sug,) = [r for r in f.regions if r.flags and r.flags[0].reason == "spill"]
     assert sug.label == "right chamber" and sug.id.startswith("s")
     assert sug.flags is not None and sug.flags[0].reason == "spill"
     assert sug.flags[0].detail == "holds points of right lobe after a retry"

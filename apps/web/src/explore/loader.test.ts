@@ -74,7 +74,12 @@ describe("published regions loader", () => {
   it("loads the live heart with its spill suggestion left out and its lines kept", async () => {
     // fixtures/pipeline/heart_regions.json: the live draft of Oct 30 with S1's plan for touch,
     // replayed in services/api/tests/test_e2e_heart_replay.py.
-    const { f } = fetcher(() => new Response(JSON.stringify(heart)));
+    // As published once the teacher has checked every part it draws.
+    const checked = structuredClone(heart);
+    for (const r of checked.regions) {
+      if (!r.flags?.some((x) => x.reason === "spill")) Object.assign(r, { touchable: true, verified_by_teacher: true });
+    }
+    const { f } = fetcher(() => new Response(JSON.stringify(checked)));
     const got = await loadPublished(ID, 1, { fetch: f, storage: null });
     expect(heart.regions).toHaveLength(17);
     expect(got.file.regions).toHaveLength(16);
@@ -84,6 +89,14 @@ describe("published regions loader", () => {
     expect(got.notTouchable).toEqual(["septum"]); // lines are never named here
     expect(got.file.lines?.map((l) => l.label)).toEqual(["tricuspid valve", "chordae tendineae", "semilunar valves", "mitral valve"]);
     expect(got.file.subject?.label).toBe("heart");
+  });
+
+  it("names the parts the teacher has not checked as not touchable, and leaves them out", async () => {
+    const { f } = fetcher(() => new Response(JSON.stringify(heart))); // the draft: nothing checked
+    const got = await loadPublished(ID, 1, { fetch: f, storage: null });
+    expect(got.file.regions).toHaveLength(0);
+    expect(got.notTouchable).toContain("right atrium");
+    expect(got.notTouchable).toContain("septum");
   });
 
   it("says when the figure is not published, and does not fall back to a draft", async () => {

@@ -134,6 +134,7 @@ regions.json schema version 3 (Oct 30, d5-6). Migration from version 2:
 - Optional `merge_proposals` ({name, region_ids, why}): touchable regions drawn as one shape. Author shows each as one merge button.
 - Explore accepts version 3 only; a version 2 file is refused as damaged: publish the figure again. Nothing in a version 2 file changes meaning.
 - Added within version 3 on Oct 30 (d5-8), with no bump: optional `group` on a region, the name of the group S1 planned it as a member of. Explore says it after the label ("anther, part of the stamen"). Every version 3 reader ignores a property it does not know (the schema allows them; the Pydantic model ignores extras), and a file without `group` means what it did, so files on either side of the change read the same in both directions. Groups are never regions and never drawn.
+- Oct 30 (d5-14), no bump, nothing a reader relies on breaks: `touchable` is true only once the teacher has checked the part (Mark checked, the `check` edit that can name many regions, a rename, a description, a merge into it, an accepted Fix outline, or an added part). A part not checked yet is a region with `touchable` false and no flag, raised on the sheet and drawn in tactile.svg; Explore leaves it out and names it in the intro, as it did suggestions. Neighbors and a line's `separates` name touchable regions only; `merge_proposals` name regions drawn on the sheet, checked or not. Publishing never waits for the check.
 
 Target: under 90 seconds from upload to review screen.
 

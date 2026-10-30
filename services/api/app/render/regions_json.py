@@ -80,6 +80,10 @@ def build_regions_file(
     abbrev = {p.region_id: p.line.text for p in braille.placements if p.kind == "abbrev"}
     centers = centroids(sheet.regions, rules.layout.inside_point_tolerance_mm)
     neighbors = find_neighbors(sheet.regions, rules.layout.neighbor_max_gap_mm)
+    # Touch requires the teacher's check (Oct 30): a part is touchable once the teacher
+    # checked, renamed, described, merged into, added it or set its outline. S2's thin and
+    # under_point_symbol flags inform and leave it touchable; spill suggestions never are.
+    checked = {r.id for r in sheet.regions if r.group_key in verified or r.source == "teacher"}
     regions: list[Region] = []
     for r in sheet.regions:
         pts = ring_mm(list(r.polygon.exterior.coords)[:-1], d)
@@ -98,17 +102,17 @@ def build_regions_file(
                 polygon_mm=pts,
                 centroid_mm=(round(cx, d), round(cy, d)),
                 parent=r.parent,
-                neighbors=neighbors[r.id],
+                neighbors=[n for n in neighbors[r.id] if n.id in checked],
                 source=region_source(r.source),
                 confidence=r.score,
-                verified_by_teacher=r.group_key in verified,
-                touchable=True,
+                verified_by_teacher=r.id in checked,
+                touchable=r.id in checked,
                 # The schema allows these to be missing but not null.
                 **{k: v for k, v in optional.items() if v is not None},
                 **({"flags": flags} if flags else {}),
             )
         )
-    plan = plan_fields(sheet, {r.id for r in regions}, d)
+    plan = plan_fields(sheet, checked, d, drawn={r.id for r in regions})
     regions += suggestion_regions(teacher.suggestions, {r.id for r in regions}, d)
     return RegionsFile(
         schema_version=3,
@@ -126,9 +130,17 @@ def build_regions_file(
     )
 
 
-def plan_fields(sheet: Sheet, touchable: AbstractSet[str], decimals: int) -> dict[str, Any]:
-    """subject, lines and merge_proposals, each left out when there is none. A line or a
-    proposal names only touchable regions; a part id is its main region's id."""
+def plan_fields(
+    sheet: Sheet,
+    touchable: AbstractSet[str],
+    decimals: int,
+    drawn: AbstractSet[str] | None = None,
+) -> dict[str, Any]:
+    """subject, lines and merge_proposals, each left out when there is none. A line names
+    only touchable regions. A proposal names regions drawn on the sheet (drawn, by default
+    the touchable ones), checked or not: merging is how a teacher checks them. A part id is
+    its main region's id."""
+    drawn = touchable if drawn is None else drawn
     out: dict[str, Any] = {}
     if sheet.silhouette is not None:
         ring = ring_mm(list(sheet.silhouette.exterior.coords)[:-1], decimals)
@@ -150,9 +162,9 @@ def plan_fields(sheet: Sheet, touchable: AbstractSet[str], decimals: int) -> dic
     if lines:
         out["lines"] = lines
     merges = [
-        MergeProposal(name=m.name, region_ids=[p for p in m.part_ids if p in touchable], why=m.why)
+        MergeProposal(name=m.name, region_ids=[p for p in m.part_ids if p in drawn], why=m.why)
         for m in sheet.merges
-        if sum(p in touchable for p in m.part_ids) >= MIN_MERGE
+        if sum(p in drawn for p in m.part_ids) >= MIN_MERGE
     ]
     if merges:
         out["merge_proposals"] = merges

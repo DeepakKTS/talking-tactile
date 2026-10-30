@@ -5,6 +5,8 @@ came from. They are replayed in order on S3's parts before S4, and the hash of t
 joins the S4 and S5 cache keys, so an edit re-runs layout and render and nothing earlier.
 
 - label: a new label for the part.
+- check: the teacher has looked at the part and its outline (Mark checked); also names
+  other regions, so "Mark all parts checked" is one edit.
 - describe: a description for the part, written to regions.json.
 - merge: the part's pixels join another part, which keeps its own label.
 - delete: the part goes; its children move up to its parent.
@@ -16,7 +18,9 @@ joins the S4 and S5 cache keys, so an edit re-runs layout and render and nothing
   a part S2 left to the teacher its first one, before S3: S3's rules run again on it. The
   hash of the outline edits joins the S3 key. Its mask is marked set by the teacher.
 
-A part a teacher labelled, described, merged into or added is marked verified."""
+A part a teacher checked, labelled, described, merged into or added is marked verified, as
+is one whose outline the teacher set (its mask's source is teacher). Only a verified part is
+touchable (Oct 30)."""
 
 import hashlib
 from collections.abc import Mapping, Sequence
@@ -44,6 +48,12 @@ class LabelEdit(_Edit):
     op: Literal["label"]
     region: RegionId
     label: Text
+
+
+class CheckEdit(_Edit):
+    op: Literal["check"]
+    region: RegionId
+    also: Annotated[list[RegionId], Field(max_length=500)] = []
 
 
 class DescribeEdit(_Edit):
@@ -82,7 +92,7 @@ class OutlineEdit(_Edit):
 
 
 Edit = Annotated[
-    LabelEdit | DescribeEdit | MergeEdit | DeleteEdit | AddEdit | OutlineEdit,
+    LabelEdit | CheckEdit | DescribeEdit | MergeEdit | DeleteEdit | AddEdit | OutlineEdit,
     Field(discriminator="op"),
 ]
 EDIT = TypeAdapter(Edit)
@@ -131,6 +141,8 @@ def annotations(edits: Sequence[Edit]) -> Annotations:
     for e in edits:
         if isinstance(e, LabelEdit):
             verified.add(part_id_of(e.region))
+        elif isinstance(e, CheckEdit):
+            verified |= {part_id_of(r) for r in (e.region, *e.also)}
         elif isinstance(e, DescribeEdit):
             descriptions[part_id_of(e.region)] = e.description
             verified.add(part_id_of(e.region))
@@ -241,6 +253,9 @@ def apply_edits(
             st.put(p.model_copy(update={"mask": p.mask.model_copy(update={"label": e.label})}))
         elif isinstance(e, DescribeEdit):
             st.get(e.region)
+        elif isinstance(e, CheckEdit):
+            for r in (e.region, *e.also):
+                st.get(r)
         elif isinstance(e, MergeEdit):
             _merge(st, e)
         elif isinstance(e, DeleteEdit):

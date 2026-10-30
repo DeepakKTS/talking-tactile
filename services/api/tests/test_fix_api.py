@@ -50,7 +50,9 @@ def test_preview_cache_accept_and_publish_a_spill_part(tmp_path: Path) -> None:
     async def body(http: httpx.AsyncClient, service: Any, fid: str, out: dict[str, Any]) -> None:
         base = f"/api/figures/{fid}"
         draft = (await http.get(f"{base}/regions.json")).json()
-        (spill,) = [r for r in draft["regions"] if not r["touchable"]]
+        (spill,) = [
+            r for r in draft["regions"] if any(f["reason"] == "spill" for f in r.get("flags", []))
+        ]
         assert spill["label"] == "right chamber"
         sid = spill["id"]
         empty = (await http.post(f"{base}/regions/{sid}/fix", json={"positive": []})).json()
@@ -89,7 +91,9 @@ def test_preview_cache_accept_and_publish_a_spill_part(tmp_path: Path) -> None:
     f = RegionsFile.from_json_obj(got["published"])
     chamber = [r for r in f.regions if r.label == "right chamber"]
     assert chamber and all(r.touchable and r.source == "teacher" for r in chamber)
-    assert all(r.touchable for r in f.regions)
+    # The fixed part is checked by its accepted outline; the others wait for the teacher.
+    assert {r.label for r in f.regions if r.touchable} == {"right chamber"}
+    assert not any(r.flags and r.flags[0].reason == "spill" for r in f.regions)
     assert got["published"] == got["draft"]
 
 
@@ -110,10 +114,12 @@ def test_fixing_a_touchable_part_keeps_the_other_regions_ids(tmp_path: Path) -> 
         out["before"], out["after"], out["lobe"] = before, after, lobe["id"]
 
     got = run(tmp_path, client, body)
-    ids = lambda f: {r["label"]: r["id"] for r in f["regions"] if r["touchable"]}  # noqa: E731
+    ids = lambda f: {r["label"]: r["id"] for r in f["regions"]}  # noqa: E731
     assert ids(got["after"]) == ids(got["before"])
     lobe = next(r for r in got["after"]["regions"] if r["id"] == got["lobe"])
-    assert lobe["source"] == "teacher"
+    # An accepted outline is the teacher's check: only that part is touchable.
+    assert lobe["source"] == "teacher" and lobe["touchable"] and lobe["verified_by_teacher"]
+    assert [r["label"] for r in got["after"]["regions"] if r["touchable"]] == ["left lobe"]
 
 
 def test_a_part_added_by_name_or_an_unknown_region_cannot_be_fixed(tmp_path: Path) -> None:

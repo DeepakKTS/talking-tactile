@@ -97,9 +97,10 @@ export function Review({ api, id, status, onEdited }: Props) {
   };
 
   if (!file) return <p role="status">{message || "Loading the review."}</p>;
-  const touchable = file.regions.filter((r) => r.touchable);
-  const unchecked = touchable.filter((r) => !r.verified_by_teacher).length;
+  const parts = file.regions.filter((r) => !isSuggestion(r));
+  const unchecked = parts.filter((r) => !r.verified_by_teacher).length;
   const flagged = notTouchable(file);
+  const waiting = notCheckedYet(file);
   const notes = forYourInformation(file);
 
   return (
@@ -125,12 +126,14 @@ export function Review({ api, id, status, onEdited }: Props) {
         <div>
           <h3>Parts</h3>
           <p>
-            {unchecked === 0 ? "Every part is checked." : `${unchecked} of ${touchable.length} parts not checked yet.`}
+            {unchecked === 0
+              ? "Every part is checked."
+              : `${unchecked} of ${parts.length} parts not checked yet. A student can touch a part only once you check it.`}
           </p>
           <ul aria-label="Parts" style={{ listStyle: "none", padding: 0 }}>
-            {touchable.map((r) => (
+            {parts.map((r) => (
               // Keyed on the saved text too, so the fields start over after an edit lands.
-              <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={touchable} busy={busy || !settled} selected={selected === r.id}
+              <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={parts} busy={busy || !settled} selected={selected === r.id}
                 onSelect={() => { setSelected(selected === r.id ? null : r.id); }} onEdit={edit}
                 onFix={() => { setFixing({ region: r.id, label: r.label }); }} />
             ))}
@@ -203,11 +206,12 @@ export function Review({ api, id, status, onEdited }: Props) {
         </ul>
       )}
 
-      {flagged.length > 0 && (
+      {flagged.length + waiting.length > 0 && (
         <div>
           <p>Publishing does not wait for these. When published, these parts are not touchable:</p>
           <ul aria-label="Not touchable when published">
             {flagged.map((f) => <li key={f.id}>{f.label}: {f.reason}</li>)}
+            {waiting.map((r) => <li key={r.id}>{r.label}: Not checked yet.</li>)}
           </ul>
         </div>
       )}
@@ -242,11 +246,24 @@ const REASONS: Record<string, string> = {
   dropped: "It was dropped as too small or too thin",
 };
 
-// Every part a student cannot touch: suggestion regions, then parts with no shape.
+// A teacher suggestion: a spill outline, never raised on the sheet.
+export const isSuggestion = (r: Region) => r.flags?.some((f) => f.reason === "spill") ?? false;
+
+// Parts drawn on the sheet that the teacher has not checked yet, one entry per part.
+export function notCheckedYet(file: RegionsFile): Region[] {
+  const seen = new Set<string>();
+  return file.regions.filter((r) => {
+    if (isSuggestion(r) || r.verified_by_teacher || seen.has(partId(r.id))) return false;
+    seen.add(partId(r.id));
+    return true;
+  });
+}
+
+// Every part that needs the teacher: suggestion regions, then parts with no shape.
 export function notTouchable(file: RegionsFile): Flagged[] {
   const out: Flagged[] = [];
   for (const r of file.regions) {
-    if (r.touchable) continue;
+    if (!isSuggestion(r)) continue;
     const same = out.find((f) => f.label === r.label && f.outlines.length > 0);
     if (same) {
       same.outlines.push(r.id); // another piece of the same suggestion
@@ -297,15 +314,23 @@ export function largest(regions: readonly Region[], ids: readonly string[]): str
 export function forYourInformation(file: RegionsFile): Note[] {
   const label = (rid: string) => file.regions.find((r) => r.id === rid)?.label ?? rid;
   const out: Note[] = [];
+  // regions.json names a line's regions only once they are touchable; before the teacher
+  // checks them, the line's labels say which parts it will sit between.
+  const drawn = new Set(file.regions.filter((r) => !isSuggestion(r)).map((r) => r.label));
   for (const l of file.lines ?? []) {
+    const crossing = l.separates
+      ? "Explore says it when a finger crosses from one to the other"
+      : l.between && drawn.has(l.between[0]) && drawn.has(l.between[1])
+        ? "Explore says it when a finger crosses from one to the other, once you check both"
+        : "listed in the key";
     const text = l.between
-      ? `A line between ${l.between[0]} and ${l.between[1]}. Not raised; ${l.separates ? "Explore says it when a finger crosses from one to the other" : "listed in the key"}.`
+      ? `A line between ${l.between[0]} and ${l.between[1]}. Not raised; ${crossing}.`
       : `A line${l.parent ? ` in ${label(l.parent)}` : ""}. Not raised; listed in the key.`;
     out.push({ key: l.id, label: l.label, text });
   }
   const groups = new Map<string, string[]>();
   for (const r of file.regions) {
-    if (!r.touchable || !r.group) continue;
+    if (isSuggestion(r) || !r.group) continue;
     const members = groups.get(r.group) ?? [];
     if (!members.includes(r.label)) members.push(r.label);
     groups.set(r.group, members);
@@ -315,7 +340,7 @@ export function forYourInformation(file: RegionsFile): Note[] {
   }
   const seen = new Set<string>();
   for (const r of file.regions) {
-    if (!r.touchable || seen.has(partId(r.id))) continue;
+    if (isSuggestion(r) || seen.has(partId(r.id))) continue;
     if (r.parent) {
       seen.add(partId(r.id));
       out.push({ key: `nested ${r.id}`, label: r.label, text: `Inside ${label(r.parent)}, raised within its outline.` });
@@ -323,7 +348,7 @@ export function forYourInformation(file: RegionsFile): Note[] {
   }
   const small = new Set<string>();
   for (const r of file.regions) {
-    if (!r.touchable || small.has(partId(r.id))) continue;
+    if (isSuggestion(r) || small.has(partId(r.id))) continue;
     if (r.flags?.some((f) => f.reason === "under_point_symbol")) {
       small.add(partId(r.id));
       out.push({ key: `small ${r.id}`, label: r.label, text: "Smaller than a point symbol, so the sheet shows it as one." });

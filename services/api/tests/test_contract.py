@@ -200,7 +200,7 @@ def test_models_accept_exactly_what_the_schema_accepts(obj: Any) -> None:
     assert model_ok(obj) == schema_ok(obj)
 
 
-def test_lines_and_merge_proposals_name_touchable_regions() -> None:
+def test_lines_name_touchable_regions_and_merge_proposals_regions_on_the_sheet() -> None:
     obj = copy.deepcopy(GOLDEN)
     obj["lines"][0]["separates"] = ["r1", "s9"]
     obj["lines"][1]["parent"] = "r8"
@@ -211,5 +211,5 @@ def test_lines_and_merge_proposals_name_touchable_regions() -> None:
         "duplicate region id r2",
         "l1: separates s9, which is not a touchable region",
         "r2: parent r8 does not exist",
-        "merge vessel and valve: x is not a touchable region",
+        "merge vessel and valve: x is not a region drawn on the sheet",
     ]

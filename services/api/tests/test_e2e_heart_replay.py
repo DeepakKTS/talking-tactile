@@ -71,14 +71,16 @@ def test_the_heart_through_the_api_on_replay() -> None:
     assert [s["outcome"] for s in got["status"]["job"]["stages"]] == ["ran"] * 6
     draft = RegionsFile.from_json_obj(got["draft"])
     assert draft.schema_version == 3 and check_references(draft) == []
-    assert {r.label for r in draft.regions if not r.touchable} == {"septum"}
-    assert len({r.label for r in draft.regions if r.touchable}) == 14 and draft.needs_teacher == []
+    assert not any(r.touchable for r in draft.regions)  # nothing checked by the teacher yet
+    spill = {r.label for r in draft.regions if r.flags and r.flags[0].reason == "spill"}
+    assert spill == {"septum"} and draft.needs_teacher == []
+    assert len({r.label for r in draft.regions} - spill) == 14
     lines = {x.label: (x.between, x.separates, x.parent) for x in draft.lines or []}
-    assert lines == {
-        "tricuspid valve": (["right atrium", "right ventricle"], ["r5", "r6"], None),
-        "chordae tendineae": (None, None, "r6"),
-        "semilunar valves": (["left ventricle", "aorta"], ["r14", "r10"], None),
-        "mitral valve": (["left atrium", "left ventricle"], ["r13", "r14"], None),
+    assert lines == {  # separates and parent name touchable regions only: none yet
+        "tricuspid valve": (["right atrium", "right ventricle"], None, None),
+        "chordae tendineae": (None, None, None),
+        "semilunar valves": (["left ventricle", "aorta"], None, None),
+        "mitral valve": (["left atrium", "left ventricle"], None, None),
     }
     assert [(m.name, m.region_ids) for m in draft.merge_proposals or []] == [
         ("aortic arch", ["r1", "r8", "r9", "r10"])
@@ -124,6 +126,6 @@ def test_fix_outline_on_replay_gives_the_live_fixes() -> None:
     fixed = RegionsFile.from_json_obj(got["draft"])
     teacher = {r.label for r in fixed.regions if r.source == "teacher"}
     assert teacher == {"aorta", "left ventricle"}
-    assert {r.label for r in fixed.regions if not r.touchable} == {"septum"}
+    assert {r.label for r in fixed.regions if r.touchable} == {"aorta", "left ventricle"}
     assert [(v["rule"], v["regions"][0]) for v in got["report"]] == [("point_symbol", "r9")]
     assert got["publish"]["error"]["code"] == "rules_violated"  # the 409 rule still applies
