@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 216,
- "updated_at": "2026-10-30T20:29:54.649Z",
+ "rev": 218,
+ "updated_at": "2026-10-30T20:36:36.697Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1600,6 +1600,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "phone"
    ],
    "changed_at": "2026-10-30T20:29:54.649Z"
+  },
+  {
+   "id": "d5-26",
+   "day": 5,
+   "title": "Recording post-roll: 250 ms after release",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "VoiceAsk keeps the microphone recording POST_ROLL_MS (250) after the finger lets go, then stops it and encodes; the falling release earcon plays after the capture so it is not in the WAV (250 ms later than before). releasedAt stays the release, so latency includes the post-roll. The AudioWorklet now posts each 128-sample quantum, not 2048-sample blocks, so stopping loses at most one quantum (under 3 ms) instead of up to 43 ms. Test: a fake microphone on the clock (0.25 before release, 0.75 after): nothing is sent before 250 ms, the WAV ends with 4000 samples of 0.75, the earcon follows the stop. Headless hold of 2.5 s: WAV 2.41 s (was 2.14).",
+   "done_at": "2026-10-30T20:36:36.697Z",
+   "tags": [
+    "explore",
+    "voice"
+   ],
+   "changed_at": "2026-10-30T20:36:36.697Z"
   },
   {
    "id": "d6-1",
@@ -2686,6 +2702,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T20:36:36.697Z",
+   "kind": "claude",
+   "text": "Task d5-26 \"Recording post-roll: 250 ms after release\" is now done. Note: VoiceAsk keeps the microphone recording POST_ROLL_MS (250) after the finger lets go, then stops it and encodes; the falling release earcon plays after the capture so it is not in the WAV (250 ms later than before). releasedAt stays the release, so latency includes the post-roll. The AudioWorklet now posts each 128-sample quantum, not 2048-sample blocks, so stopping loses at most one quantum (under 3 ms) instead of up to 43 ms. Test: a fake microphone on the clock (0.25 before release, 0.75 after): nothing is sent before 250 ms, the WAV ends with 4000 samples of 0.75, the earcon follows the stop. Headless hold of 2.5 s: WAV 2.41 s (was 2.14)."
+  },
+  {
+   "ts": "2026-10-30T20:36:36.660Z",
+   "kind": "claude",
+   "text": "Task d5-26 \"Recording post-roll: 250 ms after release\" added to day 5."
+  },
   {
    "ts": "2026-10-30T20:29:54.649Z",
    "kind": "claude",

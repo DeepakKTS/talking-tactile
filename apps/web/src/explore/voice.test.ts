@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { AudioPort } from "./audio";
 import { OFFLINE_ANSWER } from "./session";
-import { HOLD_MS, HoldToTalk, MAX_MS, MIC_DENIED, MIN_MS, type MicPort, RATE, TOO_SHORT, VoiceAsk, encodeWav, resample } from "./voice";
+import { HOLD_MS, HoldToTalk, MAX_MS, MIC_DENIED, MIN_MS, type MicPort, POST_ROLL_MS, RATE, TOO_SHORT, VoiceAsk, encodeWav, resample } from "./voice";
 
 describe("WAV encoder", () => {
   it("writes a RIFF WAVE header for mono 16-bit PCM at 16 kHz, then the samples", () => {
@@ -144,7 +144,7 @@ describe("voice ask", () => {
     expect(v.engaged).toBe(true);
     await advance(1000);
     v.up();
-    await advance(0);
+    await advance(POST_ROLL_MS);
     expect(audio.log).toEqual(["stop", "listen start", "listen end", "thinking", "thinking off"]);
     expect(sent).toHaveLength(1);
     expect(sent[0]?.length).toBe(44 + 1600 * 2); // 0.1 s at 48 kHz, as 16 kHz samples
@@ -188,5 +188,61 @@ describe("voice ask", () => {
     await advance(0);
     expect(audio.log.slice(-2)).toEqual(["listen end", `say ${TOO_SHORT}`]);
     expect(sent).toEqual([]);
+  });
+});
+
+describe("post-roll", () => {
+  it("keeps capturing 250 ms after release, so the last 250 ms of the signal is in the WAV", async () => {
+    let now = 0;
+    let releasedAt = Infinity;
+    const timers: { at: number; fn: () => void }[] = [];
+    // A microphone on the clock: 16 samples a millisecond, 0.25 before release, 0.75 after.
+    let startedAt = 0;
+    const log: string[] = [];
+    const mic: MicPort = {
+      open: () => Promise.resolve(),
+      start: () => { startedAt = now; },
+      stop: () => {
+        log.push("mic stop");
+        const n = (now - startedAt) * 16;
+        return { samples: Float32Array.from({ length: n }, (_, i) => (startedAt + i / 16 >= releasedAt ? 0.75 : 0.25)), rate: RATE };
+      },
+    };
+    const audio = new Sounds();
+    audio.listenEnd = () => { log.push("listen end"); return 0; };
+    const sent: Uint8Array[] = [];
+    const v = new VoiceAsk({
+      audio, mic, online: () => true,
+      send: (wav) => { sent.push(wav); return Promise.resolve(); },
+      now: () => now,
+      setTimer: (fn, ms) => { const t = { at: now + ms, fn }; timers.push(t); return t; },
+      clearTimer: (t) => { const i = timers.indexOf(t as (typeof timers)[number]); if (i >= 0) timers.splice(i, 1); },
+    });
+    const advance = async (ms: number) => {
+      now += ms;
+      for (const t of timers.filter((x) => x.at <= now)) {
+        timers.splice(timers.indexOf(t), 1);
+        t.fn();
+      }
+      await new Promise((r) => setTimeout(r, 0));
+    };
+    v.down();
+    await advance(HOLD_MS);
+    await advance(1000);
+    releasedAt = now;
+    v.up();
+    await advance(POST_ROLL_MS - 1);
+    expect(sent).toEqual([]); // still capturing
+    await advance(1);
+    expect(log).toEqual(["mic stop", "listen end"]); // the release earcon after the capture
+    const wav = sent[0];
+    if (!wav) throw new Error("nothing sent");
+    const d = new DataView(wav.buffer);
+    const samples = (wav.length - 44) / 2;
+    const at = (i: number) => d.getInt16(44 + 2 * i, true) / 0x7fff;
+    expect(samples).toBe((1000 + POST_ROLL_MS) * 16);
+    const tail = POST_ROLL_MS * 16;
+    for (let i = samples - tail; i < samples; i++) expect(at(i)).toBeCloseTo(0.75, 3);
+    expect(at(samples - tail - 1)).toBeCloseTo(0.25, 3);
   });
 });

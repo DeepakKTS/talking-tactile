@@ -4,7 +4,8 @@
 //   idle, pressed (a finger is down, not yet HOLD_MS), listening (the start earcon played,
 //   the microphone records), busy (the question is out; holds are ignored until the
 //   answer is spoken). A press shorter than HOLD_MS is a tap and does nothing. A recording
-//   shorter than MIN_MS is too short to send; one that reaches MAX_MS is sent.
+//   shorter than MIN_MS is too short to send; one that reaches MAX_MS is sent. Capture
+//   goes on POST_ROLL_MS after letting go, then the WAV is encoded.
 // - The microphone is Web Audio: a MediaStreamSource into an AudioWorklet that hands its
 //   samples back in blocks, kept while listening (no MediaRecorder). It is opened on the first hold, which is a
 //   user gesture, and kept open, so later questions do not lose their first word.
@@ -19,6 +20,8 @@ export const RATE = 16000;
 export const HOLD_MS = 300;
 export const MIN_MS = 400;
 export const MAX_MS = 15000;
+/** Capture goes on this long after letting go: the last syllable often trails the finger. */
+export const POST_ROLL_MS = 250;
 
 export const MIC_DENIED =
   "The microphone is not allowed, so I cannot hear questions. Type a question instead. Labels still work.";
@@ -142,15 +145,12 @@ export interface MicPort {
   stop(): { samples: Float32Array; rate: number };
 }
 
-// The worklet: copies its input in blocks of 2048 samples to the page.
+// The worklet: posts each render quantum of input (128 samples, under 3 ms) to the page,
+// so stopping loses at most one quantum of the post-roll.
 const TAP = `class Tap extends AudioWorkletProcessor {
-  constructor() { super(); this.buf = new Float32Array(2048); this.n = 0; }
   process(inputs) {
     const ch = inputs[0] && inputs[0][0];
-    if (ch) for (let i = 0; i < ch.length; i++) {
-      this.buf[this.n++] = ch[i];
-      if (this.n === this.buf.length) { this.port.postMessage(this.buf.slice()); this.n = 0; }
-    }
+    if (ch) this.port.postMessage(ch.slice());
     return true;
   }
 }
@@ -299,8 +299,9 @@ export class VoiceAsk {
         audio.say(TOO_SHORT);
       } else {
         const releasedAt = this.now();
+        await new Promise<void>((resolve) => { this.setTimer(resolve, POST_ROLL_MS); });
         const { samples, rate } = mic.stop();
-        audio.listenEnd();
+        audio.listenEnd(); // after the post-roll, so the earcon is not in the recording
         const t = this.now();
         const wav = encodeWav(resample(samples, rate));
         this.encodeMs = this.now() - t;

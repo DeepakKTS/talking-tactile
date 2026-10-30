@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 216, updated 2026-10-30T20:29:54.649Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 218, updated 2026-10-30T20:36:36.697Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -209,6 +209,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Status check first: not there before. PLAN.md section 11 now names it: one unbroken drawn shape (aorta and its three branches) has no drawn boundary, so code proposes the merge and the teacher accepts it or fixes each outline.
 - [x] d5-25 iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check
   - Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), Zedlers-MacBook-Pro.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://Zedlers-MacBook-Pro.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.
+- [x] d5-26 Recording post-roll: 250 ms after release
+  - Note: VoiceAsk keeps the microphone recording POST_ROLL_MS (250) after the finger lets go, then stops it and encodes; the falling release earcon plays after the capture so it is not in the WAV (250 ms later than before). releasedAt stays the release, so latency includes the post-roll. The AudioWorklet now posts each 128-sample quantum, not 2048-sample blocks, so stopping loses at most one quantum (under 3 ms) instead of up to 43 ms. Test: a fake microphone on the clock (0.25 before release, 0.75 after): nothing is sent before 250 ms, the WAV ends with 4000 samples of 0.75, the earcon follows the stop. Headless hold of 2.5 s: WAV 2.41 s (was 2.14).
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
