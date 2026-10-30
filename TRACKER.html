@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 167,
- "updated_at": "2026-10-30T10:11:52.256Z",
+ "rev": 171,
+ "updated_at": "2026-10-30T17:01:18.980Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1300,6 +1300,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
     "author"
    ],
    "changed_at": "2026-10-30T10:11:52.216Z"
+  },
+  {
+   "id": "d5-7",
+   "day": 5,
+   "title": "Drawn boundary evidence: merges only where the image shows no boundary; same outlines to the teacher",
+   "detail": "",
+   "timebox": "this phase",
+   "fallback": "",
+   "status": "done",
+   "note": "app/geometry/boundaries.py: drawn regions (ink and color edges over EDGE_STEP 14, grown 1 px, 4-connected) and fill colors (FILL_DELTA 55); both chosen from the pairs S2 judged on the five figures (eval/plan/RESULTS.md, Drawn boundaries). S2: Spark's shares_region keeps the largest set with no boundary, the rest left out with the reason (MergeProposal.left_out, flags); IoU 0.8 pairs with a boundary send the smaller to the teacher as same_outline (S5: a spill-style suggestion), with none they are a merge proposal and no longer split. Replay of the live recordings, no calls: heart, Japan, Commons brain unchanged (heart draft equals its fixture; aortic arch keeps 4 members). Uploaded brain: 8 of 10 areas touchable (was 10); needs you parietal lobe (same outline as postcentral gyrus) and pons (same outline as cerebellum); brainstem proposal pons, medulla, spinal cord, cerebellum dropped; but medulla loses every pixel to spinal cord (IoU 0.97, no split) and is dropped as empty, so regions.json has no proposal left; medulla and spinal cord now nest in the cerebellum's mask, which covers the brainstem. Flower: 6 of 13 (was 12): connective, filament, ovules same outline; stigma, style, ovary no longer share a region, so their spill retries are asked for and have no recording; references keep their verdicts (all still below 0.8; anther 0.198 to 0.421, connective 0.068 to 0.0). Tests: test_boundaries.py, S2 merge and same-outline tests, S5 mapping.",
+   "done_at": "2026-10-30T17:01:18.980Z",
+   "tags": [
+    "pipeline",
+    "s2"
+   ],
+   "changed_at": "2026-10-30T17:01:18.980Z"
   },
   {
    "id": "d6-1",
@@ -2240,6 +2256,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Lines get no SAM call, no mask, no spill check and never need the teacher. Explore says the line and the part together (Tricuspid valve, right ventricle) when the finger enters a part from the part across a line, directly or within dwell.hold_ms; it rides on the earcon, so the enter hold and the earcon cap apply, and the part counts as labelled. The key lists each line; Author lists it under For your information.",
    "why": "A sulcus is a border, not a place to rest a finger; given points it poisoned its lobes' spill checks. Spoken at the crossing, it is heard where it is.",
    "changed_at": "2026-10-30T10:11:33.122Z"
+  },
+  {
+   "id": "dec-mvv7ygfnuzca",
+   "date": "2026-10-30",
+   "title": "A merge is proposed only where the image shows no drawn boundary",
+   "decision": "A drawn boundary: the parts' points in different regions of the figure cut by ink and color edges (step over 14 across 2 px), or fills more than 55 apart. Spark's shares_region keeps its largest set of members with none between them; members left out are recorded with the reason. IoU pairs with none are a merge proposal, not split by the nearer point.",
+   "why": "The straight segment between points, crossing ink, failed on the eval figures: it crosses gyri lines inside one lobe, prefecture lines inside a Japan region and the open crease across the uploaded brain's brainstem, and the cerebellum's outline is taken for a leader line. Fill difference at the points alone failed too: the shaded aortic arch differs by up to 48.8, postcentral gyrus and parietal lobe by 31. Thresholds from eval/plan/RESULTS.md: one shape joins by step 10, red against pink at 17; shaded Blausen lobes differ by 60.7 and more.",
+   "changed_at": "2026-10-30T17:01:18.902Z"
+  },
+  {
+   "id": "dec-mvv7yggtrivj",
+   "date": "2026-10-30",
+   "title": "Near-identical masks across a drawn boundary go to the teacher, never split",
+   "decision": "With IoU 0.8 or more and a drawn boundary, the smaller part needs the teacher ('same outline as' the larger), its mask an untouchable suggestion with Fix outline; its points are no spill for the larger.",
+   "why": "A split by the nearer point invents a line where SAM gave both parts one outline. On the uploaded brain it sends parietal lobe (same outline as postcentral gyrus) and pons (same outline as cerebellum) to the teacher; the larger keeps an outline that also covers the smaller's drawn region, which the teacher sees only in the preview.",
+   "changed_at": "2026-10-30T17:01:18.943Z"
   }
  ],
  "risks": [
@@ -2330,6 +2362,26 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T17:01:18.980Z",
+   "kind": "claude",
+   "text": "Task d5-7 \"Drawn boundary evidence: merges only where the image shows no boundary; same outlines to the teacher\" is now done. Note: app/geometry/boundaries.py: drawn regions (ink and color edges over EDGE_STEP 14, grown 1 px, 4-connected) and fill colors (FILL_DELTA 55); both chosen from the pairs S2 judged on the five figures (eval/plan/RESULTS.md, Drawn boundaries). S2: Spark's shares_region keeps the largest set with no boundary, the rest left out with the reason (MergeProposal.left_out, flags); IoU 0.8 pairs with a boundary send the smaller to the teacher as same_outline (S5: a spill-style suggestion), with none they are a merge proposal and no longer split. Replay of the live recordings, no calls: heart, Japan, Commons brain unchanged (heart draft equals its fixture; aortic arch keeps 4 members). Uploaded brain: 8 of 10 areas touchable (was 10); needs you parietal lobe (same outline as postcentral gyrus) and pons (same outline as cerebellum); brainstem proposal pons, medulla, spinal cord, cerebellum dropped; but medulla loses every pixel to spinal cord (IoU 0.97, no split) and is dropped as empty, so regions.json has no proposal left; medulla and spinal cord now nest in the cerebellum's mask, which covers the brainstem. Flower: 6 of 13 (was 12): connective, filament, ovules same outline; stigma, style, ovary no longer share a region, so their spill retries are asked for and have no recording; references keep their verdicts (all still below 0.8; anther 0.198 to 0.421, connective 0.068 to 0.0). Tests: test_boundaries.py, S2 merge and same-outline tests, S5 mapping."
+  },
+  {
+   "ts": "2026-10-30T17:01:18.943Z",
+   "kind": "claude",
+   "text": "Decision: Near-identical masks across a drawn boundary go to the teacher, never split."
+  },
+  {
+   "ts": "2026-10-30T17:01:18.902Z",
+   "kind": "claude",
+   "text": "Decision: A merge is proposed only where the image shows no drawn boundary."
+  },
+  {
+   "ts": "2026-10-30T17:01:04.581Z",
+   "kind": "claude",
+   "text": "Task d5-7 \"Drawn boundary evidence: merges only where the image shows no boundary; same outlines to the teacher\" added to day 5."
+  },
   {
    "ts": "2026-10-30T10:11:52.256Z",
    "kind": "claude",

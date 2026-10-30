@@ -4,14 +4,18 @@
   pieces under S3's speck floor.
 - Relations:
   - Shared region, from the first masks: two masks with IoU of SHARED_IOU or more are one
-    drawn shape, as are the areas Spark marked shares_region.
+    drawn shape when the image shows no drawn boundary between the parts
+    (app/geometry/boundaries.py); with one, they have the same outline, and the smaller
+    part goes to the teacher. Of the areas Spark marked shares_region, the members with no
+    drawn boundary between them, the largest such set, share a region; the rest are left
+    out, with the reason.
   - Nesting: when NEST_INSIDE or more of B's mask lies inside A's and B is smaller, B is
     nested in A, whatever Spark said. The spill check tests it against the mask it checks:
     a first mask, or a retry's. The nesting S2 records, and S3 uses, is tested again on
     the masks S2 keeps, with the smallest such A as the parent: a first mask that took the
     whole figure nests everything in it, but the retry that replaces it may not.
     Shared pairs do not nest.
-  - NEST_INSIDE, from the first masks of the five eval figures (eval/plan/RESULTS.md, Oct
+- NEST_INSIDE, from the first masks of the five eval figures (eval/plan/RESULTS.md, Oct
     30): 0.9 was proposed. The parts Spark gave a parent sat at 0.893 to 1.0 inside it; the
     0.893 (a gyrus in its lobe) is excused by Spark's parent anyway. Between 0.90 and 0.95
     every pair that was not a shared region was a mask running over its neighbour (left
@@ -20,8 +24,8 @@
     Spill masks above 0.95 remain (the chambers in the septum's first mask, 0.97 to 0.99);
     the retry and the test on the kept mask are what keep those apart.
 - Spill: a mask holding another part's prompt point spilled onto that part, unless the
-  other part is its child (Spark's parent field), is nested in the mask, or shares its
-  region.
+  other part is its child (Spark's parent field), is nested in the mask, shares its region,
+  or has the same outline and went to the teacher.
 - Oversize: a mask is also spill when it holds points of OVERSIZE_POINTS or more other parts,
   or covers more than OVERSIZE_SHARE of the figure's object area while Spark marked the part
   thin or gave it a parent. 25% was proposed; on the bake-off it would mark the flower's
@@ -29,13 +33,14 @@
   (IoU 0.72), and whose parent is the perianth group. At 50% the rule catches v2's filament
   (112%) and no mask that looked right.
 - Contested pixels: each pixel claimed by several masks goes to the smallest; between masks
-  of equal size, to the part whose nearest prompt point is closer. Near-identical masks
-  (IoU of SHARED_IOU or more: SAM gave each part the whole shape) are then split by the
-  nearer point among them. A nested child's pixels stay in its parent's outline too, as S3
-  keeps a parent's full area, so the child is raised inside it. Spill masks take no part.
+  of equal size, to the part whose nearest prompt point is closer. Near-identical masks are
+  not split by their points (until Oct 30 they were): with no drawn boundary, a split would
+  draw a line the figure does not, so they are a merge proposal instead. A nested child's
+  pixels stay in its parent's outline too, as S3 keeps a parent's full area, so the child
+  is raised inside it. Spill masks take no part.
 """
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from collections.abc import Set as AbstractSet
 from itertools import combinations
 
@@ -103,6 +108,7 @@ def oversize(
 
 
 Box = tuple[int, int, int, int]  # row0, row1, col0, col1 (exclusive ends)
+Apart = Callable[[str, str], str | None]  # why two parts have a drawn boundary, or None
 
 
 def _box(m: Mask) -> Box | None:
@@ -129,23 +135,35 @@ class Relations:
         shared: list[set[str]],
         inside: dict[str, dict[str, float]],
         iou: dict[str, dict[str, float]],
-        alike: list[set[str]] | None = None,
+        same_outline: dict[str, tuple[str, str]] | None = None,
+        left_out: dict[str, tuple[str, str]] | None = None,
     ) -> None:
         self.nested = nested  # child -> parent
-        self.shared = shared  # groups of two or more parts, by IoU or by Spark
+        self.shared = shared  # groups of two or more parts with no drawn boundary between
         self.inside = inside  # part -> {other: share of part's mask inside other's}
         self.iou = iou  # part -> {other: IoU}
-        self.alike = alike or []  # the groups by IoU alone: near-identical masks
+        self.same_outline = same_outline or {}  # smaller -> (larger, why there is a boundary)
+        self.left_out = left_out or {}  # part Spark marked shared -> (member, why left out)
 
 
-def relate(masks: Mapping[str, Mask], spark_shared: Iterable[Iterable[str]] = ()) -> Relations:
+def _no_apart(_a: str, _b: str) -> str | None:
+    return None
+
+
+def relate(
+    masks: Mapping[str, Mask],
+    spark_shared: Iterable[Iterable[str]] = (),
+    apart: Apart = _no_apart,
+) -> Relations:
     """Nesting and shared regions among the masks. spark_shared are the groups Spark marked
-    shares_region; their parts join the shared groups whether or not they have masks."""
+    shares_region; their parts join the shared groups whether or not they have masks, when
+    apart finds no drawn boundary between them."""
     sizes = {p: int(m.sum()) for p, m in masks.items()}
     boxes = {p: _box(m) for p, m in masks.items()}
     inside: dict[str, dict[str, float]] = {p: {} for p in masks}
     iou: dict[str, dict[str, float]] = {p: {} for p in masks}
-    pairs: list[tuple[str, str]] = []
+    links: list[Sequence[str]] = []
+    same_outline: dict[str, tuple[str, str]] = {}
     for a, b in combinations(masks, 2):
         ba, bb = boxes[a], boxes[b]
         if ba is None or bb is None:
@@ -160,8 +178,18 @@ def relate(masks: Mapping[str, Mask], spark_shared: Iterable[Iterable[str]] = ()
             if j >= RECORD_SHARE:
                 iou[x][y] = round(j, 4)
         if j >= SHARED_IOU:
-            pairs.append((a, b))
-    shared = _groups([*pairs, *(tuple(g) for g in spark_shared)])
+            why = apart(a, b)
+            small, big = (b, a) if sizes[b] < sizes[a] else (a, b)
+            if why is None:
+                links.append((a, b))
+            elif small not in same_outline:
+                same_outline[small] = (big, why)
+    left_out: dict[str, tuple[str, str]] = {}
+    for g in spark_shared:
+        kept, out = core(list(dict.fromkeys(g)), apart)
+        links.append(kept)
+        left_out |= out
+    shared = _groups(links)
     mates = {p: g for g in shared for p in g}
     nested: dict[str, str] = {}
     for child, shares in inside.items():
@@ -172,7 +200,22 @@ def relate(masks: Mapping[str, Mask], spark_shared: Iterable[Iterable[str]] = ()
         ]
         if holders:
             nested[child] = min(holders, key=lambda q: (sizes[q], list(masks).index(q)))
-    return Relations(nested=nested, shared=shared, inside=inside, iou=iou, alike=_groups(pairs))
+    return Relations(nested, shared, inside, iou, same_outline, left_out)
+
+
+def core(members: Sequence[str], apart: Apart) -> tuple[list[str], dict[str, tuple[str, str]]]:
+    """The largest set of members linked by pairs with no drawn boundary (the first such set
+    on a tie), and, for each member left out, a kept member and why it is apart from it."""
+    links = [(a, b) for a, b in combinations(members, 2) if apart(a, b) is None]
+    sets = _groups(links) + [{m} for m in members if not any(m in pair for pair in links)]
+    kept = max(sets, key=lambda s: (len(s), -min(members.index(m) for m in s)))
+    order = [m for m in members if m in kept]
+    out = {}
+    for m in members:
+        if m not in kept:
+            why = [(k, w) for k in order if (w := apart(m, k)) is not None]
+            out[m] = why[0] if why else (order[0], "")
+    return order, out
 
 
 def inside_share(a: Mask, b: Mask) -> float:
@@ -231,11 +274,9 @@ def resolve(
     points: Mapping[str, Sequence[Point]],
     floor_px: float,
     nested: Mapping[str, str] | None = None,
-    alike: Sequence[AbstractSet[str]] = (),
 ) -> Resolved:
-    """Contested pixels to the smallest mask, ties to the nearer prompt point. Then, within
-    each group of near-identical masks, a pixel the group won goes to whichever member
-    claiming it has the nearer point. A nested child's pixels stay in its parent too.
+    """Contested pixels to the smallest mask, ties to the nearer prompt point. A nested
+    child's pixels stay in its parent too.
     Returns the masks, the pixels each part lost to and won from each other part, and the
     pixels each lost to specks left by the resolution."""
     if not masks:
@@ -246,7 +287,6 @@ def resolve(
     span = float(np.hypot(*shape)) + 1  # a distance never outweighs one pixel of size
     best = np.full(shape, np.inf, np.float64)
     owner = np.full(shape, -1, np.int32)
-    dists: dict[str, npt.NDArray[np.float64]] = {}
     for i, p in enumerate(order):
         seeds = np.ones(shape, np.uint8)
         for x, y in points.get(p, []):
@@ -256,20 +296,10 @@ def resolve(
             if not seeds.all()
             else np.full(shape, span)
         )
-        if any(p in g for g in alike):
-            dists[p] = dist
         cost = int(masks[p].sum()) + dist / span
         take = masks[p] & (cost < best)
         owner[take] = i
         best[take] = cost[take]
-    for g in alike:
-        members = [p for p in order if p in g]
-        won = np.isin(owner, [order.index(p) for p in members])
-        near = np.full(shape, np.inf, np.float64)
-        for p in members:
-            take = won & masks[p] & (dists[p] < near)
-            owner[take] = order.index(p)
-            near[take] = dists[p][take]
     out: dict[str, Mask] = {}
     lost: dict[str, dict[str, int]] = {}
     won_from: dict[str, dict[str, int]] = {}

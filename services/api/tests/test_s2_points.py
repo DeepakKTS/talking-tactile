@@ -11,6 +11,7 @@ import numpy.typing as npt
 import pytest
 
 from app.config import load_tactile_rules
+from app.geometry import boundaries
 from app.geometry import part_masks as pm
 from app.geometry import points as gp
 from app.meta.client import ObjectMask
@@ -409,19 +410,47 @@ def test_a_mask_under_the_nesting_share_is_still_spill() -> None:
     assert g.nested == {} and teacher(g)["left"][0] == "spill"
 
 
-def test_masks_with_a_high_iou_share_a_region_split_by_the_nearer_point() -> None:
-    """pons and medulla: SAM gives both the whole stem. Neither is spill; the stem is
-    split between them at the midpoint of their points, and a merge is proposed."""
-    stem = box(12, 188)
-    sam = FakeSam({("pons", False): [stem], ("medulla", False): [box(14, 188)]})
-    g = ground(sam, understanding(part("pons", 150), part("medulla", 750)))
-    assert g.teacher == [] and g.nested == {}
+def stem(crease: bool = False) -> Ingested:
+    """One shape, x 10 to 189, in one fill with a 2 px outline; with crease, a line drawn
+    from the top edge two thirds of the way down at x 100, open at its lower end."""
+    ing = figure()
+    img = np.full((H, W, 3), 255, np.uint8)
+    img[12:98, 12:188] = (240, 200, 120)
+    img[10:12, 10:190] = img[98:100, 10:190] = 0
+    img[10:100, 10:12] = img[10:100, 188:190] = 0
+    if crease:
+        img[12:70, 99:101] = 0
+    return ing.model_copy(update={"image": img})
+
+
+def test_near_identical_masks_with_no_drawn_boundary_are_a_merge_proposal_not_a_split() -> None:
+    """medulla and spinal cord, Oct 30: SAM gives both the whole stem, and the figure draws
+    no line between them. Neither is spill. They are not split by their points, which would
+    draw a line the figure does not: a merge is proposed, and the smaller mask takes the
+    contested pixels, as any contested pixels."""
+    sam = FakeSam({("pons", False): [box(12, 188)], ("medulla", False): [box(14, 188)]})
+    g = ground(sam, understanding(part("pons", 150), part("medulla", 750)), stem(crease=True))
+    assert g.teacher == [] and g.nested == {} and all(not r for _, r, _ in sam.calls)
     masks = {m.label: m.data for m in g.parts}
-    assert masks["pons"][60, 80] and masks["medulla"][60, 100]  # points at x 30 and 150
-    assert not (masks["pons"] & masks["medulla"]).any()
+    assert int(masks["medulla"].sum()) == 174 * 86  # all it claimed
+    assert int(masks["pons"].sum()) == 2 * 86  # what only pons claimed: no line at the points
     (m,) = g.merges
     assert (m.parts, m.name) == (("pons", "medulla"), "pons and medulla")
-    assert m.why == "their outlines overlap almost entirely"
+    assert m.why == "their outlines overlap almost entirely" and m.left_out == ()
+
+
+def test_near_identical_masks_across_a_drawn_boundary_send_the_smaller_to_the_teacher() -> None:
+    """pons and cerebellum, Oct 30: SAM gives both the same outline, but the figure draws a
+    line between them. Not split, not merged: the smaller needs the teacher, its mask a
+    suggestion, and its point is no spill for the larger, so no retry is asked for."""
+    sam = FakeSam({("cerebellum", False): [box(12, 188)], ("pons", False): [box(14, 188)]})
+    g = ground(sam, understanding(part("cerebellum", 150), part("pons", 750)))
+    assert all(not retry for _, retry, _ in sam.calls) and g.merges == []
+    (t,) = g.teacher
+    assert (t.phrase, t.reason) == ("pons", "same_outline")
+    assert t.detail == "same outline as cerebellum; " + boundaries.LINE
+    assert t.suggestion is not None and int(t.suggestion.sum()) == 174 * 86
+    assert [m.label for m in g.parts] == ["cerebellum"]
 
 
 def test_parts_spark_marked_as_one_shape_are_no_spill_and_keep_sparks_name() -> None:
@@ -429,10 +458,36 @@ def test_parts_spark_marked_as_one_shape_are_no_spill_and_keep_sparks_name() -> 
     u = planned(
         part("pons", 150), part("medulla", 750), shared=[(("pons", "medulla"), "brainstem")]
     )
-    g = ground(sam, u)
+    g = ground(sam, u, stem(crease=True))  # the crease is open: one drawn region
     assert g.teacher == [] and all(not retry for _, retry, _ in sam.calls)
     (m,) = g.merges
     assert (m.parts, m.name) == (("pons", "medulla"), "brainstem")
+
+
+def test_a_member_spark_marked_that_the_image_separates_is_left_out_of_the_merge() -> None:
+    """Spark marked left, right and mid as one shape; the figure draws left and right as two
+    boxes, and mid lies in the right box. left is left out, with the reason, and its point
+    counts as spill again: right's mask, holding it, is asked for once more."""
+    sam = FakeSam(
+        {
+            ("left", False): [box(12, 88)],
+            ("right", False): [box(25, 188)],  # over 83% of left: not nested
+            ("right", True): [box(112, 188)],
+            ("mid", False): [box(150, 188)],
+        }
+    )
+    u = planned(
+        part("left", 150),
+        part("right", 650),
+        part("mid", 850),
+        shared=[(("left", "right", "mid"), "boxes")],
+    )
+    g = ground(sam, u)
+    (m,) = g.merges
+    assert (m.parts, m.name) == (("right", "mid"), "boxes")
+    assert m.left_out == (("left", "not merged with right: " + boundaries.LINE),)
+    assert ("right", True, [[(30, 60)]]) in sam.calls and g.teacher == []
+    assert "not merged with right: " + boundaries.LINE in g.flags["left"]
 
 
 def test_the_subjects_largest_piece_is_the_silhouette() -> None:

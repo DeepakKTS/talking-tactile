@@ -11,8 +11,9 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Lines: tricuspid valve between right atrium and right ventricle; chordae tendineae in right ventricle; semilunar valves between left ventricle and aorta; mitral valve between left atrium and left ventricle.
 - Nested by geometry: none.
 - Merge proposals: 1. brachiocephalic artery, left common carotid artery, left subclavian artery, aorta as 'aortic arch' (Spark marked them as one unbroken shape)
+- Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 803939 px; in regions.json: True, 3 raised contour piece(s).
-- Rules report: 1 violation(s). Replayed calls: 21.
+- Rules report: 1 violation(s). Replayed calls: 19.
 
 15 parts, no mask 1, needs teacher 1, regressions 0 of 4 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 2, overlapping pairs 0 before resolution and 0 after. Points 25: on text 0, on lines 0, on ink 0.
 
@@ -27,22 +28,23 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: mature flower. Grade band: none.
 - Listed 16: areas 13, lines 0, groups 3, not located 0.
-- Touchable areas: 12 of 13. Touchable parts in regions.json: 14.
-- Needs you: 1. floral axis (no_mask: SAM's mask holds none of the part's points)
+- Touchable areas: 6 of 13. Touchable parts in regions.json: 6.
+- Needs you: 8. ovules (same_outline: same outline as ovary; a drawn line or color edge lies between them); pistil (no_mask: no member of the group has a mask); stigma (spill: holds points of ovary, ovules, style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses); style (spill: holds points of ovary, ovules; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses); ovary (spill: holds points of style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses); floral axis (no_mask: SAM's mask holds none of the part's points); connective (same_outline: same outline as anther; a drawn line or color edge lies between them); filament (same_outline: same outline as petal; a drawn line or color edge lies between them)
 - Lines: none.
-- Nested by geometry: microsporangium in connective.
-- Merge proposals: 4. petal, filament as 'petal and filament' (their outlines overlap almost entirely); connective, anther as 'connective and anther' (their outlines overlap almost entirely); ovules, stigma, style, ovary as 'pistil column' (Spark marked them as one unbroken shape); nectary, floral axis, pedicel as 'flower base' (Spark marked them as one unbroken shape)
-- Silhouette: SAM 2 instance(s), 148899 px; in regions.json: True, 1 raised contour piece(s).
-- Rules report: 31 violation(s). Replayed calls: 18.
+- Nested by geometry: microsporangium in anther.
+- Merge proposals: 1. floral axis, pedicel as 'flower base' (Spark marked them as one unbroken shape)
+- Left out of a merge Spark marked: nectary (not merged with floral axis: a drawn line or color edge lies between them).
+- Silhouette: SAM 2 instance(s), 148899 px; in regions.json: True, 2 raised contour piece(s).
+- Rules report: 2 violation(s). Replayed calls: 18.
 
-16 parts, no mask 1, needs teacher 1, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 4, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.
+16 parts, no mask 8, needs teacher 8, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.
 
 | Reference part | Listed now as | Matched by | v2f IoU | IoU now | Verdict |
 |---|---|---|---|---|---|
 | ovary | ovary | name | 0.245 | 0.0 | still regressed |
-| connective | connective | name | 0.0 | 0.068 | still regressed |
+| connective | connective | name | 0.0 | 0.0 | still regressed |
 | pollen sac | microsporangium | mask IoU 0.367 | 0.476 | 0.367 | still regressed |
-| anther | anther | name | 0.0 | 0.198 | still regressed |
+| anther | anther | name | 0.0 | 0.421 | still regressed |
 | filament stalk | filament | word | 0.0 | 0.0 | still regressed |
 
 ## japan_regions
@@ -54,8 +56,9 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Lines: none.
 - Nested by geometry: none.
 - Merge proposals: 0.
+- Left out of a merge Spark marked: none.
 - Silhouette: SAM 0 instance(s), 0 px; in regions.json: False, 0 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: 12.
+- Rules report: 0 violation(s). Replayed calls: 10.
 
 9 parts, no mask 0, needs teacher 0, regressions 0 of 0 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 0, overlapping pairs 0 before resolution and 0 after. Points 19: on text 0, on lines 0, on ink 0.
 
@@ -73,13 +76,14 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: human brain. Grade band: 6_8.
 - Listed 12: areas 10, lines 2, groups 0, not located 0.
-- Touchable areas: 10 of 10. Touchable parts in regions.json: 10.
-- Needs you: 0.
+- Touchable areas: 8 of 10. Touchable parts in regions.json: 7.
+- Needs you: 2. parietal lobe (same_outline: same outline as postcentral gyrus; a drawn line or color edge lies between them); pons (same_outline: same outline as cerebellum; a drawn line or color edge lies between them)
 - Lines: central sulcus between precentral gyrus and postcentral gyrus; lateral sulcus between frontal lobe and temporal lobe.
-- Nested by geometry: none.
-- Merge proposals: 2. postcentral gyrus, parietal lobe as 'postcentral gyrus and parietal lobe' (their outlines overlap almost entirely); pons, medulla, cerebellum, spinal cord as 'brainstem' (Spark marked them as one unbroken shape)
+- Nested by geometry: medulla in cerebellum, spinal cord in cerebellum.
+- Merge proposals: 1. pons, medulla, spinal cord as 'brainstem' (Spark marked them as one unbroken shape)
+- Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 1042167 px; in regions.json: True, 0 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: 13.
+- Rules report: 0 violation(s). Replayed calls: 11.
 
 ## brain_lobes
 
@@ -90,8 +94,9 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 - Lines: none.
 - Nested by geometry: none.
 - Merge proposals: 0.
+- Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 1035244 px; in regions.json: True, 1 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: 8.
+- Rules report: 0 violation(s). Replayed calls: 6.
 
 ## First-mask pairs, for NEST_INSIDE
 
@@ -150,3 +155,30 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 | brain_upload | medulla | cerebellum | 0.962 | 0.383 |  |
 | brain_upload | cerebellum | pons | 0.961 | 0.935 |  |
 | brain_upload | precentral gyrus | frontal lobe | 0.893 | 0.000 | parent |
+
+## Drawn boundaries, for EDGE_STEP and FILL_DELTA
+
+Edge step 14, fill delta 55. Joins at: the smallest edge step, 4 to 40, at which the two share a drawn region.
+
+| Figure | Pair | Judged for | Joins at | Fill delta | Drawn boundary |
+|---|---|---|---|---|---|
+| heart | aorta and brachiocephalic artery | Spark: aortic arch | 4 | 5.7 | none |
+| heart | aorta and left common carotid artery | Spark: aortic arch | 5 | 43.2 | none |
+| heart | aorta and left subclavian artery | Spark: aortic arch | 4 | 12.8 | none |
+| heart | brachiocephalic artery and left common carotid artery | Spark: aortic arch | 5 | 48.8 | none |
+| heart | brachiocephalic artery and left subclavian artery | Spark: aortic arch | 4 | 18.4 | none |
+| heart | left common carotid artery and left subclavian artery | Spark: aortic arch | 5 | 30.4 | none |
+| flower | anther and connective | IoU 0.895 | never | 246.8 | a drawn line or color edge lies between them |
+| flower | filament and petal | IoU 0.868 | 17 | 0.0 | a drawn line or color edge lies between them |
+| flower | floral axis and nectary | Spark: flower base | never | 0.0 | a drawn line or color edge lies between them |
+| flower | floral axis and pedicel | Spark: flower base | 4 | 0.0 | none |
+| flower | nectary and pedicel | Spark: flower base | never | 0.0 | a drawn line or color edge lies between them |
+| flower | ovary and ovules | IoU 0.925 | 40 | 0.0 | a drawn line or color edge lies between them |
+| flower | ovary and stigma | Spark: pistil column | never | 47.3 | a drawn line or color edge lies between them |
+| flower | ovary and style | Spark: pistil column | 40 | 81.9 | a drawn line or color edge lies between them |
+| flower | stigma and style | Spark: pistil column | never | 40.6 | a drawn line or color edge lies between them |
+| brain_upload | cerebellum and pons | IoU 0.935 | never | 21.2 | a drawn line or color edge lies between them |
+| brain_upload | medulla and pons | Spark: brainstem | 10 | 0.0 | none |
+| brain_upload | medulla and spinal cord | IoU 0.973 | 4 | 0.0 | none |
+| brain_upload | parietal lobe and postcentral gyrus | IoU 0.964 | 17 | 31.0 | a drawn line or color edge lies between them |
+| brain_upload | pons and spinal cord | Spark: brainstem | 10 | 0.0 | none |

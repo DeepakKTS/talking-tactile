@@ -16,7 +16,10 @@ touchable, what needs the teacher and why, nesting, merge proposals, and the sil
 For heart, flower and Japan, the S2 scorer (app/meta/s2_score.py) against the graded
 references, beside v2f's scores: each reference part held, regressed, improved, or still
 regressed. Also every pair of first masks with one 25% or more inside the other, the data
-NEST_INSIDE is chosen from.
+NEST_INSIDE is chosen from; and, for every pair of parts S2 had to judge (masks with an IoU
+of SHARED_IOU or more, and the parts of each group Spark marked as one shape), the drawn
+boundary evidence: the edge step at which they first share a drawn region, and how far
+their fill colors differ, the data EDGE_STEP and FILL_DELTA are chosen from.
 
 Writes eval/plan/RESULTS.md and eval/plan/scores.json; the uploaded brain's numbers go in
 them, but nothing drawn from its image. The pipeline's cache is data/plan_eval/."""
@@ -30,8 +33,9 @@ from typing import Any
 
 from app.braille.louis import Translator
 from app.config import load_explore, load_tactile_rules
+from app.geometry import boundaries, print_marks
 from app.geometry import part_masks as pm
-from app.geometry import print_marks
+from app.geometry import points as gp
 from app.meta import s2_score
 from app.meta.mock import MockMetaClient
 from app.models.regions import GradeBand, RegionsFile
@@ -63,6 +67,7 @@ FIGURES: dict[str, tuple[Path, list[str], GradeBand | None, bool]] = {
     "brain_lobes": (_EVAL / "brain_lobes.png", ["plan_brain_lobes_"], "6_8", False),
 }
 BINS = (0.25, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0001)
+STEPS = range(4, 41)
 
 
 def write_index(names: list[str]) -> None:
@@ -136,6 +141,7 @@ async def run_one(r: Runner, name: str) -> dict[str, Any]:
         "contour_pieces": _contour(out),
         "rules_report": len(report),
         "pairs": _pairs(g.facts, u),
+        "boundaries": _boundaries(ing.image, g, u),
         "live_calls": r.client.live_calls,
     }
     if graded:
@@ -151,7 +157,7 @@ def _contour(out: Path) -> dict[str, float]:
 def _pairs(facts: dict[str, Any], u: Any) -> list[dict[str, Any]]:
     """Every first-mask pair with one mask RECORD_SHARE or more inside the other."""
     parents = {p.phrase: p.parent for p in u.parts}
-    out = []
+    out: list[dict[str, Any]] = []
     for part, f in facts.items():
         if part == s2_points.SUBJECT:
             continue
@@ -160,6 +166,54 @@ def _pairs(facts: dict[str, Any], u: Any) -> list[dict[str, Any]]:
             spark = "parent" if parents.get(part) == other else ""
             out.append({"part": part, "inside": other, "share": share, "iou": iou, "spark": spark})
     return sorted(out, key=lambda x: -x["share"])
+
+
+def _boundaries(image: Any, g: Any, u: Any) -> list[dict[str, Any]]:
+    """The drawn boundary evidence for each pair S2 judged."""
+    scene = gp.scene_of(image, 0.0)
+    drawn = boundaries.Drawn(image, scene.marks, scene.obj)
+    pts = prompt_points(g)
+    judged: dict[tuple[str, str], str] = {}
+    for part, f in g.facts.items():
+        for other, iou in (f.get("iou") or {}).items():
+            if iou >= pm.SHARED_IOU:
+                judged.setdefault(tuple(sorted((part, other))), f"IoU {iou:.3f}")
+    for s in u.shares_region:
+        for a, b in itertools.combinations(s.parts, 2):
+            judged.setdefault(tuple(sorted((a, b))), f"Spark: {s.name}")
+    out: list[dict[str, Any]] = []
+    for (a, b), why in sorted(judged.items()):
+        pa, pb = pts.get(a, []), pts.get(b, [])
+        if not pa or not pb:
+            out.append({"a": a, "b": b, "judged": why, "boundary": "no points"})
+            continue
+        out.append({
+            "a": a, "b": b, "judged": why,
+            "joins_at": drawn.joins_at(pa, pb, STEPS),
+            "fill_delta": round(drawn.fill_delta(pa, pb), 1),
+            "boundary": drawn.between(pa, pb) or "none",
+        })  # fmt: skip
+    return out
+
+
+def boundary_table(rows: list[dict[str, Any]]) -> str:
+    lines = [
+        f"Edge step {boundaries.EDGE_STEP}, fill delta {boundaries.FILL_DELTA}. Joins at: the "
+        f"smallest edge step, {STEPS.start} to {STEPS.stop - 1}, at which the two share a "
+        "drawn region.",
+        "",
+        "| Figure | Pair | Judged for | Joins at | Fill delta | Drawn boundary |",
+        "|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        for b in r.get("boundaries", []):
+            joins = b.get("joins_at")
+            lines.append(
+                f"| {r['figure']} | {b['a']} and {b['b']} | {b['judged']} | "
+                f"{'never' if joins is None and 'fill_delta' in b else joins or ''} | "
+                f"{b.get('fill_delta', '')} | {b['boundary']} |"
+            )
+    return "\n".join(lines)
 
 
 def _score(name: str, image: Any, u: Any, g: Any) -> dict[str, Any]:
@@ -270,6 +324,7 @@ def markdown(rows: list[dict[str, Any]]) -> str:
         )  # fmt: skip
         merges = "; ".join(f"{', '.join(m['parts'])} as '{m['name']}' ({m['why']})"
                            for m in r["merges"])  # fmt: skip
+        left = "; ".join(f"{q} ({w})" for m in r["merges"] for q, w in m.get("left_out", []))
         sil = r["silhouette"] or {}
         out += [
             f"- Subject: {r['subject'] or 'none'}. Grade band: {r['grade_band'] or 'none'}.",
@@ -282,6 +337,7 @@ def markdown(rows: list[dict[str, Any]]) -> str:
             f"- Nested by geometry: "
             f"{', '.join(f'{c} in {p}' for c, p in r['nested'].items()) or 'none'}.",
             f"- Merge proposals: {len(r['merges'])}. {merges}",
+            f"- Left out of a merge Spark marked: {left or 'none'}.",
             f"- Silhouette: SAM {sil.get('instances', 0)} instance(s), {sil.get('px', 0)} px"
             f"{', error ' + sil['error'] if 'error' in sil else ''}; in regions.json: "
             f"{rj['subject_drawn']}, {r['contour_pieces']['pieces']} raised contour piece(s).",
@@ -294,7 +350,8 @@ def markdown(rows: list[dict[str, Any]]) -> str:
                     "|---|---|---|---|---|---|"]  # fmt: skip
             out += [f"| {c['part']} | {c['now'] or ''} | {c['match']} | {c['v2f_iou']} | "
                     f"{c['iou']} | {c['verdict']} |" for c in sc["references"]]  # fmt: skip
-    out += ["", "## First-mask pairs, for NEST_INSIDE", "", nesting_table(rows), ""]
+    out += ["", "## First-mask pairs, for NEST_INSIDE", "", nesting_table(rows)]
+    out += ["", "## Drawn boundaries, for EDGE_STEP and FILL_DELTA", "", boundary_table(rows), ""]
     return "\n".join(line.rstrip() for line in out)
 
 

@@ -7,12 +7,13 @@ from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.mask import BoolImage, Mask
 
-TeacherReason = Literal["spill", "no_mask", "no_points"]
+TeacherReason = Literal["spill", "same_outline", "no_mask", "no_points"]
 
 
 class TeacherPart(BaseModel):
-    """A listed part S2 could not make touchable. A spill keeps SAM's mask as a suggestion
-    for the teacher; it is never touchable."""
+    """A listed part S2 could not make touchable. A spill, or a mask with another part's
+    outline across a drawn boundary (same_outline), keeps SAM's mask as a suggestion for
+    the teacher; it is never touchable."""
 
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
@@ -28,13 +29,16 @@ class TeacherPart(BaseModel):
 
 
 class MergeProposal(BaseModel):
-    """Areas drawn as one shape: Spark said so (shares_region), or their masks overlap."""
+    """Areas drawn as one shape: Spark said so (shares_region), or their masks overlap, and
+    the image shows no drawn boundary between them."""
 
     model_config = ConfigDict(frozen=True)
 
     parts: tuple[str, ...]  # phrases, in S1 order
     name: str  # the suggested combined name
     why: str  # in words, for the teacher
+    # (phrase, why): parts Spark marked as one shape with these that the image separates
+    left_out: tuple[tuple[str, str], ...] = ()
 
 
 class Grounded(BaseModel):

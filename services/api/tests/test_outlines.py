@@ -138,3 +138,32 @@ def test_the_spill_check_finds_other_parts_points_but_not_a_childs() -> None:
         update={"merges": [MergeProposal(parts=("a", "b"), name="ab", why="w")]}
     )
     assert spill_of("b", mask(2, 20), shared, u) == []  # a shares b's region
+
+
+def test_a_same_outline_part_reaches_the_teacher_as_a_suggestion_or_with_no_mask() -> None:
+    """S5 writes a same_outline part like a spill: its mask outlined as an untouchable
+    suggestion, with the detail; with no mask to outline, in needs_teacher as no_mask."""
+    from types import SimpleNamespace  # noqa: PLC0415
+
+    from app.config import load_tactile_rules  # noqa: PLC0415
+    from app.geometry.scale import fit_to_page  # noqa: PLC0415
+    from app.pipeline.s5_render import teacher_info  # noqa: PLC0415
+
+    rules = load_tactile_rules()
+    sug = np.zeros((120, 200), bool)
+    sug[12:98, 14:188] = True
+    detail = "same outline as cerebellum; a drawn line or color edge lies between them"
+    g = Grounded(
+        parts=[],
+        text=[],
+        teacher=[
+            TeacherPart(phrase="pons", reason="same_outline", detail=detail, suggestion=sug),
+            TeacherPart(phrase="medulla", reason="same_outline", detail=detail),
+        ],
+    )
+    rec = SimpleNamespace(parts=[], dropped=[])
+    info = teacher_info(g, rec, fit_to_page(200, 120, "letter", rules.page), rules)  # type: ignore[arg-type]
+    assert [(s.label, s.detail) for s in info.suggestions] == [("pons", detail)]
+    assert [(n.label, n.reason, n.detail) for n in info.needs_teacher] == [
+        ("medulla", "no_mask", detail)
+    ]

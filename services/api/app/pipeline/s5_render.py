@@ -59,7 +59,8 @@ def teacher_info(g: Grounded, rec: Reconciled, fit: PageFit, rules: TactileRules
             outlines = [[(x, y) for x, y in list(p.exterior.coords)[:-1]] for p in polys]
             suggestions.append(Suggestion(label=t.phrase, polygons_mm=outlines, detail=t.detail))
             continue
-        needs.append((t.phrase, "no_mask" if t.reason == "spill" else t.reason, t.detail))
+        reason: TeacherReason = "no_points" if t.reason == "no_points" else "no_mask"
+        needs.append((t.phrase, reason, t.detail))
     needs += [(d.label, "dropped", d.reason) for d in rec.dropped]
     entries = [
         TeacherEntry(id=f"n{i}", label=label, reason=reason, detail=detail)

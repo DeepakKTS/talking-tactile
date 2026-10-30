@@ -99,7 +99,8 @@
      "aorta"
     ],
     "name": "aortic arch",
-    "why": "Spark marked them as one unbroken shape"
+    "why": "Spark marked them as one unbroken shape",
+    "left_out": []
    }
   ],
   "silhouette": {
@@ -267,7 +268,57 @@
     "spark": ""
    }
   ],
-  "live_calls": 21,
+  "boundaries": [
+   {
+    "a": "aorta",
+    "b": "brachiocephalic artery",
+    "judged": "Spark: aortic arch",
+    "joins_at": 4,
+    "fill_delta": 5.7,
+    "boundary": "none"
+   },
+   {
+    "a": "aorta",
+    "b": "left common carotid artery",
+    "judged": "Spark: aortic arch",
+    "joins_at": 5,
+    "fill_delta": 43.2,
+    "boundary": "none"
+   },
+   {
+    "a": "aorta",
+    "b": "left subclavian artery",
+    "judged": "Spark: aortic arch",
+    "joins_at": 4,
+    "fill_delta": 12.8,
+    "boundary": "none"
+   },
+   {
+    "a": "brachiocephalic artery",
+    "b": "left common carotid artery",
+    "judged": "Spark: aortic arch",
+    "joins_at": 5,
+    "fill_delta": 48.8,
+    "boundary": "none"
+   },
+   {
+    "a": "brachiocephalic artery",
+    "b": "left subclavian artery",
+    "judged": "Spark: aortic arch",
+    "joins_at": 4,
+    "fill_delta": 18.4,
+    "boundary": "none"
+   },
+   {
+    "a": "left common carotid artery",
+    "b": "left subclavian artery",
+    "judged": "Spark: aortic arch",
+    "joins_at": 5,
+    "fill_delta": 30.4,
+    "boundary": "none"
+   }
+  ],
+  "live_calls": 19,
   "score": {
    "counts": {
     "parts": 15,
@@ -375,64 +426,72 @@
    }
   ],
   "touchable_areas": [
-   "ovules",
-   "stigma",
-   "style",
-   "ovary",
    "petal",
    "sepal",
    "nectary",
    "pedicel",
-   "connective",
    "anther",
-   "microsporangium",
-   "filament"
+   "microsporangium"
   ],
   "needs_you": [
+   {
+    "part": "ovules",
+    "reason": "same_outline",
+    "detail": "same outline as ovary; a drawn line or color edge lies between them"
+   },
+   {
+    "part": "pistil",
+    "reason": "no_mask",
+    "detail": "no member of the group has a mask"
+   },
+   {
+    "part": "stigma",
+    "reason": "spill",
+    "detail": "holds points of ovary, ovules, style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
+   },
+   {
+    "part": "style",
+    "reason": "spill",
+    "detail": "holds points of ovary, ovules; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
+   },
+   {
+    "part": "ovary",
+    "reason": "spill",
+    "detail": "holds points of style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses"
+   },
    {
     "part": "floral axis",
     "reason": "no_mask",
     "detail": "SAM's mask holds none of the part's points"
+   },
+   {
+    "part": "connective",
+    "reason": "same_outline",
+    "detail": "same outline as anther; a drawn line or color edge lies between them"
+   },
+   {
+    "part": "filament",
+    "reason": "same_outline",
+    "detail": "same outline as petal; a drawn line or color edge lies between them"
    }
   ],
   "nested": {
-   "microsporangium": "connective"
+   "microsporangium": "anther"
   },
   "merges": [
    {
     "parts": [
-     "petal",
-     "filament"
-    ],
-    "name": "petal and filament",
-    "why": "their outlines overlap almost entirely"
-   },
-   {
-    "parts": [
-     "connective",
-     "anther"
-    ],
-    "name": "connective and anther",
-    "why": "their outlines overlap almost entirely"
-   },
-   {
-    "parts": [
-     "ovules",
-     "stigma",
-     "style",
-     "ovary"
-    ],
-    "name": "pistil column",
-    "why": "Spark marked them as one unbroken shape"
-   },
-   {
-    "parts": [
-     "nectary",
      "floral axis",
      "pedicel"
     ],
     "name": "flower base",
-    "why": "Spark marked them as one unbroken shape"
+    "why": "Spark marked them as one unbroken shape",
+    "left_out": [
+     [
+      "nectary",
+      "not merged with floral axis: a drawn line or color edge lies between them"
+     ]
+    ]
    }
   ],
   "silhouette": {
@@ -441,16 +500,16 @@
    "px": 148899
   },
   "regions_json": {
-   "touchable": 14,
+   "touchable": 6,
    "lines": [],
-   "merge_proposals": 4,
+   "merge_proposals": 0,
    "subject_drawn": true,
-   "needs_teacher": 2
+   "needs_teacher": 4
   },
   "contour_pieces": {
-   "pieces": 1
+   "pieces": 2
   },
-  "rules_report": 31,
+  "rules_report": 2,
   "pairs": [
    {
     "part": "microsporangium",
@@ -663,19 +722,93 @@
     "spark": ""
    }
   ],
+  "boundaries": [
+   {
+    "a": "anther",
+    "b": "connective",
+    "judged": "IoU 0.895",
+    "joins_at": null,
+    "fill_delta": 246.8,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "filament",
+    "b": "petal",
+    "judged": "IoU 0.868",
+    "joins_at": 17,
+    "fill_delta": 0.0,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "floral axis",
+    "b": "nectary",
+    "judged": "Spark: flower base",
+    "joins_at": null,
+    "fill_delta": 0.0,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "floral axis",
+    "b": "pedicel",
+    "judged": "Spark: flower base",
+    "joins_at": 4,
+    "fill_delta": 0.0,
+    "boundary": "none"
+   },
+   {
+    "a": "nectary",
+    "b": "pedicel",
+    "judged": "Spark: flower base",
+    "joins_at": null,
+    "fill_delta": 0.0,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "ovary",
+    "b": "ovules",
+    "judged": "IoU 0.925",
+    "joins_at": 40,
+    "fill_delta": 0.0,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "ovary",
+    "b": "stigma",
+    "judged": "Spark: pistil column",
+    "joins_at": null,
+    "fill_delta": 47.3,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "ovary",
+    "b": "style",
+    "judged": "Spark: pistil column",
+    "joins_at": 40,
+    "fill_delta": 81.9,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "stigma",
+    "b": "style",
+    "judged": "Spark: pistil column",
+    "joins_at": null,
+    "fill_delta": 40.6,
+    "boundary": "a drawn line or color edge lies between them"
+   }
+  ],
   "live_calls": 18,
   "score": {
    "counts": {
     "parts": 16,
-    "no_mask": 1,
-    "needs_teacher": 1,
+    "no_mask": 8,
+    "needs_teacher": 8,
     "regression": 3,
     "references": 3,
     "speck": 0,
     "under_point_symbol": 2,
     "on_text": 0,
     "on_line": 0,
-    "fragmented": 4,
+    "fragmented": 1,
     "overlap_pairs": 1,
     "overlap_pairs_before": 1,
     "points": 25,
@@ -683,7 +816,7 @@
     "points_on_line": 0,
     "points_on_ink": 0
    },
-   "summary": "16 parts, no mask 1, needs teacher 1, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 4, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
+   "summary": "16 parts, no mask 8, needs teacher 8, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.",
    "references": [
     {
      "part": "ovary",
@@ -693,20 +826,20 @@
      "match": "name",
      "verdict": "still regressed",
      "flags": [
-      "regression: IoU 0.0 with the passing Arm B mask",
-      "3 fragments"
+      "needs teacher: spill, holds points of style; the retry call failed: LiveCallError: HTTP 599: no recording for POST /v1/responses",
+      "regression: IoU 0.0 with the passing Arm B mask"
      ]
     },
     {
      "part": "connective",
      "v2f_iou": 0.0,
-     "iou": 0.068,
+     "iou": 0.0,
      "now": "connective",
      "match": "name",
      "verdict": "still regressed",
      "flags": [
-      "regression: IoU 0.068 with the passing Arm B mask",
-      "overlaps microsporangium"
+      "needs teacher: same_outline, same outline as anther; a drawn line or color edge lies between them",
+      "regression: IoU 0.0 with the passing Arm B mask"
      ]
     },
     {
@@ -717,19 +850,19 @@
      "match": "mask IoU 0.367",
      "verdict": "still regressed",
      "flags": [
-      "overlaps connective"
+      "overlaps anther"
      ]
     },
     {
      "part": "anther",
      "v2f_iou": 0.0,
-     "iou": 0.198,
+     "iou": 0.421,
      "now": "anther",
      "match": "name",
      "verdict": "still regressed",
      "flags": [
-      "regression: IoU 0.198 with the passing Arm B mask",
-      "5 fragments"
+      "regression: IoU 0.421 with the passing Arm B mask",
+      "overlaps microsporangium"
      ]
     },
     {
@@ -739,7 +872,9 @@
      "now": "filament",
      "match": "word",
      "verdict": "still regressed",
-     "flags": []
+     "flags": [
+      "needs teacher: same_outline, same outline as petal; a drawn line or color edge lies between them"
+     ]
     }
    ]
   }
@@ -796,7 +931,8 @@
   },
   "rules_report": 0,
   "pairs": [],
-  "live_calls": 12,
+  "boundaries": [],
+  "live_calls": 10,
   "score": {
    "counts": {
     "parts": 9,
@@ -936,34 +1072,38 @@
    "frontal lobe",
    "precentral gyrus",
    "postcentral gyrus",
-   "parietal lobe",
    "temporal lobe",
    "occipital lobe",
-   "pons",
    "medulla",
    "cerebellum",
    "spinal cord"
   ],
-  "needs_you": [],
-  "nested": {},
-  "merges": [
+  "needs_you": [
    {
-    "parts": [
-     "postcentral gyrus",
-     "parietal lobe"
-    ],
-    "name": "postcentral gyrus and parietal lobe",
-    "why": "their outlines overlap almost entirely"
+    "part": "parietal lobe",
+    "reason": "same_outline",
+    "detail": "same outline as postcentral gyrus; a drawn line or color edge lies between them"
    },
+   {
+    "part": "pons",
+    "reason": "same_outline",
+    "detail": "same outline as cerebellum; a drawn line or color edge lies between them"
+   }
+  ],
+  "nested": {
+   "medulla": "cerebellum",
+   "spinal cord": "cerebellum"
+  },
+  "merges": [
    {
     "parts": [
      "pons",
      "medulla",
-     "cerebellum",
      "spinal cord"
     ],
     "name": "brainstem",
-    "why": "Spark marked them as one unbroken shape"
+    "why": "Spark marked them as one unbroken shape",
+    "left_out": []
    }
   ],
   "silhouette": {
@@ -972,7 +1112,7 @@
    "px": 1042167
   },
   "regions_json": {
-   "touchable": 10,
+   "touchable": 7,
    "lines": [
     {
      "id": "l1",
@@ -991,7 +1131,7 @@
      "label": "lateral sulcus",
      "separates": [
       "r1",
-      "r5"
+      "r4"
      ],
      "between": [
       "frontal lobe",
@@ -999,9 +1139,9 @@
      ]
     }
    ],
-   "merge_proposals": 2,
+   "merge_proposals": 0,
    "subject_drawn": true,
-   "needs_teacher": 0
+   "needs_teacher": 1
   },
   "contour_pieces": {
    "pieces": 0
@@ -1114,7 +1254,49 @@
     "spark": ""
    }
   ],
-  "live_calls": 13
+  "boundaries": [
+   {
+    "a": "cerebellum",
+    "b": "pons",
+    "judged": "IoU 0.935",
+    "joins_at": null,
+    "fill_delta": 21.2,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "medulla",
+    "b": "pons",
+    "judged": "Spark: brainstem",
+    "joins_at": 10,
+    "fill_delta": 0.0,
+    "boundary": "none"
+   },
+   {
+    "a": "medulla",
+    "b": "spinal cord",
+    "judged": "IoU 0.973",
+    "joins_at": 4,
+    "fill_delta": 0.0,
+    "boundary": "none"
+   },
+   {
+    "a": "parietal lobe",
+    "b": "postcentral gyrus",
+    "judged": "IoU 0.964",
+    "joins_at": 17,
+    "fill_delta": 31.0,
+    "boundary": "a drawn line or color edge lies between them"
+   },
+   {
+    "a": "pons",
+    "b": "spinal cord",
+    "judged": "Spark: brainstem",
+    "joins_at": 10,
+    "fill_delta": 0.0,
+    "boundary": "none"
+   }
+  ],
+  "live_calls": 11
  },
  {
   "figure": "brain_lobes",
@@ -1167,6 +1349,7 @@
   },
   "rules_report": 0,
   "pairs": [],
-  "live_calls": 8
+  "boundaries": [],
+  "live_calls": 6
  }
 ]
