@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 151, updated 2026-10-30T04:05:16.572Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 155, updated 2026-10-30T05:07:22.425Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -53,8 +53,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Stream 10 seconds of audio. Get partial and final text. Try keyword hints.
   - Fallback: Use push-to-talk sync mode if realtime is awkward.
   - Note: Script and notes written from the docs: spikes/voice_spike.py (9.3 s say question with 6 domain terms; 24 kHz with and without keywords, 16 kHz with keywords, 4 runs each; plus the file endpoint), spikes/muse-voice.md. Client checked against a local fake server: pacing 1.005x real time, close 1000. PLAN.md section 17 updated. Blocked on the API key.
-- [ ] d1-8 Meta client wrapper (2 h)
+- [x] d1-8 Meta client wrapper (2 h)
   - Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.
+  - Note: Live S1 and S2 in the pipeline (dc76d92 to 64a123b). S1 live = listing + locate (kind, members, parent, instances, points). S2 = Arm A v2f in app/pipeline/s2_points.py, SAM 4 at a time, spill retry, oversize rule at 50%, background points dropped, flags into regions.json v2 (touchable, flags, needs_teacher). One call cap per job. Live heart through the API, Oct 30: 25 calls (2 Spark, 19 SAM, 4 retries; 3 more retries refused by the cap), $0.096317; S1 30.6 s, S2 28.9 s, end to end 61.3 s; S5 first failed on a texture bug (72ee37b) and finished from the cache with no new call. 15 of 19 parts touchable, 4 spill, 3 thin, 0 rule violations. Replay e2e test reproduces the published regions.json exactly. Arm B and the v2 harness deleted; API suite 88.2 s to 79.0 s.
 - [ ] d1-9 Gate A check (15 min)
   - All three models answer and latencies are written in spikes/.
 - [x] d1-10 Regions contract in code (1.5 h)

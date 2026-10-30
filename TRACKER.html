@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 151,
- "updated_at": "2026-10-30T04:05:16.572Z",
+ "rev": 155,
+ "updated_at": "2026-10-30T05:07:22.425Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -772,12 +772,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.",
    "timebox": "2 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": "Live S1 and S2 in the pipeline (dc76d92 to 64a123b). S1 live = listing + locate (kind, members, parent, instances, points). S2 = Arm A v2f in app/pipeline/s2_points.py, SAM 4 at a time, spill retry, oversize rule at 50%, background points dropped, flags into regions.json v2 (touchable, flags, needs_teacher). One call cap per job. Live heart through the API, Oct 30: 25 calls (2 Spark, 19 SAM, 4 retries; 3 more retries refused by the cap), $0.096317; S1 30.6 s, S2 28.9 s, end to end 61.3 s; S5 first failed on a texture bug (72ee37b) and finished from the cache with no new call. 15 of 19 parts touchable, 4 spill, 3 thin, 0 rule violations. Replay e2e test reproduces the published regions.json exactly. Arm B and the v2 harness deleted; API suite 88.2 s to 79.0 s.",
+   "done_at": "2026-10-30T05:07:22.388Z",
    "tags": [
     "backend"
-   ]
+   ],
+   "changed_at": "2026-10-30T05:07:22.388Z"
   },
   {
    "id": "d1-9",
@@ -1883,9 +1884,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-10-30T04:05:16.572Z",
-   "item": "Meta Model API, 189 live calls, from eval/live/ledger.jsonl (1 unpriced)",
-   "usd": 0.924678
+   "ts": "2026-10-30T05:07:22.425Z",
+   "item": "Meta Model API, 214 live calls, from eval/live/ledger.jsonl (1 unpriced)",
+   "usd": 1.020995
   }
  ],
  "outreach": [
@@ -2165,6 +2166,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "Arm A v2f (app/meta/s2_armav2.py --fixes): guarded points with 6 px clearance, SAM point prompts with negatives, one spill retry, oversize rule at 50%, smaller mask wins with ties to the nearer point; flags needs teacher (no mask, spill) and under point-symbol size",
    "why": "Live v2f, Oct 30. References held at IoU 0.8: heart 3 of 4, Japan 6 of 7, flower 0 of 5. Needs teacher: heart 6, flower 7, Japan 0. This is the last S2 iteration; d1-8 starts next regardless of the flower result.",
    "changed_at": "2026-10-30T04:05:16.534Z"
+  },
+  {
+   "id": "dec-mvuigbjelpqp",
+   "date": "2026-10-30",
+   "title": "Flagged parts are not touchable; publish lists them and does not block.",
+   "decision": "regions.json v2: a spill mask is a region with touchable false and a spill flag; a part with no shape is in needs_teacher. Explore drops both at load. Author lists them with the reason and names them at publish; publish refuses only tactile rule violations (409), as before.",
+   "why": "S2 locked on Arm A v2f with flags (Oct 30). Live heart through the API: 15 of 19 parts touchable, 4 spill (aorta, mitral valve, left ventricle, septum), published with no rule violation.",
+   "changed_at": "2026-10-30T05:07:22.350Z"
   }
  ],
  "risks": [
@@ -2255,6 +2264,26 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-10-30T05:07:22.425Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $1.020995 over 214 live calls, 1 of them unpriced."
+  },
+  {
+   "ts": "2026-10-30T05:07:22.388Z",
+   "kind": "claude",
+   "text": "Task d1-8 \"Meta client wrapper\" is now done. Note: Live S1 and S2 in the pipeline (dc76d92 to 64a123b). S1 live = listing + locate (kind, members, parent, instances, points). S2 = Arm A v2f in app/pipeline/s2_points.py, SAM 4 at a time, spill retry, oversize rule at 50%, background points dropped, flags into regions.json v2 (touchable, flags, needs_teacher). One call cap per job. Live heart through the API, Oct 30: 25 calls (2 Spark, 19 SAM, 4 retries; 3 more retries refused by the cap), $0.096317; S1 30.6 s, S2 28.9 s, end to end 61.3 s; S5 first failed on a texture bug (72ee37b) and finished from the cache with no new call. 15 of 19 parts touchable, 4 spill, 3 thin, 0 rule violations. Replay e2e test reproduces the published regions.json exactly. Arm B and the v2 harness deleted; API suite 88.2 s to 79.0 s."
+  },
+  {
+   "ts": "2026-10-30T05:07:22.350Z",
+   "kind": "claude",
+   "text": "Decision: Flagged parts are not touchable; publish lists them and does not block."
+  },
+  {
+   "ts": "2026-10-30T04:10:03.142Z",
+   "kind": "claude",
+   "text": "Task d1-8 \"Meta client wrapper\" is now doing."
+  },
   {
    "ts": "2026-10-30T04:05:16.572Z",
    "kind": "claude",
