@@ -68,6 +68,11 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
                     print("\n".join(logs[-20:]))
                     raise
             page.wait_for_timeout(seconds * 1000)
+            restart_fps = None
+            if mode == "loop":  # Start again, as when picking the rear camera: still one frame loop
+                restart_fps = page.evaluate("() => window.__tt.camFps")
+                page.click("#start")
+                page.wait_for_timeout(3000)
             if mode == "touch":
                 page.keyboard.press("t")
                 for _ in range(3):
@@ -85,6 +90,7 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
                     loopP95: [...s.loopMs].sort((a,b)=>a-b)[Math.ceil(0.95*s.loopMs.length)-1] }; }"""
             )
             stats["status"] = page.inner_text("#status")
+            stats["camFpsBeforeRestart"] = restart_fps
             shot = HERE.parent / "out" / f"tracking_e2e_{mode}.png"
             shot.parent.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(shot), full_page=True)
@@ -212,6 +218,8 @@ def main() -> None:
     if mode == "loop":
         if stats["maxInFlight"] != 1:
             failures.append("more than one frame in flight")
+        if stats["camFps"] > 1.3 * stats["camFpsBeforeRestart"]:
+            failures.append("a second Start sped up the camera count: two frame loops")
         if stats["pump"]["dropped"] == 0:
             failures.append("no frames dropped with a 100 ms worker; frames may be queuing")
         if not stats["procFps"] or stats["procFps"] > 11:

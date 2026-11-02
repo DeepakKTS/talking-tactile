@@ -95,23 +95,32 @@ async function listCameras() {
     o.textContent = d.label || `Camera ${sel.length + 1}`;
     sel.append(o);
   }
+  // Keep the camera in use selected, so pressing Start again does not switch cameras.
+  const live = video.srcObject?.getVideoTracks()[0]?.getSettings().deviceId;
+  if (live) sel.value = live;
 }
 
 async function startCamera() {
+  // A phone's default camera faces the user: ask for the rear one until a camera is picked.
   const deviceId = $("camera").value || undefined;
+  const which = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } };
+  video.srcObject?.getTracks().forEach((t) => t.stop());
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: { deviceId, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+    video: { ...which, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
   });
   video.srcObject = stream;
   await video.play();
   view.width = video.videoWidth;
   view.height = video.videoHeight;
   state.startedAt = performance.now();
+  state.camFrames = state.results = state.framesWithHands = 0; // rates since this Start
   state.videoSize = [video.videoWidth, video.videoHeight];
   await listCameras();
   $("calibrate").disabled = false;
   say(`Camera on at ${video.videoWidth} by ${video.videoHeight}.`);
+  if (state.looping) return; // a second Start swaps the camera; the loops keep running
+  state.looping = true;
   video.requestVideoFrameCallback(onVideoFrame);
   requestAnimationFrame(draw);
 }

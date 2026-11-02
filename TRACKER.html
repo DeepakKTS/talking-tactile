@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 249,
- "updated_at": "2026-11-02T20:58:48.881Z",
+ "rev": 251,
+ "updated_at": "2026-11-02T21:07:07.884Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2005,6 +2005,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-02T20:58:48.881Z"
   },
   {
+   "id": "d8-7",
+   "day": 8,
+   "title": "Touch-test page: rear camera by default, one frame loop after a second Start",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "spikes/tracking/main.js: no camera picked asks for facingMode environment (a phone opened the front one); Start again stops the old tracks, keeps the picked camera selected and does not add a second frame loop (it doubled the camera count: 81 fps for a 20 fps fake camera); rates reset per Start. e2e_check.py loop now presses Start twice and fails on two loops: fails on the old page, passes on the new. session check passes; graded figures unchanged (plan_eval, fresh cache). On the iPhone: needs device.",
+   "done_at": "2026-11-02T21:07:07.884Z",
+   "tags": [
+    "fix",
+    "gate-b"
+   ],
+   "changed_at": "2026-11-02T21:07:07.884Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -2917,6 +2933,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-02T21:07:07.884Z",
+   "kind": "claude",
+   "text": "Task d8-7 \"Touch-test page: rear camera by default, one frame loop after a second Start\" is now done. Note: spikes/tracking/main.js: no camera picked asks for facingMode environment (a phone opened the front one); Start again stops the old tracks, keeps the picked camera selected and does not add a second frame loop (it doubled the camera count: 81 fps for a 20 fps fake camera); rates reset per Start. e2e_check.py loop now presses Start twice and fails on two loops: fails on the old page, passes on the new. session check passes; graded figures unchanged (plan_eval, fresh cache). On the iPhone: needs device."
+  },
+  {
+   "ts": "2026-11-02T21:07:07.844Z",
+   "kind": "claude",
+   "text": "Task d8-7 \"Touch-test page: rear camera by default, one frame loop after a second Start\" added to day 8."
+  },
   {
    "ts": "2026-11-02T20:58:48.881Z",
    "kind": "claude",
