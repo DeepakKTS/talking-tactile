@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 245, updated 2026-11-02T20:32:56.664Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 247, updated 2026-11-02T20:42:39.370Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -230,7 +230,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d5-35 Secret-check tests run git without inherited GIT_* variables
   - Note: On Oct 30 services/api/.env (the Meta API key) was deleted. Mechanism: a commit with a path (git commit <path>) runs the pre-commit hook with GIT_INDEX_FILE pointing at the real repo's temporary index; scripts/test_check_secrets.py's git calls inherited it, so its 'git add -f services/api/.env' in a throwaway repo staged that path in the real index, and the hook's restore ('git reset --hard') deleted the real file. Fix: the tests run git and the check with every GIT_* variable removed (CLEAN_ENV); they pass normally and with GIT_INDEX_FILE set to a bad path. Tooling is frozen except when blocked; this one deleted a secret. The key must be put back by its owner; no live call can run until then.
 - [ ] d5-36 Full eval live on the chosen variant (image, ask_answer.v2) and release-to-first-word [blocked]
-  - Note: Blocked: services/api/.env with MODEL_API_KEY was deleted (d5-35); the live run stopped at its first call with 'No MODEL_API_KEY line', no call made. Until it runs: the replay tests for the answers skip (recorded with ask_answer.v1, the prompt is v2) and apps/web/e2e/ask_e2e.py expects v1 answers. Next: restore the key, then caffeinate -i env LIVE=1 META_RECORD=qa6 uv run python -m app.meta.qa_eval --live, index qa6_ask_ in replays.json in place of qa2_ask_, and measure release-to-first-word.
+  - Note: Key restored Nov 2 (services/api/.env recovered from the one unreachable git blob holding a MODEL_API_KEY line, mode 600, git-ignored). Now blocked on the network: the one-call Spark smoke test timed out connecting to api.meta.ai at 15:26 and again at 15:41 (ConnectTimeout, no HTTP status, both in the ledger, unpriced). The Mac is on a new network (10.110.86.135). Next, unchanged: caffeinate -i env LIVE=1 META_RECORD=qa6 uv run python -m app.meta.qa_eval --live, index qa6_ask_ in replays.json in place of qa2_ask_, update ask_e2e.py to v2, measure release-to-first-word.
 - [ ] Gate C: One figure end to end [Pending]
   - Pass when: The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.
   - Fallback: Cut Plus features. Spend Day 6 on the loop only.
