@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 255, updated 2026-11-02T21:14:50.890Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 257, updated 2026-11-02T21:19:46.992Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -282,6 +282,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d8-8 Gate B guide: run the recorded protocol on the iPhone
   - Note: eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://Zedlers-MacBook-Pro.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands.
 - [ ] d8-9 CI: GitHub Actions runs the hook's checks, no LIVE, no secrets [doing]
+- [x] d8-10 Edge-case audit: docs/EDGE_CASES.md
+  - Note: 41 cases in 5 areas (upload, edits, Explore sheet, questions, server), current behavior with file:line at 4debae0, expected, status. 17 to fix, 4 limitations (undo, auto registration, drift, plus the rules on unfixed figures in the README), the rest ok; 6 marked needs device. Client timeout chosen from measured latency: server deadline 12 s, client 15 s.
 
 ## Day 9: Tue Nov 3. Gate D
 
