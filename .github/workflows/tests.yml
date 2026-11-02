@@ -15,7 +15,10 @@ permissions:
 
 jobs:
   check:
-    runs-on: ubuntu-24.04
+    # arm64, as the Mac the recordings were made on: a replayed request is matched on the
+    # sha256 of its PNG, and Pillow's zlib-ng compresses differently on x86 (on ubuntu-24.04
+    # three replay tests found no recording).
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
