@@ -91,6 +91,7 @@ Wrap every live run (LIVE=1) in `caffeinate -i`, so the Mac cannot sleep mid-run
 - Block the main thread with hand tracking. It runs in a Web Worker.
 - Add infrastructure we do not need (see "Not building" in PLAN.md).
 - Use em dashes or filler words in any text a user will hear or read.
+- Commit with a path (`git commit <path>`, `git commit -o` or `-i`). Stage with `git add`, then run `git commit`. A path-limited commit runs the pre-commit hook on a temporary index; on Oct 30 that led to services/api/.env being deleted.
 
 ## Tracker
 TRACKER.html is the project memory. Update it only with scripts/tracker.py, never by hand.
