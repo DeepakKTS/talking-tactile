@@ -109,15 +109,11 @@
    "px": 803939
   },
   "regions_json": {
-   "touchable": 14,
+   "touchable": 0,
    "lines": [
     {
      "id": "l1",
      "label": "tricuspid valve",
-     "separates": [
-      "r5",
-      "r6"
-     ],
      "between": [
       "right atrium",
       "right ventricle"
@@ -125,16 +121,11 @@
     },
     {
      "id": "l2",
-     "label": "chordae tendineae",
-     "parent": "r6"
+     "label": "chordae tendineae"
     },
     {
      "id": "l3",
      "label": "semilunar valves",
-     "separates": [
-      "r14",
-      "r10"
-     ],
      "between": [
       "left ventricle",
       "aorta"
@@ -143,10 +134,6 @@
     {
      "id": "l4",
      "label": "mitral valve",
-     "separates": [
-      "r13",
-      "r14"
-     ],
      "between": [
       "left atrium",
       "left ventricle"
@@ -160,7 +147,7 @@
   "contour_pieces": {
    "pieces": 3
   },
-  "rules_report": 1,
+  "rules_report": 0,
   "pairs": [
    {
     "part": "left common carotid artery",
@@ -491,7 +478,7 @@
    "px": 148899
   },
   "regions_json": {
-   "touchable": 7,
+   "touchable": 0,
    "lines": [],
    "merge_proposals": 0,
    "subject_drawn": true,
@@ -500,7 +487,7 @@
   "contour_pieces": {
    "pieces": 1
   },
-  "rules_report": 0,
+  "rules_report": 2,
   "pairs": [
    {
     "part": "microsporangium",
@@ -911,7 +898,7 @@
    "px": 0
   },
   "regions_json": {
-   "touchable": 9,
+   "touchable": 0,
    "lines": [],
    "merge_proposals": 0,
    "subject_drawn": false,
@@ -1103,15 +1090,11 @@
    "px": 1042167
   },
   "regions_json": {
-   "touchable": 7,
+   "touchable": 0,
    "lines": [
     {
      "id": "l1",
      "label": "central sulcus",
-     "separates": [
-      "r2",
-      "r3"
-     ],
      "between": [
       "precentral gyrus",
       "postcentral gyrus"
@@ -1120,10 +1103,6 @@
     {
      "id": "l2",
      "label": "lateral sulcus",
-     "separates": [
-      "r1",
-      "r4"
-     ],
      "between": [
       "frontal lobe",
       "temporal lobe"
@@ -1137,7 +1116,7 @@
   "contour_pieces": {
    "pieces": 0
   },
-  "rules_report": 0,
+  "rules_report": 1,
   "pairs": [
    {
     "part": "parietal lobe",
@@ -1329,7 +1308,7 @@
    "px": 1035244
   },
   "regions_json": {
-   "touchable": 5,
+   "touchable": 0,
    "lines": [],
    "merge_proposals": 0,
    "subject_drawn": true,

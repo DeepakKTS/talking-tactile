@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 247, updated 2026-11-02T20:42:39.370Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 249, updated 2026-11-02T20:58:48.881Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -275,6 +275,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: scripts/hooks/pre-commit no longer stashes, resets or cleans (the old git reset --hard deleted services/api/.env on Oct 30; it also removed ignored __pycache__ dirs). Tracked files whose working copy differs from the index are moved into .git/pre-commit-aside.*, replaced by the staged version with git checkout-index, and moved back on exit, pass or fail; nothing else is changed. Untracked files stay in place during the tests. New guard: if the tests change the index (git write-tree before and after), the commit is refused. scripts/test_pre_commit.py runs the real hook in a throwaway repo with an ignored services/api/.env and apps/web/.certs/, an untracked file, an unstaged edit and an unstaged deletion: a failing commit (fails only on the staged content, proving the swap) and a passing commit leave all of them as they were; a test that stages a path blocks the commit. 3 tests pass.
 - [x] d8-5 No path-limited commits; rule in CLAUDE.md
   - Note: CLAUDE.md, Never: no git commit <path>, -o or -i; stage with git add, then git commit. A path-limited commit runs the hook on a temporary index (GIT_INDEX_FILE), which on Oct 30 led to services/api/.env being deleted (d5-35, d8-4).
+- [x] d8-6 Graded-figure baseline refreshed at HEAD (plan_eval, fresh cache)
+  - Note: Feature freeze baseline. app.meta.plan_eval rerun with a fresh pipeline cache (WORK in a temp dir) on the recordings: every graded S2 score (per part tables, references, regressions, specks, overlaps) identical to the committed d7340e1 results. Two lines had gone stale through later commits: 'Touchable parts in regions.json' is 0 on every figure (touch needs the teacher's check, by design), and the rules report counts moved (heart 1 to 0; flower 0 to 2: a 2.95 mm gap under 3.2 and a nested part partly outside its parent; uploaded brain 0 to 1: a part with 20.7 mm2 to enter under the 23.0 point symbol floor). Publish refuses those until the teacher fixes them; no pipeline tuning in the freeze. From here, every change reruns this and must leave eval/plan unchanged.
 
 ## Day 9: Tue Nov 3. Gate D
 

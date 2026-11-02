@@ -6,14 +6,14 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: heart. Grade band: none.
 - Listed 19: areas 15, lines 4, groups 0, not located 0.
-- Touchable areas: 14 of 15. Touchable parts in regions.json: 14.
+- Touchable areas: 14 of 15. Touchable parts in regions.json: 0.
 - Needs you: 1. septum (spill: holds points of right ventricle after a retry)
 - Lines: tricuspid valve between right atrium and right ventricle; chordae tendineae in right ventricle; semilunar valves between left ventricle and aorta; mitral valve between left atrium and left ventricle.
 - Nested by geometry: none.
 - Merge proposals: 1. brachiocephalic artery, left common carotid artery, left subclavian artery, aorta as 'aortic arch' (Spark marked them as one unbroken shape)
 - Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 803939 px; in regions.json: True, 3 raised contour piece(s).
-- Rules report: 1 violation(s). Replayed calls: 21.
+- Rules report: 0 violation(s). Replayed calls: 21.
 
 15 parts, no mask 1, needs teacher 1, regressions 0 of 4 references, specks 0, under a point symbol 0, on text 0, on leader lines 0, fragmented 2, overlapping pairs 0 before resolution and 0 after. Points 25: on text 0, on lines 0, on ink 0.
 
@@ -28,14 +28,14 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: mature flower. Grade band: none.
 - Listed 16: areas 13, lines 0, groups 3, not located 0.
-- Touchable areas: 7 of 13. Touchable parts in regions.json: 7.
+- Touchable areas: 7 of 13. Touchable parts in regions.json: 0.
 - Needs you: 6. ovules (same_outline: same outline as ovary; a drawn line or color edge lies between them); style (spill: holds points of ovary, ovules after a retry); ovary (spill: holds points of style after a retry); floral axis (no_mask: SAM's mask holds none of the part's points); connective (same_outline: same outline as anther; a drawn line or color edge lies between them); filament (same_outline: same outline as petal; a drawn line or color edge lies between them)
 - Lines: none.
 - Nested by geometry: microsporangium in anther.
 - Merge proposals: 1. floral axis, pedicel as 'flower base' (Spark marked them as one unbroken shape)
 - Left out of a merge Spark marked: nectary (not merged with floral axis: a drawn line or color edge lies between them).
 - Silhouette: SAM 2 instance(s), 148899 px; in regions.json: True, 1 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: 20.
+- Rules report: 2 violation(s). Replayed calls: 20.
 
 16 parts, no mask 9, needs teacher 6, regressions 3 of 3 references, specks 0, under a point symbol 2, on text 0, on leader lines 0, fragmented 1, overlapping pairs 1 before resolution and 1 after. Points 25: on text 0, on lines 0, on ink 0.
 
@@ -51,7 +51,7 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: Japan. Grade band: none.
 - Listed 9: areas 9, lines 0, groups 0, not located 0.
-- Touchable areas: 9 of 9. Touchable parts in regions.json: 9.
+- Touchable areas: 9 of 9. Touchable parts in regions.json: 0.
 - Needs you: 0.
 - Lines: none.
 - Nested by geometry: none.
@@ -76,20 +76,20 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 - Subject: human brain. Grade band: 6_8.
 - Listed 12: areas 10, lines 2, groups 0, not located 0.
-- Touchable areas: 8 of 10. Touchable parts in regions.json: 7.
+- Touchable areas: 8 of 10. Touchable parts in regions.json: 0.
 - Needs you: 2. parietal lobe (same_outline: same outline as postcentral gyrus; a drawn line or color edge lies between them); pons (same_outline: same outline as cerebellum; a drawn line or color edge lies between them)
 - Lines: central sulcus between precentral gyrus and postcentral gyrus; lateral sulcus between frontal lobe and temporal lobe.
 - Nested by geometry: medulla in cerebellum, spinal cord in cerebellum.
 - Merge proposals: 1. pons, medulla, spinal cord as 'brainstem' (Spark marked them as one unbroken shape)
 - Left out of a merge Spark marked: none.
 - Silhouette: SAM 1 instance(s), 1042167 px; in regions.json: True, 0 raised contour piece(s).
-- Rules report: 0 violation(s). Replayed calls: 13.
+- Rules report: 1 violation(s). Replayed calls: 13.
 
 ## brain_lobes
 
 - Subject: brain. Grade band: 6_8.
 - Listed 6: areas 6, lines 0, groups 0, not located 0.
-- Touchable areas: 5 of 6. Touchable parts in regions.json: 5.
+- Touchable areas: 5 of 6. Touchable parts in regions.json: 0.
 - Needs you: 1. olfactory bulb (no_points: every point was dropped by the guard)
 - Lines: none.
 - Nested by geometry: none.

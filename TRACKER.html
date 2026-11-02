@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 247,
- "updated_at": "2026-11-02T20:42:39.370Z",
+ "rev": 249,
+ "updated_at": "2026-11-02T20:58:48.881Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1989,6 +1989,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-02T20:32:56.664Z"
   },
   {
+   "id": "d8-6",
+   "day": 8,
+   "title": "Graded-figure baseline refreshed at HEAD (plan_eval, fresh cache)",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Feature freeze baseline. app.meta.plan_eval rerun with a fresh pipeline cache (WORK in a temp dir) on the recordings: every graded S2 score (per part tables, references, regressions, specks, overlaps) identical to the committed d7340e1 results. Two lines had gone stale through later commits: 'Touchable parts in regions.json' is 0 on every figure (touch needs the teacher's check, by design), and the rules report counts moved (heart 1 to 0; flower 0 to 2: a 2.95 mm gap under 3.2 and a nested part partly outside its parent; uploaded brain 0 to 1: a part with 20.7 mm2 to enter under the 23.0 point symbol floor). Publish refuses those until the teacher fixes them; no pipeline tuning in the freeze. From here, every change reruns this and must leave eval/plan unchanged.",
+   "done_at": "2026-11-02T20:58:48.881Z",
+   "tags": [
+    "eval",
+    "freeze"
+   ],
+   "changed_at": "2026-11-02T20:58:48.881Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -2901,6 +2917,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-02T20:58:48.881Z",
+   "kind": "claude",
+   "text": "Task d8-6 \"Graded-figure baseline refreshed at HEAD (plan_eval, fresh cache)\" is now done. Note: Feature freeze baseline. app.meta.plan_eval rerun with a fresh pipeline cache (WORK in a temp dir) on the recordings: every graded S2 score (per part tables, references, regressions, specks, overlaps) identical to the committed d7340e1 results. Two lines had gone stale through later commits: 'Touchable parts in regions.json' is 0 on every figure (touch needs the teacher's check, by design), and the rules report counts moved (heart 1 to 0; flower 0 to 2: a 2.95 mm gap under 3.2 and a nested part partly outside its parent; uploaded brain 0 to 1: a part with 20.7 mm2 to enter under the 23.0 point symbol floor). Publish refuses those until the teacher fixes them; no pipeline tuning in the freeze. From here, every change reruns this and must leave eval/plan unchanged."
+  },
+  {
+   "ts": "2026-11-02T20:58:39.570Z",
+   "kind": "claude",
+   "text": "Task d8-6 \"Graded-figure baseline refreshed at HEAD (plan_eval, fresh cache)\" added to day 8."
+  },
   {
    "ts": "2026-11-02T20:42:39.370Z",
    "kind": "claude",
