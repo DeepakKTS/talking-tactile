@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 241, updated 2026-10-30T22:48:08.803Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 243, updated 2026-11-02T20:29:30.228Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -271,6 +271,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - add-figure-type skill.
 - [ ] d8-3 Run every eval suite (1.5 h)
   - run-eval skill. Fill the Metrics tab from eval/RESULTS.md.
+- [x] d8-4 Pre-commit hook never removes ignored or untracked files
+  - Note: scripts/hooks/pre-commit no longer stashes, resets or cleans (the old git reset --hard deleted services/api/.env on Oct 30; it also removed ignored __pycache__ dirs). Tracked files whose working copy differs from the index are moved into .git/pre-commit-aside.*, replaced by the staged version with git checkout-index, and moved back on exit, pass or fail; nothing else is changed. Untracked files stay in place during the tests. New guard: if the tests change the index (git write-tree before and after), the commit is refused. scripts/test_pre_commit.py runs the real hook in a throwaway repo with an ignored services/api/.env and apps/web/.certs/, an untracked file, an unstaged edit and an unstaged deletion: a failing commit (fails only on the staged content, proving the swap) and a passing commit leave all of them as they were; a test that stages a path blocks the commit. 3 tests pass.
 
 ## Day 9: Tue Nov 3. Gate D
 

@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 241,
- "updated_at": "2026-10-30T22:48:08.803Z",
+ "rev": 243,
+ "updated_at": "2026-11-02T20:29:30.228Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1958,6 +1958,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    ]
   },
   {
+   "id": "d8-4",
+   "day": 8,
+   "title": "Pre-commit hook never removes ignored or untracked files",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "scripts/hooks/pre-commit no longer stashes, resets or cleans (the old git reset --hard deleted services/api/.env on Oct 30; it also removed ignored __pycache__ dirs). Tracked files whose working copy differs from the index are moved into .git/pre-commit-aside.*, replaced by the staged version with git checkout-index, and moved back on exit, pass or fail; nothing else is changed. Untracked files stay in place during the tests. New guard: if the tests change the index (git write-tree before and after), the commit is refused. scripts/test_pre_commit.py runs the real hook in a throwaway repo with an ignored services/api/.env and apps/web/.certs/, an untracked file, an unstaged edit and an unstaged deletion: a failing commit (fails only on the staged content, proving the swap) and a passing commit leave all of them as they were; a test that stages a path blocks the commit. 3 tests pass.",
+   "done_at": "2026-11-02T20:29:30.228Z",
+   "tags": [
+    "tooling",
+    "safety"
+   ],
+   "changed_at": "2026-11-02T20:29:30.228Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -2870,6 +2886,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-02T20:29:30.228Z",
+   "kind": "claude",
+   "text": "Task d8-4 \"Pre-commit hook never removes ignored or untracked files\" is now done. Note: scripts/hooks/pre-commit no longer stashes, resets or cleans (the old git reset --hard deleted services/api/.env on Oct 30; it also removed ignored __pycache__ dirs). Tracked files whose working copy differs from the index are moved into .git/pre-commit-aside.*, replaced by the staged version with git checkout-index, and moved back on exit, pass or fail; nothing else is changed. Untracked files stay in place during the tests. New guard: if the tests change the index (git write-tree before and after), the commit is refused. scripts/test_pre_commit.py runs the real hook in a throwaway repo with an ignored services/api/.env and apps/web/.certs/, an untracked file, an unstaged edit and an unstaged deletion: a failing commit (fails only on the staged content, proving the swap) and a passing commit leave all of them as they were; a test that stages a path blocks the commit. 3 tests pass."
+  },
+  {
+   "ts": "2026-11-02T20:29:22.446Z",
+   "kind": "claude",
+   "text": "Task d8-4 \"Pre-commit hook never removes ignored or untracked files\" added to day 8."
+  },
   {
    "ts": "2026-10-30T22:48:08.803Z",
    "kind": "claude",

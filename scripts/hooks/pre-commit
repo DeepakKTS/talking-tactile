@@ -3,12 +3,16 @@
 # .env.example (scripts/check_secrets.py), or if the tracker tests, the tracking node tests or
 # the product checks (pytest, vitest, ruff, eslint, mypy, tsc via make check) fail on the
 # STAGED content.
-# Unstaged changes and untracked files are stashed first (git stash --keep-index) and always
-# restored on exit, pass or fail. Ignored files (such as services/api/.env) are never touched.
+# Tracked files whose working copy differs from the staged one are moved aside into the git
+# directory, replaced by the staged version for the tests, and moved back on exit, pass or
+# fail. Those are the only paths the hook changes. It never resets, stashes or cleans, so
+# ignored files (services/api/.env, apps/web/.certs/) and untracked files are never touched;
+# untracked files are present while the tests run. On Oct 30 the old "git reset --hard"
+# deleted services/api/.env (scripts/test_pre_commit.py).
 # Install once with: sh scripts/install-hooks.sh
 set -euo pipefail
 
-# Everything runs inside main, so bash has parsed the whole hook before the stash can
+# Everything runs inside main, so bash has parsed the whole hook before the swap can
 # change this file on disk (git runs the hook from the working tree).
 main() {
   cd "$(git rev-parse --show-toplevel)"
@@ -18,40 +22,51 @@ main() {
   echo "pre-commit: secret check"
   python3 scripts/check_secrets.py
 
-  stashed=0
+  aside=""
+  swapped=()
   restore() {
-    local rc=$?
-    if [ "$stashed" = 1 ]; then
-      # Back to HEAD, then reapply the stash with its index. The stash's base is HEAD, so
-      # staged and unstaged edits to the same lines come back exactly, with no merge.
-      git reset --hard -q
-      if git stash pop --index -q; then
+    local rc=$? p failed=0
+    if [ -n "$aside" ] && [ "${#swapped[@]}" -gt 0 ]; then
+      for p in "${swapped[@]}"; do
+        if [ -e "$aside/$p" ] || [ -L "$aside/$p" ]; then
+          mv -f "$aside/$p" "$p" || failed=1
+        else
+          rm -f "$p" || failed=1 # absent from the working tree before: the hook wrote it
+        fi
+      done
+      if [ "$failed" = 0 ]; then
+        rm -rf "$aside"
         echo "pre-commit: unstaged changes restored"
       else
-        echo "pre-commit: could not restore unstaged changes. They are safe in 'git stash list'." >&2
+        echo "pre-commit: could not restore every unstaged change. The originals are in $aside" >&2
         rc=1
       fi
     fi
-    find scripts spikes services -name __pycache__ -type d -prune -exec rm -rf {} +
     exit "$rc"
   }
   trap restore EXIT
+  trap 'exit 130' INT TERM
 
   if git rev-parse -q --verify MERGE_HEAD > /dev/null; then
     echo "pre-commit: merge in progress, testing the working tree as it is"
-  elif ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
-    before=$(git rev-parse -q --verify refs/stash || true)
-    git stash push --keep-index --include-untracked -q -m "pre-commit: unstaged changes"
-    after=$(git rev-parse -q --verify refs/stash || true)
-    # Only restore a stash this hook created, never an older one of yours.
-    if [ "$after" != "$before" ]; then
-      stashed=1
-      echo "pre-commit: testing staged content (unstaged changes stashed)"
+  else
+    while IFS= read -r -d '' p; do swapped+=("$p"); done < <(git diff --name-only -z)
+    if [ "${#swapped[@]}" -gt 0 ]; then
+      aside=$(mktemp -d "$(git rev-parse --absolute-git-dir)/pre-commit-aside.XXXXXX")
+      for p in "${swapped[@]}"; do
+        if [ -e "$p" ] || [ -L "$p" ]; then
+          mkdir -p "$aside/$(dirname "$p")"
+          mv "$p" "$aside/$p"
+        fi
+        git checkout-index -f -- "$p"
+      done
+      echo "pre-commit: testing staged content (${#swapped[@]} unstaged changes set aside)"
     fi
   fi
+  staged=$(git write-tree)
 
-  echo "pre-commit: tracker and secret check tests"
-  python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py
+  echo "pre-commit: tracker, secret check and hook tests"
+  python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py scripts/test_pre_commit.py
 
   echo "pre-commit: tracking node tests"
   (cd spikes/tracking && node --test --test-reporter=dot test/*.test.mjs)
@@ -59,6 +74,12 @@ main() {
   echo "pre-commit: product checks (make check)"
   make -s check
 
+  # A test that stages a path (a leaked GIT_INDEX_FILE did on Oct 30) would change what is
+  # committed after the secret check ran.
+  if [ "$(git write-tree)" != "$staged" ]; then
+    echo "pre-commit: the tests changed the staged content. Not committing." >&2
+    exit 1
+  fi
   echo "pre-commit: all tests passed"
 }
 
