@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 251, updated 2026-11-02T21:07:07.884Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 253, updated 2026-11-02T21:10:06.494Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -279,6 +279,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Feature freeze baseline. app.meta.plan_eval rerun with a fresh pipeline cache (WORK in a temp dir) on the recordings: every graded S2 score (per part tables, references, regressions, specks, overlaps) identical to the committed d7340e1 results. Two lines had gone stale through later commits: 'Touchable parts in regions.json' is 0 on every figure (touch needs the teacher's check, by design), and the rules report counts moved (heart 1 to 0; flower 0 to 2: a 2.95 mm gap under 3.2 and a nested part partly outside its parent; uploaded brain 0 to 1: a part with 20.7 mm2 to enter under the 23.0 point symbol floor). Publish refuses those until the teacher fixes them; no pipeline tuning in the freeze. From here, every change reruns this and must leave eval/plan unchanged.
 - [x] d8-7 Touch-test page: rear camera by default, one frame loop after a second Start
   - Note: spikes/tracking/main.js: no camera picked asks for facingMode environment (a phone opened the front one); Start again stops the old tracks, keeps the picked camera selected and does not add a second frame loop (it doubled the camera count: 81 fps for a 20 fps fake camera); rates reset per Start. e2e_check.py loop now presses Start twice and fails on two loops: fails on the old page, passes on the new. session check passes; graded figures unchanged (plan_eval, fresh cache). On the iPhone: needs device.
+- [x] d8-8 Gate B guide: run the recorded protocol on the iPhone
+  - Note: eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://Zedlers-MacBook-Pro.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands.
 
 ## Day 9: Tue Nov 3. Gate D
 
