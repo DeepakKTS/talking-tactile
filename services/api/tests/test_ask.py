@@ -260,3 +260,31 @@ def test_spark_gets_the_schema_strict() -> None:
     assert (
         "strict" not in spark_body("m", "s", "u", None, ("X", {}))["response_format"]["json_schema"]
     )
+
+
+def test_a_question_past_the_deadline_says_questions_are_not_working(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class Slow(FakeClient):
+        async def answer(self, *args: Any) -> dict[str, Any]:
+            await asyncio.sleep(5)
+            return self.answer_json
+
+    monkeypatch.setattr(ask, "DEADLINE_S", 0.05)
+    client = Slow({"answer_text": "late", "source": "figure", "cited_part_ids": []})
+
+    async def body() -> None:
+        app = create_app(data_dir=tmp_path, client=MockMetaClient(load_tactile_rules().meta))
+        app.state.figure_service().asker = lambda: asker(client)
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://t"
+        ) as http:
+            r = await http.post("/api/ask", json={"figure_id": FID, "question": "What is this?"})
+            assert r.status_code == 502
+            assert r.json()["error"] == {
+                "code": "answer_failed",
+                "message": ask.FAILED,
+                "retryable": True,
+            }
+
+    asyncio.run(body())

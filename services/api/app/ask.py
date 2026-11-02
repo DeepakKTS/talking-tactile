@@ -42,6 +42,11 @@ UNSURE = "I am not sure from this figure. Ask your teacher."
 NOT_HEARD = "I did not catch a question. Hold the screen and ask again."
 CAPPED = f"That is {SESSION_QUESTIONS} questions for this session. Ask your teacher."
 FAILED = "Questions are not working right now. Labels still work."
+# A question gets this long, transcribe and Spark together; then the route says FAILED. The
+# slowest the live eval measured was about 8.3 s (Spark 6.9 s, transcribe p95 1.4 s; eval/qa/
+# scores.json, eval/qa/VOICE.md), so 12 s is 1.4 times that; Explore gives up at 15 s
+# (apps/web/src/explore/camera.ts ASK_TIMEOUT_MS), after this sentence would have arrived.
+DEADLINE_S = 12.0
 
 
 def _ids(f: RegionsFile) -> list[str]:

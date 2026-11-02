@@ -113,28 +113,38 @@ async function spokenError(res: Response): Promise<AskError> {
   return new AskError(res.status !== 404 && typeof message === "string" ? message : NOT_WORKING);
 }
 
-/** A held question: the WAV and the touch context, as multipart. */
-export async function askAudioApi(wav: Uint8Array, req: AskRequest): Promise<AskReply> {
+/** The server stops a question at 12 s and says so (services/api/app/ask.py DEADLINE_S), so
+ * its sentence normally arrives first. This is for a server or network that never answers:
+ * the student hears that questions are not working and the next hold works. */
+export const ASK_TIMEOUT_MS = 15000;
+
+async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<string, unknown>> {
   if (!navigator.onLine) throw new TypeError("offline");
+  try {
+    const res = await fetch("/api/ask", { ...init, signal: AbortSignal.timeout(timeoutMs) });
+    if (!res.ok) throw await spokenError(res);
+    return (await res.json()) as Record<string, unknown>;
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "TimeoutError") throw new AskError(NOT_WORKING);
+    throw err;
+  }
+}
+
+/** A held question: the WAV and the touch context, as multipart. */
+export async function askAudioApi(wav: Uint8Array, req: AskRequest, timeoutMs = ASK_TIMEOUT_MS): Promise<AskReply> {
   const form = new FormData();
   form.append("request", JSON.stringify({ ...req, question: undefined }));
   form.append("audio", new Blob([new Uint8Array(wav)], { type: "audio/wav" }), "question.wav");
-  const res = await fetch("/api/ask", { method: "POST", body: form });
-  if (!res.ok) throw await spokenError(res);
-  const body = (await res.json()) as Partial<AskReply>;
+  const body = (await postAsk({ method: "POST", body: form }, timeoutMs)) as Partial<AskReply>;
   if (typeof body.answer !== "string") throw new AskError(NOT_WORKING);
   return { answer: body.answer, transcript: body.transcript ?? "", timings_ms: body.timings_ms ?? {} };
 }
 
-export async function askApi(req: unknown): Promise<string> {
-  if (!navigator.onLine) throw new TypeError("offline");
-  const res = await fetch("/api/ask", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(req),
-  });
-  if (!res.ok) throw await spokenError(res);
-  const body = (await res.json()) as { answer?: unknown };
+export async function askApi(req: unknown, timeoutMs = ASK_TIMEOUT_MS): Promise<string> {
+  const body = await postAsk(
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) },
+    timeoutMs,
+  );
   if (typeof body.answer !== "string") throw new AskError(NOT_WORKING);
   return body.answer;
 }

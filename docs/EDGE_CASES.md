@@ -62,7 +62,7 @@ p95 5.9 s (12 holds); Spark p95 5.3 s on the heart, slowest of 61 answers 6.9 s
 | # | Case | Current behavior | Expected | Status |
 |---|---|---|---|---|
 | Q1 | Offline | "Questions need the network. Labels still work." before recording (`web/explore/voice.ts:273-276`, `session.ts:83`); typed the same (`camera.ts:130`, `session.ts:344`). Tests `voice.test.ts:167`, `session.test.ts:190,336` | Same | ok |
-| Q2 | Request timeout | No client timeout (`camera.ts:122,131`); the server waits up to 120 s a read, two calls a question (`api/meta/live.py:33`). A server that never answers leaves the hold busy for good: later holds are ignored (`voice.ts:245`) | Server deadline 12 s, client timeout 15 s (below) | fix |
+| Q2 | Request timeout | No client timeout (`camera.ts:122,131`); the server waits up to 120 s a read, two calls a question (`api/meta/live.py:33`). A server that never answers leaves the hold busy for good: later holds are ignored (`voice.ts:245`) | Server deadline 12 s, client timeout 15 s (below) | fixed: `test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working`, `camera.test.ts` question timeout |
 | Q3 | 50-question cap | 429 "That is 50 questions for this session. Ask your teacher." (`api/ask.py:43,303-304`), spoken as sent. Test `test_ask.py:161` | Same | ok |
 | Q4 | Silence or empty transcript | "I did not catch a question. Hold the screen and ask again." (`api/ask.py:42,313-316`); under 400 ms: "Hold the screen while you ask, then let go." (`voice.ts:28,296-299`). Tests `test_ask.py:155`, `voice.test.ts:177` | Same | ok |
 | Q5 | Very long hold | Capped at 15 s (`voice.ts:22,53-55`): sent, with the release earcon | Same | ok |

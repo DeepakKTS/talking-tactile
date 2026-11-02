@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 257, updated 2026-11-02T21:19:46.992Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 259, updated 2026-11-02T21:23:57.585Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -284,6 +284,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d8-9 CI: GitHub Actions runs the hook's checks, no LIVE, no secrets [doing]
 - [x] d8-10 Edge-case audit: docs/EDGE_CASES.md
   - Note: 41 cases in 5 areas (upload, edits, Explore sheet, questions, server), current behavior with file:line at 4debae0, expected, status. 17 to fix, 4 limitations (undo, auto registration, drift, plus the rules on unfixed figures in the README), the rest ok; 6 marked needs device. Client timeout chosen from measured latency: server deadline 12 s, client 15 s.
+- [x] d8-11 Edge case Q2: a question never hangs: server deadline 12 s, client timeout 15 s
+  - Note: api/routes/ask.py waits DEADLINE_S 12 s (app/ask.py) for transcribe and Spark together, then 502 with FAILED. Explore's two ask requests carry AbortSignal.timeout(15000) (camera.ts ASK_TIMEOUT_MS) and end in 'Questions are not working right now. Labels still work.', so a hold is never stuck busy. Chosen from the measured latency: slowest server time about 8.3 s (Spark 6.9 s max of 61, transcribe p95 1.4 s), release to first word p95 5.9 s. Tests: test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working, camera.test.ts question timeout (2).
 
 ## Day 9: Tue Nov 3. Gate D
 

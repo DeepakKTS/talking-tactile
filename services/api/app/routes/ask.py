@@ -7,6 +7,7 @@ out, and an `audio` part, a WAV of mono 16-bit PCM at 16 or 24 kHz.
 The answer comes back with the transcript and the time each step took. Every message in an
 error is written to be spoken: Explore says it as it is."""
 
+import asyncio
 import json
 from typing import Any
 
@@ -15,6 +16,7 @@ from fastapi import APIRouter, Request
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile
 
+from app import ask as asking
 from app.ask import FAILED, AskRequest, QuestionCapError, WavError
 from app.errors import ApiError
 from app.meta.live import LiveCallCapError, LiveCallError
@@ -48,14 +50,14 @@ async def ask(request: Request) -> dict[str, Any]:
     service = request.app.state.figure_service()
     req, audio = await _read(request)
     try:
-        answer = await service.asker().ask(req, audio)
+        answer = await asyncio.wait_for(service.asker().ask(req, audio), asking.DEADLINE_S)
     except WavError as exc:
         raise ApiError(
             422, "audio_invalid", "That recording could not be read. Ask again."
         ) from exc
     except QuestionCapError as exc:
         raise ApiError(429, "question_cap", str(exc)) from exc
-    except _CALL_ERRORS as exc:
+    except (*_CALL_ERRORS, TimeoutError) as exc:  # TimeoutError: past DEADLINE_S
         raise ApiError(502, "answer_failed", FAILED, True) from exc
     out: dict[str, Any] = answer.model_dump(mode="json")
     return out

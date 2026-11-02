@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 257,
- "updated_at": "2026-11-02T21:19:46.992Z",
+ "rev": 259,
+ "updated_at": "2026-11-02T21:23:57.585Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2068,6 +2068,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-02T21:19:46.992Z"
   },
   {
+   "id": "d8-11",
+   "day": 8,
+   "title": "Edge case Q2: a question never hangs: server deadline 12 s, client timeout 15 s",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "api/routes/ask.py waits DEADLINE_S 12 s (app/ask.py) for transcribe and Spark together, then 502 with FAILED. Explore's two ask requests carry AbortSignal.timeout(15000) (camera.ts ASK_TIMEOUT_MS) and end in 'Questions are not working right now. Labels still work.', so a hold is never stuck busy. Chosen from the measured latency: slowest server time about 8.3 s (Spark 6.9 s max of 61, transcribe p95 1.4 s), release to first word p95 5.9 s. Tests: test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working, camera.test.ts question timeout (2).",
+   "done_at": "2026-11-02T21:23:57.585Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-02T21:23:57.585Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -2980,6 +2996,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-02T21:23:57.585Z",
+   "kind": "claude",
+   "text": "Task d8-11 \"Edge case Q2: a question never hangs: server deadline 12 s, client timeout 15 s\" is now done. Note: api/routes/ask.py waits DEADLINE_S 12 s (app/ask.py) for transcribe and Spark together, then 502 with FAILED. Explore's two ask requests carry AbortSignal.timeout(15000) (camera.ts ASK_TIMEOUT_MS) and end in 'Questions are not working right now. Labels still work.', so a hold is never stuck busy. Chosen from the measured latency: slowest server time about 8.3 s (Spark 6.9 s max of 61, transcribe p95 1.4 s), release to first word p95 5.9 s. Tests: test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working, camera.test.ts question timeout (2)."
+  },
+  {
+   "ts": "2026-11-02T21:23:57.548Z",
+   "kind": "claude",
+   "text": "Task d8-11 \"Edge case Q2: a question never hangs: server deadline 12 s, client timeout 15 s\" added to day 8."
+  },
   {
    "ts": "2026-11-02T21:19:46.992Z",
    "kind": "claude",
