@@ -48,6 +48,10 @@ class LiveConfigError(Exception):
     """services/api/.env is missing the key. The message never holds a value."""
 
 
+class MalformedResponseError(Exception):
+    """A 200 whose body, or the model output in it, is not the shape the endpoint returns."""
+
+
 class LiveCallError(Exception):
     """A non-200 answer. The body is redacted and cut to a readable length."""
 
@@ -266,6 +270,15 @@ class LiveCaller:
                 redact=self.redact,
             )
 
+    def _json(self, line: dict[str, Any], r: httpx.Response) -> Any:
+        """The body as JSON. A 200 that is not JSON was still a call: it is logged, unpriced."""
+        try:
+            return r.json()
+        except ValueError as exc:
+            error = "the response is not JSON"
+            self.ledger.append({**line, "usage": None, "cost_usd": None, "error": error})
+            raise MalformedResponseError(error) from exc
+
     def _broken(self, line: dict[str, Any], exc: httpx.HTTPError) -> None:
         """A call that got no answer, such as a timeout, still counts and is logged."""
         error = self.redact(f"{type(exc).__name__}: {exc}")[:_ERROR_CHARS]
@@ -293,7 +306,7 @@ class LiveCaller:
         line = self._line(caller, model, describe, r.status_code, t0)
         if r.status_code != httpx.codes.OK:
             raise self._fail(line, r.status_code, r.text)
-        data = r.json()
+        data = self._json(line, r)
         usage = data.get("usage") if isinstance(data, dict) else None
         result = self._done(line, model, data, usage, units)  # the ledger line comes first
         self._record(record_as, model, r.request, path, {"status": r.status_code, "json": data})
@@ -361,7 +374,7 @@ class LiveCaller:
         line = self._line(caller, model, describe, r.status_code, t0)
         if r.status_code != httpx.codes.OK:
             raise self._fail(line, r.status_code, r.text)
-        data = r.json()
+        data = self._json(line, r)
         usage = data.get("usage") if isinstance(data, dict) else None
         result = self._done(line, model, data, usage, units)  # the ledger line comes first
         self._record(record_as, model, r.request, path, {"status": r.status_code, "json": data})

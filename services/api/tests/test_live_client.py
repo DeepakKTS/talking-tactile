@@ -9,11 +9,12 @@ from typing import Any
 
 import httpx
 import numpy as np
+import pytest
 from meta_sam_parser._mask_codec import _encode_raster
 
 from app.config import load_tactile_rules
 from app.meta.cost import CostMeter
-from app.meta.live import Ledger, LiveCaller
+from app.meta.live import Ledger, LiveCaller, MalformedResponseError
 from app.meta.live_client import LiveMetaClient, merge_located
 from app.meta.types import SheetContext, Understanding
 from app.pipeline import s1_understand, s2_ground
@@ -219,3 +220,25 @@ def test_the_plan_keeps_lines_without_points_and_checks_names_against_the_listin
     assert u.subject == "brain"
     assert [(s.parts, s.name) for s in u.shares_region] == [
         (("pons", "frontal lobe"), "pons and frontal lobe")]  # fmt: skip
+
+
+@pytest.mark.parametrize(
+    "response",
+    [chat("not json"), chat("[1, 2]"), httpx.Response(200, json={"choices": []})],
+)
+def test_an_answer_without_a_json_object_is_malformed(
+    tmp_path: Path, response: httpx.Response
+) -> None:
+    def caller() -> LiveCaller:
+        return LiveCaller(
+            key="test-key",
+            base_url="https://api.meta.ai/v1",
+            ledger=Ledger(tmp_path / "ledger.jsonl"),
+            meter=CostMeter(RULES.meta),
+            cap=RULES.meta.live_call_cap,
+            transport=httpx.MockTransport(lambda _r: response),
+        )
+
+    live = LiveMetaClient(RULES.meta, caller)
+    with pytest.raises(MalformedResponseError):
+        asyncio.run(live.answer("f" * 64, None, "system", "user", {"type": "object"}, "q"))

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 261, updated 2026-11-03T00:43:11.593Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 263, updated 2026-11-03T00:49:06.159Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -288,6 +288,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: api/routes/ask.py waits DEADLINE_S 12 s (app/ask.py) for transcribe and Spark together, then 502 with FAILED. Explore's two ask requests carry AbortSignal.timeout(15000) (camera.ts ASK_TIMEOUT_MS) and end in 'Questions are not working right now. Labels still work.', so a hold is never stuck busy. Chosen from the measured latency: slowest server time about 8.3 s (Spark 6.9 s max of 61, transcribe p95 1.4 s), release to first word p95 5.9 s. Tests: test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working, camera.test.ts question timeout (2).
 - [x] d8-12 Edge case S5: a student hears only sentences written to be spoken
   - Note: apps/web/src/explore/camera.ts: a failed question says the server's message only for the ask route's own codes (invalid_request, audio_invalid, question_cap, answer_failed); a 500 ('Something went wrong.'), a 503 naming LIVE=1, a 404 or a proxy page say 'Questions are not working right now. Labels still work.'; a 200 that is not JSON says the same instead of the offline sentence. Tests: camera.test.ts 'what a failed question says' (3).
+- [x] d8-13 Edge case S4: a malformed model answer says questions are not working
+  - Note: New MalformedResponseError (app/meta/live.py). A 200 that is not JSON writes its ledger line (unpriced, error 'the response is not JSON') and raises it, in post_json and post_multipart. LiveMetaClient.answer raises it for empty choices or content that is not a JSON object; transcribe for a body that is not an object; the Asker for a reply that fails SparkAnswer. The ask route maps it to 502 with FAILED instead of 500 'Something went wrong.'. Tests: test_ask.py::test_a_malformed_answer_says_questions_are_not_working (2), test_live_ledger.py::test_a_200_that_is_not_json_is_logged_and_raised_as_malformed, test_live_client.py::test_an_answer_without_a_json_object_is_malformed (3).
 
 ## Day 9: Tue Nov 3. Gate D
 

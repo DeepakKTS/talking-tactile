@@ -288,3 +288,24 @@ def test_a_question_past_the_deadline_says_questions_are_not_working(
             }
 
     asyncio.run(body())
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [{"reply": {"nonsense": 1}}, {"answer_text": 3, "source": "figure", "cited_part_ids": []}],
+)
+def test_a_malformed_answer_says_questions_are_not_working(
+    tmp_path: Path, reply: dict[str, Any]
+) -> None:
+    client = FakeClient(reply)
+
+    async def body() -> None:
+        app = create_app(data_dir=tmp_path, client=MockMetaClient(load_tactile_rules().meta))
+        app.state.figure_service().asker = lambda: asker(client)
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://t"
+        ) as http:
+            r = await http.post("/api/ask", json={"figure_id": FID, "question": "What is this?"})
+            assert (r.status_code, r.json()["error"]["message"]) == (502, ask.FAILED)
+
+    asyncio.run(body())

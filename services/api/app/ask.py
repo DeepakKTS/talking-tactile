@@ -23,8 +23,9 @@ import wave
 from collections import defaultdict
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 
+from app.meta.live import MalformedResponseError
 from app.models.regions import Region, RegionsFile
 
 Source = Literal["figure", "teacher_description", "off_figure", "unsure"]
@@ -325,7 +326,10 @@ class Asker:
         schema = answer_schema(f)
         raw = await client.answer(req.figure_id, image, self.system, user, schema, question)
         timings["spark"] = ms_since(t)
-        spark = SparkAnswer.model_validate(raw.get("reply", raw))
+        try:
+            spark = SparkAnswer.model_validate(raw.get("reply", raw))
+        except ValidationError as exc:
+            raise MalformedResponseError("the answer does not fit the schema") from exc
         text, source, cited = final(spark, f)
         fallback = spark.source == "teacher_description" and source == "unsure"
         timings["server"] = ms_since(t0)

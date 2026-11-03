@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 261,
- "updated_at": "2026-11-03T00:43:11.593Z",
+ "rev": 263,
+ "updated_at": "2026-11-03T00:49:06.159Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2100,6 +2100,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T00:43:11.593Z"
   },
   {
+   "id": "d8-13",
+   "day": 8,
+   "title": "Edge case S4: a malformed model answer says questions are not working",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "New MalformedResponseError (app/meta/live.py). A 200 that is not JSON writes its ledger line (unpriced, error 'the response is not JSON') and raises it, in post_json and post_multipart. LiveMetaClient.answer raises it for empty choices or content that is not a JSON object; transcribe for a body that is not an object; the Asker for a reply that fails SparkAnswer. The ask route maps it to 502 with FAILED instead of 500 'Something went wrong.'. Tests: test_ask.py::test_a_malformed_answer_says_questions_are_not_working (2), test_live_ledger.py::test_a_200_that_is_not_json_is_logged_and_raised_as_malformed, test_live_client.py::test_an_answer_without_a_json_object_is_malformed (3).",
+   "done_at": "2026-11-03T00:49:06.159Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T00:49:06.159Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3012,6 +3028,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T00:49:06.159Z",
+   "kind": "claude",
+   "text": "Task d8-13 \"Edge case S4: a malformed model answer says questions are not working\" is now done. Note: New MalformedResponseError (app/meta/live.py). A 200 that is not JSON writes its ledger line (unpriced, error 'the response is not JSON') and raises it, in post_json and post_multipart. LiveMetaClient.answer raises it for empty choices or content that is not a JSON object; transcribe for a body that is not an object; the Asker for a reply that fails SparkAnswer. The ask route maps it to 502 with FAILED instead of 500 'Something went wrong.'. Tests: test_ask.py::test_a_malformed_answer_says_questions_are_not_working (2), test_live_ledger.py::test_a_200_that_is_not_json_is_logged_and_raised_as_malformed, test_live_client.py::test_an_answer_without_a_json_object_is_malformed (3)."
+  },
+  {
+   "ts": "2026-11-03T00:49:06.122Z",
+   "kind": "claude",
+   "text": "Task d8-13 \"Edge case S4: a malformed model answer says questions are not working\" added to day 8."
+  },
   {
    "ts": "2026-11-03T00:43:11.593Z",
    "kind": "claude",

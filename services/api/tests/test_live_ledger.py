@@ -19,6 +19,7 @@ from app.meta.live import (
     LiveCallError,
     LiveConfigError,
     LiveDisabledError,
+    MalformedResponseError,
     load_key,
     spark_units,
 )
@@ -210,3 +211,15 @@ def test_every_configured_model_has_a_price() -> None:
     models = RULES.meta.models
     for model in (models.spark, models.sam, models.voice):
         assert model in RULES.meta.prices_usd
+
+
+def test_a_200_that_is_not_json_is_logged_and_raised_as_malformed(tmp_path: Path) -> None:
+    c = caller(tmp_path, lambda _r: httpx.Response(200, text="<html>gateway</html>"))
+    with pytest.raises(MalformedResponseError):
+        asyncio.run(c.post_json("/chat/completions", {}, caller="ask", model=SPARK, describe="q"))
+    [line] = c.ledger.read()
+    assert (line["status"], line["cost_usd"], line["error"]) == (
+        200,
+        None,
+        "the response is not JSON",
+    )

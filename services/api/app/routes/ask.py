@@ -19,11 +19,17 @@ from starlette.datastructures import UploadFile
 from app import ask as asking
 from app.ask import FAILED, AskRequest, QuestionCapError, WavError
 from app.errors import ApiError
-from app.meta.live import LiveCallCapError, LiveCallError
+from app.meta.live import LiveCallCapError, LiveCallError, MalformedResponseError
 from app.meta.mock import MockFixtureMissingError
 
 router = APIRouter(prefix="/api")
-_CALL_ERRORS = (LiveCallError, LiveCallCapError, httpx.HTTPError, MockFixtureMissingError)
+_CALL_ERRORS = (
+    LiveCallError,
+    LiveCallCapError,
+    MalformedResponseError,
+    httpx.HTTPError,
+    MockFixtureMissingError,
+)
 
 
 async def _read(request: Request) -> tuple[AskRequest, bytes | None]:

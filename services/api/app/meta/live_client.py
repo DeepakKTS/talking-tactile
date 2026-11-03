@@ -29,7 +29,7 @@ from app.config import Meta
 from app.meta import sam_adapter
 from app.meta.client import MetaClient, ObjectMask, SamObject, job_cap
 from app.meta.cost import CostMeter
-from app.meta.live import LiveCaller, spark_units
+from app.meta.live import LiveCaller, MalformedResponseError, spark_units
 from app.meta.types import (
     LISTING_SCHEMA,
     LOCATE_SCHEMA,
@@ -329,6 +329,8 @@ class LiveMetaClient:
             units=lambda _usage: {"audio_seconds": float(math.ceil(seconds))},
             record_as=self._name(f"ask_transcribe_{digest}_{'kw' if keywords else 'nokw'}"),
         )
+        if not isinstance(res.body, dict):
+            raise MalformedResponseError("the transcribe response is not a JSON object")
         return str(res.body.get("transcript", "")).strip()
 
     async def answer(
@@ -356,4 +358,10 @@ class LiveMetaClient:
             units=spark_units,
             record_as=self._name(f"ask_{slug(what)[:40]}_{digest}"),
         )
-        return dict(json.loads(res.body["choices"][0]["message"]["content"]))
+        try:
+            content = json.loads(res.body["choices"][0]["message"]["content"])
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            raise MalformedResponseError("the answer has no JSON content") from exc
+        if not isinstance(content, dict):
+            raise MalformedResponseError("the answer is not a JSON object")
+        return content
