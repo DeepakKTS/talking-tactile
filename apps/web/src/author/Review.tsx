@@ -57,7 +57,8 @@ export function Review({ api, id, status, onEdited }: Props) {
 
   const labelOf = (rid: string) => file?.regions.find((r) => r.id === rid)?.label ?? rid;
 
-  const send = async (what: string, call: () => Promise<unknown>) => {
+  /** True when the call went through; on a failure the message says why. */
+  const send = async (what: string, call: () => Promise<unknown>): Promise<boolean> => {
     setBusy(true);
     setRefused(null);
     setPublished(null);
@@ -65,14 +66,16 @@ export function Review({ api, id, status, onEdited }: Props) {
     try {
       await call();
       onEdited();
+      return true;
     } catch (err) {
       setMessage(err instanceof ApiError ? err.message : `${what} failed.`);
+      return false;
     } finally {
       setBusy(false);
     }
   };
 
-  const edit = (r: Region, e: Edit, what: string) => send(what, () => api.edit(id, r.id, e));
+  const edit = async (r: Region, e: Edit, what: string) => { await send(what, () => api.edit(id, r.id, e)); };
 
   const merge = (m: MergeProposal) =>
     send(`Merging ${joined(m.region_ids.map(labelOf))} as ${m.name}`, async () => {
@@ -126,8 +129,9 @@ export function Review({ api, id, status, onEdited }: Props) {
             busy={busy || !settled}
             onClose={() => { setFixing(null); }}
             onAccept={async (positive, negative) => {
-              await send(`Setting the outline of ${fixing.label}`, () => api.edit(id, fixing.region, { op: "outline", positive, negative }));
-              setFixing(null);
+              // A failed accept keeps the panel and its points, so the teacher can try again.
+              const ok = await send(`Setting the outline of ${fixing.label}`, () => api.edit(id, fixing.region, { op: "outline", positive, negative }));
+              if (ok) setFixing(null);
             }} />
         ) : (
           <figure>
@@ -224,7 +228,7 @@ export function Review({ api, id, status, onEdited }: Props) {
               </ul>
             </>
           )}
-          <AddPart busy={busy || !settled} onAdd={(name) => send(`Looking for ${name}`, () => api.add(id, name))} />
+          <AddPart busy={busy || !settled} onAdd={async (name) => { await send(`Looking for ${name}`, () => api.add(id, name)); }} />
         </div>
         <figure style={{ position: "relative", margin: 0 }}>
           <img src={api.draftUrl(id, "tactile.svg", version)} alt="Preview of the tactile sheet" style={{ width: "100%", display: "block" }} />

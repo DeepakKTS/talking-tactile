@@ -29,6 +29,7 @@ class FakeServer {
   stage = "s2";
   describeOnly: string | null = null; // Spark's reason, for a describe_only job
   created = true; // false: the same image was uploaded before
+  refuseEdit: string | null = null; // a PATCH answers 409 with this message
   published = 0;
   fixCalls = 0;
 
@@ -67,6 +68,9 @@ class FakeServer {
         outcome: positive.length ? "ran" : null, latency_ms: positive.length ? 1234 : null, calls: this.fixCalls - 1, call_cap: 30 });
     }
     const edit = new RegExp(`^/api/figures/${ID}/regions/(\\w+)$`).exec(path);
+    if (method === "PATCH" && edit && this.refuseEdit) {
+      return json({ error: { code: "edit_conflict", message: this.refuseEdit, retryable: true } }, 409);
+    }
     if (method === "PATCH" && edit) {
       const r = this.regions.regions.find((x) => x.id === edit[1]);
       const e = body as { op: string; label?: string; description?: string };
@@ -332,6 +336,22 @@ describe("author page", () => {
     expect(patch?.url).toBe(`/api/figures/${ID}/regions/n1`);
     expect(patch?.body).toEqual({ op: "outline", positive: [[500, 400]], negative: [[100, 100]] });
     await waitFor(() => { expect(screen.queryByRole("region", { name: "Fix outline of septum" })).toBeNull(); });
+  });
+
+  it("a failed accept keeps the Fix outline panel and its points, and says why", async () => {
+    server.regions.needs_teacher = [{ id: "n1", label: "septum", reason: "no_mask", detail: "SAM's mask holds none of the part's points" }];
+    server.refuseEdit = "The figure changed. Reload it and try again.";
+    await upload();
+    fireEvent.click(screen.getByRole("button", { name: "Fix outline of septum" }));
+    const panel = await screen.findByRole("region", { name: "Fix outline of septum" });
+    const img = await within(panel).findByRole("img");
+    img.getBoundingClientRect = () => ({ left: 0, top: 0, width: 500, height: 400, right: 500, bottom: 400, x: 0, y: 0, toJSON: () => ({}) });
+    fireEvent.click(img, { clientX: 250, clientY: 200 });
+    await within(panel).findByText("SAM answered in 1234 ms. Fix calls for this version: 1 of 30.");
+    fireEvent.click(within(panel).getByRole("button", { name: "Accept the outline of septum anyway" })); // it spills
+    expect(await screen.findByText("The figure changed. Reload it and try again.")).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Fix outline of septum" })).toBeTruthy();
+    expect(within(screen.getByRole("region", { name: "Fix outline of septum" })).getByText(/Positive points: \(500, 400\)/)).toBeTruthy();
   });
 
   it("marks a part checked, renames one and describes one, each as an edit", async () => {

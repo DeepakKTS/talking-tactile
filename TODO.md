@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 290, updated 2026-11-03T02:14:25.270Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 292, updated 2026-11-03T02:20:18.546Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -317,6 +317,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: apps/web/src/author/AuthorPage.tsx: when POST /api/figures answers created false (the same pixels as an earlier upload, so the same figure and job), the page says 'You uploaded this figure before. Its review, edits and published versions are below.' in a status line; a new figure says nothing extra. Server behavior unchanged. Test: AuthorPage.test.tsx 'says when the same figure was uploaded before, and only then'.
 - [x] d8-26 Edge case E2: the fix-call cap says a previewed outline can still be accepted
   - Note: app/figures.py FIX_CAP: at the fix-call cap the 429 says 'This figure used its fix calls for this version. An outline you already previewed can still be accepted: it needs no new call.' Checked first: Runner.outline_mask serves an accepted outline from the cache. Test: test_fix_api.py::test_at_the_fix_cap_a_new_point_is_refused_and_a_previewed_outline_still_accepted (cap of one: a second point gets the 429 and the sentence; accepting the first preview succeeds, the job ends done, still one fix call).
+- [x] d8-27 Edge case E3: a failed accept keeps the Fix outline panel and its points
+  - Note: apps/web/src/author/Review.tsx: send() reports whether the call went through; accepting an outline closes the Fix outline panel only on success. On a failure (cap, conflict, network) the panel stays with the teacher's points and the review's status line says why; before, the panel closed and the points were lost. Test: AuthorPage.test.tsx 'a failed accept keeps the Fix outline panel and its points, and says why' (a 409 on the PATCH); fails on the old code.
 
 ## Day 9: Tue Nov 3. Gate D
 
