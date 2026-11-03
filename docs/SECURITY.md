@@ -1,5 +1,43 @@
 # Security pass
 
+## Reporting a vulnerability
+
+Please report a vulnerability privately through GitHub's private vulnerability reporting: on
+the repository's Security tab, choose "Report a vulnerability"
+(https://github.com/DeepakKTS/talking-tactile/security/advisories/new). Do not open a public
+issue. Say what you found, how to reproduce it, and what it exposes.
+This is a hackathon project maintained by one person, with no bug bounty.
+
+In scope: the code in this repository (the API in `services/api/`, the web app in `apps/web/`,
+the Gate B page in `spikes/tracking/`, the scripts). Out of scope: Meta's Model API itself,
+and a deployment on a network other than the local one it is built for (see below).
+
+## Threat model and known gaps
+
+The build is for one Mac and one phone on a home or school network, run by the teacher. It
+protects the Meta API key, the student's questions, and the credits. It is not built for the
+open internet.
+
+- No route has a login. Anyone who can reach the Mac's web server can upload, edit, publish and
+  read a figure whose id they know.
+- Cross-site requests: a page on another site, open in a browser on the same network, can send
+  simple POSTs (a typed question as `text/plain`, an upload, a publish) that the API runs. CORS
+  hides the answer only. A fix is queued (`docs/review/QA.md` F02).
+- Uploads have no rate limit, and the fix-call cap starts over with each edit version
+  (`docs/review/QA.md` F04, F05).
+- The API on 127.0.0.1:8000 accepts any Host header, so DNS rebinding from a browser on the Mac
+  is possible (F24).
+- Prompt injection: a question or a teacher's description goes into Spark's prompt. The
+  schema, the cited-id check and the fixed off-figure sentences limit what comes back, and all
+  7 injections in the eval passed, but an answer from the figure is spoken as Spark wrote it,
+  up to two sentences.
+- Storage: uploaded images, published sheets and the job database stay in `data/` with no
+  expiry. Uvicorn's access log prints the client's address.
+- The budget stop counts per process and starts at $0 on each restart; it does not read the
+  ledger (F39).
+
+## What was checked
+
 What was checked before the demo (Nov 3, night), what was found, and what was fixed. Each fix
 is its own commit, named in the tracker. The project runs on one Mac on a home network for a
 demo; nothing here is hardened for the open internet.
@@ -18,6 +56,12 @@ Found:
   have never been committed; both are git-ignored.
 - The secret check covered the key, assignments of the key's variable and `.env` files, but not
   certificate or key files: a force-added `apps/web/.certs/phone-key.pem` would have passed.
+
+Second pass (Nov 3, review): unreachable objects too (`git fsck --unreachable --no-reflogs`).
+One unreachable blob holds an earlier Meta API key, not the current one (compared in code,
+never printed; that key gave 401 on Nov 3). No ref reaches it, so a push does not send it, but
+a copy of the folder or a local clone does. Pruning it (`git reflog expire
+--expire-unreachable=now --all && git gc --prune=now`) is the owner's call.
 
 Fixed:
 - The secret check now refuses `*.pem`, `*.key`, `*.p12` and `*.pfx` files and any staged file
@@ -94,6 +138,11 @@ Fixed:
   to claim a fresh address (`app/middleware.py` RateLimit, `apps/web/vite.config.ts` xfwd,
   tests in `services/api/tests/test_rate_limit.py`).
 
+Correction (Nov 3, review, `docs/review/QA.md` F03): the code takes the first X-Forwarded-For
+entry, which a client on this machine can set. A phone through the proxy is still counted by
+its own address only because uvicorn's default proxy-header handling replaces the client
+address before RateLimit runs. A fix is queued.
+
 ## Dependencies
 
 Checked (Nov 3): `uvx pip-audit` on every pinned Python package of `services/api/uv.lock`
@@ -138,7 +187,8 @@ Fixed:
   `Referrer-Policy: no-referrer` (`apps/web/vite.config.ts` SECURITY_HEADERS, DEV_HEADERS;
   test in `apps/web/scripts/devserver.test.ts`). Scripts, workers, connections, images and
   media only from the app's own origin (plus blob: for workers and the camera stream), no
-  plugins, no framing, no other `<base>`. The page can send nothing to another host.
+  plugins, no framing, no other `<base>`. The page can fetch nothing from another host. Under `dev:phone`
+  the policy also allows websockets to any host, for Vite's reload socket.
 - The Gate B page gets the same headers, with jsDelivr (MediaPipe's bundle and wasm) and
   Google's model storage (the hand model) as the only other origins (`spikes/tracking/serve.py`;
   `spikes/tracking/e2e_check.py` serves the page through the same handler).
