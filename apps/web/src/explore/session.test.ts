@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { EXPLORE } from "../shared/config";
 import type { AudioPort } from "./audio";
 import type { Pt } from "./homography";
 import { Metrics } from "./metrics";
-import { AskError, type AskRequest, ExploreSession, OFFLINE_ANSWER, keyAction, notTouchableSentence } from "./session";
+import { AskError, type AskRequest, ExploreSession, OFFLINE_ANSWER, STILL_WORKING, STILL_WORKING_MS, keyAction, notTouchableSentence } from "./session";
 import { untouchableNames } from "../shared/regions";
 import { SYNTHETIC, sheet, square } from "./testkit";
 
@@ -359,5 +359,49 @@ describe("spoken questions", () => {
     });
     await offline.askSpoken(wav, performance.now());
     expect(audio.said()).toEqual(["That is 50 questions for this session. Ask your teacher.", OFFLINE_ANSWER]);
+  });
+});
+
+describe("a student waiting for an answer", () => {
+  afterEach(() => { vi.useRealTimers(); });
+
+  const later = (ms: number, value: string) => new Promise<string>((r) => { setTimeout(() => { r(value); }, ms); });
+
+  it("hears once that it is still working at 8 s, then the tone again, then the answer", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const { audio, session } = setup(() => later(12000, "It joins the two lobes."));
+    const asking = session.command("What does the stem connect to?");
+    await vi.advanceTimersByTimeAsync(STILL_WORKING_MS - 1);
+    expect(audio.said()).toEqual([]);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(audio.said()).toEqual([STILL_WORKING]);
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(audio.log.at(-1)).toBe("thinking"); // the tone is back while it waits
+    await vi.advanceTimersByTimeAsync(5000);
+    await asking;
+    expect(audio.said()).toEqual([STILL_WORKING, "It joins the two lobes."]);
+    expect(STILL_WORKING).toBe("Still working on that.");
+  });
+
+  it("an answer within 8 s comes with no waiting sentence", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const { audio, session } = setup(() => later(5000, "It joins the two lobes."));
+    const asking = session.command("What does the stem connect to?");
+    await vi.advanceTimersByTimeAsync(20000);
+    await asking;
+    expect(audio.said()).toEqual(["It joins the two lobes."]);
+  });
+
+  it("a held question waits the same way", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const audio = new FakeAudio();
+    const session = new ExploreSession(SYNTHETIC, EXPLORE, {
+      audio, metrics: new Metrics(), ask: () => Promise.resolve(""),
+      askAudio: () => later(9000, "It joins the two lobes.").then((answer) => ({ answer, transcript: "what does the stem connect to", timings_ms: {} })),
+    });
+    const asking = session.askSpoken(new Uint8Array(44), performance.now());
+    await vi.advanceTimersByTimeAsync(10000);
+    await asking;
+    expect(audio.said()).toEqual([STILL_WORKING, "It joins the two lobes."]);
   });
 });

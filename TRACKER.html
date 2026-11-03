@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 354,
- "updated_at": "2026-11-03T07:43:31.731Z",
+ "rev": 356,
+ "updated_at": "2026-11-03T07:54:44.246Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2776,6 +2776,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T07:43:31.689Z"
   },
   {
+   "id": "d9-7",
+   "day": 9,
+   "title": "Student wait: Still working at 8 s, too long at 20 s, server 25 s",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "session.ts patient(): a held or typed question with no answer at 8 s says 'Still working on that.' once, and the thinking tone comes back 1.5 s later; camera.ts ASK_TIMEOUT_MS 20 s, then 'That took too long. Please ask again.' (TOO_LONG, was the generic not-working sentence); ask.py DEADLINE_S 25 s. EDGE_CASES Q2 and README updated. Tests: session.test.ts 'a student waiting for an answer' (8 s sentence once and the tone back; none for an answer within 8 s; held questions the same), camera.test.ts (never-answering server: the too-long sentence).",
+   "done_at": "2026-11-03T07:54:44.246Z",
+   "tags": [
+    "fix",
+    "ask"
+   ],
+   "changed_at": "2026-11-03T07:54:44.246Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3616,6 +3632,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T07:54:44.246Z",
+   "kind": "claude",
+   "text": "Task d9-7 \"Student wait: Still working at 8 s, too long at 20 s, server 25 s\" is now done. Note: session.ts patient(): a held or typed question with no answer at 8 s says 'Still working on that.' once, and the thinking tone comes back 1.5 s later; camera.ts ASK_TIMEOUT_MS 20 s, then 'That took too long. Please ask again.' (TOO_LONG, was the generic not-working sentence); ask.py DEADLINE_S 25 s. EDGE_CASES Q2 and README updated. Tests: session.test.ts 'a student waiting for an answer' (8 s sentence once and the tone back; none for an answer within 8 s; held questions the same), camera.test.ts (never-answering server: the too-long sentence)."
+  },
+  {
+   "ts": "2026-11-03T07:54:44.162Z",
+   "kind": "claude",
+   "text": "Task d9-7 \"Student wait: Still working at 8 s, too long at 20 s, server 25 s\" added to day 9."
+  },
   {
    "ts": "2026-11-03T07:43:31.731Z",
    "kind": "claude",

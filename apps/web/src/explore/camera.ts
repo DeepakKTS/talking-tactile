@@ -115,11 +115,12 @@ async function spokenError(res: Response): Promise<AskError> {
   return new AskError(spoken ? message : NOT_WORKING);
 }
 
-/** The server stops a question at 30 s and says so (services/api/app/ask.py DEADLINE_S), so
- * its sentence normally arrives first; 5 s more covers the phone's network. This is for a
- * server or network that never answers: the student hears that questions are not working and
- * the next hold works. The thinking tone plays all the while. */
-export const ASK_TIMEOUT_MS = 35000;
+/** A student waits at most this long: at 8 s the session says "Still working on that."
+ * (session.ts), at 20 s the request stops and TOO_LONG is said, and the next hold works. The
+ * server's own deadline is 25 s (services/api/app/ask.py DEADLINE_S), so it never runs on
+ * long after the student has been told. */
+export const ASK_TIMEOUT_MS = 20000;
+export const TOO_LONG = "That took too long. Please ask again.";
 
 async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<string, unknown>> {
   if (!navigator.onLine) throw new TypeError("offline");
@@ -128,7 +129,7 @@ async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<str
     if (!res.ok) throw await spokenError(res);
     return (await res.json()) as Record<string, unknown>;
   } catch (err) {
-    if (err instanceof DOMException && err.name === "TimeoutError") throw new AskError(NOT_WORKING);
+    if (err instanceof DOMException && err.name === "TimeoutError") throw new AskError(TOO_LONG);
     if (err instanceof SyntaxError) throw new AskError(NOT_WORKING); // a 200 that is not JSON
     throw err;
   }

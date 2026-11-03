@@ -43,12 +43,12 @@ UNSURE = "I am not sure from this figure. Ask your teacher."
 NOT_HEARD = "I did not catch a question. Hold the screen and ask again."
 CAPPED = f"That is {SESSION_QUESTIONS} questions for this session. Ask your teacher."
 FAILED = "Questions are not working right now. Labels still work."
-# A question gets this long, transcribe and Spark together; then the route says FAILED. The
-# slowest Spark answer in the committed live evals is 18.7 s (eval/qa/scores.json, Nov 3,
-# answer prompt v2, 73 questions) and transcribe p95 is 1.4 s (eval/qa/VOICE.md): about
-# 20.1 s, so 30 s is 1.5 times that. Explore gives up at 35 s
-# (apps/web/src/explore/camera.ts ASK_TIMEOUT_MS), after this sentence would have arrived.
-DEADLINE_S = 30.0
+# A question gets this long, transcribe and Spark together; then the route says FAILED.
+# Explore says "Still working on that." at 8 s and gives up at 20 s with "That took too long.
+# Please ask again." (apps/web/src/explore/session.ts, camera.ts); 25 s here bounds the Meta
+# calls a little after that, so none runs on long after the student was told. At minimal effort
+# the slowest of 12 held questions took 14.7 s (eval/qa/VOICE.md, Nov 3).
+DEADLINE_S = 25.0
 
 
 def _ids(f: RegionsFile) -> list[str]:

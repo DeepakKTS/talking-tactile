@@ -83,6 +83,12 @@ export const HELP =
   "Press M for more, period to repeat, W for what is here. " +
   "Escape stops speech. R sets the corners again. Hold the screen and ask a question, then let go. Or type a question and press Enter.";
 export const OFFLINE_ANSWER = "Questions need the network. Labels still work.";
+/** Said once when a question has no answer after STILL_WORKING_MS; the browser gives up at 20 s
+ * (camera.ts ASK_TIMEOUT_MS) with "That took too long. Please ask again." */
+export const STILL_WORKING = "Still working on that.";
+export const STILL_WORKING_MS = 8000;
+/** The thinking tone comes back after the sentence, while the question still waits. */
+const RESUME_TONE_MS = 1500;
 const OFF_SHEET = "Your finger is off the sheet. Press R to set the corners again.";
 const OFF_SHEET_TOUCH = "Your finger is off the sheet. Tap Set corners to set them again.";
 const CANNOT_SEE = "The camera cannot see the sheet.";
@@ -314,7 +320,7 @@ export class ExploreSession {
     let answer: string;
     try {
       if (!this.deps.askAudio) throw new TypeError("no spoken questions here");
-      const reply = await this.deps.askAudio(wav, this.request(""));
+      const reply = await this.patient(this.deps.askAudio(wav, this.request("")));
       answer = reply.answer;
       this.heard = reply.transcript;
       const t = reply.timings_ms;
@@ -344,13 +350,29 @@ export class ExploreSession {
     let answer: string;
     this.deps.audio.thinking(true); // the same tone a held question plays while it waits
     try {
-      answer = await this.deps.ask(req);
+      answer = await this.patient(this.deps.ask(req));
     } catch (err) {
       answer = err instanceof AskError ? err.spoken : OFFLINE_ANSWER;
     } finally {
       this.deps.audio.thinking(false);
     }
     this.deps.audio.say(answer);
+  }
+
+  /** At STILL_WORKING_MS with no answer, says so once; the thinking tone comes back after. */
+  private async patient<T>(pending: Promise<T>): Promise<T> {
+    const { audio } = this.deps;
+    let resume: ReturnType<typeof setTimeout> | undefined;
+    const still = setTimeout(() => {
+      audio.say(STILL_WORKING);
+      resume = setTimeout(() => { audio.thinking(true); }, RESUME_TONE_MS);
+    }, STILL_WORKING_MS);
+    try {
+      return await pending;
+    } finally {
+      clearTimeout(still);
+      clearTimeout(resume);
+    }
   }
 
   private remember(r: IndexedRegion): void {

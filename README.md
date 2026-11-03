@@ -104,8 +104,9 @@ guesses geometry.
   answer from a teacher description must name a part that has one.
 - Code has the last word: off-figure and unsure answers get fixed sentences that send the
   student to the teacher, an answer keeps at most two sentences, and cited ids must exist.
-- A session has 50 questions; a question has 30 s on the server and 35 s in the browser
-  before the student hears "Questions are not working right now. Labels still work."
+- A session has 50 questions. A question with no answer at 8 s says "Still working on that."
+  once; at 20 s the browser gives up with "That took too long. Please ask again."; the server
+  stops its Meta calls at 25 s.
 - The API key stays on the backend. Camera frames never leave the browser.
 
 ## Results

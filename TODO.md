@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 354, updated 2026-11-03T07:43:31.731Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 356, updated 2026-11-03T07:54:44.246Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -381,6 +381,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Fallback: A credits slide at the end of the video and a Credits section in the README.
 - [x] d9-6 Answer latency: minimal reasoning effort with a 2000-token cap
   - Note: Live, 12 held questions a variant, interleaved (eval/qa/VOICE.md). Server p50/p95 ms: A shipped (v2, strict, full image, low) 9064/10338; B no strict 10248/13869 (never shipped); C image 768 px 8453/10863; D minimal + max_completion_tokens 400 4762/7010 with 3 of 12 answers cut (the cap counts reasoning tokens); E minimal + 2000, with A again: A 5924/7602, E 4557/5518, no errors. Docs quoted: reasoning_effort enum none..max, 'Muse Spark always reasons, so reasoning_effort: none returns HTTP 400'; max_completion_tokens 'counting both visible output and reasoning tokens'. Shipped E (live_client ASK_EFFORT minimal, ASK_MAX_TOKENS 2000): full eval live, recorded qa7, no worse: heart source 36/38 (citations 35, was 32; flags 3, was 5), brain 35/35 (34, flags 5), picture questions heart 5/6, brain 6/6 as before; Spark p50 3.5/3.2 s (was 7.7/6.7). Release to first word, headless Chrome, live: p50 5.0 s (was 8.5), 10 of 12 within 6.0 s, two at 13.8 and 14.7 s. Mock replays and the fallback now on qa7; ask_e2e sentences unchanged.
+- [x] d9-7 Student wait: Still working at 8 s, too long at 20 s, server 25 s
+  - Note: session.ts patient(): a held or typed question with no answer at 8 s says 'Still working on that.' once, and the thinking tone comes back 1.5 s later; camera.ts ASK_TIMEOUT_MS 20 s, then 'That took too long. Please ask again.' (TOO_LONG, was the generic not-working sentence); ask.py DEADLINE_S 25 s. EDGE_CASES Q2 and README updated. Tests: session.test.ts 'a student waiting for an answer' (8 s sentence once and the tone back; none for an answer within 8 s; held questions the same), camera.test.ts (never-answering server: the too-long sentence).
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.
