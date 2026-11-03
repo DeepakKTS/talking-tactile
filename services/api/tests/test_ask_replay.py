@@ -22,6 +22,7 @@ from app.models.regions import RegionsFile
 from app.paths import FIXTURES_DIR, REPO_ROOT
 from app.pipeline import s0_ingest
 from app.prompts import load_prompt
+from tests.recorded_png import mac_png
 
 RULES = load_tactile_rules()
 PROMPT = load_prompt(ask.PROMPT)
@@ -70,6 +71,8 @@ def request(q: dict[str, Any]) -> ask.AskRequest:
 
 
 # The questions the recorded live run answered (scores.json); the image experiment's are apart.
+# Each request holds the figure's PNG as encoded on macOS (tests/recorded_png.py).
+@mac_png
 @stale
 @pytest.mark.parametrize(
     "q", [q for q in qa_eval.load_questions() if q["id"] in LIVE], ids=lambda q: q["id"]

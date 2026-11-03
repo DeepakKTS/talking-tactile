@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 339, updated 2026-11-03T05:25:36.780Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 341, updated 2026-11-03T05:34:19.721Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -354,6 +354,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: LICENSE: the Apache License 2.0 text, the same file (sha256 cfc7749b...) the repo already holds from apache.org for MediaPipe. NOTICE: copyright line for the Talking Tactile authors (the repo URL; no personal name assumed), the code under Apache-2.0, the figures and files made from them under their own licenses (heart and Japan share-alike, brain CC BY 3.0, flower public domain, banana CC BY-SA 3.0; ATTRIBUTION.md), MediaPipe Apache-2.0, meta-sam-parser under Meta's SAM License installed from PyPI and not distributed here, liblouis and other dependencies installed, not distributed. README: a License section.
 - [x] d8-44 docs/DEMO.md timed under 3 minutes; stale parts after item C updated
   - Note: docs/DEMO.md: target under 3 minutes, planned at 2:50, the exact limit marked 'check the submission form'; the 10 shots timed (12, 28, 15, 12, 23, 12, 30, 12, 12, 14 s = 170 s), with what to cut first if the limit is shorter (shot 9, then 6); shot 7 allows for the measured 8.5 s p50 answer wait. Stale parts after item C: mock questions (typed eval questions asked with no finger are answered offline; held ones need the recorded clips), the question fallback (type both shot 7 questions in mock mode; the Explore question field exists), the numbers (v2 results, 8.5/9.6 s).
+- [x] d8-45 CI green again: exact question replays run on macOS only
+  - Note: CI failed from 5da50db (item C) to 951266f: the answer replay tests, skipped as stale until then, ran on Linux, where the figure's PNG encodes to other bytes, so 10 exact replays (the questions asked with a finger on a part) found no recording; the 63 finger-free ones passed through mock mode's fallback. test_every_eval_question_gets_its_live_answer_back now carries mac_png like the other three; it runs in the Mac's hook. I did not watch CI between those commits; the hook passed each time on the Mac.
 
 ## Day 9: Tue Nov 3. Gate D
 

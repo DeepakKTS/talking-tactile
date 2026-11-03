@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 339,
- "updated_at": "2026-11-03T05:25:36.780Z",
+ "rev": 341,
+ "updated_at": "2026-11-03T05:34:19.721Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2607,6 +2607,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T05:12:34.269Z"
   },
   {
+   "id": "d8-45",
+   "day": 8,
+   "title": "CI green again: exact question replays run on macOS only",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "CI failed from 5da50db (item C) to 951266f: the answer replay tests, skipped as stale until then, ran on Linux, where the figure's PNG encodes to other bytes, so 10 exact replays (the questions asked with a finger on a part) found no recording; the 63 finger-free ones passed through mock mode's fallback. test_every_eval_question_gets_its_live_answer_back now carries mac_png like the other three; it runs in the Mac's hook. I did not watch CI between those commits; the hook passed each time on the Mac.",
+   "done_at": "2026-11-03T05:34:19.721Z",
+   "tags": [
+    "ci",
+    "test"
+   ],
+   "changed_at": "2026-11-03T05:34:19.721Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3520,6 +3536,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T05:34:19.721Z",
+   "kind": "claude",
+   "text": "Task d8-45 \"CI green again: exact question replays run on macOS only\" is now done. Note: CI failed from 5da50db (item C) to 951266f: the answer replay tests, skipped as stale until then, ran on Linux, where the figure's PNG encodes to other bytes, so 10 exact replays (the questions asked with a finger on a part) found no recording; the 63 finger-free ones passed through mock mode's fallback. test_every_eval_question_gets_its_live_answer_back now carries mac_png like the other three; it runs in the Mac's hook. I did not watch CI between those commits; the hook passed each time on the Mac."
+  },
+  {
+   "ts": "2026-11-03T05:34:19.673Z",
+   "kind": "claude",
+   "text": "Task d8-45 \"CI green again: exact question replays run on macOS only\" added to day 8."
+  },
   {
    "ts": "2026-11-03T05:25:36.780Z",
    "kind": "claude",
