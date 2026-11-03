@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 375,
- "updated_at": "2026-11-03T10:33:23.021Z",
+ "rev": 377,
+ "updated_at": "2026-11-03T10:44:19.440Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2931,6 +2931,23 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T10:33:23.021Z"
   },
   {
+   "id": "d9-17",
+   "day": 9,
+   "title": "Demo tooling: make preflight, make demo-live and make demo-mock",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "scripts/preflight.py (make preflight; PREFLIGHT=--live adds app.meta.smoke under caffeinate -i): OK or FAIL for the key file (non-empty key line, git-ignored, value never printed), the phone certificate (valid a day more, for the LAN address and the .local name), ports 8000/5173/8443 (free or the expected server), the heart and the Commons brain v4 regions.json through the API (a temporary mock API when :8000 is down) and through dev:phone, CI on HEAD, git clean and pushed, credits left from the ledger (FAIL under $10); exit 1 on any FAIL. 8 unit tests (scripts/test_preflight.py, in the hook and CI). scripts/demo.sh (make demo-live / demo-mock): API, dev:phone and Gate B serve.py under caffeinate -i, refuses busy ports, prints the iPhone URLs .local first; Ctrl-C stops all three. Run: demo-mock up, preflight correct (heart 12 regions, brain 5, both paths), stopped with all three ports freed; demo-live left running. docs/DEMO.md Start and Pre-flight, README.",
+   "done_at": "2026-11-03T10:44:19.440Z",
+   "tags": [
+    "demo",
+    "tooling",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T10:44:19.440Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3771,6 +3788,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T10:44:19.440Z",
+   "kind": "claude",
+   "text": "Task d9-17 \"Demo tooling: make preflight, make demo-live and make demo-mock\" is now done. Note: scripts/preflight.py (make preflight; PREFLIGHT=--live adds app.meta.smoke under caffeinate -i): OK or FAIL for the key file (non-empty key line, git-ignored, value never printed), the phone certificate (valid a day more, for the LAN address and the .local name), ports 8000/5173/8443 (free or the expected server), the heart and the Commons brain v4 regions.json through the API (a temporary mock API when :8000 is down) and through dev:phone, CI on HEAD, git clean and pushed, credits left from the ledger (FAIL under $10); exit 1 on any FAIL. 8 unit tests (scripts/test_preflight.py, in the hook and CI). scripts/demo.sh (make demo-live / demo-mock): API, dev:phone and Gate B serve.py under caffeinate -i, refuses busy ports, prints the iPhone URLs .local first; Ctrl-C stops all three. Run: demo-mock up, preflight correct (heart 12 regions, brain 5, both paths), stopped with all three ports freed; demo-live left running. docs/DEMO.md Start and Pre-flight, README."
+  },
+  {
+   "ts": "2026-11-03T10:44:19.375Z",
+   "kind": "claude",
+   "text": "Task d9-17 \"Demo tooling: make preflight, make demo-live and make demo-mock\" added to day 9."
+  },
   {
    "ts": "2026-11-03T10:33:23.021Z",
    "kind": "claude",

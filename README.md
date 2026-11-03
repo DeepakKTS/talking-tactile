@@ -44,6 +44,10 @@ are not working right now. Labels still work."
 Live mode: copy `.env.example` to `services/api/.env`, set `MODEL_API_KEY`, and run the API
 with `LIVE=1` (`docs/DEMO.md` has the commands, terminal by terminal).
 
+For a demo with the iPhone: `make preflight` checks the setup (OK or FAIL per check), and
+`make demo-live` or `make demo-mock` starts the API, the phone's web server and the Gate B page
+together and prints the iPhone URLs (`docs/DEMO.md`).
+
 Checks: `make check` runs every test suite, lint and type check, as the pre-commit hook and CI
 (`.github/workflows/tests.yml`) do.
 

@@ -3,7 +3,7 @@ API := services/api
 WEB := apps/web
 UV := uv run --project $(API)
 
-.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet
+.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet preflight demo-live demo-mock
 
 install:
 	@command -v lou_translate > /dev/null || { echo "liblouis is missing: brew install liblouis"; exit 1; }
@@ -48,3 +48,15 @@ synthetic-sheet:
 
 # Everything the pre-commit hook runs for product code.
 check: test lint typecheck
+
+# Before a demo or a take: OK or FAIL per check, non-zero on any FAIL (scripts/preflight.py).
+# PREFLIGHT=--live adds the live smoke, one call per Meta model.
+preflight:
+	python3 scripts/preflight.py $(PREFLIGHT)
+
+# The API, the phone's web server and the Gate B page, under caffeinate -i; prints the iPhone URLs.
+demo-live:
+	sh scripts/demo.sh live
+
+demo-mock:
+	sh scripts/demo.sh mock

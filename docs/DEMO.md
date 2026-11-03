@@ -10,6 +10,24 @@ step fails twice, fix it or cut it.
 
 Every command starts at the repo root (the folder you cloned).
 
+```
+make preflight     # OK or FAIL per check; fix every FAIL first (PREFLIGHT=--live adds a live smoke)
+make demo-live     # or make demo-mock
+```
+
+`make demo-live` (or `make demo-mock`) starts the three servers under `caffeinate -i`: the API
+on 127.0.0.1:8000 (live, or mock with no Meta calls), the web app for the phone over HTTPS on
+:5173, and the Gate B touch-test page on :8443. It refuses to start while one of those ports is
+in use, and prints the iPhone URLs, the `.local` name first. Ctrl-C stops all three. Keep the
+display awake in another terminal with `caffeinate -dimsu`.
+
+`make preflight` checks the key file (never printing it), the phone certificate against this
+Mac's LAN address and `.local` name, what holds ports 8000, 5173 and 8443, the heart and the
+Commons brain version 4 through the API and through the phone's web server, CI on HEAD, that the
+tree is clean and pushed, and the credits left in the ledger. It exits non-zero on any FAIL.
+
+The sections below start the same servers one terminal at a time.
+
 ### Mock mode (no network, no Meta calls, costs nothing)
 
 Author's upload and pipeline replay the live recordings in `fixtures/recorded/replays.json`
@@ -69,8 +87,8 @@ none: upload and publish first (README quickstart).
 
 Do these in order, the day of filming.
 
-1. **Code**: on the commit you will film, `make check` passes, and so do
-   `uv run apps/web/e2e/explore_e2e.py` and `uv run apps/web/e2e/plan_e2e.py`.
+1. **Code**: on the commit you will film, `make preflight` says ALL OK, `make check` passes,
+   and so do `uv run apps/web/e2e/explore_e2e.py` and `uv run apps/web/e2e/plan_e2e.py`.
 2. **Fresh clone**: `git clone`, `make install`, `MOCK_META=1 make dev` starts with no step
    beyond `services/api/.env`.
 3. **Mock run, network off**: the whole shot list. Everything but questions works.
@@ -91,7 +109,8 @@ Do these in order, the day of filming.
     the printed marks.
 12. **Light**: overhead light on, no window glare on the sheet; the device check's camera
     row is ok and Explore never says "The camera cannot see the sheet."
-13. **Credits**: note the spend (`python3 scripts/tracker.py spend`) before and after.
+13. **Credits**: note the credits left (`make preflight`, last line) before and after;
+    `python3 scripts/tracker.py spend` records the spend in the tracker.
 14. **Numbers**: every number said or shown comes from a committed result file (below) and
     matches it on the day.
 15. **Audio levels**: the app voice is audible over any narration track.
