@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 274,
- "updated_at": "2026-11-03T01:28:25.640Z",
+ "rev": 276,
+ "updated_at": "2026-11-03T01:35:12.629Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2196,6 +2196,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:28:25.640Z"
   },
   {
+   "id": "d8-19",
+   "day": 8,
+   "title": "Edge case X1: a sheet that cannot load is an alert a screen reader says",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/ExplorePage.tsx: a failed load (bad id, not published, network down with no saved copy, another schema version, damaged) is shown in a role=alert paragraph in place of the plain status line, so a screen reader announces it; before, nothing was heard, since Start stays disabled and the app voice needs Start. The status line itself stays plain: it also mirrors every spoken sentence, and a live status would double them. Test: explore_e2e.py failed_loads_are_told checks the alert (no saved copy: alert true). With VoiceOver: needs device.",
+   "done_at": "2026-11-03T01:35:12.629Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:35:12.629Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3108,6 +3124,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:35:12.629Z",
+   "kind": "claude",
+   "text": "Task d8-19 \"Edge case X1: a sheet that cannot load is an alert a screen reader says\" is now done. Note: apps/web/src/explore/ExplorePage.tsx: a failed load (bad id, not published, network down with no saved copy, another schema version, damaged) is shown in a role=alert paragraph in place of the plain status line, so a screen reader announces it; before, nothing was heard, since Start stays disabled and the app voice needs Start. The status line itself stays plain: it also mirrors every spoken sentence, and a live status would double them. Test: explore_e2e.py failed_loads_are_told checks the alert (no saved copy: alert true). With VoiceOver: needs device."
+  },
+  {
+   "ts": "2026-11-03T01:35:12.591Z",
+   "kind": "claude",
+   "text": "Task d8-19 \"Edge case X1: a sheet that cannot load is an alert a screen reader says\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:28:25.640Z",
    "kind": "claude",

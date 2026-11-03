@@ -449,9 +449,13 @@ def failed_loads_are_told(saved: tuple[Any, Requests], fresh: tuple[Any, Request
         page.goto(explore_url(base, fid))
         page.get_by_text(want).wait_for(timeout=10000)
         told = reqs.told_about("/regions.json")
-        out[name] = {"failed": len(told), "said": want}
+        # A sheet that did not load is an alert, so a screen reader says it without Start.
+        alert = page.get_by_role("alert").filter(has_text=want).count() == 1
+        out[name] = {"failed": len(told), "said": want, "alert": alert}
         if len(told) != 1 or reqs.silent():
             fail.append(f"failed load {name}: told {told}, silent {reqs.silent()}")
+        if name == "no_saved_copy" and not alert:
+            fail.append(f"failed load {name}: not an alert")
         page.unroute("**/regions.json")
         page.close()
     return out

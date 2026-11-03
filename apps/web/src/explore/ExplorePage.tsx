@@ -148,6 +148,8 @@ function ExploreSheet() {
   const [file, setFile] = useState<RegionsFile | null>(null);
   const [notTouchable, setNotTouchable] = useState<string[]>([]);
   const [status, setStatus] = useState(figure ? "Loading the sheet." : "");
+  // A sheet that cannot load is said in an alert: Start stays off, so nothing else speaks.
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [settings, setSettings] = useState<Settings>(loadSettings);
   const [question, setQuestion] = useState("");
@@ -203,7 +205,7 @@ function ExploreSheet() {
         trace.current.ready = true;
       })
       .catch((err: unknown) => {
-        if (live) setStatus(err instanceof LoadError ? err.message : "The sheet could not be loaded.");
+        if (live) setLoadError(err instanceof LoadError ? err.message : "The sheet could not be loaded.");
       });
     return () => {
       live = false;
@@ -459,7 +461,7 @@ function ExploreSheet() {
   return (
     <main style={{ WebkitTouchCallout: "none", userSelect: "none", minHeight: "100vh" }}>
       <h1>Explore{file ? `: ${file.title}` : ""}</h1>
-      <p>{status}</p>
+      {loadError ? <p role="alert">{loadError}</p> : <p>{status}</p>}
       {!started && (
         <button ref={startButton} type="button" onClick={() => void start()} disabled={!file} style={{ fontSize: "2rem", padding: "1rem 2rem" }}>
           Start exploring

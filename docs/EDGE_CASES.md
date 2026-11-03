@@ -41,7 +41,7 @@ filler, and it says what still works or what to do next.
 
 | # | Case | Current behavior | Expected | Status |
 |---|---|---|---|---|
-| X1 | Unknown figure id | Shown on screen only ("That is not a figure id.", "This figure is not published yet.", `web/explore/loader.ts:31,43`); the status line is a plain `<p>` (`web/explore/ExplorePage.tsx:458`), so a screen reader does not announce it, and Start stays disabled | Announced by the screen reader | fix |
+| X1 | Unknown figure id | Shown on screen only ("That is not a figure id.", "This figure is not published yet.", `web/explore/loader.ts:31,43`); the status line is a plain `<p>` (`web/explore/ExplorePage.tsx:458`), so a screen reader does not announce it, and Start stays disabled | Announced by the screen reader | fixed: `explore_e2e.py` failed_loads_are_told (alert); with VoiceOver: needs device |
 | X2 | Old schema version | Refused by the schema (`docs/regions.schema.json:9`); shown as "The sheet is damaged: regions.json is invalid: /schema_version must be equal to constant" (`loader.ts:68`), screen only | Announced, in plain words: ask the teacher to publish again | fixed: `loader.test.ts` another schema version, contract break in plain words |
 | X3 | Camera denied | Says "The camera did not start. Allow the camera and press Start again." (`ExplorePage.tsx:308`), but Start is already hidden (`:281,459`), so it cannot be pressed | Start comes back | fixed: `explore_e2e.py` camera_denied (fails on the old page); on the iPhone: needs device |
 | X4 | No rear camera | `facingMode: { ideal: "environment" }` falls back to any camera, silently (`web/explore/camera.ts:60`); `/explore?check=1` warns (`web/explore/check.ts:28-29`) | Same; the device check is where it shows | ok, needs device |
