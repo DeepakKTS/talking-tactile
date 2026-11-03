@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 337, updated 2026-11-03T05:12:34.269Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 339, updated 2026-11-03T05:25:36.780Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -335,7 +335,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d8-34 Flaky layout property test: coordinates at 0.01 mm
   - Note: The pre-commit hook failed on test_layout.py::test_gap_enforcement_only_shrinks_and_leaves_every_gap_clear: Hypothesis drew boxes at x = 1.675e-209 and 3.899e-257 beside x = 0, and the overlap step then left a strip with zero-width spikes, which enforce_gaps reported unresolved. With the same boxes at x = 0 the result is clean (no unresolved pair). Pixel contours in page mm never carry subnormal coordinates, so the generator now rounds to 0.01 mm; enforce_gaps is unchanged. 5 seeds and the whole file pass.
 - [ ] d8-35 At home: network and phone checklist [doing]
-  - Note: In order: 1 live eval on answer prompt v2 (item C: smoke call, qa_eval --live as qa6, re-index replays, update ask_e2e, release-to-first-word); 2 serve the phone (cert:phone if the address changed, API live, dev:phone); 3 ?check=1 readings on the iPhone; 4 hold-to-talk with VoiceOver off then on, plus the needs-device rows of docs/EDGE_CASES.md; 5 Gate B (eval/gate-b/README.md); 6 device latency film (latency.csv, videos.sha256); 7 one live voice take; 8 tracker.py spend.
+  - Note: Done Nov 3: item C (live eval v2, qa6, mock fallback, ask_e2e), certificate and both servers for the iPhone. Left, in order: ?check=1 readings on the iPhone; hold-to-talk with VoiceOver off then on, plus the needs-device rows of docs/EDGE_CASES.md; Gate B (eval/gate-b/README.md); the device latency film (latency.csv, videos.sha256); one live voice take; tracker.py spend.
 - [x] d8-36 ask_e2e on the v2 recordings
   - Note: apps/web/e2e/ask_e2e.py now names qa6_ask_* (Nov 3, answer prompt v2). Its two typed questions, asked with no part under the finger as h15 and h19 were, recorded the same sentences as on v1 ('The left ventricle pumps blood out to the whole body through the aortic arch.'; 'This figure does not show that. Ask your teacher.'), so the expectations stand; PASS on the mock API. lat-answer set to 8496 ms (p50 release to first word, live, headless Chrome).
 - [x] d8-37 Mock answers finger-free questions anywhere: the demo's offline fallback
