@@ -55,3 +55,23 @@ As above (headless Chrome, fake microphone, live API), on published version 4, w
 | Network and server code | 12 | 15 | 23 |
 | WAV encoding (device) | 12 | 3 | 5 |
 | On the device: encoding, then speech starting | 12 | 8 | 10 |
+
+### Release to first spoken word, answer prompt v2 (Nov 3)
+
+As above (headless Chrome on the Mac, Chrome's fake microphone playing the three clips, four
+holds each, live API, published version 4, 250 ms post-roll), with answer prompt v2 and its
+strict per-figure schema: 12 holds.
+
+| Part | Runs | p50 ms | p95 ms |
+|---|---|---|---|
+| Release to first spoken word (with the 250 ms post-roll) | 12 | 8496 | 9641 |
+| Transcribe (server) | 12 | 969 | 1098 |
+| Spark (server) | 12 | 7189 | 8491 |
+| Network and server code | 12 | 13 | 15 |
+| WAV encoding (device) | 12 | 2 | 3 |
+| On the device: encoding, then speech starting | 12 | 6 | 8 |
+
+Spark is about 4 s slower at p50 than on Oct 30 (3052 ms with prompt v1). The question eval
+of the same evening (eval/qa/scores.json, 73 questions) has Spark at p50 7657 ms on the heart
+and 6692 ms on the brain, slowest 18693 ms. One run cannot tell how much is the v2 prompt and
+schema and how much is the service that evening. The iPhone figure is still to be measured.
