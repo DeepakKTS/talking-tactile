@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 306, updated 2026-11-03T03:21:05.598Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 308, updated 2026-11-03T03:25:43.004Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -333,6 +333,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: AuthorPage.test.tsx 'uploads with the options, shows the stages, then the review' failed on CI twice (c5d3f74, d5f49cf), passing elsewhere: it found 'Outlining each part.' and then checked a stage line synchronously, and a 5 ms poll could finish the fake job between them on a slower runner. The fake server now holds the job running (holdRunning) until the test has checked the progress lines. Test-only change; 22 of 22 three runs in a row.
 - [x] d8-34 Flaky layout property test: coordinates at 0.01 mm
   - Note: The pre-commit hook failed on test_layout.py::test_gap_enforcement_only_shrinks_and_leaves_every_gap_clear: Hypothesis drew boxes at x = 1.675e-209 and 3.899e-257 beside x = 0, and the overlap step then left a strip with zero-width spikes, which enforce_gaps reported unresolved. With the same boxes at x = 0 the result is clean (no unresolved pair). Pixel contours in page mm never carry subnormal coordinates, so the generator now rounds to 0.01 mm; enforce_gaps is unchanged. 5 seeds and the whole file pass.
+- [ ] d8-35 At home: network and phone checklist [doing]
+  - Note: In order: 1 live eval on answer prompt v2 (item C: smoke call, qa_eval --live as qa6, re-index replays, update ask_e2e, release-to-first-word); 2 serve the phone (cert:phone if the address changed, API live, dev:phone); 3 ?check=1 readings on the iPhone; 4 hold-to-talk with VoiceOver off then on, plus the needs-device rows of docs/EDGE_CASES.md; 5 Gate B (eval/gate-b/README.md); 6 device latency film (latency.csv, videos.sha256); 7 one live voice take; 8 tracker.py spend.
 
 ## Day 9: Tue Nov 3. Gate D
 
