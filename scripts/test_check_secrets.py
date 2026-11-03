@@ -103,6 +103,22 @@ class CheckSecretsTest(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn("services/api/.env", r.stderr)
 
+    def test_certificate_and_key_files_are_refused(self) -> None:
+        for rel in ("apps/web/.certs/phone.pem", "apps/web/.certs/phone-key.pem", "x/server.key", "x/id.p12"):
+            with self.subTest(rel=rel):
+                self.stage(rel, "not a real key\n")
+                r = self.run_check()
+                self.assertEqual(r.returncode, 1)
+                self.assertIn(rel, r.stderr)
+                self.git("rm", "-q", "--cached", rel)
+
+    def test_a_private_key_block_in_any_file_is_refused(self) -> None:
+        block = "-----BEGIN " + "RSA PRIVATE" + " KEY-----\nMIIfake\n-----END RSA PRIVATE KEY-----\n"
+        self.stage("notes/setup.md", "copied by mistake:\n" + block)
+        r = self.run_check()
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("holds a private key", r.stderr)
+
     def test_only_staged_content_counts(self) -> None:
         self.stage("notes.md", "clean\n")
         (self.repo / "notes.md").write_text(f"unstaged {FAKE_KEY}\n")

@@ -1,5 +1,7 @@
 """Pre-commit secret check. Refuses staged content that holds the Meta API key, or that assigns
-MODEL_API_KEY anywhere but .env.example, or a .env file itself.
+MODEL_API_KEY anywhere but .env.example, or a .env file itself, or a certificate or key file
+(*.pem such as apps/web/.certs/phone-key.pem, *.key, *.p12, *.pfx), or any file holding a
+private key block.
 
 The key is read from services/api/.env and compared as bytes, so binary files count too. Only
 the staged blobs are read, not the working tree. Findings name the file and the reason. They
@@ -19,6 +21,9 @@ ENV_FILE = Path("services") / "api" / ".env"
 KEY_NAME = "MODEL_API_KEY"
 ALLOWED_ASSIGN = {".env.example"}
 ASSIGN_RE = re.compile(rb"\b" + KEY_NAME.encode() + rb"[ \t]*=")
+KEY_FILE_SUFFIXES = (".pem", ".key", ".p12", ".pfx")
+# Built from parts, so this file does not itself hold the marker it refuses.
+PRIVATE_KEY_RE = re.compile(rb"-----BEGIN [A-Z ]*" + b"PRIVATE" + rb" KEY-----")
 
 
 def read_key(env_file: Path) -> str | None:
@@ -49,6 +54,10 @@ def findings(path: str, data: bytes, key: str | None) -> list[str]:
     found = []
     if Path(path).name == ".env":
         found.append("is a .env file")
+    if Path(path).suffix.lower() in KEY_FILE_SUFFIXES:
+        found.append("is a certificate or key file")
+    if PRIVATE_KEY_RE.search(data):
+        found.append("holds a private key")
     if key and key.encode() in data:
         found.append("contains the API key from services/api/.env")
     if path not in ALLOWED_ASSIGN and ASSIGN_RE.search(data):

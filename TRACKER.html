@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 360,
- "updated_at": "2026-11-03T08:25:37.594Z",
+ "rev": 362,
+ "updated_at": "2026-11-03T08:36:58.868Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2824,6 +2824,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T08:25:37.594Z"
   },
   {
+   "id": "d9-10",
+   "day": 9,
+   "title": "Security: the secret check refuses key files and private key blocks",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "History and tree scanned (3,279 objects): no key, private key block, cloud or chat token, bearer token or valued MODEL_API_KEY assignment; no .env, .pem, .key, .p12 or .pfx ever committed. scripts/check_secrets.py now refuses *.pem, *.key, *.p12, *.pfx and any file holding a private key block (it already refused the key, assignments and .env); tests in scripts/test_check_secrets.py (13 pass). docs/SECURITY.md started.",
+   "done_at": "2026-11-03T08:36:58.868Z",
+   "tags": [
+    "security"
+   ],
+   "changed_at": "2026-11-03T08:36:58.868Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3664,6 +3679,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T08:36:58.868Z",
+   "kind": "claude",
+   "text": "Task d9-10 \"Security: the secret check refuses key files and private key blocks\" is now done. Note: History and tree scanned (3,279 objects): no key, private key block, cloud or chat token, bearer token or valued MODEL_API_KEY assignment; no .env, .pem, .key, .p12 or .pfx ever committed. scripts/check_secrets.py now refuses *.pem, *.key, *.p12, *.pfx and any file holding a private key block (it already refused the key, assignments and .env); tests in scripts/test_check_secrets.py (13 pass). docs/SECURITY.md started."
+  },
+  {
+   "ts": "2026-11-03T08:36:58.769Z",
+   "kind": "claude",
+   "text": "Task d9-10 \"Security: the secret check refuses key files and private key blocks\" added to day 9."
+  },
   {
    "ts": "2026-11-03T08:25:37.594Z",
    "kind": "claude",
