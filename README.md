@@ -56,6 +56,22 @@ are in `docs/submission/`; the security pass is in `docs/SECURITY.md`.
 Checks: `make check` runs every test suite, lint and type check, as the pre-commit hook and CI
 (`.github/workflows/tests.yml`) do.
 
+## Screens
+
+![How it works: the teacher's upload, S0 to S5 with the Meta model at each stage, the printed sheet, and the phone's touch and question paths, with the safety rules marked](docs/submission/architecture.svg)
+
+From a headless mock-mode run (`docs/submission/screenshots/`):
+
+| | |
+|---|---|
+| ![The review: parts flagged for the teacher, a suggested merge, the Needs you list](docs/submission/screenshots/author-review.png) | ![Fix outline of the aorta: two clicks, SAM's new outline](docs/submission/screenshots/author-fix-outline.png) |
+| The review: what needs the teacher, and why | Fix outline: two clicks, SAM answers |
+| ![After publishing: print at 100 percent, then open in Explore](docs/submission/screenshots/author-publish.png) | ![The device check at phone size](docs/submission/screenshots/explore-device-check.png) |
+| Published: print it, then open it in Explore | The device check (headless Chrome, so the camera says nothing about which way it faces) |
+
+The heart: "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. Resized and
+placed on a white background." (`ATTRIBUTION.md`)
+
 ## How it works
 
 ### Author: S0 to S5

@@ -142,6 +142,12 @@ figure's normalized size.
 | `fixtures/qa/heart_v4_regions.json` | fixtures/heart.png, published version 4 | CC BY-SA 3.0, with the heart's credit line |
 | `fixtures/qa/brain_lobes_v4_regions.json` | fixtures/eval/brain_lobes.png, published version 4 | CC BY 3.0, with the brain's credit line |
 
+### Screenshots, docs/submission/screenshots/
+
+The four screenshots of Author and Explore (Nov 3, a headless mock-mode run) show
+fixtures/heart.png in the review and the Fix outline panel: CC BY-SA 3.0, with the heart's
+credit line, which README.md prints under them.
+
 ### Recorded model answers, fixtures/recorded/
 
 Each recording is one Meta model call about one figure above: an S1 listing or plan, SAM
@@ -162,6 +168,8 @@ hold the synthetic speech of `fixtures/audio/`, above.
   `spikes/tracking/make_sheet.py` from `spikes/tracking/sheet.json`.
 - `fixtures/regions/golden.json` and `cases.json`: a hand-written contract figure and its test
   cases.
+- `docs/submission/architecture.svg` (the system diagram) and `docs/submission/captions.srt`
+  (the video's narration as captions, made by `scripts/captions.py`).
 
 ## Not stored here
 

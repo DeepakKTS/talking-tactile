@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 388,
- "updated_at": "2026-11-03T11:57:18.816Z",
+ "rev": 390,
+ "updated_at": "2026-11-03T12:08:06.480Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -3029,6 +3029,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T11:57:18.816Z"
   },
   {
+   "id": "d9-23",
+   "day": 9,
+   "title": "Video helpers: captions, architecture diagram, screenshots",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "docs/submission/captions.srt: 26 cues from VIDEO_SCRIPT.md's narration inside each shot's time less 0.3 s at each end, at most two lines of 42 characters (scripts/captions.py rebuilds it; 3 tests, one checks the committed file matches the script). docs/submission/architecture.svg: 1920 x 1080, upload, S0 to S5 with the model at each (Spark S1, SAM S2, code S0 S3 S4 S5), teacher review and publish, the printed sheet and regions.json, the phone's touch path (camera, MediaPipe in a Web Worker, homography and 1 euro filter, region engine, tone and name) and question path (hold to talk, Voice Transcribe, commands on the phone, Spark, spoken answer), 7 safety rules marked; text 19 px or more; rendered in Chrome and checked. docs/submission/screenshots/: the review with flags, Fix outline of the aorta (two recorded clicks, SAM answered), the publish screen, the device check at phone size; from a clean clone in mock mode. README Screens section with the heart's credit line; ATTRIBUTION lists the screenshots (CC BY-SA 3.0) and the own-work files.",
+   "done_at": "2026-11-03T12:08:06.480Z",
+   "tags": [
+    "submission",
+    "docs"
+   ],
+   "changed_at": "2026-11-03T12:08:06.480Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3882,6 +3898,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T12:08:06.480Z",
+   "kind": "claude",
+   "text": "Task d9-23 \"Video helpers: captions, architecture diagram, screenshots\" is now done. Note: docs/submission/captions.srt: 26 cues from VIDEO_SCRIPT.md's narration inside each shot's time less 0.3 s at each end, at most two lines of 42 characters (scripts/captions.py rebuilds it; 3 tests, one checks the committed file matches the script). docs/submission/architecture.svg: 1920 x 1080, upload, S0 to S5 with the model at each (Spark S1, SAM S2, code S0 S3 S4 S5), teacher review and publish, the printed sheet and regions.json, the phone's touch path (camera, MediaPipe in a Web Worker, homography and 1 euro filter, region engine, tone and name) and question path (hold to talk, Voice Transcribe, commands on the phone, Spark, spoken answer), 7 safety rules marked; text 19 px or more; rendered in Chrome and checked. docs/submission/screenshots/: the review with flags, Fix outline of the aorta (two recorded clicks, SAM answered), the publish screen, the device check at phone size; from a clean clone in mock mode. README Screens section with the heart's credit line; ATTRIBUTION lists the screenshots (CC BY-SA 3.0) and the own-work files."
+  },
+  {
+   "ts": "2026-11-03T12:08:06.432Z",
+   "kind": "claude",
+   "text": "Task d9-23 \"Video helpers: captions, architecture diagram, screenshots\" added to day 9."
+  },
   {
    "ts": "2026-11-03T11:57:18.816Z",
    "kind": "claude",

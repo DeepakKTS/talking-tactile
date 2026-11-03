@@ -39,6 +39,15 @@ words come from Muse Voice Transcribe, so they need the network. The tones and n
 | Touch to tone on the iPhone | Not said | <!-- tt:earcon-device -->TBD: the device latency film<!-- /tt:earcon-device --> |
 | Fingertip error on the 9-point sheet | Not said | <!-- tt:gate-b -->TBD: Gate B, `eval/gate-b/README.md`<!-- /tt:gate-b --> |
 
+## Files for the edit
+
+- `captions.srt`: the narration above as captions, timed to the shots
+  (`python3 scripts/captions.py` rebuilds it after the narration or the times change).
+- `architecture.svg`: the whole system on one 1920 x 1080 card, for shot 10 or a cutaway in
+  shot 2.
+- `screenshots/`: the review, Fix outline, the publish screen and the device check, from a
+  headless mock run, for inserts if a screen take fails.
+
 ## Captions for every take
 
 - Heart: "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. Resized and

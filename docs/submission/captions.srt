@@ -1,0 +1,119 @@
+1
+00:00:00,300 --> 00:00:06,700
+A blind student can feel the shape of a
+heart on a raised sheet.
+
+2
+00:00:06,700 --> 00:00:11,700
+Talking Tactile tells them what they are
+touching.
+
+3
+00:00:12,300 --> 00:00:16,944
+The teacher uploads the textbook figure.
+
+4
+00:00:16,944 --> 00:00:22,749
+Muse Spark reads it and plans each part
+for touch.
+
+5
+00:00:22,749 --> 00:00:26,000
+SAM 3.1 outlines every part.
+
+6
+00:00:26,000 --> 00:00:33,779
+Code, not the model, decides the geometry:
+gaps, textures, braille.
+
+7
+00:00:33,779 --> 00:00:39,700
+What the models were unsure of goes to the
+teacher.
+
+8
+00:00:40,300 --> 00:00:45,269
+Nothing is touchable until the teacher
+checks it.
+
+9
+00:00:45,269 --> 00:00:51,455
+Publishing refuses a sheet that breaks a
+tactile design rule.
+
+10
+00:00:51,455 --> 00:00:54,700
+The sheet prints at exact scale.
+
+11
+00:00:55,300 --> 00:01:02,020
+On the student's side, a phone camera
+watches the sheet.
+
+12
+00:01:02,020 --> 00:01:06,700
+Its corners tie the camera to the page.
+
+13
+00:01:07,300 --> 00:01:11,104
+Each part has its own tone.
+
+14
+00:01:11,104 --> 00:01:21,388
+Rest a finger and the phone says the
+part's name, with no network at all.
+
+15
+00:01:21,388 --> 00:01:29,700
+Say "tell me more" to hear what the
+teacher wrote about it.
+
+16
+00:01:30,300 --> 00:01:41,700
+Directions come from the sheet's geometry,
+never from a language model.
+
+17
+00:01:42,300 --> 00:01:43,551
+Hold to ask.
+
+18
+00:01:43,551 --> 00:01:51,891
+Muse Voice Transcribe hears the question,
+with the figure's part names as hints.
+
+19
+00:01:51,891 --> 00:01:56,166
+Muse Spark answers only from this figure.
+
+20
+00:01:56,166 --> 00:02:03,464
+If the figure does not say, it tells the
+student to ask their teacher.
+
+21
+00:02:03,464 --> 00:02:10,970
+In our live tests, 36 of 38 heart
+questions were answered from the right
+
+22
+00:02:10,970 --> 00:02:11,700
+source.
+
+23
+00:02:12,300 --> 00:02:23,700
+With the network gone, touch still works,
+and the phone says what does not.
+
+24
+00:02:24,300 --> 00:02:35,700
+The same steps work on a second figure.
+
+25
+00:02:36,300 --> 00:02:39,320
+Talking Tactile.
+
+26
+00:02:39,320 --> 00:02:49,700
+Built on Muse Spark, SAM 3.1 and Muse
+Voice Transcribe.

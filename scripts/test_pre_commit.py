@@ -50,6 +50,7 @@ class PreCommitHookTest(unittest.TestCase):
             "scripts/test_pre_commit.py": PASSING_UNITTEST,
             "scripts/test_preflight.py": PASSING_UNITTEST,
             "scripts/test_results.py": PASSING_UNITTEST,
+            "scripts/test_captions.py": PASSING_UNITTEST,
             "spikes/tracking/test/ok.test.mjs": NODE_TEST,
             "Makefile": "check:\n\tpython3 check.py\n",
             "check.py": CHECK,

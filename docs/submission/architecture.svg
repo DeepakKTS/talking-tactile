@@ -1,0 +1,243 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="Helvetica, Arial, sans-serif">
+  <title>Talking Tactile: from the textbook figure to a sheet that talks</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+    <style>
+      .box { stroke: #333; stroke-width: 2; rx: 12; }
+      .meta { fill: #dbe8ff; }
+      .code { fill: #eeeeee; }
+      .phone { fill: #dff3e2; }
+      .person { fill: #fff3d6; }
+      .t { font-size: 24px; font-weight: bold; fill: #111; }
+      .tag { font-size: 20px; font-weight: bold; }
+      .tag-meta { fill: #1d4ed8; }
+      .tag-code { fill: #555; }
+      .tag-phone { fill: #15803d; }
+      .b { font-size: 19px; fill: #222; }
+      .lane { font-size: 30px; font-weight: bold; fill: #111; }
+      .line { stroke: #333; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .note { font-size: 19px; fill: #333; font-style: italic; }
+      .badge circle { fill: #c62828; }
+      .badge text { fill: #fff; font-size: 19px; font-weight: bold; text-anchor: middle; }
+      .rule { font-size: 19px; fill: #222; }
+    </style>
+  </defs>
+  <rect width="1920" height="1080" fill="#ffffff"/>
+  <text x="55" y="58" font-size="36" font-weight="bold" fill="#111">Talking Tactile: from a textbook figure to a sheet that talks</text>
+
+  <!-- Author lane -->
+  <text class="lane" x="55" y="118">Author mode: the teacher</text>
+
+  <rect class="box person" x="55" y="145" width="200" height="190"/>
+  <text class="t" x="70" y="183">Upload</text>
+  <text class="tag tag-code" x="70" y="213">teacher</text>
+  <text class="b" x="70" y="248">The textbook's</text>
+  <text class="b" x="70" y="272">own figure: PNG,</text>
+  <text class="b" x="70" y="296">JPEG or a PDF</text>
+  <text class="b" x="70" y="320">page</text>
+
+  <rect class="box code" x="285" y="145" width="200" height="190"/>
+  <text class="t" x="300" y="183">S0 ingest</text>
+  <text class="tag tag-code" x="300" y="213">code</text>
+  <text class="b" x="300" y="248">Checks size,</text>
+  <text class="b" x="300" y="272">deskews, refuses</text>
+  <text class="b" x="300" y="296">a blank or</text>
+  <text class="b" x="300" y="320">blurry image</text>
+
+  <rect class="box meta" x="515" y="145" width="200" height="190"/>
+  <text class="t" x="530" y="183">S1 understand</text>
+  <text class="tag tag-meta" x="530" y="213">Muse Spark</text>
+  <text class="b" x="530" y="248">Lists the parts,</text>
+  <text class="b" x="530" y="272">plans each for</text>
+  <text class="b" x="530" y="296">touch: area, line</text>
+  <text class="b" x="530" y="320">or group</text>
+
+  <rect class="box meta" x="745" y="145" width="200" height="190"/>
+  <text class="t" x="760" y="183">S2 ground</text>
+  <text class="tag tag-meta" x="760" y="213">SAM 3.1</text>
+  <text class="b" x="760" y="248">Outlines each</text>
+  <text class="b" x="760" y="272">part from its</text>
+  <text class="b" x="760" y="296">points; a spill</text>
+  <text class="b" x="760" y="320">is retried</text>
+
+  <rect class="box code" x="975" y="145" width="200" height="190"/>
+  <text class="t" x="990" y="183">S3 reconcile</text>
+  <text class="tag tag-code" x="990" y="213">code</text>
+  <text class="b" x="990" y="248">Merges near</text>
+  <text class="b" x="990" y="272">duplicates, nests</text>
+  <text class="b" x="990" y="296">parts, drops</text>
+  <text class="b" x="990" y="320">slivers</text>
+
+  <rect class="box code" x="1205" y="145" width="200" height="190"/>
+  <text class="t" x="1220" y="183">S4 layout</text>
+  <text class="tag tag-code" x="1220" y="213">code</text>
+  <text class="b" x="1220" y="248">Millimeters,</text>
+  <text class="b" x="1220" y="272">3.2 mm gaps,</text>
+  <text class="b" x="1220" y="296">textures, point</text>
+  <text class="b" x="1220" y="320">symbols</text>
+
+  <rect class="box code" x="1435" y="145" width="200" height="190"/>
+  <text class="t" x="1450" y="183">S5 render</text>
+  <text class="tag tag-code" x="1450" y="213">code</text>
+  <text class="b" x="1450" y="248">Print PDF at</text>
+  <text class="b" x="1450" y="272">scale, braille,</text>
+  <text class="b" x="1450" y="296">regions.json,</text>
+  <text class="b" x="1450" y="320">rules report</text>
+
+  <rect class="box person" x="1665" y="145" width="200" height="190"/>
+  <text class="t" x="1680" y="183">Review</text>
+  <text class="tag tag-code" x="1680" y="213">teacher</text>
+  <text class="b" x="1680" y="248">Checks parts,</text>
+  <text class="b" x="1680" y="272">fixes outlines</text>
+  <text class="b" x="1680" y="296">(SAM clicks),</text>
+  <text class="b" x="1680" y="320">publishes</text>
+
+  <path class="line" d="M255,240 H283"/>
+  <path class="line" d="M485,240 H513"/>
+  <path class="line" d="M715,240 H743"/>
+  <path class="line" d="M945,240 H973"/>
+  <path class="line" d="M1175,240 H1203"/>
+  <path class="line" d="M1405,240 H1433"/>
+  <path class="line" d="M1635,240 H1663"/>
+
+  <!-- From the published sheet to the phone -->
+  <rect class="box person" x="700" y="385" width="520" height="70"/>
+  <text class="t" x="725" y="420">Printed sheet</text>
+  <text class="b" x="725" y="444">at 100 percent, outlines traced raised</text>
+  <path class="line" d="M1720,335 V420 H1222"/>
+  <path class="line" d="M700,420 H165 V543"/>
+  <path class="line" d="M1810,335 V485 H900 V543"/>
+  <text class="note" x="1250" y="476">regions.json: labels, tones and guidance work offline</text>
+
+  <!-- Explore lane -->
+  <text class="lane" x="300" y="520">Explore mode: the student's phone</text>
+
+  <rect class="box phone" x="55" y="545" width="220" height="170"/>
+  <text class="t" x="70" y="583">Camera</text>
+  <text class="tag tag-phone" x="70" y="613">on the phone</text>
+  <text class="b" x="70" y="648">The phone in a</text>
+  <text class="b" x="70" y="672">mount over the</text>
+  <text class="b" x="70" y="696">sheet</text>
+
+  <rect class="box phone" x="300" y="545" width="220" height="170"/>
+  <text class="t" x="315" y="583">MediaPipe</text>
+  <text class="tag tag-phone" x="315" y="613">on the phone</text>
+  <text class="b" x="315" y="648">Hand Landmarker</text>
+  <text class="b" x="315" y="672">in a Web Worker</text>
+  <text class="b" x="315" y="696">finds the fingertip</text>
+
+  <rect class="box phone" x="545" y="545" width="220" height="170"/>
+  <text class="t" x="560" y="583">Homography</text>
+  <text class="tag tag-phone" x="560" y="613">on the phone</text>
+  <text class="b" x="560" y="648">4 corner marks to</text>
+  <text class="b" x="560" y="672">sheet millimeters,</text>
+  <text class="b" x="560" y="696">1 euro filter</text>
+
+  <rect class="box phone" x="790" y="545" width="220" height="170"/>
+  <text class="t" x="805" y="583">Region engine</text>
+  <text class="tag tag-phone" x="805" y="613">on the phone</text>
+  <text class="b" x="805" y="648">The part under</text>
+  <text class="b" x="805" y="672">the finger, from</text>
+  <text class="b" x="805" y="696">regions.json</text>
+
+  <rect class="box phone" x="1035" y="545" width="220" height="170"/>
+  <text class="t" x="1050" y="583">Tone and name</text>
+  <text class="tag tag-phone" x="1050" y="613">on the phone</text>
+  <text class="b" x="1050" y="648">A texture tone on</text>
+  <text class="b" x="1050" y="672">entering, the name</text>
+  <text class="b" x="1050" y="696">after a rest</text>
+
+  <path class="line" d="M275,630 H298"/>
+  <path class="line" d="M520,630 H543"/>
+  <path class="line" d="M765,630 H788"/>
+  <path class="line" d="M1010,630 H1033"/>
+
+  <rect class="box phone" x="55" y="745" width="220" height="170"/>
+  <text class="t" x="70" y="783">Hold to talk</text>
+  <text class="tag tag-phone" x="70" y="813">on the phone</text>
+  <text class="b" x="70" y="848">A 16 kHz WAV</text>
+  <text class="b" x="70" y="872">made in the</text>
+  <text class="b" x="70" y="896">browser</text>
+
+  <rect class="box meta" x="300" y="745" width="220" height="170"/>
+  <text class="t" x="315" y="783">Transcribe</text>
+  <text class="tag tag-meta" x="315" y="813">Muse Voice</text>
+  <text class="b" x="315" y="848">The figure's part</text>
+  <text class="b" x="315" y="872">names as keyword</text>
+  <text class="b" x="315" y="896">hints</text>
+
+  <rect class="box phone" x="545" y="745" width="220" height="170"/>
+  <text class="t" x="560" y="783">Commands</text>
+  <text class="tag tag-phone" x="560" y="813">on the phone</text>
+  <text class="b" x="560" y="848">more, repeat,</text>
+  <text class="b" x="560" y="872">where is: no</text>
+  <text class="b" x="560" y="896">model call</text>
+
+  <rect class="box meta" x="790" y="745" width="220" height="170"/>
+  <text class="t" x="805" y="783">Answer</text>
+  <text class="tag tag-meta" x="805" y="813">Muse Spark</text>
+  <text class="b" x="805" y="848">Any other words,</text>
+  <text class="b" x="805" y="872">strict schema,</text>
+  <text class="b" x="805" y="896">this figure only</text>
+
+  <rect class="box phone" x="1035" y="745" width="220" height="170"/>
+  <text class="t" x="1050" y="783">Spoken answer</text>
+  <text class="tag tag-phone" x="1050" y="813">on the phone</text>
+  <text class="b" x="1050" y="848">Or "Ask your</text>
+  <text class="b" x="1050" y="872">teacher" when the</text>
+  <text class="b" x="1050" y="896">figure does not say</text>
+
+  <path class="line" d="M275,830 H298"/>
+  <path class="line" d="M520,830 H543"/>
+  <path class="line" d="M765,830 H788"/>
+  <path class="line" d="M1010,830 H1033"/>
+
+  <!-- Safety rule badges -->
+  <g class="badge"><circle cx="243" cy="160" r="16"/><text x="243" y="167">1</text></g>
+  <g class="badge"><circle cx="1393" cy="160" r="16"/><text x="1393" y="167">2</text></g>
+  <g class="badge"><circle cx="1853" cy="160" r="16"/><text x="1853" y="167">3</text></g>
+  <g class="badge"><circle cx="998" cy="560" r="16"/><text x="998" y="567">2</text></g>
+  <g class="badge"><circle cx="1243" cy="560" r="16"/><text x="1243" y="567">7</text></g>
+  <g class="badge"><circle cx="263" cy="760" r="16"/><text x="263" y="767">6</text></g>
+  <g class="badge"><circle cx="508" cy="760" r="16"/><text x="508" y="767">4</text></g>
+  <g class="badge"><circle cx="964" cy="760" r="16"/><text x="964" y="767">4</text></g>
+  <g class="badge"><circle cx="998" cy="760" r="16"/><text x="998" y="767">5</text></g>
+
+  <!-- Safety rules -->
+  <rect x="1300" y="545" width="565" height="390" rx="12" fill="#fff5f5" stroke="#c62828" stroke-width="2"/>
+  <text class="t" x="1320" y="582">Safety rules</text>
+  <g class="badge"><circle cx="1336" cy="614" r="14"/><text x="1336" y="621">1</text></g>
+  <text class="rule" x="1362" y="620">No model redraws the figure: the sheet is</text>
+  <text class="rule" x="1362" y="643">the textbook's own picture.</text>
+  <g class="badge"><circle cx="1336" cy="666" r="14"/><text x="1336" y="673">2</text></g>
+  <text class="rule" x="1362" y="672">Geometry comes from code: gaps, directions,</text>
+  <text class="rule" x="1362" y="695">neighbors. Never the language model.</text>
+  <g class="badge"><circle cx="1336" cy="718" r="14"/><text x="1336" y="725">3</text></g>
+  <text class="rule" x="1362" y="724">Nothing is touchable until the teacher checks</text>
+  <text class="rule" x="1362" y="747">it; publish refuses a broken tactile rule.</text>
+  <g class="badge"><circle cx="1336" cy="770" r="14"/><text x="1336" y="777">4</text></g>
+  <text class="rule" x="1362" y="776">The API key stays on the Mac: every Meta call</text>
+  <text class="rule" x="1362" y="799">goes through the backend.</text>
+  <g class="badge"><circle cx="1336" cy="822" r="14"/><text x="1336" y="829">5</text></g>
+  <text class="rule" x="1362" y="828">Answers come from this figure only; anything</text>
+  <text class="rule" x="1362" y="851">else goes back to the teacher.</text>
+  <g class="badge"><circle cx="1336" cy="874" r="14"/><text x="1336" y="881">6</text></g>
+  <text class="rule" x="1362" y="880">No audio and no question text is stored.</text>
+  <g class="badge"><circle cx="1336" cy="908" r="14"/><text x="1336" y="915">7</text></g>
+  <text class="rule" x="1362" y="914">Touch needs no network: tones, names, guidance.</text>
+
+  <!-- Legend -->
+  <rect class="box meta" x="55" y="975" width="40" height="28"/>
+  <text class="b" x="105" y="996">Meta model</text>
+  <rect class="box code" x="255" y="975" width="40" height="28"/>
+  <text class="b" x="305" y="996">Code, no model</text>
+  <rect class="box phone" x="485" y="975" width="40" height="28"/>
+  <text class="b" x="535" y="996">On the phone, no network</text>
+  <rect class="box person" x="795" y="975" width="40" height="28"/>
+  <text class="b" x="845" y="996">A person, or what they hold</text>
+  <g class="badge"><circle cx="1142" cy="989" r="14"/><text x="1142" y="996">1</text></g>
+  <text class="b" x="1166" y="996">Safety rule</text>
+  <text class="b" x="55" y="1048">The Mac serves the app and the API on the local network. Only the backend's Meta model calls leave it.</text>
+</svg>
