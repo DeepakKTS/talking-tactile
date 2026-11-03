@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 362,
- "updated_at": "2026-11-03T08:36:58.868Z",
+ "rev": 364,
+ "updated_at": "2026-11-03T08:50:56.950Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2839,6 +2839,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T08:36:58.868Z"
   },
   {
+   "id": "d9-11",
+   "day": 9,
+   "title": "Security: every request body has a size limit",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Ids, versions and file names were already validated (no path built from free text). Only the upload had a size limit. middleware.py: every POST, PATCH or PUT must say its length: upload 10 MB, /api/ask and /api/transcribe 2 MB, anything else 64 KB; 413 before reading, 411 without a length. tests/test_body_guard.py (edit and fix over 64 KB, question and transcription over 2 MB, a body-less publish passes, no length 411).",
+   "done_at": "2026-11-03T08:50:56.950Z",
+   "tags": [
+    "security"
+   ],
+   "changed_at": "2026-11-03T08:50:56.950Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3679,6 +3694,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T08:50:56.950Z",
+   "kind": "claude",
+   "text": "Task d9-11 \"Security: every request body has a size limit\" is now done. Note: Ids, versions and file names were already validated (no path built from free text). Only the upload had a size limit. middleware.py: every POST, PATCH or PUT must say its length: upload 10 MB, /api/ask and /api/transcribe 2 MB, anything else 64 KB; 413 before reading, 411 without a length. tests/test_body_guard.py (edit and fix over 64 KB, question and transcription over 2 MB, a body-less publish passes, no length 411)."
+  },
+  {
+   "ts": "2026-11-03T08:50:56.863Z",
+   "kind": "claude",
+   "text": "Task d9-11 \"Security: every request body has a size limit\" added to day 9."
+  },
   {
    "ts": "2026-11-03T08:36:58.868Z",
    "kind": "claude",

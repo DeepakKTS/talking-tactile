@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 362, updated 2026-11-03T08:36:58.868Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 364, updated 2026-11-03T08:50:56.950Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -389,6 +389,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: spikes/tracking: every protocol action works by touch: Start camera, Calibrate, corners tapped on the view, Touch test, rest-to-record, new Record now (Space) and Stop speech (Escape) buttons, the download link. On a phone (lib/device.js, the same media query as Explore): 'Tap corner A, top left.'..., 'Calibrated. Check that the outline and targets sit on the printed ones, then tap Touch test.', crossed corners and 'Calibrate first: tap Calibrate.' name buttons; the button labels drop (R) and (T); the Keys sentence is hidden. Bug found: on a 390 px phone the page was 658 px wide (the per-target JSON in the results has no break points), so the browser zoomed out and taps missed; #results, #stats, #status now wrap anywhere. Test: e2e_check.py touch-session on an emulated phone (390 x 844, is_mobile, has_touch): the whole protocol by taps, wording, buttons, Record now only during the test, Wake Lock first, page width 390, the tapped download saved and analyzed: 45 touches, mean 0.03 mm, Gate B pass. Tracking code and parity-checked files unchanged; parity hashes unchanged.
 - [x] d9-10 Security: the secret check refuses key files and private key blocks
   - Note: History and tree scanned (3,279 objects): no key, private key block, cloud or chat token, bearer token or valued MODEL_API_KEY assignment; no .env, .pem, .key, .p12 or .pfx ever committed. scripts/check_secrets.py now refuses *.pem, *.key, *.p12, *.pfx and any file holding a private key block (it already refused the key, assignments and .env); tests in scripts/test_check_secrets.py (13 pass). docs/SECURITY.md started.
+- [x] d9-11 Security: every request body has a size limit
+  - Note: Ids, versions and file names were already validated (no path built from free text). Only the upload had a size limit. middleware.py: every POST, PATCH or PUT must say its length: upload 10 MB, /api/ask and /api/transcribe 2 MB, anything else 64 KB; 413 before reading, 411 without a length. tests/test_body_guard.py (edit and fix over 64 KB, question and transcription over 2 MB, a body-less publish passes, no length 411).
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.

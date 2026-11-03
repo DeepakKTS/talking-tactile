@@ -22,3 +22,27 @@ Found:
 Fixed:
 - The secret check now refuses `*.pem`, `*.key`, `*.p12` and `*.pfx` files and any staged file
   holding a private key block (tests in `scripts/test_check_secrets.py`).
+
+## Inputs
+
+Checked:
+- Figure ids: every figure route checks the id against 64 lowercase hex characters before it
+  is used (`app/routes/figures.py` `_fid`, `app/pipeline/cache.py` `is_figure_id`); questions
+  check it in the request model (`app/ask.py` `AskRequest`).
+- Versions: an integer of at least 1, or "latest". File names: only the listed ones
+  (`MEDIA_TYPES`, `DRAFT_ONLY_TYPES`); anything else is a 404. No file path is built from free
+  text, so there is no path traversal. Region ids are matched against the figure's own
+  regions or validated (`RegionId`, letters, digits and _ up to 32).
+- Questions: up to 500 characters; up to 10 recent parts; a session id of up to 64 safe
+  characters; extra fields refused. Audio: mono 16-bit WAV at 16 or 24 kHz only.
+- Uploads: 10 MB, 50 million pixels, PNG, JPEG or PDF by content (`app/pipeline/s0_ingest.py`).
+
+Found:
+- Only the figure upload had a size limit. A question, an edit or a fix call could send a body
+  of any size, read whole into memory.
+
+Fixed:
+- Every request with a body must say its length and fit: the upload 10 MB, a question or a
+  transcription 2 MB (a 15 s recording is about 720 KB), anything else 64 KB. A body over its
+  limit is refused with 413 before it is read, one with no length with 411
+  (`app/middleware.py`, tests in `services/api/tests/test_body_guard.py`).

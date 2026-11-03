@@ -1,6 +1,6 @@
 """ASGI middleware: a request id on every request and response with one JSON access log
-line, and the upload guard, which refuses an oversized upload from its Content-Length
-before any of the body is read."""
+line, and the body guard (UploadGuard), which refuses an oversized request body from its
+Content-Length before any of it is read."""
 
 import json
 import logging
@@ -59,23 +59,41 @@ class RequestContext:
             request_id.reset(token)
 
 
+# The largest body each kind of request may send. A held question is at most 15 s of 16-bit
+# mono WAV at 24 kHz (apps/web/src/explore/voice.ts MAX_MS): about 720 KB.
+ASK_BODY_BYTES = 2 * 1024 * 1024
+JSON_BODY_BYTES = 64 * 1024
+_ASK_PATHS = ("/api/ask", "/api/transcribe")
+
+
 class UploadGuard:
-    """POST /api/figures must say its length, and the length must fit the upload limit."""
+    """Every request with a body must say its length, and the length must fit: the figure
+    upload its file limit, a question ASK_BODY_BYTES, anything else (edits, fix calls)
+    JSON_BODY_BYTES. Refused from the Content-Length, before any of the body is read."""
 
     def __init__(self, app: ASGIApp, max_bytes: int, path: str = "/api/figures") -> None:
         self.app = app
         self.max_bytes = max_bytes
         self.path = path
 
+    def _limit(self, path: str) -> tuple[int, str]:
+        if path == self.path:
+            mb = self.max_bytes / (1024 * 1024)
+            return self.max_bytes + _FORM_SLACK_BYTES, f"The file is over {mb:g} MB."
+        if path in _ASK_PATHS:
+            return ASK_BODY_BYTES, "The recording is too long."
+        return JSON_BODY_BYTES, "The request is too large."
+
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] == "http" and scope["method"] == "POST" and scope["path"] == self.path:
-            length = dict(scope["headers"]).get(b"content-length")
+        if scope["type"] == "http" and scope["method"] in ("POST", "PATCH", "PUT"):
+            headers = dict(scope["headers"])
+            length = headers.get(b"content-length")
             if length is None or not length.isdigit():
-                await _refuse(send, 411, "length_required", "Send the upload with its length.")
+                await _refuse(send, 411, "length_required", "Send the request with its length.")
                 return
-            if int(length) > self.max_bytes + _FORM_SLACK_BYTES:
-                mb = self.max_bytes / (1024 * 1024)
-                await _refuse(send, 413, "too_large", f"The file is over {mb:g} MB.")
+            limit, message = self._limit(scope["path"])
+            if int(length) > limit:
+                await _refuse(send, 413, "too_large", message)
                 return
         await self.app(scope, receive, send)
 
