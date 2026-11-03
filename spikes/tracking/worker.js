@@ -1,5 +1,6 @@
 // Hand tracking worker. Receives one ImageBitmap at a time, returns landmarks only (no pixels).
-// MediaPipe Hand Landmarker, VIDEO mode, up to 2 hands. GPU delegate first, CPU if that fails.
+// MediaPipe Hand Landmarker, VIDEO mode, up to 2 hands, on the delegate the page asks for: the
+// page starts it on GPU and moves to CPU when the GPU gives no result (lib/warmup.js).
 // ?stub=<ms> in the page URL replaces the model with a fixed delay, for testing the frame loop.
 
 const MP_VERSION = "1.1.0";
@@ -32,27 +33,17 @@ async function createLandmarker(delegate) {
 async function init(msg) {
   stubMs = msg.stubMs || 0;
   if (stubMs) {
-    self.postMessage({ type: "ready", backend: `stub ${stubMs} ms` });
+    self.postMessage({ type: "ready", backend: `stub ${stubMs} ms`, delegate: msg.delegate || "GPU" });
     return;
   }
   const t0 = performance.now();
-  const order = msg.delegate ? [msg.delegate] : ["GPU", "CPU"];
-  const errors = [];
-  for (const delegate of order) {
-    try {
-      landmarker = await createLandmarker(delegate);
-      self.postMessage({
-        type: "ready",
-        backend: `mediapipe ${MP_VERSION} ${delegate}`,
-        loadMs: performance.now() - t0,
-        errors,
-      });
-      return;
-    } catch (err) {
-      errors.push(`${delegate}: ${err?.message ?? err}`);
-    }
+  const delegate = msg.delegate || "GPU";
+  try {
+    landmarker = await createLandmarker(delegate);
+    self.postMessage({ type: "ready", backend: `mediapipe ${MP_VERSION} ${delegate}`, delegate, loadMs: performance.now() - t0, errors: [] });
+  } catch (err) {
+    self.postMessage({ type: "error", phase: "init", message: `${delegate}: ${err?.message ?? err}` });
   }
-  self.postMessage({ type: "error", message: errors.join("; ") });
 }
 
 function detect(msg) {
@@ -80,7 +71,7 @@ self.onmessage = async (e) => {
     if (stubMs) await new Promise((r) => setTimeout(r, stubMs));
     else if (landmarker) hands = detect(msg);
   } catch (err) {
-    self.postMessage({ type: "error", message: `detect: ${err?.message ?? err}` });
+    self.postMessage({ type: "error", phase: "detect", message: `detect: ${err?.message ?? err}` });
   } finally {
     msg.bitmap.close();
   }

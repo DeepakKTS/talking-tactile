@@ -12,6 +12,7 @@ export const SHIPPED_SOURCES = [
   "apps/web/src/explore/hands.ts",
   "apps/web/src/explore/homography.ts",
   "apps/web/src/explore/oneEuro.ts",
+  "apps/web/src/explore/warmup.ts",
   "apps/web/src/shared/config.ts",
   "config/explore.yaml",
 ];
@@ -95,6 +96,58 @@ export const PATH_CASES = {
   "a pointing hand and a farther hand with exactly 2 curled": (rnd) => twoHands(rnd, {}, { ...TWO_CURLED, indexLen: 380 }),
 };
 
+// The delegate warm-up (apps/web/src/explore/warmup.ts and lib/warmup.js): event sequences,
+// in ms. "tick" is the page's 250 ms check of the fallback timer.
+function ticks(from, to) {
+  const out = [];
+  for (let t = from; t <= to; t += 250) out.push({ t, e: "tick" });
+  return out;
+}
+const byTime = (events) => events.sort((a, b) => a.t - b.t || (a.e === "tick") - (b.e === "tick"));
+
+export const WARMUP_CASES = {
+  "the GPU never returns": () => byTime([{ t: 900, e: "ready" }, { t: 1000, e: "fed" }, ...ticks(0, 12000), { t: 9500, e: "ready" }, { t: 9600, e: "fed" }, { t: 9900, e: "result" }]),
+  "a cold start with a 10 s model load": () => byTime([{ t: 10000, e: "ready" }, { t: 10050, e: "fed" }, { t: 11550, e: "result" }, ...ticks(0, 30000)]),
+  "ready long before the first frame": () => byTime([{ t: 2000, e: "ready" }, { t: 60000, e: "fed" }, ...ticks(0, 69000)]),
+  "the GPU throws at init, CPU never dropped": () => byTime([{ t: 3000, e: "error" }, { t: 5000, e: "ready" }, { t: 5100, e: "fed" }, ...ticks(0, 40000), { t: 40000, e: "error" }]),
+  "results at 20 a second": () => byTime([{ t: 0, e: "ready" }, { t: 0, e: "fed" }, ...Array.from({ length: 140 }, (_, i) => ({ t: 1000 + i * 50, e: "result" })), ...ticks(0, 8000)]),
+};
+
+function warmupRandom(rnd) {
+  const events = [];
+  let t = 0;
+  for (let i = 0; i < 400; i++) {
+    t += Math.floor(rnd() * 400);
+    const x = rnd();
+    events.push({ t, e: x < 0.05 ? "ready" : x < 0.2 ? "fed" : x < 0.3 ? "result" : x < 0.32 ? "error" : "tick" });
+  }
+  return events;
+}
+
+/** Runs a Warmup class over events; both sides of the parity test use this driver. */
+export function runWarmup(WarmupClass, events) {
+  const w = new WarmupClass();
+  const out = [];
+  let last = 0;
+  for (const { t, e } of events) {
+    last = t;
+    if (e === "ready") w.ready(t);
+    else if (e === "fed") w.fed(t);
+    else if (e === "result") w.result(t);
+    else if (e === "error") {
+      const drop = w.failed();
+      if (drop) w.fallBack("error");
+      out.push([t, "error", drop]);
+    } else {
+      const drop = w.timedOut(t);
+      if (drop) w.fallBack("timeout");
+      if (drop) out.push([t, "timeout"]);
+    }
+  }
+  out.push(["end", w.delegate, w.fellBack, w.isReady, w.warm, w.timeToFirstResultMs, Math.round(w.fps(last) * 1000) / 1000]);
+  return out;
+}
+
 export function makeInputs(cornersMm) {
   let rnd = rng("homography");
   const homography = Array.from({ length: 40 }, () => {
@@ -113,7 +166,10 @@ export function makeInputs(cornersMm) {
     rnd = rng(name);
     return [name, Array.from({ length: RUNS }, () => ({ quad: cameraQuad(rnd), frames: make(rnd) }))];
   }));
-  return { cornersMm, video: VIDEO, homography, euro, paths };
+  const warmup = Object.fromEntries(Object.entries(WARMUP_CASES).map(([name, make]) => [name, make()]));
+  rnd = rng("warmup random");
+  for (let k = 0; k < 6; k++) warmup[`random ${k + 1}`] = warmupRandom(rnd);
+  return { cornersMm, video: VIDEO, homography, euro, paths, warmup };
 }
 
 export function digest(inputs) {

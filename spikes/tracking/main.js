@@ -1,4 +1,6 @@
 import { createFramePump } from "./lib/pump.js";
+import { CPU_FALLBACK_MS, Warmup } from "./lib/warmup.js";
+import { ScreenAwake } from "./lib/wakelock.js";
 
 const params = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
@@ -38,33 +40,74 @@ export function say(text) {
   $("status").textContent = text;
 }
 
-// ---------- worker ----------
+const awake = new ScreenAwake((text) => {
+  say(text);
+  if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+});
 
-const worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
+// ---------- worker ----------
+// Made when the page loads, so the model and wasm download and the GPU initialises before
+// Start camera is pressed. Frames go to it only once it is ready. GPU first; the CPU fallback
+// is lib/warmup.js's, the port of the shipped rules (apps/web/src/explore/warmup.ts).
+
+const warmup = new Warmup();
 const sentAt = new Map();
 let inFlight = 0;
+let worker = makeWorker(params.get("delegate") || "GPU");
 const pump = createFramePump(({ bitmap, id }) => {
   inFlight++;
   state.maxInFlight = Math.max(state.maxInFlight, inFlight);
   sentAt.set(id, performance.now());
+  warmup.fed(performance.now());
   worker.postMessage({ type: "frame", bitmap, id, ts: Math.round(performance.now()) }, [bitmap]);
 });
 state.pump = pump.stats;
+state.warmup = warmup;
+if (params.get("delegate") === "CPU") warmup.fallBack("asked for CPU in the URL");
 
-worker.onmessage = (e) => {
-  const msg = e.data;
+function makeWorker(delegate) {
+  const w = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
+  w.onmessage = (e) => { if (w === worker) onWorker(e.data); };
+  w.postMessage({ type: "init", stubMs: Number(params.get("stub") || 0), delegate });
+  console.log(`hand tracker: starting ${delegate}`);
+  return w;
+}
+
+function fallBack(reason) {
+  worker.onmessage = null;
+  worker.terminate();
+  warmup.fallBack(reason);
+  state.backend = null;
+  // The frame in flight to the dropped worker will never come back.
+  inFlight = 0;
+  sentAt.clear();
+  pump.done();
+  console.log(`hand tracker: GPU dropped (${reason}); CPU from now`);
+  say(`Hand tracker: ${reason}; using CPU.`);
+  worker = makeWorker("CPU");
+}
+
+setInterval(() => {
+  if (warmup.timedOut(performance.now())) fallBack(`no result from the GPU ${CPU_FALLBACK_MS / 1000} s after its first frame`);
+}, 250);
+
+function onWorker(msg) {
   if (msg.type === "ready") {
+    warmup.ready(performance.now());
     state.backend = msg.backend;
     state.loadMs = msg.loadMs ?? null;
     state.backendErrors = msg.errors ?? [];
+    console.log(`hand tracker: ${msg.backend} ready in ${Math.round(msg.loadMs ?? 0)} ms`);
     say(`Hand tracker ready: ${msg.backend}.`);
   } else if (msg.type === "log") {
     console.log(`worker: ${msg.text}`);
   } else if (msg.type === "error") {
-    say(`Hand tracker error: ${msg.message}`);
+    if (warmup.failed()) fallBack(`the GPU failed (${msg.message})`);
+    else say(`Hand tracker error: ${msg.message}`);
   } else if (msg.type === "result") {
     inFlight--;
     pump.done();
+    warmup.result(performance.now());
     state.results++;
     push(state.inferMs, msg.inferMs);
     const t = sentAt.get(msg.id);
@@ -74,8 +117,7 @@ worker.onmessage = (e) => {
     if (msg.hands.length) state.framesWithHands++;
     onHands(msg.hands);
   }
-};
-worker.postMessage({ type: "init", stubMs: Number(params.get("stub") || 0), delegate: params.get("delegate") || undefined });
+}
 
 // Filled in by later steps: calibration, filtering and the touch test.
 let onHands = () => {};
@@ -101,6 +143,8 @@ async function listCameras() {
 }
 
 async function startCamera() {
+  // First, before any await: Safari grants the Wake Lock only within the tap. Not awaited.
+  awake.request();
   // A phone's default camera faces the user: ask for the rear one until a camera is picked.
   const deviceId = $("camera").value || undefined;
   const which = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } };
@@ -127,6 +171,11 @@ async function startCamera() {
 
 function onVideoFrame() {
   state.camFrames++;
+  if (!warmup.isReady) {
+    // Still warming up: no frame is fed, so none waits on a landmarker that is not there.
+    video.requestVideoFrameCallback(onVideoFrame);
+    return;
+  }
   pump
     .offer(async () => ({ bitmap: await createImageBitmap(video), id: ++state.frameId }))
     .catch((err) => say(`Frame capture failed: ${err.message}`));
@@ -162,6 +211,7 @@ function drawStats() {
   state.procFps = state.results / secs;
   $("stats").textContent = [
     `backend ${state.backend ?? "loading"}${state.loadMs ? ` (loaded in ${Math.round(state.loadMs)} ms)` : ""}  video ${view.width}x${view.height}`,
+    `delegate ${warmup.delegate}${warmup.fellBack ? ` (GPU dropped: ${warmup.fellBack})` : ""}  first result ${warmup.timeToFirstResultMs === null ? "not yet" : `${Math.round(warmup.timeToFirstResultMs)} ms after the first frame`}  ${warmup.fps(performance.now()).toFixed(1)} results a second`,
     `camera ${state.camFps.toFixed(1)} fps  processed ${state.procFps.toFixed(1)} fps  dropped ${s.dropped} of ${s.offered}  max in flight ${state.maxInFlight}`,
     `worker p50 ${pct(state.inferMs, 50).toFixed(1)} ms  p95 ${pct(state.inferMs, 95).toFixed(1)} ms`,
     `frame to result p50 ${pct(state.loopMs, 50).toFixed(1)} ms  p95 ${pct(state.loopMs, 95).toFixed(1)} ms`,

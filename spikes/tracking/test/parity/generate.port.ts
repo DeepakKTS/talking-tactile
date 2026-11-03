@@ -1,7 +1,7 @@
 // @ts-nocheck
-// Writes what the shipped tracking code (apps/web/src/explore, early-start) gives for the
-// inputs in inputs.mjs, so test/parity.test.mjs on main can hold the spike to it. Run it
-// with vitest.config.mjs after any change to the port or to the inputs.
+// Writes what the shipped tracking code (apps/web/src/explore) gives for the inputs in
+// inputs.mjs, so test/parity.test.mjs can hold the spike to it. Run it with vitest.config.mjs
+// after any change to the shipped files or to the inputs, from committed shipped code.
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -10,8 +10,9 @@ import { EXPLORE } from "@port/shared/config";
 import { applyHomography, homographyFromPoints } from "@port/explore/homography";
 import { OneEuroFilter2D, oneEuroParams } from "@port/explore/oneEuro";
 import { FingertipTracker } from "@port/explore/fingertip";
+import { Warmup } from "@port/explore/warmup";
 import sheet from "@spike/sheet.json";
-import { SHIPPED_SOURCES, VIDEO, digest, landmarksPx, makeInputs } from "./inputs.mjs";
+import { SHIPPED_SOURCES, VIDEO, digest, landmarksPx, makeInputs, runWarmup } from "./inputs.mjs";
 
 it("writes the shipped code's outputs", () => {
   const inputs = makeInputs(sheet.corners_mm);
@@ -36,6 +37,7 @@ it("writes the shipped code's outputs", () => {
       return out.p ? [out.p[0], out.p[1], out.pointing] : null;
     });
   })]));
+  const warmup = Object.fromEntries(Object.entries(inputs.warmup).map(([name, events]) => [name, runWarmup(Warmup, events)]));
   const git = (cmd: string) => execSync(`git ${cmd}`, { cwd: process.cwd() }).toString().trim();
   const root = git("rev-parse --show-toplevel");
   const sources = Object.fromEntries(SHIPPED_SOURCES.map((f) => [f, createHash("sha256").update(readFileSync(`${root}/${f}`)).digest("hex")]));
@@ -53,5 +55,6 @@ it("writes the shipped code's outputs", () => {
     homography,
     euro,
     paths,
+    warmup,
   })}\n`);
 });

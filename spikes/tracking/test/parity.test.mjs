@@ -14,7 +14,8 @@ import { fileURLToPath } from "node:url";
 import { applyHomography, homographyFromPoints } from "../lib/homography.js";
 import { OneEuroFilter2D } from "../lib/oneeuro.js";
 import { FingertipMapper, TRACKING } from "../lib/fingertip.js";
-import { PATH_CASES, SHIPPED_SOURCES, VIDEO, digest, landmarksPx, makeInputs } from "./parity/inputs.mjs";
+import { Warmup } from "../lib/warmup.js";
+import { PATH_CASES, SHIPPED_SOURCES, VIDEO, digest, landmarksPx, makeInputs, runWarmup } from "./parity/inputs.mjs";
 
 const sheet = JSON.parse(readFileSync(new URL("../sheet.json", import.meta.url)));
 const port = JSON.parse(readFileSync(new URL("./parity/port_outputs.json", import.meta.url)));
@@ -25,7 +26,7 @@ const euroParams = ({ mincutoff_hz, beta, dcutoff_hz }) => ({ mincutoffHz: mincu
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BRANCHES = ["early-start", "origin/early-start"];
-const REMAKE = "cd .worktrees/early-start/apps/web && npx vitest run --config ../../../../spikes/tracking/test/parity/vitest.config.mjs";
+const REMAKE = "cd apps/web && npx vitest run --config ../../spikes/tracking/test/parity/vitest.config.mjs";
 
 // The shipped file: from this checkout once apps/web is here (after a merge), else from the
 // early-start branch.
@@ -139,5 +140,12 @@ for (const name of Object.keys(PATH_CASES)) {
     assert.equal(r.presence, 0, "a frame had a point in one and none in the other");
     assert.equal(r.pointing, 0, "frames where one called the hand pointing and the other did not");
     assert.ok(r.worst < TOL_MM, `worst ${r.worst} mm`);
+  });
+}
+
+// The delegate warm-up: lib/warmup.js against the shipped explore/warmup.ts, event by event.
+for (const name of Object.keys(inputs.warmup)) {
+  test(`delegate warm-up, ${name}: the same fallbacks and the same end state`, () => {
+    assert.deepEqual(runWarmup(Warmup, inputs.warmup[name]), port.warmup[name]);
   });
 }

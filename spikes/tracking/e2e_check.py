@@ -5,6 +5,7 @@
 """Headless browser check for the tracking spike, using the installed Google Chrome and a fake camera.
 
   uv run spikes/tracking/e2e_check.py loop          stub worker with a 100 ms delay: frames must drop, never queue
+  uv run spikes/tracking/e2e_check.py fallback      stub GPU worker that never answers: the page must be on CPU 8 s after its first frame
   uv run spikes/tracking/e2e_check.py hands VIDEO [CPU|GPU]   MediaPipe on a y4m clip: hands must be found
   uv run spikes/tracking/e2e_check.py touch VIDEO [CPU|GPU]   same, then T and 3 Space presses record 3 touches
   uv run spikes/tracking/e2e_check.py session       a whole 45 touch test through the page, scripted hands,
@@ -30,6 +31,21 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE.parent / "out"  # git-ignored
 
 
+# The order of the Wake Lock request and the camera request; headless Chrome has no screen to
+# keep on, so a stand-in grants the lock and records the call.
+ORDER_JS = """
+(() => {
+  window.__order = [];
+  Object.defineProperty(navigator, "wakeLock", { configurable: true, value: {
+    request: () => { window.__order.push("wakeLock"); return Promise.resolve({ release: () => Promise.resolve() }); },
+  } });
+  const md = navigator.mediaDevices;
+  const gum = md.getUserMedia.bind(md);
+  md.getUserMedia = (c) => { window.__order.push(c && c.video ? "camera" : "microphone"); return gum(c); };
+})();
+"""
+
+
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args: object) -> None:
         pass
@@ -47,7 +63,7 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
     args = ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"]
     if video:
         args.append(f"--use-file-for-fake-video-capture={Path(video).resolve()}")
-    query = "?stub=100" if mode == "loop" else (f"?delegate={delegate}" if delegate else "")
+    query = {"loop": "?stub=100", "fallback": "?stub=600000"}.get(mode) or (f"?delegate={delegate}" if delegate else "")
     if mode in ("hands", "touch"):
         # Whole 640x480 frame as the sheet, so the fingertip lands at a known place in mm.
         query += ("&" if query else "?") + "corners=0,0,640,0,640,480,0,480"
@@ -56,6 +72,7 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
         with sync_playwright() as p:
             browser = p.chromium.launch(channel="chrome", headless=True, args=args)
             page = browser.new_page()
+            page.add_init_script(ORDER_JS)
             page.on("console", lambda m: logs.append(f"{m.type}: {m.text}"))
             page.on("pageerror", lambda e: logs.append(f"pageerror: {e}"))
             page.goto(f"http://127.0.0.1:{port}/index.html{query}")
@@ -90,6 +107,9 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
                     loopP95: [...s.loopMs].sort((a,b)=>a-b)[Math.ceil(0.95*s.loopMs.length)-1] }; }"""
             )
             stats["status"] = page.inner_text("#status")
+            stats["order"] = page.evaluate("() => window.__order")
+            stats["delegate"] = page.evaluate("() => window.__tt.warmup.delegate")
+            stats["fellBack"] = page.evaluate("() => window.__tt.warmup.fellBack")
             stats["camFpsBeforeRestart"] = restart_fps
             shot = HERE.parent / "out" / f"tracking_e2e_{mode}.png"
             shot.parent.mkdir(parents=True, exist_ok=True)
@@ -212,9 +232,16 @@ def main() -> None:
         sys.exit(1 if failures else 0)
     video = sys.argv[2] if len(sys.argv) > 2 else None
     delegate = sys.argv[3] if len(sys.argv) > 3 else None
-    stats = run(mode, video, seconds=6 if mode == "loop" else 8, delegate=delegate)
+    stats = run(mode, video, seconds={"loop": 6, "fallback": 10}.get(mode, 8), delegate=delegate)
     print(json.dumps(stats, indent=1))
     failures = []
+    order = stats.get("order") or []
+    if not order or order[0] != "wakeLock" or "camera" not in order:
+        failures.append(f"the Wake Lock was not requested before the camera: {order}")
+    if mode == "fallback":
+        # A stub GPU that never answers: 8 s after its first frame the page is on CPU.
+        if stats["delegate"] != "CPU" or not (stats["fellBack"] or "").startswith("no result from the GPU 8 s"):
+            failures.append(f"no CPU fallback: delegate {stats['delegate']}, {stats['fellBack']}")
     if mode == "loop":
         if stats["maxInFlight"] != 1:
             failures.append("more than one frame in flight")

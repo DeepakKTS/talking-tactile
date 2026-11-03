@@ -1,12 +1,12 @@
-// Runs generate.port.ts with the shipped code. From the early-start worktree:
-//   cd .worktrees/early-start/apps/web
-//   npx vitest run --config ../../../../spikes/tracking/test/parity/vitest.config.mjs
-// It writes port_outputs.json next to this file, in main.
+// Runs generate.port.ts with the shipped code, committed. From the repo root:
+//   cd apps/web
+//   npx vitest run --config ../../spikes/tracking/test/parity/vitest.config.mjs
+// It writes port_outputs.json next to this file.
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
-const web = process.cwd(); // the shipped app: early-start's apps/web
+const web = process.cwd(); // the shipped app: apps/web
 const { parse } = createRequire(`${web}/`)("yaml");
 
 export default {

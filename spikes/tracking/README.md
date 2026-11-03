@@ -1,6 +1,6 @@
 # Tracking spike
 
-A standalone page that covers Day 2 (d2-1 to d2-4) as a prototype. The camera keeps only the newest frame. MediaPipe Hand Landmarker runs in a Web Worker (VIDEO mode, 2 hands). A homography is built from 4 corners you click. The fingertip is mapped to sheet millimeters through a 1 euro filter. A 9 point touch test reports mean and p95 error.
+A standalone page that covers Day 2 (d2-1 to d2-4) as a prototype. The camera keeps only the newest frame. MediaPipe Hand Landmarker runs in a Web Worker (VIDEO mode, 2 hands). The worker loads with the page and starts on GPU; frames go to it only once it is ready, and it moves to CPU when the GPU gives no result 8 s after its first frame, or throws (lib/warmup.js, the port of the shipped apps/web/src/explore/warmup.ts). A homography is built from 4 corners you click. The fingertip is mapped to sheet millimeters through a 1 euro filter. A 9 point touch test reports mean and p95 error.
 
 ## Run the touch test
 
@@ -19,7 +19,8 @@ Keys: R recalibrate, T start the test, Space record now, Escape stop speech. The
 
 - `cd spikes/tracking && npm test`: node tests for the frame pump, homography, 1 euro filter, pointing hand picker and touch test logic. Node only, nothing to install.
 - `test/parity.test.mjs` (part of `npm test`) holds the spike to the shipped tracking code in `apps/web/src/explore` on early-start: same inputs, same contact point every frame. main has no `apps/web`, so the shipped outputs are stored in `test/parity/port_outputs.json`. They record the early-start commit and a sha256 of each shipped file they came from (`SHIPPED_SOURCES` in `test/parity/inputs.mjs`), and the test fails, naming the file, once any of those files on early-start changes. It also fails if a listed file imports one that is not listed. To remake them, from the early-start worktree: `cd .worktrees/early-start/apps/web && npx vitest run --config ../../../../spikes/tracking/test/parity/vitest.config.mjs`.
-- `uv run spikes/tracking/e2e_check.py loop`: headless Chrome with a fake camera and a 100 ms stub worker. Frames must drop and never queue.
+- `uv run spikes/tracking/e2e_check.py loop`: headless Chrome with a fake camera and a 100 ms stub worker. Frames must drop and never queue, and the Wake Lock is requested before the camera.
+- `uv run spikes/tracking/e2e_check.py fallback`: a stub GPU worker that never answers. The page must be on CPU 8 s after its first frame (lib/warmup.js).
 - `uv run spikes/tracking/e2e_check.py hands CLIP.y4m CPU`: MediaPipe on a fake camera clip. A hand must be found and mapped onto the sheet.
 - `uv run spikes/tracking/e2e_check.py touch CLIP.y4m CPU`: the same, then T and 3 Space presses.
 - `uv run spikes/tracking/e2e_check.py session`: a whole 45 touch test through the page with scripted hands (stub worker, `?corners=`, T, dwell captures), then the downloaded JSON through `analyze_touch.py`. The contact point must land on every target, mean under 0.5 mm, with no page errors. Takes about 50 s, so it is not in the pre-commit hook; run it before a Gate B run.

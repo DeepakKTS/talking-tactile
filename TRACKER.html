@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 343,
- "updated_at": "2026-11-03T06:07:39.753Z",
+ "rev": 345,
+ "updated_at": "2026-11-03T06:16:31.606Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2639,6 +2639,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T06:07:39.753Z"
   },
   {
+   "id": "d8-47",
+   "day": 8,
+   "title": "Gate B page on the shared warm-up rules; parity holds lib/warmup.js to warmup.ts",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "spikes/tracking: lib/warmup.js (the port of apps/web/src/explore/warmup.ts) and lib/wakelock.js; worker.js initialises only the delegate it is given; main.js makes the worker at page load (GPU), feeds frames only once ready, checks the fallback every 250 ms and restarts on CPU (logs the delegate; delegate, first result, fps in the stats line and window.__tt.warmup); the Wake Lock is the first call of Start camera. Parity: apps/web/src/explore/warmup.ts added to SHIPPED_SOURCES; inputs.mjs gains 11 warm-up event sequences (5 named, 6 random) run by one driver on both sides; port_outputs.json regenerated deliberately from main at 18f3634 (not dirty): one hash added (warmup.ts 6d99a477...), the six others and all homography, 1 euro and path outputs byte-identical; the remake command now runs from apps/web on main. Tests: test/warmup.test.mjs; e2e_check.py fallback (stub GPU never answers: CPU, 'no result from the GPU 8 s after its first frame') and loop (Wake Lock before the camera); 54 node tests, session check PASS.",
+   "done_at": "2026-11-03T06:16:31.606Z",
+   "tags": [
+    "fix",
+    "gate-b"
+   ],
+   "changed_at": "2026-11-03T06:16:31.606Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3552,6 +3568,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T06:16:31.606Z",
+   "kind": "claude",
+   "text": "Task d8-47 \"Gate B page on the shared warm-up rules; parity holds lib/warmup.js to warmup.ts\" is now done. Note: spikes/tracking: lib/warmup.js (the port of apps/web/src/explore/warmup.ts) and lib/wakelock.js; worker.js initialises only the delegate it is given; main.js makes the worker at page load (GPU), feeds frames only once ready, checks the fallback every 250 ms and restarts on CPU (logs the delegate; delegate, first result, fps in the stats line and window.__tt.warmup); the Wake Lock is the first call of Start camera. Parity: apps/web/src/explore/warmup.ts added to SHIPPED_SOURCES; inputs.mjs gains 11 warm-up event sequences (5 named, 6 random) run by one driver on both sides; port_outputs.json regenerated deliberately from main at 18f3634 (not dirty): one hash added (warmup.ts 6d99a477...), the six others and all homography, 1 euro and path outputs byte-identical; the remake command now runs from apps/web on main. Tests: test/warmup.test.mjs; e2e_check.py fallback (stub GPU never answers: CPU, 'no result from the GPU 8 s after its first frame') and loop (Wake Lock before the camera); 54 node tests, session check PASS."
+  },
+  {
+   "ts": "2026-11-03T06:16:31.558Z",
+   "kind": "claude",
+   "text": "Task d8-47 \"Gate B page on the shared warm-up rules; parity holds lib/warmup.js to warmup.ts\" added to day 8."
+  },
   {
    "ts": "2026-11-03T06:07:39.753Z",
    "kind": "claude",
