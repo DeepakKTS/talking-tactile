@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 308,
- "updated_at": "2026-11-03T03:25:43.004Z",
+ "rev": 312,
+ "updated_at": "2026-11-03T03:47:35.926Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -724,14 +724,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "One figure in, structured parts list out. Use the meta-api-spike skill.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "blocked",
-   "note": "Script and notes written from the docs: spikes/spark_spike.py (understand case with heart.png and S1 schema, answer case streamed with TTFT and cache check), spikes/muse-spark.md. Dry run passes on Python 3.11 via uv. Blocked on the API key in services/api/.env.",
-   "done_at": null,
+   "status": "done",
+   "note": "Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3.",
+   "done_at": "2026-11-03T03:47:35.804Z",
    "tags": [
     "spike",
     "models"
    ],
-   "changed_at": "2026-10-24T06:34:06.910Z"
+   "changed_at": "2026-11-03T03:47:35.804Z"
   },
   {
    "id": "d1-6",
@@ -740,14 +740,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.",
    "timebox": "1.5 h",
    "fallback": "Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.",
-   "status": "doing",
-   "note": "Oct 29 SAM diagnostic (app/meta/sam_diagnostic.py, 8 live calls, $0.020, spikes/sam.md): banana control 1 instance at 0.977, heart.png whole 1 at 0.570, left ventricle, aorta and right atrium 0 in both phrasings. Request and mask decoding verified on both answers. A raster can be smaller than its bounds (668 x 1024 for 928 x 1423). Waiting for Deepak's review before 4.2. SAM p50 and p95 not measured: only 2 answers had instances.",
-   "done_at": null,
+   "status": "done",
+   "note": "Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3.",
+   "done_at": "2026-11-03T03:47:35.846Z",
    "tags": [
     "spike",
     "models"
    ],
-   "changed_at": "2026-10-29T17:51:27.244Z"
+   "changed_at": "2026-11-03T03:47:35.846Z"
   },
   {
    "id": "d1-7",
@@ -756,14 +756,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Stream 10 seconds of audio. Get partial and final text. Try keyword hints.",
    "timebox": "1 h",
    "fallback": "Use push-to-talk sync mode if realtime is awkward.",
-   "status": "blocked",
-   "note": "Script and notes written from the docs: spikes/voice_spike.py (9.3 s say question with 6 domain terms; 24 kHz with and without keywords, 16 kHz with keywords, 4 runs each; plus the file endpoint), spikes/muse-voice.md. Client checked against a local fake server: pacing 1.005x real time, close 1000. PLAN.md section 17 updated. Blocked on the API key.",
-   "done_at": null,
+   "status": "done",
+   "note": "Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3.",
+   "done_at": "2026-11-03T03:47:35.886Z",
    "tags": [
     "spike",
     "models"
    ],
-   "changed_at": "2026-10-24T06:41:58.912Z"
+   "changed_at": "2026-11-03T03:47:35.886Z"
   },
   {
    "id": "d1-8",
@@ -1936,12 +1936,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "add-figure-type skill.",
    "timebox": "2.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "",
+   "status": "cut",
+   "note": "feature freeze",
    "done_at": null,
    "tags": [
     "author"
-   ]
+   ],
+   "changed_at": "2026-11-03T03:47:35.926Z"
   },
   {
    "id": "d8-3",
@@ -3377,6 +3378,26 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T03:47:35.926Z",
+   "kind": "claude",
+   "text": "Task d8-2 \"Three more figure types\" is now cut. Note: feature freeze"
+  },
+  {
+   "ts": "2026-11-03T03:47:35.886Z",
+   "kind": "claude",
+   "text": "Task d1-7 \"Spike Muse Voice Transcribe\" is now done. Note: Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3."
+  },
+  {
+   "ts": "2026-11-03T03:47:35.846Z",
+   "kind": "claude",
+   "text": "Task d1-6 \"Spike SAM 3.1\" is now done. Note: Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3."
+  },
+  {
+   "ts": "2026-11-03T03:47:35.804Z",
+   "kind": "claude",
+   "text": "Task d1-5 \"Spike Muse Spark\" is now done. Note: Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3."
+  },
   {
    "ts": "2026-11-03T03:25:43.004Z",
    "kind": "claude",

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 308, updated 2026-11-03T03:25:43.004Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 312, updated 2026-11-03T03:47:35.926Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -42,17 +42,17 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d1-4 Repo skeleton and kit (1.5 h)
   - apps/web, services/api, Makefile, CI with lint and tests. Copy the kit and this file into the root.
   - Note: Commit 3c3c1d4 on early-start. apps/web: Vite 8.3.5, React 19.3, TypeScript 6.0.3 strict (noUncheckedIndexedAccess, exactOptionalPropertyTypes), vitest 5, eslint strictTypeChecked, 2 tests. services/api: FastAPI 0.162 on Python 3.11.14 via uv, pytest with warnings as errors, ruff incl. PLR2004 magic-value check on app/, mypy strict, 1 test. make dev/test/lint/typecheck/eval/check. Hook runs make check; probe with a failing staged pytest and a passing unstaged copy: blocked, exit 1, unstaged copy restored.
-- [ ] d1-5 Spike Muse Spark (1 h) [blocked]
+- [x] d1-5 Spike Muse Spark (1 h)
   - One figure in, structured parts list out. Use the meta-api-spike skill.
-  - Note: Script and notes written from the docs: spikes/spark_spike.py (understand case with heart.png and S1 schema, answer case streamed with TTFT and cache check), spikes/muse-spark.md. Dry run passes on Python 3.11 via uv. Blocked on the API key in services/api/.env.
-- [ ] d1-6 Spike SAM 3.1 (1.5 h) [doing]
+  - Note: Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3.
+- [x] d1-6 Spike SAM 3.1 (1.5 h)
   - Five phrases on the heart figure. Record mask format, cost and p50 and p95 latency.
   - Fallback: Weak on line art: try the local SAM 3.1 checkpoint with point prompts today.
-  - Note: Oct 29 SAM diagnostic (app/meta/sam_diagnostic.py, 8 live calls, $0.020, spikes/sam.md): banana control 1 instance at 0.977, heart.png whole 1 at 0.570, left ventricle, aorta and right atrium 0 in both phrasings. Request and mask decoding verified on both answers. A raster can be smaller than its bounds (668 x 1024 for 928 x 1423). Waiting for Deepak's review before 4.2. SAM p50 and p95 not measured: only 2 answers had instances.
-- [ ] d1-7 Spike Muse Voice Transcribe (1 h) [blocked]
+  - Note: Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3.
+- [x] d1-7 Spike Muse Voice Transcribe (1 h)
   - Stream 10 seconds of audio. Get partial and final text. Try keyword hints.
   - Fallback: Use push-to-talk sync mode if realtime is awkward.
-  - Note: Script and notes written from the docs: spikes/voice_spike.py (9.3 s say question with 6 domain terms; 24 kHz with and without keywords, 16 kHz with keywords, 4 runs each; plus the file endpoint), spikes/muse-voice.md. Client checked against a local fake server: pacing 1.005x real time, close 1000. PLAN.md section 17 updated. Blocked on the API key.
+  - Note: Done: the evidence is Gate A's pass (Spark, SAM and Voice returned real results, p50/p95 in spikes/); closed Nov 3.
 - [x] d1-8 Meta client wrapper (2 h)
   - Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.
   - Note: Live S1 and S2 in the pipeline (dc76d92 to 64a123b). S1 live = listing + locate (kind, members, parent, instances, points). S2 = Arm A v2f in app/pipeline/s2_points.py, SAM 4 at a time, spill retry, oversize rule at 50%, background points dropped, flags into regions.json v2 (touchable, flags, needs_teacher). One call cap per job. Live heart through the API, Oct 30: 25 calls (2 Spark, 19 SAM, 4 retries; 3 more retries refused by the cap), $0.096317; S1 30.6 s, S2 28.9 s, end to end 61.3 s; S5 first failed on a texture bug (72ee37b) and finished from the cache with no new call. 15 of 19 parts touchable, 4 spill, 3 thin, 0 rule violations. Replay e2e test reproduces the published regions.json exactly. Arm B and the v2 harness deleted; API suite 88.2 s to 79.0 s.
@@ -267,8 +267,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 - [ ] d8-1 Fix the top three issues (3 h)
   - From testing and the Issues tab.
-- [ ] d8-2 Three more figure types (2.5 h)
+- [ ] ~~d8-2 Three more figure types~~ (2.5 h) [cut]
   - add-figure-type skill.
+  - Note: feature freeze
 - [ ] d8-3 Run every eval suite (1.5 h)
   - run-eval skill. Fill the Metrics tab from eval/RESULTS.md.
 - [x] d8-4 Pre-commit hook never removes ignored or untracked files
