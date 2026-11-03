@@ -1,7 +1,7 @@
 # Filming the demo
 
-A runbook for recording the demo video on the Mac and the demo iPhone. Official video length:
-**TBD** (Deepak supplies it; fit the shot list to it).
+A runbook for recording the demo video on the Mac and the demo iPhone. Target: under 3
+minutes, planned at 2:50. The exact limit: **check the submission form**.
 
 Rule from the demo-readiness checklist: never record a step that only works sometimes. If a
 step fails twice, fix it or cut it.
@@ -30,10 +30,11 @@ npm run dev:phone
 
 On the Mac alone, `MOCK_META=1 make dev` runs both on http://localhost:5173.
 
-Questions in mock mode: until the live eval re-records the answers for answer prompt v2
-(the open item C), every question gets "Questions are not working right now. Labels still
-work." (checked Nov 2 against published heart version 4). After that run, mock mode answers
-the eval's recorded questions only, word for word.
+Questions in mock mode: a typed question is answered from the live eval's recordings
+(answer prompt v2, Nov 3, `fixtures/recorded/qa6_*`) when the eval asked it with no part
+under the finger; then it is answered wherever the finger is. Any other question, and any
+held (spoken) question but the recorded clips, says "Questions are not working right now.
+Labels still work."
 
 ### Live mode (Spark, SAM, Voice; costs credits)
 
@@ -109,21 +110,23 @@ card covering every shot it appears in.
 
 ## Shots
 
-Times are TBD until the official length is known. Words to say are a suggestion; keep them
-plain, with no claim the result files do not back.
+Planned at 2:50, leaving 10 s under 3 minutes. If the form's limit is shorter, cut shot 9
+first, then shot 6. Words to say are a suggestion; keep them plain, with no claim the result
+files do not back. Pipeline and question waits are real: cut them in the edit, and say on
+screen when a wait was shortened.
 
-| # | Show | Say | Needs |
-|---|---|---|---|
-| 1 | The printed textbook heart beside the raised sheet | Who it is for: a blind student, and the teacher who makes the sheet | Nothing |
-| 2 | Author on the Mac: upload heart.png, the parts Spark lists, SAM's outlines, the "Needs you" list, the aortic arch merge in one press | Spark reads the figure and plans the parts; SAM outlines each one; code decides geometry; the teacher confirms | Network in live mode; mock replays the same recorded answers |
-| 3 | Check the parts, describe the left ventricle, Publish; the print PDF with the 100 mm bar | Nothing is touchable until the teacher checks it; publish refuses a sheet that breaks a tactile rule | Mock or live |
-| 4 | The phone in its mount over the sheet; Start; a helper sets the corners | The phone camera watches the sheet; the outline is checked against the printed marks | No network (the app is served from the Mac on the LAN) |
-| 5 | A finger enters parts: an earcon on entry, the name after a rest; M for more on the left ventricle; W | Labels and earcons come from the sheet's file, with no network | No network |
-| 6 | "Where is the aorta?": guidance beeps toward it | Directions come from code, never from the language model | No network |
-| 7 | Hold to talk: "What does the left ventricle do?"; the answer from the teacher's description. Then a question the figure does not cover: the deflection to the teacher | Muse Voice Transcribe with the figure's part names as hints; Spark answers from the figure's data under a strict schema | Network, live |
-| 8 | Wi-Fi off on the phone: touch still speaks; a question says "Questions need the network. Labels still work." | It still works offline, and says what does not | No network |
-| 9 | The Commons brain sheet, a few touches | The same pipeline on a second figure | No network for touch |
-| 10 | End card: the three Meta models and what each does, both credit lines | | Nothing |
+| # | Time | Secs | Show | Say | Needs |
+|---|---|---|---|---|---|
+| 1 | 0:00 to 0:12 | 12 | The printed textbook heart beside the raised sheet | Who it is for: a blind student, and the teacher who makes the sheet | Nothing |
+| 2 | 0:12 to 0:40 | 28 | Author on the Mac: upload heart.png, the parts Spark lists, SAM's outlines, the "Needs you" list, the aortic arch merge in one press (the pipeline wait cut) | Spark reads the figure and plans the parts; SAM outlines each one; code decides geometry; the teacher confirms | Network in live mode; mock replays the same recorded answers |
+| 3 | 0:40 to 0:55 | 15 | Check the parts, describe the left ventricle, Publish; the print PDF with the 100 mm bar | Nothing is touchable until the teacher checks it; publish refuses a sheet with nothing checked or a broken tactile rule | Mock or live |
+| 4 | 0:55 to 1:07 | 12 | The phone in its mount over the sheet; Start; a helper sets the corners | The phone camera watches the sheet; the outline is checked against the printed marks | No network (the app is served from the Mac on the LAN) |
+| 5 | 1:07 to 1:30 | 23 | A finger enters parts: an earcon on entry, the name after a rest; M for more on the left ventricle; W | Labels and earcons come from the sheet's file, with no network | No network |
+| 6 | 1:30 to 1:42 | 12 | "Where is the aorta?": guidance beeps toward it | Directions come from code, never from the language model | No network |
+| 7 | 1:42 to 2:12 | 30 | Hold to talk: "What does the left ventricle do?"; the answer from the teacher's description. Then "What does the right ventricle do?": the deflection to the teacher. Each answer takes about 9 s live (p50 8.5 s): keep one wait whole, cut the other | Muse Voice Transcribe with the figure's part names as hints; Spark answers from the figure's data under a strict schema | Network, live |
+| 8 | 2:12 to 2:24 | 12 | Wi-Fi off on the phone: touch still speaks; a question says "Questions need the network. Labels still work." | It still works offline, and says what does not | No network |
+| 9 | 2:24 to 2:36 | 12 | The Commons brain sheet, a few touches | The same pipeline on a second figure | No network for touch |
+| 10 | 2:36 to 2:50 | 14 | End card: the three Meta models and what each does, both credit lines | | Nothing |
 
 ## When the network is not there
 
@@ -133,15 +136,16 @@ plain, with no claim the result files do not back.
 | Publish and print (shot 3) | Needs no Meta call; works in either mode |
 | MediaPipe hand model (shots 4 to 9) | Served by the app from the Mac (`/models/hand_landmarker.task`), so it needs the LAN, not the internet |
 | Opening a sheet (shots 4, 9) | Explore keeps the last good copy of each version on the phone; with the Mac unreachable it says "Opened the saved copy; the network is down." |
-| Questions (shot 7) | Live only for now. If dev.meta.ai is unreachable (university Wi-Fi blocks it), use the phone's hotspot for the Mac. Once item C re-records the answers, mock mode can replay the eval's own questions; any other question needs live |
+| Questions (shot 7) | If dev.meta.ai is unreachable (university Wi-Fi blocks it), use the phone's hotspot for the Mac. With no network at all, run mock mode and type both questions instead of holding: they were recorded with no part under the finger, so mock mode answers them wherever the finger is. Say on screen that the answers are replayed recordings |
 | Device check rows | Needs no Meta call |
 
 ## Numbers for the script
 
 Only these, from committed files, re-read on the day:
 
-- Question answers: `eval/qa/RESULTS.md` (to be re-run on answer prompt v2, item C).
-- Release to first spoken word: `eval/qa/VOICE.md` (p50 4.5 s, p95 5.9 s on prompt v1,
+- Question answers: `eval/qa/RESULTS.md` (live, answer prompt v2, Nov 3: heart source right
+  36 of 38, Commons brain 35 of 35).
+- Release to first spoken word: `eval/qa/VOICE.md` (p50 8.5 s, p95 9.6 s on prompt v2,
   headless Chrome on the Mac; the iPhone figure is item "device latency film").
 - Part plan on the eval figures: `eval/plan/RESULTS.md`.
 - Spend: `python3 scripts/tracker.py spend`.
