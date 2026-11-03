@@ -8,12 +8,15 @@ import shutil
 from pathlib import Path
 
 import cv2
+import httpx
 import jsonschema
 import numpy as np
 import pytest
 
 from app.braille.louis import Translator
 from app.config import load_explore, load_tactile_rules
+from app.figures import job_json
+from app.meta.live import LiveCallError, MalformedResponseError
 from app.meta.mock import MockMetaClient
 from app.meta.types import SheetContext, Understanding
 from app.models.image import RGB
@@ -338,3 +341,35 @@ def test_segmenting_keeps_to_the_sam_concurrency(tmp_path: Path) -> None:
     assert RULES.meta.text_phrase in phrases
     assert len(phrases) == len(set(phrases)) > RULES.meta.sam_concurrency
     assert client.most == RULES.meta.sam_concurrency
+
+
+class _MetaFails(MockMetaClient):
+    def __init__(self, error: Exception) -> None:
+        super().__init__(RULES.meta)
+        self.error = error
+
+    async def understand(
+        self, image: RGB, figure_id: str, prompt: Prompt, locate: Prompt, sheet: SheetContext
+    ) -> Understanding:
+        raise self.error
+
+
+@pytest.mark.parametrize(
+    ("error", "code", "retryable"),
+    [
+        (LiveCallError(401, "bad key"), "meta_key", False),
+        (LiveCallError(403, "forbidden"), "meta_key", False),
+        (LiveCallError(429, "slow down"), "meta_busy", True),
+        (LiveCallError(503, "unavailable"), "meta_unreachable", True),
+        (httpx.ConnectTimeout("timed out"), "meta_unreachable", True),
+        (MalformedResponseError("not JSON"), "meta_malformed", True),
+    ],
+)
+def test_a_meta_failure_tells_the_teacher_what_happened(
+    tmp_path: Path, error: Exception, code: str, retryable: bool
+) -> None:
+    job = submit_and_run(make_runner(tmp_path, _MetaFails(error)))
+    assert (job.status, job.stage, job.error_code) == ("failed", "s1", code)
+    reported = job_json(job)["error"]
+    assert isinstance(reported, dict) and reported["retryable"] is retryable
+    assert job.error_message is not None and job.error_message.startswith("The Meta API ")

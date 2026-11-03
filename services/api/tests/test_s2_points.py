@@ -16,7 +16,8 @@ from app.geometry import part_masks as pm
 from app.geometry import points as gp
 from app.meta.client import ObjectMask
 from app.meta.cost import CostMeter
-from app.meta.live import LiveCallCapError
+from app.meta.live import LiveCallCapError, LiveCallError
+from app.meta.record import NO_RECORDING
 from app.meta.types import GridPoint, Instance, PartPhrase, Understanding
 from app.pipeline import s2_ground, s2_points
 from app.pipeline.s0_ingest import Ingested
@@ -561,3 +562,21 @@ def test_nesting_is_tested_again_on_the_mask_a_retry_keeps() -> None:
     assert g.nested == {} and g.teacher == []
     assert g.facts["left"]["inside_of"] == {"wall": 1.0}  # the first masks, as eval data
     assert [m.label for m in g.parts] == ["left", "right", "wall"]
+
+
+def test_when_every_first_call_fails_on_meta_the_job_fails_with_that_error() -> None:
+    down = LiveCallError(503, "unavailable")
+    sam = FakeSam({("left", False): down, ("right", False): down})
+    with pytest.raises(LiveCallError):
+        ground(sam, understanding(part("left", 150), part("right", 750)))
+
+
+@pytest.mark.parametrize(
+    "error", [LiveCallCapError("cap"), LiveCallError(NO_RECORDING, "no recording")]
+)
+def test_a_cap_or_a_missing_recording_on_every_part_still_goes_to_the_teacher(
+    error: Exception,
+) -> None:
+    sam = FakeSam({("left", False): error, ("right", False): error})
+    g = ground(sam, understanding(part("left", 150), part("right", 750)))
+    assert set(teacher(g)) == {"left", "right"}

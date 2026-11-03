@@ -64,7 +64,7 @@ DRAFT_ONLY_TYPES = {
     REPAIRS_FILE: "application/json",
     SOURCE_FILE: "image/png",
 }
-_RETRYABLE_JOB_ERRORS = {"stage_failed"}
+_RETRYABLE_JOB_ERRORS = {"stage_failed", "meta_busy", "meta_unreachable", "meta_malformed"}
 _READ_ONLY = stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
 
 

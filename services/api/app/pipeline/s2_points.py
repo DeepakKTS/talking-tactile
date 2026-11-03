@@ -50,6 +50,7 @@ from app.geometry.scale import fit_to_page
 from app.meta.client import MetaClient, job_cap
 from app.meta.live import LiveCallCapError, LiveCallError
 from app.meta.mock import MockFixtureMissingError
+from app.meta.record import NO_RECORDING
 from app.meta.types import PartPhrase, Understanding
 from app.models.image import RGB
 from app.models.mask import BoolImage, Mask
@@ -78,6 +79,14 @@ SETTINGS = {
 }
 SUBJECT = "_subject"  # S2's facts on the silhouette call, beside the parts'
 _CALL_ERRORS = (LiveCallError, LiveCallCapError, httpx.HTTPError, MockFixtureMissingError)
+
+
+def meta_down(exc: Exception) -> bool:
+    """The Meta API itself failed: no answer, or an HTTP error. Not the run's call cap, and
+    not a replay's missing recording (NO_RECORDING)."""
+    if isinstance(exc, LiveCallError):
+        return exc.status != NO_RECORDING
+    return isinstance(exc, httpx.HTTPError)
 
 
 def grid_to_px(v: float, size: int) -> int:
@@ -115,6 +124,7 @@ class _Run:
         self.facts: dict[str, dict[str, Any]] = {p: {} for p in self.parts}
         self.teacher: dict[str, TeacherPart] = {}
         self.sent: dict[str, list[list[Point]]] = {}  # per part, per instance
+        self.first_errors: list[Exception] = []  # the first calls' errors, in order
 
     def need_teacher(
         self, part: str, reason: str, detail: str, suggestion: BoolImage | None = None
@@ -175,9 +185,9 @@ class _Run:
 
     async def call(
         self, part: str, negatives: Sequence[Point], retry: bool
-    ) -> tuple[BoolImage, list[float | None]] | str:
+    ) -> tuple[BoolImage, list[float | None]] | Exception:
         """One SAM call for a part: the union of each instance's pieces that hold its
-        points, with the confidences; or the error, as text."""
+        points, with the confidences; or the call's error."""
         insts = self.sent[part]
         async with self.gate:
             try:
@@ -190,7 +200,7 @@ class _Run:
                     retry,
                 )
             except _CALL_ERRORS as exc:
-                return f"{type(exc).__name__}: {exc}"
+                return exc
         by_id = {a.object_id: a for a in answer}
         mask = np.zeros(self.ing.image.shape[:2], bool)
         confs: list[float | None] = []
@@ -203,8 +213,9 @@ class _Run:
 
     async def first(self, part: str) -> tuple[str, BoolImage | None]:
         got = await self.call(part, [], False)
-        if isinstance(got, str):
-            self.need_teacher(part, "no_mask", f"SAM call failed: {got}")
+        if isinstance(got, Exception):
+            self.first_errors.append(got)
+            self.need_teacher(part, "no_mask", f"SAM call failed: {type(got).__name__}: {got}")
             return part, None
         mask, confs = got
         self.facts[part]["confidence"] = confs
@@ -230,8 +241,9 @@ class _Run:
         if not add:
             return part, mask, f"holds points of {names}; no retry: the points are next to its own"
         got = await self.call(part, add, True)
-        if isinstance(got, str):
-            return part, mask, f"holds points of {names}; the retry call failed: {got}"
+        if isinstance(got, Exception):
+            failed = f"{type(got).__name__}: {got}"
+            return part, mask, f"holds points of {names}; the retry call failed: {failed}"
         again = got[0]
         still = pm.points_inside(part, again, pts, parents, self.ignore(part, again))
         if again.any() and not still:
@@ -358,6 +370,14 @@ class _Run:
         outline = asyncio.ensure_future(self.silhouette())  # first in line at the gate
         firsts = await asyncio.gather(*(self.first(part) for part in self.sent))
         shape = await outline
+        if (
+            self.sent
+            and len(self.first_errors) == len(self.sent)
+            and all(meta_down(e) for e in self.first_errors)
+        ):
+            # Every part's call failed on the Meta API itself (a bad key, Meta down): the job
+            # fails and says why, rather than finishing with every part sent to the teacher.
+            raise self.first_errors[0]
         kept = self.relate({part: m for part, m in firsts if m is not None})
         retried = await asyncio.gather(*(self.retry(part, m) for part, m in kept.items()))
         touch = self.split_spill(list(retried))

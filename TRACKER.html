@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 276,
- "updated_at": "2026-11-03T01:35:12.629Z",
+ "rev": 278,
+ "updated_at": "2026-11-03T01:42:12.553Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2212,6 +2212,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:35:12.629Z"
   },
   {
+   "id": "d8-20",
+   "day": 8,
+   "title": "Edge case S1: a Meta failure in a job tells the teacher what happened",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/pipeline/runner.py meta_failure: a job stopped by the Meta API gets a code and a sentence for the teacher instead of stage_failed and the raw httpx text: 401/403 meta_key 'The Meta API refused the key. Check MODEL_API_KEY in services/api/.env.' (not retryable); 429 meta_busy (retryable); no answer, timeout or 5xx meta_unreachable 'The Meta API could not be reached. Try again later.'; a malformed answer meta_malformed. A replay's 599 no-recording keeps its old handling. app/pipeline/s2_points.py: when every part's first SAM call fails on Meta itself (not the call cap, not a missing recording), S2 raises that error, so the job fails with the reason instead of finishing done with every part sent to the teacher. Covers EDGE_CASES S1, S2, S3. No automatic retry in the freeze. Tests: test_runner.py::test_a_meta_failure_tells_the_teacher_what_happened (6), test_s2_points.py::test_when_every_first_call_fails_on_meta_the_job_fails_with_that_error, ::test_a_cap_or_a_missing_recording_on_every_part_still_goes_to_the_teacher (2).",
+   "done_at": "2026-11-03T01:42:12.553Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:42:12.553Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3124,6 +3140,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:42:12.553Z",
+   "kind": "claude",
+   "text": "Task d8-20 \"Edge case S1: a Meta failure in a job tells the teacher what happened\" is now done. Note: app/pipeline/runner.py meta_failure: a job stopped by the Meta API gets a code and a sentence for the teacher instead of stage_failed and the raw httpx text: 401/403 meta_key 'The Meta API refused the key. Check MODEL_API_KEY in services/api/.env.' (not retryable); 429 meta_busy (retryable); no answer, timeout or 5xx meta_unreachable 'The Meta API could not be reached. Try again later.'; a malformed answer meta_malformed. A replay's 599 no-recording keeps its old handling. app/pipeline/s2_points.py: when every part's first SAM call fails on Meta itself (not the call cap, not a missing recording), S2 raises that error, so the job fails with the reason instead of finishing done with every part sent to the teacher. Covers EDGE_CASES S1, S2, S3. No automatic retry in the freeze. Tests: test_runner.py::test_a_meta_failure_tells_the_teacher_what_happened (6), test_s2_points.py::test_when_every_first_call_fails_on_meta_the_job_fails_with_that_error, ::test_a_cap_or_a_missing_recording_on_every_part_still_goes_to_the_teacher (2)."
+  },
+  {
+   "ts": "2026-11-03T01:42:12.504Z",
+   "kind": "claude",
+   "text": "Task d8-20 \"Edge case S1: a Meta failure in a job tells the teacher what happened\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:35:12.629Z",
    "kind": "claude",

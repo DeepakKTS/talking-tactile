@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 276, updated 2026-11-03T01:35:12.629Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 278, updated 2026-11-03T01:42:12.553Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -303,6 +303,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: apps/web/src/explore/loader.ts: a regions.json whose schema_version is not the schema's const (3, read from docs/regions.schema.json) is refused with 'This sheet was made for another version of Explore. Ask your teacher to publish it again.'; any other contract break or bad JSON with 'The sheet is damaged. Ask your teacher to publish it again.' instead of the raw validator text. Neither is saved. Tests: loader.test.ts 'says a sheet from another schema version needs publishing again' (2 and 4), 'refuses a file that breaks the contract, in plain words'.
 - [x] d8-19 Edge case X1: a sheet that cannot load is an alert a screen reader says
   - Note: apps/web/src/explore/ExplorePage.tsx: a failed load (bad id, not published, network down with no saved copy, another schema version, damaged) is shown in a role=alert paragraph in place of the plain status line, so a screen reader announces it; before, nothing was heard, since Start stays disabled and the app voice needs Start. The status line itself stays plain: it also mirrors every spoken sentence, and a live status would double them. Test: explore_e2e.py failed_loads_are_told checks the alert (no saved copy: alert true). With VoiceOver: needs device.
+- [x] d8-20 Edge case S1: a Meta failure in a job tells the teacher what happened
+  - Note: app/pipeline/runner.py meta_failure: a job stopped by the Meta API gets a code and a sentence for the teacher instead of stage_failed and the raw httpx text: 401/403 meta_key 'The Meta API refused the key. Check MODEL_API_KEY in services/api/.env.' (not retryable); 429 meta_busy (retryable); no answer, timeout or 5xx meta_unreachable 'The Meta API could not be reached. Try again later.'; a malformed answer meta_malformed. A replay's 599 no-recording keeps its old handling. app/pipeline/s2_points.py: when every part's first SAM call fails on Meta itself (not the call cap, not a missing recording), S2 raises that error, so the job fails with the reason instead of finishing done with every part sent to the teacher. Covers EDGE_CASES S1, S2, S3. No automatic retry in the freeze. Tests: test_runner.py::test_a_meta_failure_tells_the_teacher_what_happened (6), test_s2_points.py::test_when_every_first_call_fails_on_meta_the_job_fails_with_that_error, ::test_a_cap_or_a_missing_recording_on_every_part_still_goes_to_the_teacher (2).
 
 ## Day 9: Tue Nov 3. Gate D
 

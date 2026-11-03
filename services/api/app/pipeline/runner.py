@@ -21,6 +21,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any, get_args
 
+import httpx
 import numpy as np
 
 from app.braille.louis import BrailleUnavailableError, Translator
@@ -32,9 +33,10 @@ from app.geometry.reconcile import Reconciled, ReconciledPart
 from app.geometry.scale import PageFit, fit_to_page
 from app.meta.client import MetaClient, make_client
 from app.meta.cost import BudgetExceededError
-from app.meta.live import Ledger
+from app.meta.live import Ledger, LiveCallError, MalformedResponseError
 from app.meta.live_client import SPARK_EFFORT
 from app.meta.mock import MockFixtureMissingError
+from app.meta.record import NO_RECORDING
 from app.meta.types import Understanding
 from app.models.mask import BoolImage, Mask
 from app.models.regions import GradeBand, PageSize
@@ -104,6 +106,26 @@ _ERROR_CODES: dict[type[Exception], str] = {
     BrailleUnavailableError: "braille_unavailable",
     EditError: "edit_conflict",
 }
+
+
+_UNAUTHORIZED, _FORBIDDEN, _TOO_MANY, _SERVER_ERRORS = 401, 403, 429, 500
+
+
+def meta_failure(exc: Exception) -> tuple[str, str] | None:
+    """A Meta API failure as an error code and a sentence for the teacher, or None for
+    anything else. A replay's missing recording (NO_RECORDING) is not one."""
+    status = exc.status if isinstance(exc, LiveCallError) else None
+    if status in (_UNAUTHORIZED, _FORBIDDEN):
+        return "meta_key", "The Meta API refused the key. Check MODEL_API_KEY in services/api/.env."
+    if status == _TOO_MANY:
+        return "meta_busy", "The Meta API is limiting requests. Try again in a minute."
+    if isinstance(exc, httpx.HTTPError) or (
+        status is not None and _SERVER_ERRORS <= status < NO_RECORDING
+    ):
+        return "meta_unreachable", "The Meta API could not be reached. Try again later."
+    if isinstance(exc, MalformedResponseError):
+        return "meta_malformed", "The Meta API sent an answer that could not be read. Try again."
+    return None
 
 
 class NotReadyError(Exception):
@@ -277,13 +299,17 @@ class Runner:
                         return self.jobs.must_get(job.id)
             self.jobs.finish(job.id, "done", result_key=walk.keys["s5"])
         except Exception as exc:
-            code = next((c for t, c in _ERROR_CODES.items() if isinstance(exc, t)), "stage_failed")
+            meta = meta_failure(exc)
+            code = meta[0] if meta else None
+            code = code or next((c for t, c in _ERROR_CODES.items() if isinstance(exc, t)), None)
+            code = code or "stage_failed"
             where = {"job_id": job.id, "stage": stage}
             if code == "stage_failed":
                 log.exception("job %s failed at %s", job.id, stage, extra=where)
             else:
                 log.warning("job %s failed at %s: %s", job.id, stage, exc, extra=where)
-            self.jobs.fail(job.id, stage, code, str(exc) or type(exc).__name__)
+            message = meta[1] if meta else str(exc) or type(exc).__name__
+            self.jobs.fail(job.id, stage, code, message)
         return self.jobs.must_get(job.id)
 
     async def _start(self, job: JobRecord) -> _Walk:
