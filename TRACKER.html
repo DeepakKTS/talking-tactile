@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 431,
- "updated_at": "2026-11-03T21:13:26.536Z",
+ "rev": 442,
+ "updated_at": "2026-11-03T22:16:58.335Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1976,13 +1976,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "run-eval skill. Fill the Metrics tab from eval/RESULTS.md.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "DO NOW (Phase A, A5): the replay scorers app.meta.plan_eval and app.meta.qa_eval, no calls. Note: eval/run.py (make eval) is a stub that writes every suite as not run; queued for Phase B.",
-   "done_at": null,
+   "status": "done",
+   "note": "DONE (replay, no calls), after every Phase A commit: app.meta.plan_eval on a fresh cache left eval/plan unchanged; app.meta.qa_eval replay gave scores identical to eval/qa/scores.json apart from timings. Needs the published version 4 sheets in data/ (a fresh clone fails, queued for Phase B). eval/run.py (make eval) is still a stub, queued for Phase B.",
+   "done_at": "2026-11-03T22:16:43.642Z",
    "tags": [
     "eval"
    ],
-   "changed_at": "2026-11-03T20:26:39.174Z"
+   "changed_at": "2026-11-03T22:16:43.642Z"
   },
   {
    "id": "d8-4",
@@ -2765,12 +2765,12 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "1.5 h",
    "fallback": "",
    "status": "doing",
-   "note": "DO NOW (Phase A, A2): README rewrite; the phone numbers land in Phase B (make results).",
+   "note": "README rewritten (6033c4b), every number cited, phone numbers 'not measured' in tt: spans. Left: make results in Phase B (B2), then the video link (B3).",
    "done_at": null,
    "tags": [
     "docs"
    ],
-   "changed_at": "2026-11-03T20:26:39.362Z"
+   "changed_at": "2026-11-03T22:16:43.726Z"
   },
   {
    "id": "d9-5",
@@ -3089,19 +3089,81 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T12:18:50.381Z"
   },
   {
+   "id": "d9-25",
+   "day": 9,
+   "title": "Independent reviews: judge and QA, with triage",
+   "detail": "docs/review/JUDGE.md, QA.md, TRIAGE.md (42380a1); docs fixes in f379381 and 96c5b48",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Two subagents, fresh context, fresh clones of c3503ab, mock only. Judge: creativity 8, ambition 9, works 6, Meta models 8. QA: 39 findings (1 high, 10 medium, 28 low); the high one is an unreachable blob holding an earlier key, not the current one (checked in code). Reports saved with redactions (42380a1); every finding decided in docs/review/TRIAGE.md; docs fixes f379381, 96c5b48.",
+   "done_at": "2026-11-03T22:16:53.047Z",
+   "tags": [
+    "docs",
+    "review"
+   ],
+   "changed_at": "2026-11-03T22:16:53.047Z"
+  },
+  {
+   "id": "d9-26",
+   "day": 9,
+   "title": "Open-source readiness: CONTRIBUTING, reporting, gitignore, branches",
+   "detail": "96c5b48; early-start deleted local and remote (0 commits outside main)",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "96c5b48: CONTRIBUTING.md, SECURITY.md reporting (GitHub private vulnerability reporting, still to be switched on by Deepak) and threat model, .gitignore .env.* *.pem *.key *.p12. early-start deleted local and remote after checking 0 commits outside main. No TODO or FIXME in tracked files. Release check on the tree: no Mac name, no /Users/ path, no personal email; the private file name stays in plan_eval.py (Phase B). CI badge in README.",
+   "done_at": "2026-11-03T22:16:53.090Z",
+   "tags": [
+    "docs"
+   ],
+   "changed_at": "2026-11-03T22:16:53.090Z"
+  },
+  {
+   "id": "d9-27",
+   "day": 9,
+   "title": "Submission form text",
+   "detail": "docs/submission/FORM.md (81f1147); Deepak confirms track, problem statement, repo public, video link",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "docs/submission/FORM.md (81f1147). Deepak confirms: Indie, Push the Frontier, repo public, the video link.",
+   "done_at": "2026-11-03T22:16:53.132Z",
+   "tags": [
+    "submit"
+   ],
+   "changed_at": "2026-11-03T22:16:53.132Z"
+  },
+  {
+   "id": "d9-28",
+   "day": 9,
+   "title": "Phase B: code fixes queued from the review",
+   "detail": "docs/review/TRIAGE.md, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13 non-UTF-8 500; F17 clip length; F24 trusted hosts; F16 question maxLength; F14 control characters; F12 aspect ratio; F23 Gate B listing; F33 .env* in the secret check; qa_eval seed of version 4 sheets plus the mock-question seed; eval/run.py; FORM.md in results.py DOCS; private file name in plan_eval.py; spikes/tracking/README stale line",
+   "timebox": "after filming",
+   "fallback": "",
+   "status": "todo",
+   "note": "",
+   "done_at": null,
+   "tags": [
+    "fix",
+    "security"
+   ],
+   "changed_at": "2026-11-03T22:16:43.893Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
    "detail": "Clone, make dev, run the demo script once.",
    "timebox": "45 min",
    "fallback": "",
-   "status": "todo",
-   "note": "DO NOW (Phase A, A5): clean-clone quickstart again at HEAD; last pass d9-22 at 0fe7379.",
-   "done_at": null,
+   "status": "done",
+   "note": "DONE at 81f1147 (Nov 3): gh repo clone, make install (14 s, warm caches), mock API and Vite on own ports, the README quickstart in headless Chrome: Ready for review in 22.9 s, publish, print PDF 200 (93,205 bytes), Explore version 1, Enter and H; a typed question says 'Questions are not working right now', as README now states. WebKit 26.6 with the real headers: device check, Explore Start, Gate B page: no CSP violation or page error, MediaPipe GPU ready (115, 90, 624 ms). One 404 in Chrome's console, likely /favicon.ico (the app has none), not confirmed.",
+   "done_at": "2026-11-03T22:16:43.685Z",
    "tags": [
     "demo"
    ],
-   "changed_at": "2026-11-03T20:26:39.462Z"
+   "changed_at": "2026-11-03T22:16:43.685Z"
   },
   {
    "id": "d10-2",
@@ -3916,6 +3978,15 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [
   {
+   "id": "i-mw18zsv34px3",
+   "ts": "2026-11-03T22:16:58.335Z",
+   "title": "An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.",
+   "severity": "medium",
+   "status": "open",
+   "note": "",
+   "changed_at": "2026-11-03T22:16:58.335Z"
+  },
+  {
    "id": "i-mvtub2znb0gu",
    "ts": "2026-10-29T17:51:27.203Z",
    "title": "ASR heard \"aorta\" as \"order\" on a synthetic clip with no hints",
@@ -3944,6 +4015,61 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T22:16:58.335Z",
+   "kind": "claude",
+   "text": "Issue opened: An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.."
+  },
+  {
+   "ts": "2026-11-03T22:16:53.132Z",
+   "kind": "claude",
+   "text": "Task d9-27 \"Submission form text\" is now done. Note: docs/submission/FORM.md (81f1147). Deepak confirms: Indie, Push the Frontier, repo public, the video link."
+  },
+  {
+   "ts": "2026-11-03T22:16:53.090Z",
+   "kind": "claude",
+   "text": "Task d9-26 \"Open-source readiness: CONTRIBUTING, reporting, gitignore, branches\" is now done. Note: 96c5b48: CONTRIBUTING.md, SECURITY.md reporting (GitHub private vulnerability reporting, still to be switched on by Deepak) and threat model, .gitignore .env.* *.pem *.key *.p12. early-start deleted local and remote after checking 0 commits outside main. No TODO or FIXME in tracked files. Release check on the tree: no Mac name, no /Users/ path, no personal email; the private file name stays in plan_eval.py (Phase B). CI badge in README."
+  },
+  {
+   "ts": "2026-11-03T22:16:53.047Z",
+   "kind": "claude",
+   "text": "Task d9-25 \"Independent reviews: judge and QA, with triage\" is now done. Note: Two subagents, fresh context, fresh clones of c3503ab, mock only. Judge: creativity 8, ambition 9, works 6, Meta models 8. QA: 39 findings (1 high, 10 medium, 28 low); the high one is an unreachable blob holding an earlier key, not the current one (checked in code). Reports saved with redactions (42380a1); every finding decided in docs/review/TRIAGE.md; docs fixes f379381, 96c5b48."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.893Z",
+   "kind": "claude",
+   "text": "Task d9-28 \"Phase B: code fixes queued from the review\" added to day 9."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.852Z",
+   "kind": "claude",
+   "text": "Task d9-27 \"Submission form text\" added to day 9."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.809Z",
+   "kind": "claude",
+   "text": "Task d9-26 \"Open-source readiness: CONTRIBUTING, reporting, gitignore, branches\" added to day 9."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.768Z",
+   "kind": "claude",
+   "text": "Task d9-25 \"Independent reviews: judge and QA, with triage\" added to day 9."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.726Z",
+   "kind": "claude",
+   "text": "Task d9-4 \"README with measured numbers\" note updated, still doing. Note: README rewritten (6033c4b), every number cited, phone numbers 'not measured' in tt: spans. Left: make results in Phase B (B2), then the video link (B3)."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.685Z",
+   "kind": "claude",
+   "text": "Task d10-1 \"Fresh clone test\" is now done. Note: DONE at 81f1147 (Nov 3): gh repo clone, make install (14 s, warm caches), mock API and Vite on own ports, the README quickstart in headless Chrome: Ready for review in 22.9 s, publish, print PDF 200 (93,205 bytes), Explore version 1, Enter and H; a typed question says 'Questions are not working right now', as README now states. WebKit 26.6 with the real headers: device check, Explore Start, Gate B page: no CSP violation or page error, MediaPipe GPU ready (115, 90, 624 ms). One 404 in Chrome's console, likely /favicon.ico (the app has none), not confirmed."
+  },
+  {
+   "ts": "2026-11-03T22:16:43.642Z",
+   "kind": "claude",
+   "text": "Task d8-3 \"Run every eval suite\" is now done. Note: DONE (replay, no calls), after every Phase A commit: app.meta.plan_eval on a fresh cache left eval/plan unchanged; app.meta.qa_eval replay gave scores identical to eval/qa/scores.json apart from timings. Needs the published version 4 sheets in data/ (a fresh clone fails, queued for Phase B). eval/run.py (make eval) is still a stub, queued for Phase B."
+  },
   {
    "ts": "2026-11-03T21:13:26.536Z",
    "kind": "claude",

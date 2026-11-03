@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 431, updated 2026-11-03T21:13:26.536Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 442, updated 2026-11-03T22:16:58.335Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -295,9 +295,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] ~~d8-2 Three more figure types~~ (2.5 h) [cut]
   - add-figure-type skill.
   - Note: feature freeze
-- [ ] d8-3 Run every eval suite (1.5 h)
+- [x] d8-3 Run every eval suite (1.5 h)
   - run-eval skill. Fill the Metrics tab from eval/RESULTS.md.
-  - Note: DO NOW (Phase A, A5): the replay scorers app.meta.plan_eval and app.meta.qa_eval, no calls. Note: eval/run.py (make eval) is a stub that writes every suite as not run; queued for Phase B.
+  - Note: DONE (replay, no calls), after every Phase A commit: app.meta.plan_eval on a fresh cache left eval/plan unchanged; app.meta.qa_eval replay gave scores identical to eval/qa/scores.json apart from timings. Needs the published version 4 sheets in data/ (a fresh clone fails, queued for Phase B). eval/run.py (make eval) is still a stub, queued for Phase B.
 - [x] d8-4 Pre-commit hook never removes ignored or untracked files
   - Note: scripts/hooks/pre-commit no longer stashes, resets or cleans (the old git reset --hard deleted services/api/.env on Oct 30; it also removed ignored __pycache__ dirs). Tracked files whose working copy differs from the index are moved into .git/pre-commit-aside.*, replaced by the staged version with git checkout-index, and moved back on exit, pass or fail; nothing else is changed. Untracked files stay in place during the tests. New guard: if the tests change the index (git write-tree before and after), the commit is refused. scripts/test_pre_commit.py runs the real hook in a throwaway repo with an ignored services/api/.env and apps/web/.certs/, an untracked file, an unstaged edit and an unstaged deletion: a failing commit (fails only on the staged content, proving the swap) and a passing commit leave all of them as they were; a test that stages a path blocks the commit. 3 tests pass.
 - [x] d8-5 No path-limited commits; rule in CLAUDE.md
@@ -405,7 +405,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: NEEDS DEEPAK: filming, docs/DEMO.md and docs/submission/VIDEO_SCRIPT.md; captions in docs/submission/captions.srt.
 - [ ] d9-4 README with measured numbers (1.5 h) [doing]
   - Setup, models and why, numbers from RESULTS.md, honest tester status.
-  - Note: DO NOW (Phase A, A2): README rewrite; the phone numbers land in Phase B (make results).
+  - Note: README rewritten (6033c4b), every number cited, phone numbers 'not measured' in tt: spans. Left: make results in Phase B (B2), then the video link (B3).
 - [ ] d9-5 Credit the CC BY-SA heart figure in the README and demo video (15 min)
   - Use the credit line in ATTRIBUTION.md: Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. State that the tactile sheet and its files are adaptations shared under CC BY-SA 3.0.
   - Fallback: A credits slide at the end of the video and a Credits section in the README.
@@ -448,19 +448,31 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: docs/submission/captions.srt: 26 cues from VIDEO_SCRIPT.md's narration inside each shot's time less 0.3 s at each end, at most two lines of 42 characters (scripts/captions.py rebuilds it; 3 tests, one checks the committed file matches the script). docs/submission/architecture.svg: 1920 x 1080, upload, S0 to S5 with the model at each (Spark S1, SAM S2, code S0 S3 S4 S5), teacher review and publish, the printed sheet and regions.json, the phone's touch path (camera, MediaPipe in a Web Worker, homography and 1 euro filter, region engine, tone and name) and question path (hold to talk, Voice Transcribe, commands on the phone, Spark, spoken answer), 7 safety rules marked; text 19 px or more; rendered in Chrome and checked. docs/submission/screenshots/: the review with flags, Fix outline of the aorta (two recorded clicks, SAM answered), the publish screen, the device check at phone size; from a clean clone in mock mode. README Screens section with the heart's credit line; ATTRIBUTION lists the screenshots (CC BY-SA 3.0) and the own-work files.
 - [x] d9-24 Release check before going public (read-only)
   - Note: Read-only, Nov 3. Never committed: fixtures/private/ (0 commits), fixtures/recorded/private_* (0), the private image's blob (0). Tracked tree: the private file name in services/api/app/meta/plan_eval.py (kept by d8-40) and apps/web/scripts/devserver.test.ts (Nov 3 security test, a path only); its id prefix in 36 lines of eval/live/ledger.jsonl (not edited, by decision); no /Users/ path, no user name, no email. History (no rewrite, by decision): the figure's old name in 8 commits, its file name in 4, its full id in 4, per-part plan rows in eval/plan before 7c59107; the Mac user name in 23 diff lines of commits since corrected; emails only the commit author, the Co-Authored-By noreply and a test's t@example.com. Docs name the Mac's Bonjour host (DEMO.md 4, eval/gate-b/README 1, tracker). LICENSE full Apache-2.0 text, GitHub detects apache-2.0; NOTICE and ATTRIBUTION cover every committed figure, audio clip, model file and library, the screenshots and the diagram. Left before public: decide on the host name in docs and the private file name in two files; repo description empty; optional license fields in package.json and pyproject.toml; early-start has no commits outside main.
+- [x] d9-25 Independent reviews: judge and QA, with triage
+  - docs/review/JUDGE.md, QA.md, TRIAGE.md (42380a1); docs fixes in f379381 and 96c5b48
+  - Note: Two subagents, fresh context, fresh clones of c3503ab, mock only. Judge: creativity 8, ambition 9, works 6, Meta models 8. QA: 39 findings (1 high, 10 medium, 28 low); the high one is an unreachable blob holding an earlier key, not the current one (checked in code). Reports saved with redactions (42380a1); every finding decided in docs/review/TRIAGE.md; docs fixes f379381, 96c5b48.
+- [x] d9-26 Open-source readiness: CONTRIBUTING, reporting, gitignore, branches
+  - 96c5b48; early-start deleted local and remote (0 commits outside main)
+  - Note: 96c5b48: CONTRIBUTING.md, SECURITY.md reporting (GitHub private vulnerability reporting, still to be switched on by Deepak) and threat model, .gitignore .env.* *.pem *.key *.p12. early-start deleted local and remote after checking 0 commits outside main. No TODO or FIXME in tracked files. Release check on the tree: no Mac name, no /Users/ path, no personal email; the private file name stays in plan_eval.py (Phase B). CI badge in README.
+- [x] d9-27 Submission form text
+  - docs/submission/FORM.md (81f1147); Deepak confirms track, problem statement, repo public, video link
+  - Note: docs/submission/FORM.md (81f1147). Deepak confirms: Indie, Push the Frontier, repo public, the video link.
+- [ ] d9-28 Phase B: code fixes queued from the review (after filming)
+  - docs/review/TRIAGE.md, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13 non-UTF-8 500; F17 clip length; F24 trusted hosts; F16 question maxLength; F14 control characters; F12 aspect ratio; F23 Gate B listing; F33 .env* in the secret check; qa_eval seed of version 4 sheets plus the mock-question seed; eval/run.py; FORM.md in results.py DOCS; private file name in plan_eval.py; spikes/tracking/README stale line
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.
 
 ## Day 10: Wed Nov 4
 
-- [ ] d10-1 Fresh clone test (45 min)
+- [x] d10-1 Fresh clone test (45 min)
   - Clone, make dev, run the demo script once.
-  - Note: DO NOW (Phase A, A5): clean-clone quickstart again at HEAD; last pass d9-22 at 0fe7379.
+  - Note: DONE at 81f1147 (Nov 3): gh repo clone, make install (14 s, warm caches), mock API and Vite on own ports, the README quickstart in headless Chrome: Ready for review in 22.9 s, publish, print PDF 200 (93,205 bytes), Explore version 1, Enter and H; a typed question says 'Questions are not working right now', as README now states. WebKit 26.6 with the real headers: device check, Explore Start, Gate B page: no CSP violation or page error, MediaPipe GPU ready (115, 90, 624 ms). One 404 in Chrome's console, likely /favicon.ico (the app has none), not confirmed.
 - [ ] d10-2 Submit by 3 PM ET (30 min)
   - The official deadline is 9 PM ET. Do not use it.
   - Note: NEEDS DEEPAK: the submission form, text in docs/submission/FORM.md; target 3 PM ET Nov 4.
 
 ## Open issues
 
+- (medium) An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.
 - (medium) ASR heard "aorta" as "order" on a synthetic clip with no hints: Mitigated: the figure's labels go as keyword hints (d9-8). On three synthetic clips every word was right with and without hints (eval/qa/VOICE.md). Accuracy on a real voice is not measured.
