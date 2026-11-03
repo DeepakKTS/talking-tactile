@@ -7,7 +7,8 @@
   uv run apps/web/e2e/ask_e2e.py
 
 Mock mode answers the heart from its live recordings (fixtures/recorded/replays.json), the
-questions included (qa2_ask_* and qa_ask_transcribe_*, the question eval of Oct 30), so no request reaches the network.
+questions included (qa6_ask_*, the question eval of Nov 3 on answer prompt v2, and the transcribe
+clips qa_ask_transcribe_* of Oct 30), so no request reaches the network.
 
 1. /author: upload heart.png; press the aortic arch merge; Mark all parts checked; describe
    the left ventricle and the right atrium as the eval did. Publish. The published

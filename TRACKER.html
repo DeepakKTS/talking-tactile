@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 313,
- "updated_at": "2026-11-03T04:21:45.624Z",
+ "rev": 316,
+ "updated_at": "2026-11-03T04:27:18.321Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2466,6 +2466,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T03:25:43.004Z"
   },
   {
+   "id": "d8-36",
+   "day": 8,
+   "title": "ask_e2e on the v2 recordings",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/e2e/ask_e2e.py now names qa6_ask_* (Nov 3, answer prompt v2). Its two typed questions, asked with no part under the finger as h15 and h19 were, recorded the same sentences as on v1 ('The left ventricle pumps blood out to the whole body through the aortic arch.'; 'This figure does not show that. Ask your teacher.'), so the expectations stand; PASS on the mock API. lat-answer set to 8496 ms (p50 release to first word, live, headless Chrome).",
+   "done_at": "2026-11-03T04:27:18.321Z",
+   "tags": [
+    "test"
+   ],
+   "changed_at": "2026-11-03T04:27:18.321Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -2676,9 +2691,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "target": 2.0,
    "unit": "s",
    "report_only": false,
-   "value": null,
-   "measured_at": null,
-   "source": ""
+   "value": 8496,
+   "measured_at": "2026-11-03T04:27:18.239Z",
+   "source": "live",
+   "changed_at": "2026-11-03T04:27:18.239Z"
   },
   {
    "id": "auth-time",
@@ -3378,6 +3394,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T04:27:18.321Z",
+   "kind": "claude",
+   "text": "Task d8-36 \"ask_e2e on the v2 recordings\" is now done. Note: apps/web/e2e/ask_e2e.py now names qa6_ask_* (Nov 3, answer prompt v2). Its two typed questions, asked with no part under the finger as h15 and h19 were, recorded the same sentences as on v1 ('The left ventricle pumps blood out to the whole body through the aortic arch.'; 'This figure does not show that. Ask your teacher.'), so the expectations stand; PASS on the mock API. lat-answer set to 8496 ms (p50 release to first word, live, headless Chrome)."
+  },
+  {
+   "ts": "2026-11-03T04:27:18.279Z",
+   "kind": "claude",
+   "text": "Task d8-36 \"ask_e2e on the v2 recordings\" added to day 8."
+  },
+  {
+   "ts": "2026-11-03T04:27:18.239Z",
+   "kind": "claude",
+   "text": "Metric \"Release Space to first word, p50\" set to 8496 s (live)."
+  },
   {
    "ts": "2026-11-03T04:21:45.624Z",
    "kind": "claude",
