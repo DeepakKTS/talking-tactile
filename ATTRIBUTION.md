@@ -118,6 +118,19 @@ The same terms apply as for the clip above.
 
 The license text in both places is the Apache License 2.0 from https://www.apache.org/licenses/LICENSE-2.0.txt (sha256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30).
 
+## meta-sam-parser 0.1.0 (PyPI)
+
+| | |
+|---|---|
+| Author | Meta Platforms, Inc. |
+| Source | https://github.com/meta-models/meta-sam, installed from `services/api/pyproject.toml` (hash-pinned in `services/api/uv.lock`) |
+| License | SAM License, last updated November 19, 2025 (in the package's `dist-info/licenses/LICENSE`). Not an open-source license: it binds each installer, including trade controls and no reverse engineering, and a redistribution must carry the license |
+| Use | Decodes SAM 3.1's mask output in `services/api/app/meta/sam_adapter.py`. No code from it is copied here |
+
+## liblouis
+
+Installed on the system (`brew install liblouis` or `apt install liblouis-bin liblouis-data`), version 3.39.0 when checked; GPL-3.0-or-later for the tools and LGPL-2.1-or-later for the library. The backend runs `lou_translate` as a separate process (`services/api/app/braille/louis.py`). Not distributed here.
+
 ## Derived from the figures above
 
 These are adaptations of a figure listed above, so each carries that figure's license and,

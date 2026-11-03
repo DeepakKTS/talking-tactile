@@ -1,7 +1,6 @@
 # Talking Tactile: submission write-up
 
-Every number below names the committed file it comes from. TBD marks what is not measured
-yet; fill it in from the named file once it is, or leave it out.
+Every number below names the committed file it comes from. What is not measured says so.
 
 ## Short (about 150 words)
 
@@ -62,16 +61,17 @@ picture.
   heart, 9 of 9 on a map of Japan's regions, 5 of 6 on a brain figure, and 7 of 13 on a flower,
   where the rest go to the teacher's "Needs you" list.
 - Questions, live (`eval/qa/RESULTS.md`): source right for 36 of 38 on the heart and 35 of 35
-  on the brain. All 9 questions the figures do not answer, and all 7 prompt injections, were
-  sent back to the teacher.
+  on the brain. All 9 questions the figures do not answer were sent back to the teacher. All 7
+  prompt injections passed: 6 were sent back, 1 was answered from the teacher's description
+  (`eval/qa/README.md` says why that passes).
 - Release of the talk button to the first spoken word (`eval/qa/VOICE.md`): p50 5.0 s over 12
   runs in Chrome on the Mac; two of the 12 took about 14 s. On the iPhone:
-  <!-- tt:voice-device -->TBD<!-- /tt:voice-device -->.
+  <!-- tt:voice-device -->not measured<!-- /tt:voice-device -->.
 - Fingertip accuracy on the 9-point test sheet (`eval/gate-b/README.md`, target a mean error of
-  4 mm or less): <!-- tt:gate-b -->TBD<!-- /tt:gate-b -->.
+  4 mm or less): <!-- tt:gate-b -->not measured<!-- /tt:gate-b -->.
 - Touch to tone on the iPhone, from the latency film:
-  <!-- tt:earcon-device -->TBD<!-- /tt:earcon-device -->.
-- Spend: $5.31 of the $150 credits over 1,012 live calls (`eval/live/ledger.jsonl`, as of
+  <!-- tt:earcon-device -->not measured<!-- /tt:earcon-device -->.
+- Spend: $5.31 of the $150 credits (`eval/live/ledger.jsonl`, 1,013 logged calls, as of
   Nov 3).
 
 ### Limits

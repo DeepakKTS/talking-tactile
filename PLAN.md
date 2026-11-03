@@ -4,7 +4,7 @@
 
 A teacher uploads a science figure. Talking Tactile finds its parts, applies tactile design rules, and prints a sheet that can be traced into a raised graphic. A blind student puts the sheet under a phone camera and explores it with their fingers. When a finger rests on a part, the app says its name. When the student asks a question out loud, the app answers from that figure.
 
-No QR codes, no stickers, no special tablet. The camera and the models do the work.
+No QR codes, no stickers, no special tablet: only four printed corner marks, which a sighted helper taps once. The camera and the models do the rest.
 
 ## 2. Why this matters, with sources
 

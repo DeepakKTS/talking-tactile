@@ -1,7 +1,7 @@
 # Flower, Arm A v2: why the filament grew and where the references went
 
 Replay only, Oct 29: the recorded v2 calls (`fixtures/recorded/armav2_flower_*.json`)
-through `app/meta/s2_armav2.py`, with each instance's raw SAM mask captured before
+through `app/meta/s2_armav2.py` (since removed), with each instance's raw SAM mask captured before
 post-processing. Areas are mm² on a letter page (0.0806 mm per px). No live calls.
 
 ## The filament mask, 2007.6 mm²

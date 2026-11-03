@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 430,
- "updated_at": "2026-11-03T20:26:39.610Z",
+ "rev": 431,
+ "updated_at": "2026-11-03T21:13:26.536Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1611,7 +1611,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "",
    "fallback": "",
    "status": "done",
-   "note": "Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), \u003cyour-mac>.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://\u003cyour-mac>.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.",
+   "note": "Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (\u003cLAN address>), \u003cyour-mac>.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://\u003cLAN address>:5173/explore?check=1 and https://\u003cyour-mac>.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.",
    "done_at": "2026-10-30T20:29:54.649Z",
    "tags": [
     "explore",
@@ -3945,6 +3945,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "log": [
   {
+   "ts": "2026-11-03T21:13:26.536Z",
+   "kind": "claude",
+   "text": "Redacted 5 passages (2 distinct): Release prep: LAN addresses replaced with \u003cLAN address> before the repo goes public (review finding QA F32)."
+  },
+  {
    "ts": "2026-11-03T20:26:39.610Z",
    "kind": "claude",
    "text": "Issue open: ASR heard \"aorta\" as \"order\" on a synthetic clip with no hints. Mitigated: the figure's labels go as keyword hints (d9-8). On three synthetic clips every word was right with and without hints (eval/qa/VOICE.md). Accuracy on a real voice is not measured."
@@ -4867,7 +4872,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   {
    "ts": "2026-11-02T20:42:39.330Z",
    "kind": "claude",
-   "text": "Task d5-36 \"Full eval live on the chosen variant (image, ask_answer.v2) and release-to-first-word\" note updated, still blocked. Note: Key restored Nov 2 (services/api/.env recovered from the one unreachable git blob holding a MODEL_API_KEY line, mode 600, git-ignored). Now blocked on the network: the one-call Spark smoke test timed out connecting to api.meta.ai at 15:26 and again at 15:41 (ConnectTimeout, no HTTP status, both in the ledger, unpriced). The Mac is on a new network (10.110.86.135). Next, unchanged: caffeinate -i env LIVE=1 META_RECORD=qa6 uv run python -m app.meta.qa_eval --live, index qa6_ask_ in replays.json in place of qa2_ask_, update ask_e2e.py to v2, measure release-to-first-word."
+   "text": "Task d5-36 \"Full eval live on the chosen variant (image, ask_answer.v2) and release-to-first-word\" note updated, still blocked. Note: Key restored Nov 2 (services/api/.env recovered from the one unreachable git blob holding a MODEL_API_KEY line, mode 600, git-ignored). Now blocked on the network: the one-call Spark smoke test timed out connecting to api.meta.ai at 15:26 and again at 15:41 (ConnectTimeout, no HTTP status, both in the ledger, unpriced). The Mac is on a new network (\u003cLAN address>). Next, unchanged: caffeinate -i env LIVE=1 META_RECORD=qa6 uv run python -m app.meta.qa_eval --live, index qa6_ask_ in replays.json in place of qa2_ask_, update ask_e2e.py to v2, measure release-to-first-word."
   },
   {
    "ts": "2026-11-02T20:32:56.664Z",
@@ -5017,7 +5022,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   {
    "ts": "2026-10-30T20:29:54.649Z",
    "kind": "claude",
-   "text": "Task d5-25 \"iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check\" is now done. Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), \u003cyour-mac>.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://\u003cyour-mac>.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts."
+   "text": "Task d5-25 \"iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check\" is now done. Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (\u003cLAN address>), \u003cyour-mac>.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://\u003cLAN address>:5173/explore?check=1 and https://\u003cyour-mac>.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts."
   },
   {
    "ts": "2026-10-30T20:29:42.512Z",

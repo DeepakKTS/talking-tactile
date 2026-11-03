@@ -16,8 +16,13 @@ Third-party software:
 - MediaPipe Hand Landmarker model (apps/web/public/models/hand_landmarker.task) and
   @mediapipe/tasks-vision: Apache License 2.0, Copyright The MediaPipe Authors. Their
   license text is in apps/web/public/models/LICENSE and apps/web/public/licenses/.
-- meta-sam-parser 0.1.0 is under Meta's SAM License. It is a dependency installed from PyPI
-  (services/api/pyproject.toml) and is not distributed here.
+- meta-sam-parser 0.1.0 is under Meta's SAM License (not an open-source license; source and
+  license at https://github.com/meta-models/meta-sam). It is a dependency installed from PyPI
+  (services/api/pyproject.toml) and is not distributed here. Its terms bind whoever installs
+  it, including trade controls and no reverse engineering. Anyone who redistributes it, for
+  example in a built image or a virtual environment, must include its license.
+- fixtures/audio/*.wav are synthetic speech from the macOS `say` voice. Apple's terms for its
+  system voices apply to them, not the Apache License (ATTRIBUTION.md).
 - liblouis, for braille, is installed on the system (brew or apt) and is not distributed
   here.
 - Other Python and npm dependencies are installed from their registries through the lock

@@ -14,18 +14,18 @@ Two users:
 
 - Meta Global AI Developer Hackathon, Indie track, solo. Build window Oct 26 to Nov 4, 2026. Submission due Nov 4, 9:00 PM ET. Our own deadline is Nov 4, 3:00 PM ET.
 - Budget: $150 of Meta Model API credits. Every call is metered by `services/api/app/meta/cost.py`.
-- Code was written before Oct 26, all of it on Oct 24. The Official Rules allow pre-event work (decision of Oct 27). On main: the planning documents, `scripts/tracker.py` with its tests, the Spark, SAM and Voice spike scripts in `spikes/` (written from the docs, dry runs only, no live call yet), and the tracking spike in `spikes/tracking/` (test sheet, touch-test page, `analyze_touch.py`, `e2e_check.py`, parity tests against the shipped code). Also on main, merged from branch `early-start` on Oct 27 (the branch is kept, with no commits outside main): the FastAPI backend (regions contract, config loaders, pipeline S0 to S5 with a per-stage cache and SQLite jobs, braille through `lou_translate`, the rules validator, the figure routes with publish refusing rule violations, a Meta client interface with a mock and a SAM adapter stub only) and the React app (Author upload, review, publish and print; Explore camera, hand worker, homography, 1 euro filter, region engine, audio, guidance and local intents). S1 and S2 have only run on mocks. The ask route (spoken and typed questions) exists since Oct 30; register does not.
+- Pre-event code was all written on Oct 24; the build resumed on Oct 27. The Official Rules allow pre-event work (decision of Oct 27). On main: the planning documents, `scripts/tracker.py` with its tests, the Spark, SAM and Voice spike scripts in `spikes/` (written from the docs, dry runs only, no live call yet), and the tracking spike in `spikes/tracking/` (test sheet, touch-test page, `analyze_touch.py`, `e2e_check.py`, parity tests against the shipped code). Also on main, merged from branch `early-start` on Oct 27 (the branch was deleted on Nov 3; all its commits are in main): the FastAPI backend (regions contract, config loaders, pipeline S0 to S5 with a per-stage cache and SQLite jobs, braille through `lou_translate`, the rules validator, the figure routes with publish refusing rule violations, a Meta client interface with a mock and a SAM adapter stub only) and the React app (Author upload, review, publish and print; Explore camera, hand worker, homography, 1 euro filter, region engine, audio, guidance and local intents). S1 and S2 have run live since Oct 30 (recordings in `fixtures/recorded/`). The ask route (spoken and typed questions) exists since Oct 30; register does not.
 - Judging weights (from a guide quoting the event waiver, confirm in the Official Rules): Impact 30, Use of Meta tooling 25, Demo 25, Technical depth 20.
 
 ## Meta models we use, and why each one is here
 
 | Model | Where | Job |
 |---|---|---|
-| `muse-spark-1.3` | Author S1, S3. Explore answers | Reads the figure, proposes parts as short phrases, maps labels to masks, answers questions from figure data |
-| `sam-3.1` | Author S2. Explore registration | Segments every proposed part zero-shot. Finds the sheet for registration |
-| `muse-voice-transcribe-1.0` | Explore voice | Streaming speech to text with keyword hints built from region labels |
+| `muse-spark-1.3` | Author S1. Explore answers | Reads the figure, proposes parts as short phrases, plans them for touch with points, answers questions from figure data |
+| `sam-3.1` | Author S2 and Fix outline | Segments every planned part zero-shot from Spark's points, and the subject's silhouette |
+| `muse-voice-transcribe-1.0` | Explore voice | Speech to text (the file endpoint) with keyword hints built from region labels |
 
-Base URL `https://api.meta.ai/v1`, OpenAI compatible. Voice uses `wss://api.meta.ai/v1/asr/realtime`. Confirm exact request shapes for SAM and Voice on Day 1 with the `meta-api-spike` skill before writing feature code against them.
+Base URL `https://api.meta.ai/v1`, OpenAI compatible. Voice uses `POST /v1/asr/transcribe` (the realtime socket `wss://api.meta.ai/v1/asr/realtime` is not used). Confirm exact request shapes for SAM and Voice on Day 1 with the `meta-api-spike` skill before writing feature code against them.
 
 We do not use Muse Image. A generative model must never redraw a science figure, because a student would learn from a picture that is not the textbook's.
 
@@ -37,10 +37,10 @@ apps/web/            React + TypeScript + Vite. Routes /author and /explore
   src/author/        upload, review, print
   src/workers/       hand tracker worker (MediaPipe Hand Landmarker)
 services/api/        Python 3.11, FastAPI
-  app/routes/        figures, ask, register, voice
+  app/routes/        figures, ask (spoken and typed questions, transcribe)
   app/pipeline/      s0_ingest .. s5_render, one file per stage
-  app/meta/          client, retries, cache, cost meter, mock fixtures
-  app/geometry/      vectorize, rules, homography, orientation
+  app/meta/          client, live client, mock, cost meter, recording, eval tools
+  app/geometry/      vectorize, layout, reconcile, neighbors, overlap, validate (the rules)
   app/braille/       liblouis wrapper
 config/tactile_rules.yaml   sourced design constants
 docs/regions.schema.json    the contract between author and explore
@@ -56,7 +56,7 @@ make test         # pytest + vitest
 make lint         # ruff + eslint
 make typecheck    # mypy strict on app/ + tsc
 make check        # test + lint + typecheck, what the pre-commit hook runs
-make eval         # runs eval/ and writes eval/RESULTS.md
+make eval         # a stub: writes eval/RESULTS.md with every suite "not run"; the scorers are plan_eval and qa_eval below
 uv run spikes/tracking/e2e_check.py session   # the whole touch test through the spike page, scripted hands, about 50 s. Run before Gate B
 uv run apps/web/e2e/explore_e2e.py   # headless Chrome on a mock API: author flow, Explore online and offline, no local voice, camera with MediaPipe. Prints JSON, exits non-zero on a failed check
 uv run apps/web/e2e/fix_e2e.py   # headless Chrome on the mock API: Fix outline of the heart's aorta from recorded clicks, publish, Explore touches it

@@ -72,7 +72,8 @@ strict per-figure schema: 12 holds.
 | On the device: encoding, then speech starting | 12 | 6 | 8 |
 
 Spark is about 4 s slower at p50 than on Oct 30 (3052 ms with prompt v1). The question eval
-of the same evening (eval/qa/scores.json, 73 questions) has Spark at p50 7657 ms on the heart
+of the same evening (the qa6 run, 73 questions, since replaced in eval/qa/scores.json by the
+minimal-effort rerun) has Spark at p50 7657 ms on the heart
 and 6692 ms on the brain, slowest 18693 ms. One run cannot tell how much is the v2 prompt and
 schema and how much is the service that evening. The iPhone figure is still to be measured.
 

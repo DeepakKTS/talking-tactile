@@ -56,7 +56,8 @@ filler, and it says what still works or what to do next.
 
 Measured (eval/qa/VOICE.md, live, headless Chrome on this Mac): release to first spoken word
 p95 9.6 s on answer prompt v2 (12 holds, Nov 3; 5.9 s on v1, Oct 30); transcribe p95 1.4 s.
-Spark over the 73 questions of eval/qa/scores.json (Nov 3, v2): p95 16.1 s on the heart,
+Spark over the 73 questions of the qa6 run (Nov 3, v2 at low effort; eval/qa/scores.json
+now holds the later minimal-effort rerun): p95 16.1 s on the heart,
 slowest 18.7 s. The slowest observed server time is then about 20.1 s.
 
 | # | Case | Current behavior | Expected | Status |
