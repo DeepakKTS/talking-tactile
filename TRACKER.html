@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 351,
- "updated_at": "2026-11-03T07:14:03.388Z",
+ "rev": 354,
+ "updated_at": "2026-11-03T07:43:31.731Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2760,6 +2760,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-10-24T07:18:20.556Z"
   },
   {
+   "id": "d9-6",
+   "day": 9,
+   "title": "Answer latency: minimal reasoning effort with a 2000-token cap",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Live, 12 held questions a variant, interleaved (eval/qa/VOICE.md). Server p50/p95 ms: A shipped (v2, strict, full image, low) 9064/10338; B no strict 10248/13869 (never shipped); C image 768 px 8453/10863; D minimal + max_completion_tokens 400 4762/7010 with 3 of 12 answers cut (the cap counts reasoning tokens); E minimal + 2000, with A again: A 5924/7602, E 4557/5518, no errors. Docs quoted: reasoning_effort enum none..max, 'Muse Spark always reasons, so reasoning_effort: none returns HTTP 400'; max_completion_tokens 'counting both visible output and reasoning tokens'. Shipped E (live_client ASK_EFFORT minimal, ASK_MAX_TOKENS 2000): full eval live, recorded qa7, no worse: heart source 36/38 (citations 35, was 32; flags 3, was 5), brain 35/35 (34, flags 5), picture questions heart 5/6, brain 6/6 as before; Spark p50 3.5/3.2 s (was 7.7/6.7). Release to first word, headless Chrome, live: p50 5.0 s (was 8.5), 10 of 12 within 6.0 s, two at 13.8 and 14.7 s. Mock replays and the fallback now on qa7; ask_e2e sentences unchanged.",
+   "done_at": "2026-11-03T07:43:31.689Z",
+   "tags": [
+    "perf",
+    "ask"
+   ],
+   "changed_at": "2026-11-03T07:43:31.689Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -2897,10 +2913,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "target": 2.0,
    "unit": "s",
    "report_only": false,
-   "value": 8.496,
-   "measured_at": "2026-11-03T04:30:18.576Z",
+   "value": 5.01,
+   "measured_at": "2026-11-03T07:43:31.731Z",
    "source": "live",
-   "changed_at": "2026-11-03T04:30:18.576Z"
+   "changed_at": "2026-11-03T07:43:31.731Z"
   },
   {
    "id": "auth-time",
@@ -3600,6 +3616,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T07:43:31.731Z",
+   "kind": "claude",
+   "text": "Metric \"Release Space to first word, p50\" set to 5.01 s (live)."
+  },
+  {
+   "ts": "2026-11-03T07:43:31.689Z",
+   "kind": "claude",
+   "text": "Task d9-6 \"Answer latency: minimal reasoning effort with a 2000-token cap\" is now done. Note: Live, 12 held questions a variant, interleaved (eval/qa/VOICE.md). Server p50/p95 ms: A shipped (v2, strict, full image, low) 9064/10338; B no strict 10248/13869 (never shipped); C image 768 px 8453/10863; D minimal + max_completion_tokens 400 4762/7010 with 3 of 12 answers cut (the cap counts reasoning tokens); E minimal + 2000, with A again: A 5924/7602, E 4557/5518, no errors. Docs quoted: reasoning_effort enum none..max, 'Muse Spark always reasons, so reasoning_effort: none returns HTTP 400'; max_completion_tokens 'counting both visible output and reasoning tokens'. Shipped E (live_client ASK_EFFORT minimal, ASK_MAX_TOKENS 2000): full eval live, recorded qa7, no worse: heart source 36/38 (citations 35, was 32; flags 3, was 5), brain 35/35 (34, flags 5), picture questions heart 5/6, brain 6/6 as before; Spark p50 3.5/3.2 s (was 7.7/6.7). Release to first word, headless Chrome, live: p50 5.0 s (was 8.5), 10 of 12 within 6.0 s, two at 13.8 and 14.7 s. Mock replays and the fallback now on qa7; ask_e2e sentences unchanged."
+  },
+  {
+   "ts": "2026-11-03T07:43:31.594Z",
+   "kind": "claude",
+   "text": "Task d9-6 \"Answer latency: minimal reasoning effort with a 2000-token cap\" added to day 9."
+  },
   {
    "ts": "2026-11-03T07:14:03.388Z",
    "kind": "claude",

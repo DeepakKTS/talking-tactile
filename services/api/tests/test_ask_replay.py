@@ -1,4 +1,4 @@
-"""POST /api/ask on replay of the live runs (fixtures/recorded/qa6_ask_*, Nov 3, answer
+"""POST /api/ask on replay of the live runs (fixtures/recorded/qa7_ask_*, Nov 3, answer
 prompt v2; qa_ask_transcribe_*, Oct 30): the question eval's 73 answers on published version 4
 of the heart and the Commons brain (fixtures/qa/*_v4_regions.json), the transcribe clips, and
 the route. Nothing reaches the network: a request the recordings do not hold fails."""

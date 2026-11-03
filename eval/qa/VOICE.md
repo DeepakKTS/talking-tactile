@@ -75,3 +75,46 @@ Spark is about 4 s slower at p50 than on Oct 30 (3052 ms with prompt v1). The qu
 of the same evening (eval/qa/scores.json, 73 questions) has Spark at p50 7657 ms on the heart
 and 6692 ms on the brain, slowest 18693 ms. One run cannot tell how much is the v2 prompt and
 schema and how much is the service that evening. The iPhone figure is still to be measured.
+
+
+## Answer latency variants (Nov 3, night)
+
+Live, in-process through the same Asker as POST /api/ask (no browser): the three clips, the
+heart's published version 4, 12 held questions a variant, interleaved A B C D so they share
+the service's load. Server time is transcribe plus Spark; the browser adds about 0.3 s (the
+250 ms post-roll, network, speech start; tables above). Not recorded.
+
+| Variant | Errors | Server p50 ms | Server p95 ms | Spark p50 ms | Spark p95 ms |
+|---|---|---|---|---|---|
+| A: prompt v2, strict schema, full image, effort "low" (shipped until now) | 0 | 9064 | 10338 | 7698 | 9628 |
+| B: as A without strict (measurement only, never shipped) | 0 | 10248 | 13869 | 9453 | 12927 |
+| C: as A, image downscaled to 768 px on its longest side | 0 | 8453 | 10863 | 7455 | 9167 |
+| D: as A, effort "minimal", max_completion_tokens 400 | 3 of 12 | 4762 | 7010 | 3953 | 6041 |
+
+D's three errors are answers with no JSON: the cap counts reasoning tokens ("counting both
+visible output and reasoning tokens", dev.meta.ai chat completions schemas), and minimal
+reasoning still passed 400. "minimal" is the lowest effort Muse Spark takes ("Muse Spark
+always reasons, so reasoning_effort: "none" returns HTTP 400", dev.meta.ai/docs/protocols/
+chat-completions). A fifth variant, run interleaved with A once more:
+
+| Variant | Errors | Server p50 ms | Server p95 ms | Spark p50 ms | Spark p95 ms |
+|---|---|---|---|---|---|
+| A (again, a lighter-loaded run) | 0 | 5924 | 7602 | 4979 | 6809 |
+| E: as A, effort "minimal", max_completion_tokens 2000 | 0 | 4557 | 5518 | 3722 | 4710 |
+
+E shipped: the full eval at E (eval/qa/scores.json, recorded as qa7) scores no worse than at A:
+heart source 36 of 38 (citations 35, was 32; outside-word flags 3, was 5), Commons brain 35 of
+35 (citations 34, flags 5), the picture questions the same (heart 5 of 6, brain 6 of 6).
+
+### Release to first spoken word, effort "minimal" (shipped)
+
+Headless Chrome, fake microphone, the three clips four times each, live API, version 4.
+
+| Part | Runs | p50 ms | p95 ms |
+|---|---|---|---|
+| Release to first spoken word (with the 250 ms post-roll) | 12 | 5010 | 13780 |
+| Transcribe (server) | 12 | 964 | 1190 |
+| Spark (server) | 12 | 3700 | 12300 |
+
+Ten of the 12 took 4.3 to 6.0 s; two took 13.8 and 14.7 s (Spark 12.3 and 13.5 s). With 12
+runs the p95 is the slower of those two.

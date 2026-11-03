@@ -44,7 +44,15 @@ from app.models.mask import Mask
 from app.prompts import Prompt
 
 SPARK_EFFORT = "medium"  # spikes/muse-spark.md
-ASK_EFFORT = "low"  # Explore's answers: short, from the figure data given
+# Explore's answers: short, from the figure data given. "minimal" is the lowest effort Muse
+# Spark takes ("Muse Spark always reasons, so reasoning_effort: "none" returns HTTP 400",
+# dev.meta.ai/docs/protocols/chat-completions). The cap is max_completion_tokens, "counting
+# both visible output and reasoning tokens" (docs, chat completions schemas): 2000 is above the
+# largest answer of the Nov 3 eval at "low" (1876); a 400 cap cut 3 of 12 answers short.
+# Measured Nov 3, 12 held questions each, interleaved (eval/qa/VOICE.md): server p50 4.6 s
+# against 5.9 s at "low".
+ASK_EFFORT = "minimal"
+ASK_MAX_TOKENS = 2000
 _PAIR = 2  # a line separates two areas; a shared region has two or more
 _SLUG = re.compile(r"[^a-z0-9]+")
 
@@ -342,11 +350,12 @@ class LiveMetaClient:
         schema: dict[str, Any],
         what: str,
     ) -> dict[str, Any]:
-        """Muse Spark answers one question about the figure, at low reasoning effort; with
-        png None, from the text alone."""
+        """Muse Spark answers one question about the figure, at minimal reasoning effort and
+        at most ASK_MAX_TOKENS; with png None, from the text alone."""
         body = spark_body(
             self._models.spark, system, user, png, ("FigureAnswer", schema), ASK_EFFORT, strict=True
         )
+        body["max_completion_tokens"] = ASK_MAX_TOKENS
         digest = hashlib.sha256(user.encode()).hexdigest()[:8]
         res = await self._caller.post_json(
             "/chat/completions",

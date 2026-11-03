@@ -242,3 +242,27 @@ def test_an_answer_without_a_json_object_is_malformed(
     live = LiveMetaClient(RULES.meta, caller)
     with pytest.raises(MalformedResponseError):
         asyncio.run(live.answer("f" * 64, None, "system", "user", {"type": "object"}, "q"))
+
+
+def test_an_answer_asks_for_minimal_effort_a_token_cap_and_strict(tmp_path: Path) -> None:
+    seen: list[dict[str, Any]] = []
+    reply = {"reply": {"answer_text": "x", "source": "unsure", "cited_part_ids": []}}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(json.loads(request.content))
+        return chat(json.dumps(reply))
+
+    def caller() -> LiveCaller:
+        return LiveCaller(
+            key="test-key",
+            base_url="https://api.meta.ai/v1",
+            ledger=Ledger(tmp_path / "l.jsonl"),
+            meter=CostMeter(RULES.meta),
+            cap=RULES.meta.live_call_cap,
+            transport=httpx.MockTransport(handler),
+        )
+
+    asyncio.run(LiveMetaClient(RULES.meta, caller).answer("f" * 64, None, "s", "u", {}, "q"))
+    [body] = seen
+    assert (body["reasoning_effort"], body["max_completion_tokens"]) == ("minimal", 2000)
+    assert body["response_format"]["json_schema"]["strict"] is True

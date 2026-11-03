@@ -1,5 +1,5 @@
 {
- "description": "Figures mock mode answers from live recordings (app/meta/mock.py). The heart: S1 from the live run of Oct 30 with the plan for touch (locate v2, no grade band), S2 from its second live S2 run (NEST_INSIDE 0.95), and the Fix outline calls from the run of Oct 30 under the per-job cap. The Commons brain (fixtures/eval/brain_lobes.png): S1 and S2 from its live run of Oct 30, uploaded with grade band 6_8. Explore's questions on both (qa6_ask_*): the live question eval of Nov 3 on published version 4, answer prompt v2; the heart's transcribe clips (qa_ask_transcribe_*).",
+ "description": "Figures mock mode answers from live recordings (app/meta/mock.py). The heart: S1 from the live run of Oct 30 with the plan for touch (locate v2, no grade band), S2 from its second live S2 run (NEST_INSIDE 0.95), and the Fix outline calls from the run of Oct 30 under the per-job cap. The Commons brain (fixtures/eval/brain_lobes.png): S1 and S2 from its live run of Oct 30, uploaded with grade band 6_8. Explore's questions on both (qa7_ask_*): the live question eval of Nov 3 on published version 4, answer prompt v2 at minimal reasoning effort; the heart's transcribe clips (qa_ask_transcribe_*).",
  "figures": {
   "913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada": {
    "name": "heart",
@@ -8,14 +8,14 @@
     "plan2_heart_",
     "pipeline_heart2_fix_",
     "qa_ask_transcribe_",
-    "qa6_ask_"
+    "qa7_ask_"
    ]
   },
   "046e94d4f0b53298900ab96754caeb348dbc624b35841512d4e5b1198a36a699": {
    "name": "brain_lobes",
    "prefixes": [
     "plan_brain_lobes_",
-    "qa6_ask_"
+    "qa7_ask_"
    ]
   }
  }

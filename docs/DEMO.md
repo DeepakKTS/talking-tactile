@@ -31,7 +31,7 @@ npm run dev:phone
 On the Mac alone, `MOCK_META=1 make dev` runs both on http://localhost:5173.
 
 Questions in mock mode: a typed question is answered from the live eval's recordings
-(answer prompt v2, Nov 3, `fixtures/recorded/qa6_*`) when the eval asked it with no part
+(answer prompt v2, Nov 3, `fixtures/recorded/qa7_*`) when the eval asked it with no part
 under the finger; then it is answered wherever the finger is. Any other question, and any
 held (spoken) question but the recorded clips, says "Questions are not working right now.
 Labels still work."
@@ -123,7 +123,7 @@ screen when a wait was shortened.
 | 4 | 0:55 to 1:07 | 12 | The phone in its mount over the sheet; Start; a helper sets the corners | The phone camera watches the sheet; the outline is checked against the printed marks | No network (the app is served from the Mac on the LAN) |
 | 5 | 1:07 to 1:30 | 23 | A finger enters parts: an earcon on entry, the name after a rest; M for more on the left ventricle; W | Labels and earcons come from the sheet's file, with no network | No network |
 | 6 | 1:30 to 1:42 | 12 | "Where is the aorta?": guidance beeps toward it | Directions come from code, never from the language model | No network |
-| 7 | 1:42 to 2:12 | 30 | Hold to talk: "What does the left ventricle do?"; the answer from the teacher's description. Then "What does the right ventricle do?": the deflection to the teacher. Each answer takes about 9 s live (p50 8.5 s): keep one wait whole, cut the other | Muse Voice Transcribe with the figure's part names as hints; Spark answers from the figure's data under a strict schema | Network, live |
+| 7 | 1:42 to 2:12 | 30 | Hold to talk: "What does the left ventricle do?"; the answer from the teacher's description. Then "What does the right ventricle do?": the deflection to the teacher. Each answer takes about 5 s live (p50 5.0 s), now and then near 15 s: keep one wait whole, cut the other | Muse Voice Transcribe with the figure's part names as hints; Spark answers from the figure's data under a strict schema | Network, live |
 | 8 | 2:12 to 2:24 | 12 | Wi-Fi off on the phone: touch still speaks; a question says "Questions need the network. Labels still work." | It still works offline, and says what does not | No network |
 | 9 | 2:24 to 2:36 | 12 | The Commons brain sheet, a few touches | The same pipeline on a second figure | No network for touch |
 | 10 | 2:36 to 2:50 | 14 | End card: the three Meta models and what each does, both credit lines | | Nothing |
@@ -143,9 +143,9 @@ screen when a wait was shortened.
 
 Only these, from committed files, re-read on the day:
 
-- Question answers: `eval/qa/RESULTS.md` (live, answer prompt v2, Nov 3: heart source right
-  36 of 38, Commons brain 35 of 35).
-- Release to first spoken word: `eval/qa/VOICE.md` (p50 8.5 s, p95 9.6 s on prompt v2,
-  headless Chrome on the Mac; the iPhone figure is item "device latency film").
+- Question answers: `eval/qa/RESULTS.md` (live, answer prompt v2 at minimal effort, Nov 3:
+  heart source right 36 of 38, Commons brain 35 of 35).
+- Release to first spoken word: `eval/qa/VOICE.md` (p50 5.0 s, two of 12 near 14 s, headless
+  Chrome on the Mac; the iPhone figure is item "device latency film").
 - Part plan on the eval figures: `eval/plan/RESULTS.md`.
 - Spend: `python3 scripts/tracker.py spend`.

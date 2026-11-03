@@ -37,7 +37,7 @@ Author (the teacher):
 Explore (the student): touching needs the printed sheet under a camera (a phone in a mount,
 `docs/DEMO.md`). Without one, Explore still starts from the keyboard: Enter presses Start, H
 says the help. In mock mode a typed question is answered from the question eval's live
-recordings (answer prompt v2, `fixtures/recorded/qa6_*`): an eval question asked with no part
+recordings (answer prompt v2, `fixtures/recorded/qa7_*`): an eval question asked with no part
 under the finger is answered wherever the finger is, and any other question says "Questions
 are not working right now. Labels still work."
 
@@ -114,9 +114,9 @@ Every number here is from a committed result file; rerun the command to reproduc
 
 | What | Result | File |
 |---|---|---|
-| Questions, live, answer prompt v2 (Nov 3) | Heart: source right 36 of 38, citations right 32. Commons brain: 35 of 35, 34. The "unsure" fallback fired 0 times. 5 answers a figure use a word not in the figure data, a lead for a reader: mostly plain wording ("they", "carries", the shape words of the picture questions), once outside knowledge ("great vessels") | `eval/qa/RESULTS.md` |
+| Questions, live, answer prompt v2 at minimal reasoning effort (Nov 3) | Heart: source right 36 of 38, citations right 35. Commons brain: 35 of 35, 34. The "unsure" fallback fired 0 times. 3 heart and 5 brain answers use a word not in the figure data, a lead for a reader, not a verdict | `eval/qa/RESULTS.md` |
 | Questions about the picture (shape, biggest, top and bottom), in the same run | Heart: source right 5 of 6, citations 4. Brain: 6 of 6, 5. Without the image (Oct 30, prompt v1): 3 of 6 each | `eval/qa/RESULTS.md`, `RESULTS_image_no_image.md` |
-| Release to first spoken word (headless Chrome on a Mac, live, prompt v2) | p50 8.5 s, p95 9.6 s over 12 held questions; Spark is 7.2 s of the p50 | `eval/qa/VOICE.md` |
+| Release to first spoken word (headless Chrome on a Mac, live, prompt v2, minimal effort) | p50 5.0 s over 12 held questions (8.5 s at "low"); 10 of 12 within 6.0 s, two at 13.8 and 14.7 s | `eval/qa/VOICE.md` |
 | Transcribe on synthetic speech | Every word right on 3 clips, with and without keywords | `eval/qa/VOICE.md` |
 | Part plan, touchable areas | Heart 14 of 15, Japan regions 9 of 9, flower 7 of 13 | `eval/plan/RESULTS.md` |
 | S2 against the graded reference masks | Heart 0 regressions of 4, flower 3 of 3 | `eval/plan/RESULTS.md` |
@@ -129,11 +129,12 @@ Every number here is from a committed result file; rerun the command to reproduc
   has not been made.
 - **A sighted helper sets the corners.** There is no automatic registration and no check that
   the phone or the sheet moved after it (`docs/EDGE_CASES.md` X5, X6).
-- **Questions need the network and the Meta API**, and are slow: 8.5 s at p50 from letting go
-  to the first word on a Mac, most of it Spark (`eval/qa/VOICE.md`). Offline, mock mode answers
+- **Questions need the network and the Meta API**, and can be slow: 5.0 s at p50 from letting
+  go to the first word on a Mac, with some answers near 15 s, most of it Spark
+  (`eval/qa/VOICE.md`). Offline, mock mode answers
   only the eval's recorded questions.
-- **Answers can stray in wording.** The scorer flags 5 answers a figure for words not in the
-  figure data; one ("great vessels") is outside knowledge (`eval/qa/RESULTS.md`).
+- **Answers can stray in wording.** The scorer flags 3 heart and 5 brain answers for words not
+  in the figure data (`eval/qa/RESULTS.md`).
 - **Voice is tested on synthetic speech only**, and English only.
 - **Small parts are hard for S2.** On the flower, 6 of 13 areas need the teacher and all 3
   reference parts regressed (`eval/plan/RESULTS.md`).
