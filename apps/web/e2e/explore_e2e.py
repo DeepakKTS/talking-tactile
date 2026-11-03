@@ -305,6 +305,30 @@ def no_selection(page: Page, fail: list[str]) -> dict[str, Any]:
     return out
 
 
+def touch_wording(browser: Any, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
+    """An emulated phone (no hover, coarse pointer): Start by tap; the intro names what to do
+    on a phone, and no line names a key."""
+    ctx = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+    ctx.add_init_script(SPEECH_JS)
+    page = ctx.new_page()
+    page.goto(explore_url(base, fid))
+    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    out: dict[str, Any] = {"touch_only": page.evaluate("() => matchMedia('(hover: none) and (pointer: coarse)').matches")}
+    n = log_len(page)
+    page.get_by_role("button", name="Start exploring").tap()
+    page.wait_for_function("window.__tt.started", timeout=10000)
+    page.wait_for_timeout(300)
+    out["said"] = says(page, n)
+    body = page.inner_text("main")
+    out["keys_line"] = "Keys:" in body
+    if not out["touch_only"] or out["keys_line"] or not any(t.endswith("Touch the sheet to hear a part, or hold the screen to ask.") for t in out["said"]):
+        fail.append(f"touch wording: {out}")
+    if any("Press " in t for t in out["said"]):
+        fail.append(f"touch wording names a key: {out['said']}")
+    ctx.close()
+    return out
+
+
 def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str]) -> dict[str, Any]:
     page.goto(explore_url(base, fid))
     page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
@@ -685,6 +709,7 @@ def explore_run(browser: Any, base: str, fid: str, regions: list[dict[str, Any]]
     result["failed_loads"] = failed_loads_are_told((script_ctx, script_reqs), (fresh_ctx, fresh_reqs), base, fid, fail)
     _, page, _ = context("explore camera denied")
     result["camera_denied"] = camera_denied(page, base, fid, fail)
+    result["touch_wording"] = touch_wording(browser, base, fid, fail)
     _, page, _ = context("explore device check")
     result["device_check"] = device_check(page, base, fail)
     _, cam, cam_reqs = context("explore camera")

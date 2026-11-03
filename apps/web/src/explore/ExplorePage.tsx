@@ -9,6 +9,7 @@ import type { RegionsFile } from "../shared/regions";
 import type { WorkerHand } from "../workers/protocol";
 import { AudioEngine, type AudioPort, NO_LOCAL_VOICE, type VoiceMode, browserAudioDeps } from "./audio";
 import { CameraLoop, type HandsFrame, askApi, askAudioApi } from "./camera";
+import { touchOnly } from "./device";
 import { HandTracker } from "./tracker";
 import { ScreenAwake } from "./wakeLock";
 import { CornerClicks, loadCorners, parseQuad, saveCorners } from "./corners";
@@ -148,6 +149,7 @@ export function ExplorePage() {
 
 function ExploreSheet() {
   const [{ figure, version, scripted, stubMs, corners: given }] = useState(readParams);
+  const [touch] = useState(() => touchOnly()); // a phone: say "tap", name no key
 
   const [file, setFile] = useState<RegionsFile | null>(null);
   const [notTouchable, setNotTouchable] = useState<string[]>([]);
@@ -227,7 +229,7 @@ function ExploreSheet() {
 
   const setCorners = useCallback((quad: Quad, w: number, h: number) => {
     if (!file) return;
-    const c = new CornerClicks(file.page, EXPLORE.registration.mark_inset_mm);
+    const c = new CornerClicks(file.page, EXPLORE.registration.mark_inset_mm, touch);
     const step = c.fromCorners(quad);
     if (step.kind !== "done") {
       say(step.prompt);
@@ -239,15 +241,15 @@ function ExploreSheet() {
     view.current.quad = quad;
     trace.current.calibrated = true;
     saveCorners(storage(), w, h, quad);
-  }, [file, say]);
+  }, [file, say, touch]);
 
   const startCorners = useCallback(() => {
     if (!file) return;
-    corners.current = new CornerClicks(file.page, EXPLORE.registration.mark_inset_mm);
+    corners.current = new CornerClicks(file.page, EXPLORE.registration.mark_inset_mm, touch);
     clicking.current = true;
     const step = corners.current.start();
     if (step.kind === "next") say(`A helper sets the corners. ${step.prompt}`);
-  }, [file, say]);
+  }, [file, say, touch]);
 
   const onHands = useCallback((f: HandsFrame) => {
     const s = session.current;
@@ -271,7 +273,7 @@ function ExploreSheet() {
     eng.onVoiceChange = () => { setNoLocalVoice(eng.noLocalVoice); };
     const port = new TracingAudio(eng, trace.current.log);
     audio.current = port;
-    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, askAudio: askAudioApi, notTouchable });
+    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, askAudio: askAudioApi, notTouchable, touch });
     session.current = s;
     eng.onSpeechStart = (at, text) => {
       s.speechStarted(at, text);
@@ -322,7 +324,7 @@ function ExploreSheet() {
     const saved = given ?? loadCorners(storage(), v.videoWidth, v.videoHeight);
     if (saved) setCorners(saved, v.videoWidth, v.videoHeight);
     else startCorners();
-  }, [file, notTouchable, started, settings.voice, scripted, given, onHands, say, setCorners, startCorners]);
+  }, [file, notTouchable, started, settings.voice, scripted, given, onHands, say, setCorners, startCorners, touch]);
 
   // Keys work everywhere except while typing, where only Escape does.
   useEffect(() => {
@@ -528,12 +530,12 @@ function ExploreSheet() {
           </form>
           <p>Hold anywhere on the screen to ask out loud, and let go when you are done.</p>
           {heard && <p aria-live="off">You asked: {heard}</p>}
-          <p>Keys: Escape stops speech. R sets the corners. H help. M more. Period repeats. W what is here.</p>
+          {!touch && <p>Keys: Escape stops speech. R sets the corners. H help. M more. Period repeats. W what is here.</p>}
           {!scripted && (
             <section aria-label="Camera view">
               <button type="button" onClick={startCorners}>Set corners (R)</button>
               <canvas ref={canvas} onClick={onCanvasClick} style={{ maxWidth: "100%", display: "block" }}
-                aria-label="Camera view. A helper clicks the four corner marks here, in order A, B, C, D." />
+                aria-label={`Camera view. A helper ${touch ? "taps" : "clicks"} the four corner marks here, in order A, B, C, D.`} />
             </section>
           )}
         </>

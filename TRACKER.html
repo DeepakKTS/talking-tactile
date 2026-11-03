@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 348,
- "updated_at": "2026-11-03T07:00:43.486Z",
+ "rev": 351,
+ "updated_at": "2026-11-03T07:14:03.388Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2671,6 +2671,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T07:00:43.486Z"
   },
   {
+   "id": "d8-49",
+   "day": 8,
+   "title": "Explore on a phone: sentences name what to tap, never a key",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Had not landed before: the intro said 'Press H for help.', off the sheet 'Press R to set the corners again.', corners 'Click corner A...' and 'Press R and click A, B, C and D...', and the page showed 'Keys: Escape stops speech. R sets the corners...'. explore/device.ts touchOnly: (hover: none) and (pointer: coarse), an iPhone. On such a device: 'Tap corner A, top left.'; 'Those corners cross over. Tap Set corners, then tap A, B, C and D in order round the sheet.'; 'Your finger is off the sheet. Tap Set corners to set them again.'; the intro ends 'Touch the sheet to hear a part, or hold the screen to ask.'; the Keys line is not shown; the camera view's label says taps. A laptop keeps the keyboard wording (e2e expectations unchanged). Tests: device.test.ts, corners.test.ts (phone prompts), session.test.ts (phone intro and off-sheet, no Press or Keys); explore_e2e touch_wording on an emulated phone (390 x 844, is_mobile, has_touch: Start by tap, phone intro, no Keys line). Tracking code unchanged.",
+   "done_at": "2026-11-03T07:14:03.344Z",
+   "tags": [
+    "fix",
+    "explore"
+   ],
+   "changed_at": "2026-11-03T07:14:03.344Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3092,9 +3108,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-11-03T05:25:36.652Z",
-   "item": "Meta Model API, 764 live calls, from eval/live/ledger.jsonl (4 unpriced)",
-   "usd": 4.143608
+   "ts": "2026-11-03T07:14:03.388Z",
+   "item": "Meta Model API, 771 live calls, from eval/live/ledger.jsonl (4 unpriced)",
+   "usd": 4.174987
   }
  ],
  "outreach": [
@@ -3584,6 +3600,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T07:14:03.388Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $4.174987 over 771 live calls, 4 of them unpriced."
+  },
+  {
+   "ts": "2026-11-03T07:14:03.344Z",
+   "kind": "claude",
+   "text": "Task d8-49 \"Explore on a phone: sentences name what to tap, never a key\" is now done. Note: Had not landed before: the intro said 'Press H for help.', off the sheet 'Press R to set the corners again.', corners 'Click corner A...' and 'Press R and click A, B, C and D...', and the page showed 'Keys: Escape stops speech. R sets the corners...'. explore/device.ts touchOnly: (hover: none) and (pointer: coarse), an iPhone. On such a device: 'Tap corner A, top left.'; 'Those corners cross over. Tap Set corners, then tap A, B, C and D in order round the sheet.'; 'Your finger is off the sheet. Tap Set corners to set them again.'; the intro ends 'Touch the sheet to hear a part, or hold the screen to ask.'; the Keys line is not shown; the camera view's label says taps. A laptop keeps the keyboard wording (e2e expectations unchanged). Tests: device.test.ts, corners.test.ts (phone prompts), session.test.ts (phone intro and off-sheet, no Press or Keys); explore_e2e touch_wording on an emulated phone (390 x 844, is_mobile, has_touch: Start by tap, phone intro, no Keys line). Tracking code unchanged."
+  },
+  {
+   "ts": "2026-11-03T07:14:03.303Z",
+   "kind": "claude",
+   "text": "Task d8-49 \"Explore on a phone: sentences name what to tap, never a key\" added to day 8."
+  },
   {
    "ts": "2026-11-03T07:00:43.486Z",
    "kind": "claude",

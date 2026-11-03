@@ -21,6 +21,16 @@ describe("corner clicks", () => {
     expect(y).toBeCloseTo(INSET, 6);
   });
 
+  it("on a phone the helper is asked to tap, and crossed corners name the Set corners button", () => {
+    const c = new CornerClicks(PAGE, INSET, true);
+    expect(c.start()).toEqual({ kind: "next", prompt: "Tap corner A, top left." });
+    expect(c.click([300, 100])).toEqual({ kind: "next", prompt: "Tap corner B, top right." });
+    [[1020, 650], [1000, 120]].forEach((p) => c.click(p as [number, number]));
+    expect(c.click([280, 620])).toEqual({
+      kind: "crossed", prompt: "Those corners cross over. Tap Set corners, then tap A, B, C and D in order round the sheet.",
+    });
+  });
+
   it("says so when the clicks cross over, and starts again", () => {
     const c = new CornerClicks(PAGE, INSET);
     c.start();

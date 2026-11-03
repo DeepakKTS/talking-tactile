@@ -57,7 +57,7 @@ const centroid = (label: string): Pt => {
   return [r.centroid_mm[0], r.centroid_mm[1]];
 };
 
-function setup(ask?: (r: AskRequest) => Promise<string>, notTouchable: string[] = []) {
+function setup(ask?: (r: AskRequest) => Promise<string>, notTouchable: string[] = [], touch = false) {
   const audio = new FakeAudio();
   const metrics = new Metrics();
   const asked: AskRequest[] = [];
@@ -70,6 +70,7 @@ function setup(ask?: (r: AskRequest) => Promise<string>, notTouchable: string[] 
       throw new TypeError("Failed to fetch");
     },
     notTouchable,
+    touch,
   });
   // Frame times run ahead of the clock; receivedAt is the real clock, as the code under
   // test reads it, so code time is measured for real.
@@ -197,6 +198,17 @@ describe("explore session", () => {
     await session.command("where is the pore");
     hold(centroid("stem"), 1000);
     expect(audio.log.filter((l) => l === "beep").length).toBeGreaterThan(0);
+  });
+
+  it("on a phone, the intro and the off-sheet sentence name what to tap, never a key", () => {
+    const { audio, session, hold } = setup(undefined, [], true);
+    session.intro();
+    hold([-40, 500], (EXPLORE.health.off_page_points_before_recal + 5) * FRAME);
+    expect(audio.said()).toEqual([
+      `${SYNTHETIC.title}. ${SYNTHETIC.summary} Touch the sheet to hear a part, or hold the screen to ask.`,
+      "Your finger is off the sheet. Tap Set corners to set them again.",
+    ]);
+    expect(audio.said().join(" ")).not.toMatch(/\bPress\b|\bKeys?\b/);
   });
 
   it("asks to set the corners again when points keep landing off the sheet", () => {

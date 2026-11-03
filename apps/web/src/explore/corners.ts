@@ -10,9 +10,13 @@ export type CornerStep =
   | { kind: "done"; toMm: Mat3; corners: Quad }
   | { kind: "crossed"; prompt: string };
 
-export function promptFor(i: number): string {
-  return `Click corner ${CORNER_NAMES[i] ?? ""}.`;
+/** touch: a phone, where the helper taps, and there is no R key (device.ts). */
+export function promptFor(i: number, touch = false): string {
+  return `${touch ? "Tap" : "Click"} corner ${CORNER_NAMES[i] ?? ""}.`;
 }
+
+const CROSSED = "Those corners cross over. Press R and click A, B, C and D in order round the sheet.";
+const CROSSED_TOUCH = "Those corners cross over. Tap Set corners, then tap A, B, C and D in order round the sheet.";
 
 export class CornerClicks {
   private clicks: Pt[] = [];
@@ -20,6 +24,7 @@ export class CornerClicks {
   constructor(
     private readonly page: { width_mm: number; height_mm: number },
     private readonly insetMm: number,
+    private readonly touch = false,
   ) {}
 
   get count(): number {
@@ -32,12 +37,12 @@ export class CornerClicks {
 
   start(): CornerStep {
     this.clicks = [];
-    return { kind: "next", prompt: promptFor(0) };
+    return { kind: "next", prompt: promptFor(0, this.touch) };
   }
 
   click(p: Pt): CornerStep {
     this.clicks.push(p);
-    if (this.clicks.length < 4) return { kind: "next", prompt: promptFor(this.clicks.length) };
+    if (this.clicks.length < 4) return { kind: "next", prompt: promptFor(this.clicks.length, this.touch) };
     const quad = this.clicks as unknown as Quad;
     this.clicks = [];
     return this.fromCorners(quad);
@@ -45,7 +50,7 @@ export class CornerClicks {
 
   fromCorners(quad: Quad): CornerStep {
     if (!isConvexQuad(quad)) {
-      return { kind: "crossed", prompt: "Those corners cross over. Press R and click A, B, C and D in order round the sheet." };
+      return { kind: "crossed", prompt: this.touch ? CROSSED_TOUCH : CROSSED };
     }
     return { kind: "done", toMm: homographyFromPoints(quad, markCorners(this.page, this.insetMm)), corners: quad };
   }

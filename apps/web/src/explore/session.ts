@@ -45,6 +45,8 @@ export interface SessionDeps {
   askAudio?: (wav: Uint8Array, req: AskRequest) => Promise<AskReply>;
   /** Parts on the sheet a student cannot touch yet, said once in the intro. */
   notTouchable?: readonly string[];
+  /** A phone (device.ts): sentences name what to tap, never a key. */
+  touch?: boolean;
 }
 
 export interface FingerSample {
@@ -82,6 +84,7 @@ export const HELP =
   "Escape stops speech. R sets the corners again. Hold the screen and ask a question, then let go. Or type a question and press Enter.";
 export const OFFLINE_ANSWER = "Questions need the network. Labels still work.";
 const OFF_SHEET = "Your finger is off the sheet. Press R to set the corners again.";
+const OFF_SHEET_TOUCH = "Your finger is off the sheet. Tap Set corners to set them again.";
 const CANNOT_SEE = "The camera cannot see the sheet.";
 const SEES_AGAIN = "The camera can see the sheet again.";
 const RECENT = 2;
@@ -145,7 +148,8 @@ export class ExploreSession {
 
   intro(): void {
     const missing = notTouchableSentence(this.deps.notTouchable ?? []);
-    this.deps.audio.say(`${this.file.title}. ${this.file.summary} ${missing}Press H for help.`);
+    const next = this.deps.touch ? "Touch the sheet to hear a part, or hold the screen to ask." : "Press H for help.";
+    this.deps.audio.say(`${this.file.title}. ${this.file.summary} ${missing}${next}`);
   }
 
   help(): void {
@@ -360,7 +364,7 @@ export class ExploreSession {
     if (!off) this.warnedOffSheet = false;
     if (this.offSheet >= this.cfg.health.off_page_points_before_recal && !this.warnedOffSheet) {
       this.warnedOffSheet = true;
-      this.deps.audio.say(OFF_SHEET);
+      this.deps.audio.say(this.deps.touch ? OFF_SHEET_TOUCH : OFF_SHEET);
     }
   }
 }
