@@ -4,7 +4,7 @@ Under 3 minutes, planned at 2:50, following the shot list in `docs/DEMO.md` (sam
 same times). If the form's limit is shorter, cut shot 9 first, then shot 6.
 
 Criterion is the judging criterion the shot mainly serves: creativity, technical ambition, or
-whether it works. **Phone** marks shots that need footage from the iPhone in its mount over the
+whether it works (to confirm against the Official Rules). **Phone** marks shots that need footage from the iPhone in its mount over the
 printed sheet; the rest are screen recordings on the Mac or a still.
 
 Every number said or shown names its file. TBD: not measured yet; say nothing in its place

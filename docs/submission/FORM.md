@@ -3,14 +3,14 @@
 Ready to paste. Every number names the committed file it comes from. Fields marked "not
 measured" are filled from `eval/gate-b/` once the phone measurements exist.
 
-## For Deepak to confirm before pasting
+## Before pasting
 
-- Track: **Indie** (`APPLICATION.md`, Track: Indie developer).
-- Problem statement: **Push the Frontier**, as named in the application (`APPLICATION.md`):
-  an ordinary camera learns what a finger is touching on a physical object, with no markers.
-  "Build for Your World" was not chosen, because it asks for a problem known firsthand.
-- Public GitHub repository: https://github.com/DeepakKTS/talking-tactile (make it public
-  first; it is private today).
+- Track: **Indie**. Confirmed by Deepak, Nov 3.
+- Problem statement: **Push the Frontier**. Confirmed by Deepak, Nov 3. The idea: an ordinary
+  camera learns what a finger is touching on a printed sheet, with only four printed corner
+  marks on it.
+- Public GitHub repository: https://github.com/DeepakKTS/talking-tactile (Deepak makes it
+  public on Nov 3).
 - Demo video: `<VIDEO_URL>`
 - Coding tool: the code was written with Claude Code. Muse Code was not used; nothing below
   claims it.

@@ -81,7 +81,7 @@ Credit line: "Blausen 0111 BrainLobes.png by BruceBlaus (Blausen.com staff, Medi
 | Made by | This project, on Oct 27, 2026, with the macOS `say` command (system default voice, rate 160) and ffmpeg |
 | Use | Test audio for the Muse Voice Transcribe smoke call and its replay test only |
 
-The voice is Apple's macOS speech synthesis, so Apple's terms for its system voices apply. Replace this clip with a recording of our own voice before anything built from it is shown publicly.
+The voice is Apple's macOS speech synthesis, so Apple's terms for its system voices apply. Kept for now under those terms (decision of Nov 3); after filming it is to be replaced with a recording of the owner's own voice, and the replays recorded from it again.
 
 ## fixtures/audio/question_left_ventricle.wav, question_superior_vena_cava.wav, question_left_pulmonary_veins.wav
 
