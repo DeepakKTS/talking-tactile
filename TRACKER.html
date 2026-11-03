@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 286,
- "updated_at": "2026-11-03T02:03:55.025Z",
+ "rev": 288,
+ "updated_at": "2026-11-03T02:08:58.120Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2292,6 +2292,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T02:03:55.025Z"
   },
   {
+   "id": "d8-25",
+   "day": 8,
+   "title": "Edge case U11: an upload of a figure seen before says so",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/author/AuthorPage.tsx: when POST /api/figures answers created false (the same pixels as an earlier upload, so the same figure and job), the page says 'You uploaded this figure before. Its review, edits and published versions are below.' in a status line; a new figure says nothing extra. Server behavior unchanged. Test: AuthorPage.test.tsx 'says when the same figure was uploaded before, and only then'.",
+   "done_at": "2026-11-03T02:08:58.120Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T02:08:58.120Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3204,6 +3220,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T02:08:58.120Z",
+   "kind": "claude",
+   "text": "Task d8-25 \"Edge case U11: an upload of a figure seen before says so\" is now done. Note: apps/web/src/author/AuthorPage.tsx: when POST /api/figures answers created false (the same pixels as an earlier upload, so the same figure and job), the page says 'You uploaded this figure before. Its review, edits and published versions are below.' in a status line; a new figure says nothing extra. Server behavior unchanged. Test: AuthorPage.test.tsx 'says when the same figure was uploaded before, and only then'."
+  },
+  {
+   "ts": "2026-11-03T02:08:58.082Z",
+   "kind": "claude",
+   "text": "Task d8-25 \"Edge case U11: an upload of a figure seen before says so\" added to day 8."
+  },
   {
    "ts": "2026-11-03T02:03:55.025Z",
    "kind": "claude",

@@ -28,6 +28,7 @@ class FakeServer {
   polls = 0;
   stage = "s2";
   describeOnly: string | null = null; // Spark's reason, for a describe_only job
+  created = true; // false: the same image was uploaded before
   published = 0;
   fixCalls = 0;
 
@@ -42,7 +43,7 @@ class FakeServer {
       new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json" } });
     if (method === "POST" && path === "/api/figures") {
       this.polls = 0;
-      return json({ figure_id: ID, created: true, job: this.job() }, 202);
+      return json({ figure_id: ID, created: this.created, job: this.job() }, this.created ? 202 : 200);
     }
     if (method === "GET" && path === `/api/figures/${ID}`) {
       this.polls++;
@@ -417,6 +418,23 @@ describe("author page", () => {
     )).toBeTruthy();
     expect(screen.queryByText("Ready for review.")).toBeNull();
     expect(screen.queryByRole("list", { name: "Parts" })).toBeNull();
+  });
+
+  it("says when the same figure was uploaded before, and only then", async () => {
+    const upload = async () => {
+      fireEvent.change(screen.getByLabelText(/Figure \(PNG/), { target: { files: [new File([new Uint8Array([1])], "heart.png")] } });
+      fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
+      await screen.findByRole("link", { name: "Upload another figure" });
+    };
+    page();
+    await upload();
+    expect(screen.queryByText(/You uploaded this figure before/)).toBeNull();
+    cleanup();
+    window.history.replaceState(null, "", "/author");
+    server.created = false;
+    page();
+    await upload();
+    expect(screen.getByText("You uploaded this figure before. Its review, edits and published versions are below.")).toBeTruthy();
   });
 
   it("says what went wrong with an upload", async () => {

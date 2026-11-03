@@ -57,8 +57,13 @@ export function AuthorPage({ api = new FigureApi(), pollMs = POLL_MS }: { api?: 
   const [reviewable, setReviewable] = useState<string | null>(null);
   if (id && reviewable !== id && status?.figure_id === id && status.job.status === "done") setReviewable(id);
 
-  const opened = (figureId: string) => {
+  // The same image uploaded again opens its earlier review (the server keys a figure by its
+  // pixels): say so, since the edits and published versions there are the earlier ones.
+  const [again, setAgain] = useState(false);
+
+  const opened = (figureId: string, created: boolean) => {
     window.history.replaceState(null, "", `/author?figure=${figureId}`);
+    setAgain(!created);
     setId(figureId);
   };
 
@@ -66,6 +71,7 @@ export function AuthorPage({ api = new FigureApi(), pollMs = POLL_MS }: { api?: 
     <main>
       <h1>Author a tactile sheet</h1>
       {!id && <UploadPanel api={apiRef} onUploaded={opened} />}
+      {id && again && <p role="status">{UPLOADED_BEFORE}</p>}
       {id && error && <p role="alert">{error}</p>}
       {id && status && <Progress status={status} />}
       {id && status && reviewable === id && <Review api={apiRef} id={id} status={status} onEdited={refresh} />}
@@ -78,7 +84,9 @@ export function AuthorPage({ api = new FigureApi(), pollMs = POLL_MS }: { api?: 
   );
 }
 
-function UploadPanel({ api, onUploaded }: { api: FigureApi; onUploaded: (id: string) => void }) {
+const UPLOADED_BEFORE = "You uploaded this figure before. Its review, edits and published versions are below.";
+
+function UploadPanel({ api, onUploaded }: { api: FigureApi; onUploaded: (id: string, created: boolean) => void }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
@@ -101,7 +109,7 @@ function UploadPanel({ api, onUploaded }: { api: FigureApi; onUploaded: (id: str
         gradeBand: gradeBand || null,
         pageIndex: Math.max(0, Number(form.get("page_index") ?? 1) - 1),
       });
-      onUploaded(r.figure_id);
+      onUploaded(r.figure_id, r.created);
     } catch (err) {
       setMessage(err instanceof ApiError ? err.message : "The upload failed.");
     } finally {
