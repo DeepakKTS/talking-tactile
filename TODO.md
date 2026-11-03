@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 319, updated 2026-11-03T04:34:35.781Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 321, updated 2026-11-03T04:39:27.805Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -340,6 +340,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: apps/web/e2e/ask_e2e.py now names qa6_ask_* (Nov 3, answer prompt v2). Its two typed questions, asked with no part under the finger as h15 and h19 were, recorded the same sentences as on v1 ('The left ventricle pumps blood out to the whole body through the aortic arch.'; 'This figure does not show that. Ask your teacher.'), so the expectations stand; PASS on the mock API. lat-answer set to 8496 ms (p50 release to first word, live, headless Chrome).
 - [x] d8-37 Mock answers finger-free questions anywhere: the demo's offline fallback
   - Note: app/meta/mock.py: when an answer request has no exact recording (599), mock mode serves a recording of the same question on the same published sheet that was asked with no part under the finger and nothing touched before; the prompts must be equal but for the two touch-context lines. So typed or transcribed questions from the eval's finger-free set (qa6) are answered offline wherever the finger is, and an answer tied to a finger position (h01 'What is this?' on the right atrium) is never served for another part. Tests: test_ask_replay.py::test_mock_answers_a_finger_free_question_wherever_the_finger_is, ::test_mock_never_serves_an_answer_tied_to_another_finger_position; both fail on the old mock.
+- [x] d8-38 Question deadline 30 s, client 35 s, from the v2 eval
+  - Note: The Nov 3 v2 eval (73 questions) has Spark at up to 18.7 s; with transcribe p95 1.4 s the slowest server time is about 20.1 s, past the 20 s deadline of d8-30. DEADLINE_S 30 s (1.5 times), ASK_TIMEOUT_MS 35 s; EDGE_CASES Q2 and README updated. Tests unchanged (they set their own deadline): test_ask.py, camera.test.ts pass. The live API on :8000 is restarted to load it.
 
 ## Day 9: Tue Nov 3. Gate D
 

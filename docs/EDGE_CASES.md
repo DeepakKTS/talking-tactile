@@ -55,14 +55,14 @@ filler, and it says what still works or what to do next.
 ## Questions
 
 Measured (eval/qa/VOICE.md, live, headless Chrome on this Mac): release to first spoken word
-p95 5.9 s (12 holds); transcribe p95 1.4 s. Spark: p95 5.3 s on the heart and slowest 6.9 s
-over the 61 answers of eval/qa/scores.json, but slowest 10.2 s (and 8.7 s) over the 12 picture
-questions of eval/qa/scores_image.json. The slowest observed server time is then about 11.6 s.
+p95 9.6 s on answer prompt v2 (12 holds, Nov 3; 5.9 s on v1, Oct 30); transcribe p95 1.4 s.
+Spark over the 73 questions of eval/qa/scores.json (Nov 3, v2): p95 16.1 s on the heart,
+slowest 18.7 s. The slowest observed server time is then about 20.1 s.
 
 | # | Case | Current behavior | Expected | Status |
 |---|---|---|---|---|
 | Q1 | Offline | "Questions need the network. Labels still work." before recording (`web/explore/voice.ts:273-276`, `session.ts:83`); typed the same (`camera.ts:130`, `session.ts:344`). Tests `voice.test.ts:167`, `session.test.ts:190,336` | Same | ok |
-| Q2 | Request timeout | No client timeout (`camera.ts:122,131`); the server waits up to 120 s a read, two calls a question (`api/meta/live.py:33`). A server that never answers leaves the hold busy for good: later holds are ignored (`voice.ts:245`) | Server deadline 20 s, client timeout 25 s (below) | fixed: `test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working`, `camera.test.ts` question timeout |
+| Q2 | Request timeout | No client timeout (`camera.ts:122,131`); the server waits up to 120 s a read, two calls a question (`api/meta/live.py:33`). A server that never answers leaves the hold busy for good: later holds are ignored (`voice.ts:245`) | Server deadline 30 s, client timeout 35 s (below) | fixed: `test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working`, `camera.test.ts` question timeout |
 | Q3 | 50-question cap | 429 "That is 50 questions for this session. Ask your teacher." (`api/ask.py:43,303-304`), spoken as sent. Test `test_ask.py:161` | Same | ok |
 | Q4 | Silence or empty transcript | "I did not catch a question. Hold the screen and ask again." (`api/ask.py:42,313-316`); under 400 ms: "Hold the screen while you ask, then let go." (`voice.ts:28,296-299`). Tests `test_ask.py:155`, `voice.test.ts:177` | Same | ok |
 | Q5 | Very long hold | Capped at 15 s (`voice.ts:22,53-55`): sent, with the release earcon | Same | ok |
@@ -72,12 +72,13 @@ questions of eval/qa/scores_image.json. The slowest observed server time is then
 | Q9 | Question while an answer is spoken | The hold stops the answer and listens (`voice.ts:292`), as intended; a screen reader's speech cannot be stopped (`web/explore/audio.ts:208-212`). Test `voice.test.ts:139-148` | Same | ok, needs device |
 | Q10 | Typed question while waiting | No thinking tone for a typed question (`session.ts:338-347`) | Thinking tone, as for a spoken one | fixed: `session.test.ts` sends other questions to /api/ask |
 
-Timeout choice: the server stops a question at 20 s and answers "Questions are not working
-right now. Labels still work."; that is 1.7 times the slowest observed server time (11.6 s),
-so no answer the evals saw would be cut. The client gives up at 25 s, leaving 5 s for the
+Timeout choice: the server stops a question at 30 s and answers "Questions are not working
+right now. Labels still work."; that is 1.5 times the slowest observed server time (20.1 s),
+so no answer the evals saw would be cut. The client gives up at 35 s, leaving 5 s for the
 phone's network and the server's own answer, so the server's sentence normally arrives first,
-and a hold is never stuck. The thinking tone plays during the wait. (First set at 12 and 15 s
-from scores.json alone, which missed the slower picture questions; corrected the same day.)
+and a hold is never stuck. The thinking tone plays during the wait. History: 12 and 15 s on
+Nov 2 from the v1 eval alone, 20 and 25 s the same day once the picture questions showed
+10.2 s, 30 and 35 s on Nov 3 once the v2 eval showed Spark at 18.7 s.
 
 ## Server
 

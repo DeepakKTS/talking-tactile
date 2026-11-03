@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 319,
- "updated_at": "2026-11-03T04:34:35.781Z",
+ "rev": 321,
+ "updated_at": "2026-11-03T04:39:27.805Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2497,6 +2497,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T04:34:35.781Z"
   },
   {
+   "id": "d8-38",
+   "day": 8,
+   "title": "Question deadline 30 s, client 35 s, from the v2 eval",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "The Nov 3 v2 eval (73 questions) has Spark at up to 18.7 s; with transcribe p95 1.4 s the slowest server time is about 20.1 s, past the 20 s deadline of d8-30. DEADLINE_S 30 s (1.5 times), ASK_TIMEOUT_MS 35 s; EDGE_CASES Q2 and README updated. Tests unchanged (they set their own deadline): test_ask.py, camera.test.ts pass. The live API on :8000 is restarted to load it.",
+   "done_at": "2026-11-03T04:39:27.805Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T04:39:27.805Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3410,6 +3426,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T04:39:27.805Z",
+   "kind": "claude",
+   "text": "Task d8-38 \"Question deadline 30 s, client 35 s, from the v2 eval\" is now done. Note: The Nov 3 v2 eval (73 questions) has Spark at up to 18.7 s; with transcribe p95 1.4 s the slowest server time is about 20.1 s, past the 20 s deadline of d8-30. DEADLINE_S 30 s (1.5 times), ASK_TIMEOUT_MS 35 s; EDGE_CASES Q2 and README updated. Tests unchanged (they set their own deadline): test_ask.py, camera.test.ts pass. The live API on :8000 is restarted to load it."
+  },
+  {
+   "ts": "2026-11-03T04:39:27.761Z",
+   "kind": "claude",
+   "text": "Task d8-38 \"Question deadline 30 s, client 35 s, from the v2 eval\" added to day 8."
+  },
   {
    "ts": "2026-11-03T04:34:35.781Z",
    "kind": "claude",
