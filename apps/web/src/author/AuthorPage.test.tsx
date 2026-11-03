@@ -27,6 +27,7 @@ class FakeServer {
   jobVersion = 0;
   polls = 0;
   stage = "s2";
+  describeOnly: string | null = null; // Spark's reason, for a describe_only job
   published = 0;
   fixCalls = 0;
 
@@ -96,13 +97,14 @@ class FakeServer {
   private job() {
     const done = this.polls >= 2;
     if (done) this.jobVersion = this.editVersion;
+    const describe = done && this.describeOnly !== null;
     return {
       id: `job${this.editVersion}`,
-      status: done ? "done" : "running",
+      status: describe ? "describe_only" : done ? "done" : "running",
       stage: done ? null : this.stage,
       edit_version: done ? this.editVersion : this.editVersion,
       stages: done ? [] : [{ stage: "s0", outcome: "ran", ms: 40, cost_usd: 0 }],
-      error: null,
+      error: describe ? { code: "describe_only", message: this.describeOnly, retryable: false } : null,
     };
   }
 }
@@ -403,6 +405,18 @@ describe("author page", () => {
     page();
     expect(await screen.findByRole("heading", { name: synthetic.title })).toBeTruthy();
     expect(server.calls.some((c) => c.method === "POST")).toBe(false);
+  });
+
+  it("says when a figure is better described in words, with Spark's reason, and offers no review", async () => {
+    server.describeOnly = "A photo of a lab bench with no labeled parts.";
+    page();
+    fireEvent.change(screen.getByLabelText(/Figure \(PNG/), { target: { files: [new File([new Uint8Array([1])], "bench.png")] } });
+    fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
+    expect(await screen.findByText(
+      "This figure is better described in words than made into a tactile sheet. A photo of a lab bench with no labeled parts.",
+    )).toBeTruthy();
+    expect(screen.queryByText("Ready for review.")).toBeNull();
+    expect(screen.queryByRole("list", { name: "Parts" })).toBeNull();
   });
 
   it("says what went wrong with an upload", async () => {

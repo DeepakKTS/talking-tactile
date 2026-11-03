@@ -316,6 +316,13 @@ def test_describe_only_stops_before_segmenting(tmp_path: Path) -> None:
     job = submit_and_run(make_runner(tmp_path, client))
     assert job.status == "describe_only"
     assert outcomes(job) == {"s0": "ran", "s1": "ran"}
+    # Spark's reason reaches the teacher, as the job's error, not retryable.
+    assert job.error_code == "describe_only" and job.error_message
+    assert job_json(job)["error"] == {
+        "code": "describe_only",
+        "message": job.error_message,
+        "retryable": False,
+    }
     assert [c.call for c in client.calls] == ["understand"]
 
 

@@ -295,7 +295,7 @@ class Runner:
                 if stage == "s1":
                     u: Understanding = await walk.value("s1")
                     if u.verdict == "describe_only":
-                        self.jobs.finish(job.id, "describe_only")
+                        self.jobs.describe_only(job.id, u.verdict_reason)
                         return self.jobs.must_get(job.id)
             self.jobs.finish(job.id, "done", result_key=walk.keys["s5"])
         except Exception as exc:

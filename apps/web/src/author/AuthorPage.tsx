@@ -8,6 +8,8 @@ import { Review } from "./Review";
 const POLL_MS = 400;
 const STAGES: StageName[] = ["s0", "s1", "s2", "s3", "s4", "s5"];
 const FINISHED = new Set<Job["status"]>(["done", "failed", "describe_only"]);
+// Spark's verdict on a figure with nothing to make tactile; its reason follows.
+const DESCRIBE_ONLY = "This figure is better described in words than made into a tactile sheet.";
 
 export function figureFromUrl(): string | null {
   const id = new URLSearchParams(window.location.search).get("figure");
@@ -154,7 +156,9 @@ function Progress({ status }: { status: Status }) {
       <p role="status">
         {job.status === "failed"
           ? `Stopped at ${job.stage ? STAGE_WORDS[job.stage].toLowerCase() : "a stage"}: ${job.error?.message ?? "an error"}`
-          : applying
+          : job.status === "describe_only" && !applying
+            ? `${DESCRIBE_ONLY}${job.error?.message ? ` ${job.error.message}` : ""}`
+            : applying
             ? job.stage
               ? `${STAGE_WORDS[job.stage]}.`
               : "Waiting to start."

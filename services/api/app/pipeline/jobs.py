@@ -79,6 +79,17 @@ class JobStore:
     def finish(self, job_id: str, status: JobStatus, result_key: str | None = None) -> None:
         self._update(job_id, status=status, stage=None, result_key=result_key)
 
+    def describe_only(self, job_id: str, reason: str) -> None:
+        """Spark judged the figure better described in words: the job ends there, and its
+        reason goes in the error fields for the teacher (code describe_only, not retryable)."""
+        self._update(
+            job_id,
+            status="describe_only",
+            stage=None,
+            error_code="describe_only",
+            error_message=reason,
+        )
+
     def fail(self, job_id: str, stage: str | None, code: str, message: str) -> None:
         self._update(job_id, status="failed", stage=stage, error_code=code, error_message=message)
 

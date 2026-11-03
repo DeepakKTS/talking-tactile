@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 284,
- "updated_at": "2026-11-03T01:57:41.869Z",
+ "rev": 286,
+ "updated_at": "2026-11-03T02:03:55.025Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2276,6 +2276,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:57:41.869Z"
   },
   {
+   "id": "d8-24",
+   "day": 8,
+   "title": "Edge case U8: a describe-only figure says so, with Spark's reason",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "A job Spark judges describe_only now keeps Spark's verdict_reason (JobStore.describe_only: error code describe_only, not retryable), and the Author page says 'This figure is better described in words than made into a tactile sheet.' followed by the reason, instead of 'Ready for review.' with no review. No schema change: the job's existing error fields carry it. Tests: test_runner.py::test_describe_only_stops_before_segmenting (reason in job_json), AuthorPage.test.tsx 'says when a figure is better described in words'.",
+   "done_at": "2026-11-03T02:03:55.025Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T02:03:55.025Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3188,6 +3204,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T02:03:55.025Z",
+   "kind": "claude",
+   "text": "Task d8-24 \"Edge case U8: a describe-only figure says so, with Spark's reason\" is now done. Note: A job Spark judges describe_only now keeps Spark's verdict_reason (JobStore.describe_only: error code describe_only, not retryable), and the Author page says 'This figure is better described in words than made into a tactile sheet.' followed by the reason, instead of 'Ready for review.' with no review. No schema change: the job's existing error fields carry it. Tests: test_runner.py::test_describe_only_stops_before_segmenting (reason in job_json), AuthorPage.test.tsx 'says when a figure is better described in words'."
+  },
+  {
+   "ts": "2026-11-03T02:03:54.980Z",
+   "kind": "claude",
+   "text": "Task d8-24 \"Edge case U8: a describe-only figure says so, with Spark's reason\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:57:41.869Z",
    "kind": "claude",
