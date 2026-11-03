@@ -2,31 +2,39 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 393, updated 2026-11-03T18:59:20.022Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 430, updated 2026-11-03T20:26:39.610Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
 
 - [ ] d0-1 Submit the hackathon application (1 h)
   - Use the crisp answers in Handbook, Application answers. One application only.
-- [ ] d0-2 Make the Weavory repo public and its README current (30 min)
+  - Note: NEEDS DEEPAK: confirm the application was submitted. Nothing in the repo shows it; the credits and the accepted Official Rules (d1-1, d1-3) suggest it was.
+- [ ] ~~d0-2 Make the Weavory repo public and its README current~~ (30 min) [cut]
   - Reviewers will click github.com/DeepakKTS/weavory.ai. Check the 232 tests and npm link are visible.
-- [ ] d0-3 Email Northeastern disability services (20 min)
+  - Note: CUT: another project (Weavory), outside this repo. Not tracked here.
+- [ ] ~~d0-3 Email Northeastern disability services~~ (20 min) [cut]
   - Ask for a student who reads tactile graphics, or staff who make them, for a 15 to 30 minute session between Nov 1 and Nov 3.
-- [ ] d0-4 Email Perkins School for the Blind (20 min)
+  - Note: CUT: not done before the deadline. No tester outreach was sent; README says the tool is not yet tested with blind students or teachers.
+- [ ] ~~d0-4 Email Perkins School for the Blind~~ (20 min) [cut]
   - Ask an educator or transcriber for a remote review of one tactile sheet and the talking layer.
-- [ ] d0-5 Email one braille transcription service (20 min)
+  - Note: CUT: not done before the deadline. No outreach to Perkins was sent.
+- [ ] ~~d0-5 Email one braille transcription service~~ (20 min) [cut]
   - Ask for a short remote design review of a print PDF. Offer to credit them.
+  - Note: CUT: not done before the deadline. No braille transcription service was contacted.
 - [ ] d0-6 Buy materials (1 h)
   - Puffy fabric paint in 2 colors, heavy cardstock, a phone stand or gooseneck clamp, masking tape, a ruler.
   - Fallback: Hot glue and layered card also work.
-- [ ] d0-7 Read BANA tactile graphics guidelines, units 1 to 3 (2 h)
+  - Note: NEEDS DEEPAK: physical. Confirm the paint, cardstock and stand were bought; no repo evidence.
+- [ ] ~~d0-7 Read BANA tactile graphics guidelines, units 1 to 3~~ (2 h) [cut]
   - Use the 2022 edition. Note anything that changes config/tactile_rules.yaml.
+  - Note: CUT: not done before the deadline. Each value in config/tactile_rules.yaml names its source (APH handout, ADA 2010 table 703.3.1, NPS Harpers Ferry guidelines, tactilegraphics.org); the BANA 2022 re-check its header asks for (line 2) was not done.
 - [x] d0-8 List 20 openly licensed figures for the eval set (1.5 h)
   - 5 labeled diagrams, 5 bar charts, 5 line graphs, 5 maps. Write the license next to each.
   - Note: spikes/eval-figures.md: 20 figures, 5 per type, all on Wikimedia Commons. Licenses: 7 PD, 1 CC0, 7 CC BY 4.0, 5 CC BY-SA 3.0/4.0, each checked on the file page and the Commons API, then rechecked independently (20 of 20 match). fixtures/heart.png is Heart_diagram-en.svg by ZooFari, CC BY-SA 3.0, 2048x1612 on white. Learned: Commons thumbnails come back at 3840 px with transparent backgrounds, so S0 must flatten onto white and resize locally; CC BY-SA figures need the license carried onto the tactile sheet.
-- [ ] d0-9 Note phone model and laptop GPU (10 min)
+- [ ] ~~d0-9 Note phone model and laptop GPU~~ (10 min) [cut]
   - Baseline for the Day 2 device decision.
+  - Note: CUT: superseded. The device is decided: the iPhone in Safari (d8-46 device check: GPU delegate, 20.8 fps on the second tap). The phone model and the laptop GPU were never written down.
 
 ## Day 1: Mon Oct 26. Gate A
 
@@ -56,8 +64,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d1-8 Meta client wrapper (2 h)
   - Timeouts, retry with backoff and jitter, semaphore, cache, cost meter, MOCK_META mode.
   - Note: Live S1 and S2 in the pipeline (dc76d92 to 64a123b). S1 live = listing + locate (kind, members, parent, instances, points). S2 = Arm A v2f in app/pipeline/s2_points.py, SAM 4 at a time, spill retry, oversize rule at 50%, background points dropped, flags into regions.json v2 (touchable, flags, needs_teacher). One call cap per job. Live heart through the API, Oct 30: 25 calls (2 Spark, 19 SAM, 4 retries; 3 more retries refused by the cap), $0.096317; S1 30.6 s, S2 28.9 s, end to end 61.3 s; S5 first failed on a texture bug (72ee37b) and finished from the cache with no new call. 15 of 19 parts touchable, 4 spill, 3 thin, 0 rule violations. Replay e2e test reproduces the published regions.json exactly. Arm B and the v2 harness deleted; API suite 88.2 s to 79.0 s.
-- [ ] d1-9 Gate A check (15 min)
+- [x] d1-9 Gate A check (15 min)
   - All three models answer and latencies are written in spikes/.
+  - Note: DONE: Gate A is pass (gate evidence, Oct 30): Spark, SAM and Voice returned real results; p50/p95 in spikes/muse-spark.md, spikes/sam.md, spikes/muse-voice.md, spikes/results/.
 - [x] d1-10 Regions contract in code (1.5 h)
   - Pydantic models and TypeScript types for regions.json. fixtures/regions/golden.json validated against docs/regions.schema.json from Python and TypeScript, so the two sides cannot drift.
   - Note: Commit f435df1. Python: app/models/regions.py, 52 pytest tests incl. 41 shared cases from fixtures/regions/cases.json and a 600-example hypothesis mutation test (schema vs pydantic agree; it found Literal[1] accepting True). TypeScript: regions.gen.ts generated from the schema, staleness test, ajv 2020 parseRegions, 45 vitest tests on the same golden and cases. Probe: adding an enum value to the schema fails both sides (2 pytest, 2 vitest).
@@ -85,15 +94,18 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: spikes/tracking: lib/homography.js (4 point DLT, convex check for click order), lib/oneeuro.js (per axis, config/explore.yaml values), lib/fingertip.js (pointing hand picker, 4 mm contact offset toward DIP), calib.js (click A to D, overlay of projected sheet and targets, saved per camera size). 18 node tests. Headless: whole frame as sheet, fingertip mapped to 62.7, 69.5 mm, matching the hand math within 0.1 mm, pointing pose recognized. Watch: MediaPipe warns NORM_RECT projection is exact only for square input; check in the touch test.
 - [ ] d2-4 Run the 9 point touch test (1 h) [blocked]
   - Print the test sheet, 45 touches, record mean and p95 error in mm.
-  - Note: Ready for the user to print and run. spikes/tracking/test-sheet.pdf (Letter, 4 lettered corners, 9 targets, 100 mm bar; measured at 300 dpi: bar 100.41 mm with end caps, target centers within 0.005 mm of sheet.json). Touch test mode: 45 touches (9 x 5, seeded, no back to back repeats), dwell capture 15 mm/s for 600 ms or Space, mean, p95, bias, per target, JSON download. 41 node tests (counted Oct 27 with npm test in spikes/tracking; was 25 on Oct 24); headless touch flow passes. Waiting on the physical test, protocol in eval/gate-b/README.md.
-- [ ] d2-5 Measure fps on phone browser and laptop (30 min)
+  - Note: NEEDS DEEPAK: the physical 45-touch test on the iPhone, protocol in eval/gate-b/README.md. Ready: spikes/tracking/test-sheet.pdf and the touch-test page (d8-8, d9-9). The result goes to eval/gate-b/ for make results.
+- [x] d2-5 Measure fps on phone browser and laptop (30 min)
   - Pick the device for Explore.
   - Fallback: Laptop plus phone as webcam.
-- [ ] d2-6 Record hand touch videos for replay tests (30 min)
+  - Note: DONE: phone chosen. iPhone Safari: 20.8 fps, GPU delegate, 24 ms a frame (d8-46 device check). Mac: Playwright WebKit 29.6 fps, GPU (d9-20). No laptop-as-webcam fallback needed.
+- [ ] ~~d2-6 Record hand touch videos for replay tests~~ (30 min) [cut]
   - Lets tracking accuracy be measured the same way every run, with no person needed.
+  - Note: CUT: not done before the deadline. No hand videos were recorded. Scripted hands replay the touch loop instead: spikes/tracking/e2e_check.py and apps/web/e2e/explore_e2e.py (?source=script).
 - [ ] d2-7 Gate B check (15 min)
   - Mean fingertip error 4 mm or less.
   - Fallback: Require the pointing pose, dwell 800 ms, parts above 12 mm.
+  - Note: NEEDS DEEPAK: decided by the d2-4 run. make results writes eval/gate-b/RESULTS.md and prints the gate command.
 - [ ] Gate B: Tracking is accurate [Pending]
   - Pass when: Mean fingertip error of 4 mm or less on the 9 point sheet.
   - Fallback: Require the pointing pose, dwell 800 ms, keep parts above 12 mm.
@@ -103,10 +115,12 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d3-1 S0 ingest (2 h)
   - Type and size check, PDF page render, deskew, blur check, 2048 px, hash.
   - Note: Commit 20a637d. app/pipeline/s0_ingest.py, pure. Content sniffing, 10 MB guard before decoding, pypdfium2 page render at 200 dpi with page index, transparency to white, deskew only for a bright quad over 20 to 98 percent of the photo with 40 levels contrast (a chart frame is not cropped), blur floor 0.15 measured on synthetic and heart (sharp 0.49 to 0.56, 4 px blur 0.09 to 0.13), sha256 of normalized pixels. 22 tests. Synthetic PNG 34 ms, photo deskew 63 ms (90 percent of ink within 10 px), PDF 83 ms.
-- [ ] d3-2 S1 understand (2 h)
+- [x] d3-2 S1 understand (2 h)
   - Muse Spark structured output: type, title, summary, parts, color meaning, verdict.
-- [ ] d3-3 S2 ground (2 h)
+  - Note: DONE under d1-8 and d5-6: services/api/app/pipeline/s1_understand.py (Spark listing and locate with the tactile plan). Results from live recordings: eval/plan/RESULTS.md.
+- [x] d3-3 S2 ground (2 h)
   - One SAM 3.1 call per phrase, four at a time, plus print text.
+  - Note: DONE, redesigned: SAM text prompts found no heart parts (spikes/sam.md, SAM diagnostic Oct 29), so S2 sends Spark-placed point prompts: services/api/app/pipeline/s2_ground.py, s2_points.py. 44 point prompts, 44 single instances (spikes/sam.md). Graded in eval/plan/RESULTS.md.
 - [x] d3-4 S3 reconcile (2 h)
   - Merge near duplicates, nest contained parts, drop slivers, numbered overlay mapping.
   - Note: Commit d9ad1aa. app/geometry/reconcile.py, pure, on Masks. On the synthetic raw masks: 8 parts out, each cleaned part equals its truth mask (speck, text leak, duplicate and sliver handled), core nested under outer chamber, the 45 mm2 lobe overlap goes to the smaller lobe. 82 ms p50 for 10 parts and 8 text masks at 1479 x 2048. The Muse Spark numbered-overlay mapping is not built; it needs the key.
@@ -140,11 +154,13 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d4-3 S5 render (2 h)
   - tactile.svg, print.pdf with 100 mm calibration bar, regions.json, validation report.
   - Note: Commits a2ca503 and 88fe8fe. tactile.svg layers guides, textures, outlines, braille; L marks 12.7 mm in (explore.yaml, shared with Explore); 1 mm outlines inside each edge (gaps, nested clearance and braille clearance now count it); textures 3.2 mm inside, off children, 3.7 mm off braille, pieces under 4 mm dropped; key pages with abbreviations and texture samples; print.pdf via cairosvg 2.9.1 (works with Homebrew cairo 1.18.4) and pypdf; regions.json valid against the schema; SVG ids match. Print scale at 300 dpi with pdftoppm: 2550 x 3300 px, bar 1182 px = 100.08 mm, lobe edge and mark corner within 0.2 mm. make synthetic-sheet writes data/synthetic/print.pdf, 2 pages, 0 violations. Render 23 ms, PDF 162 ms. 12 render tests.
-- [ ] d4-4 Rules check passes on the heart figure (1 h)
+- [x] d4-4 Rules check passes on the heart figure (1 h)
   - tactile-rules-check skill. Fix causes, never loosen rules.
+  - Note: DONE: the heart's rules report is empty and it publishes: services/api/tests/test_e2e_heart_replay.py (report == [] at lines 94 and 135); published version 4 in fixtures/qa/heart_v4_regions.json. Publish refuses any rule violation (services/api/app/figures.py).
 - [ ] d4-5 Print two copies and trace with puffy paint (1 h)
   - Let them dry overnight. Tape the sheet edges for the demo.
   - Fallback: Hot glue or layered card.
+  - Note: NEEDS DEEPAK: physical. Print and trace the heart sheet (docs/DEMO.md pre-flight: bar measured, sheet traced or swelled, taped).
 - [x] d4-6 Centroids and neighbor directions (1 h)
   - Point inside each region, neighbors within a set distance, 8 directions plus inside and around, all from code. Property tests for symmetry.
   - Note: Commit 1625b6e. app/geometry/neighbors.py: centroid_mm at the pole of inaccessibility (inside even for a C shape), neighbors within 20 mm plus direct inside/around, direction of the shortest outline-to-outline line in 8 sectors. 19 tests incl. 3 hypothesis properties (symmetry, quarter turn of the sheet, centroid inside). Synthetic: vessel down from outer chamber, right lobe right of left lobe, stem has left lobe up.
@@ -154,8 +170,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 5: Fri Oct 30. Gate C
 
-- [ ] d5-1 Auto registration (2.5 h)
+- [ ] ~~d5-1 Auto registration~~ (2.5 h) [cut]
   - /api/register: OpenCV outline first, SAM fallback, four rotation check, confidence.
+  - Note: CUT: feature freeze. /api/register was never built. Corners are set by tapping or clicking the four lettered corners, which needs a sighted helper; listed as a limitation in README.
 - [x] d5-2 Region engine and state machine (2.5 h)
   - Box check, point-in-polygon, hysteresis, dwell, vitest coverage.
   - Note: Commits 2099e86, 9967ea0 on early-start. apps/web/src/explore: regionIndex.ts (box check, even-odd point in polygon, signed edge distance for shrunk and grown outlines, smallest area first, earcon pitch from texture) and touch.ts (enter on outline shrunk 1 mm, 120 ms hold then earcon; dwell under 15 mm/s for 600 ms then label once; exit on outline grown 2 mm, 120 ms then tick; earcons and ticks capped 6 per second; speed over a 200 ms window, dwell clock backdated to the window start). Every value from explore.yaml. fast-check, 300 runs each: border rest with jitter under 1 mm never flickers; scanning at 25 mm/s or more never speaks a label and stays capped; each property fails with its mechanism removed. Region lookup 0.39 us per point on the synthetic sheet (8 regions), 2.96 us at 60 regions of 200 points.
@@ -168,6 +185,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] d5-5 Gate C check (30 min)
   - The heart figure works end to end on the real traced sheet.
   - Fallback: Cut Plus features, spend Day 6 on the loop.
+  - Note: NEEDS DEEPAK: the heart on the real traced sheet, end to end, during filming (docs/DEMO.md shots). Headless replay already passes (apps/web/e2e/plan_e2e.py, ask_e2e.py).
 - [x] d5-6 Tactile-aware part planning: S1 plans areas, lines, groups, parents, shared regions and subject; S2, sheet, Explore and Author use the plan (this phase)
   - Live run on a private test figure, not distributed: 5 of 12 touchable. Re-run heart, flower, Japan against graded references; the private test figure and an openly licensed brain from Commons.
   - Note: S1 locate v2 plans for touch (grade band, printed size, minimum part and gap): area, line, group, parent, separates, shares_region, subject; S1 key holds the job options. S2: lines get no call and never need the teacher; spill excuses Spark's children, parts nested in the checked mask (NEST_INSIDE 0.95 from the eval masks, not 0.9) and shared regions (IoU 0.8 or Spark); nesting re-tested on kept masks; near-identical masks split by the nearer point; merge proposals; silhouette by one SAM phrase call. S4: lines in the key, silhouette contour raised clear of every outline and braille, checked by the validator. regions.json v3 (subject, lines, merge_proposals; PLAN.md migration). Explore: crossing a line says 'line, part' with the earcon (enter hold and earcon cap kept), code path 0.8 ms headless (plan_e2e, frameToBoundaryMs); resting on the silhouette on no part says the subject once per entry. Author: Needs you, For your information, one merge button per proposal. Live, replayed in app/meta/plan_eval.py (eval/plan/RESULTS.md): heart 14 of 15 areas touchable, needs you 1 (septum spill), references 3 held, 1 improved (left common carotid 0.0 to 0.927), 0 regressed; Japan 9 of 9, 6 held, 1 improved (Kansai 0.612 to 0.804); flower 12 of 13, needs you 1, its 5 references all below 0.8 as in v2f (ovary 0.245 to 0.0, pollen sac 0.476 to 0.367: Spark's points moved); a private test figure, not distributed: 10 of 10 areas (was 5 of 12 parts), needs you 0, 2 lines, 2 merge proposals, silhouette in regions.json with 0 raised pieces; Commons brain (Blausen 0111, CC BY 3.0) 5 of 6, olfactory bulb no points. 107 live calls, $0.476566. Rules: heart 1 point-symbol violation (clears with the aortic arch merge), flower 31 from its groups' nesting in S3/S4, none from the silhouette.
@@ -237,15 +255,18 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 6: Sat Oct 31
 
-- [ ] d6-1 Voice capture and proxy (2.5 h)
+- [x] d6-1 Voice capture and proxy (2.5 h)
   - AudioWorklet, 16 kHz mono, /api/voice relay, keyword hints from labels.
+  - Note: DONE, redesigned: hold to talk records 16 kHz mono WAV in the browser (apps/web/src/explore/voice.ts) and posts it to /api/ask or /api/transcribe with the figure's labels as keyword hints (services/api/app/routes/ask.py, d9-8). No realtime WebSocket relay.
 - [x] d6-2 Local intent parser (1 h)
   - where is, more, repeat, stop, what is here.
   - Note: Commit fc6117e on early-start. intents.ts: stop, repeat, more, what is here, where is, after fillers; labels and braille abbreviations matched on spelling or a rough sound key (rite and write match right), min_label_similarity 0.75 from explore.yaml; no match says 'There is no X on this sheet.' Everything else goes to /api/ask with the current and last two regions. 31 tests.
-- [ ] d6-3 Grounded answers (2 h)
+- [x] d6-3 Grounded answers (2 h)
   - /api/ask with the cached figure context, streamed, first sentence spoken early.
-- [ ] d6-4 Barge-in (30 min)
+  - Note: DONE under d5-17 to d5-36: POST /api/ask answers from the published figure with a strict schema (services/api/app/ask.py, prompts in services/api/app/prompts/). Eval: eval/qa/RESULTS.md. Not streamed: the whole answer is spoken when it arrives.
+- [x] d6-4 Barge-in (30 min)
   - Space cancels speech and starts listening.
+  - Note: DONE, as hold to talk: when listening starts the app stops its own speech (apps/web/src/explore/voice.ts:301, audio.stop()); Escape stops speech from the keyboard (apps/web/src/explore/session.ts:75). Space is not used.
 - [x] d6-5 Guidance mode (2 h)
   - Direction in words once, beeps speed up, chime and label on arrival.
   - Note: Commit fc6117e on early-start. guidance.ts: direction to the part's centroid in 8 sectors (same as the Python neighbors code, reversal property tested), distance to the outline in whole cm, said once when a finger is seen; beeps from 1.5 per s at 150 mm to 10 per s at the edge, updated every 300 ms, none over its own speech; chime and label after 200 ms inside. Headless offline: 'Stem. Left, 12 centimeters.', 3 beeps in 3 s far, 27 near, chime and Stem on arrival.
@@ -257,21 +278,26 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Commits 56c1698, 903e500 on early-start. API: draft-only GET source.png (S0 image) and report.json (the rules report publish would refuse with), 404 under /published/. /author: upload (PNG, JPEG, PDF page number, grade band, paper), stage progress by name with times, review with the figure as uploaded, parts flagged Checked or Not checked in words beside an amber or green bar, the tactile preview with the selected part outlined from regions.json; mark checked, rename, describe, merge, delete with confirm, add by name; rules report in words; refused publish lists each violation (parts, rule, measured, limit); publish gives that version's print PDF, print and trace steps and the Explore link; ?figure= reopens. 10 vitest tests on a fake API. Headless Chrome against the mock API: upload through the file input, rename pore, mark left lobe checked (8 then 6 not checked), all rules pass, publish v1, PDF link serves %PDF, Explore link opens v1 and Explore runs on it. Live mode waits on d1-8.
 - [ ] d7-2 Accessibility pass (1.5 h)
   - Keyboard only, VoiceOver or NVDA, onboarding audio. accessibility-pass skill.
-- [ ] d7-3 Tester session or remote expert review (1.5 h)
+  - Note: NEEDS DEEPAK: the machine steps pass (eval/a11y.md, explore_e2e.py); a real screen reader was never run. VoiceOver hold-to-talk on the iPhone is in d8-35.
+- [ ] ~~d7-3 Tester session or remote expert review~~ (1.5 h) [cut]
   - Record tasks, times and their own words, with consent.
   - Fallback: Expert review of the print PDF, or an honest README note.
-- [ ] d7-4 Evidence-based design table (1 h)
+  - Note: CUT: not done before the deadline. No tester session and no expert review happened. README states it plainly.
+- [ ] ~~d7-4 Evidence-based design table~~ (1 h) [cut]
   - Map each design choice to its source: BANA, APH, CamIO user feedback.
+  - Note: CUT: not done before the deadline as a separate table. Each design constant names its source inline in config/tactile_rules.yaml; no CamIO feedback mapping was written.
 
 ## Day 8: Mon Nov 2
 
-- [ ] d8-1 Fix the top three issues (3 h)
+- [x] d8-1 Fix the top three issues (3 h)
   - From testing and the Issues tab.
+  - Note: DONE: the fixes from testing are the edge cases in docs/EDGE_CASES.md (d8-11 to d8-28) and the security tasks d9-10 to d9-15. Issues tab: the earcon budget decided; SAM zero instances diagnosed and closed (point prompts); ASR aorta issue mitigated by keyword hints.
 - [ ] ~~d8-2 Three more figure types~~ (2.5 h) [cut]
   - add-figure-type skill.
   - Note: feature freeze
 - [ ] d8-3 Run every eval suite (1.5 h)
   - run-eval skill. Fill the Metrics tab from eval/RESULTS.md.
+  - Note: DO NOW (Phase A, A5): the replay scorers app.meta.plan_eval and app.meta.qa_eval, no calls. Note: eval/run.py (make eval) is a stub that writes every suite as not run; queued for Phase B.
 - [x] d8-4 Pre-commit hook never removes ignored or untracked files
   - Note: scripts/hooks/pre-commit no longer stashes, resets or cleans (the old git reset --hard deleted services/api/.env on Oct 30; it also removed ignored __pycache__ dirs). Tracked files whose working copy differs from the index are moved into .git/pre-commit-aside.*, replaced by the staged version with git checkout-index, and moved back on exit, pass or fail; nothing else is changed. Untracked files stay in place during the tests. New guard: if the tests change the index (git write-tree before and after), the commit is refused. scripts/test_pre_commit.py runs the real hook in a throwaway repo with an ignored services/api/.env and apps/web/.certs/, an untracked file, an unstaged edit and an unstaged deletion: a failing commit (fails only on the staged content, proving the swap) and a passing commit leave all of them as they were; a test that stages a path blocks the commit. 3 tests pass.
 - [x] d8-5 No path-limited commits; rule in CLAUDE.md
@@ -335,7 +361,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d8-34 Flaky layout property test: coordinates at 0.01 mm
   - Note: The pre-commit hook failed on test_layout.py::test_gap_enforcement_only_shrinks_and_leaves_every_gap_clear: Hypothesis drew boxes at x = 1.675e-209 and 3.899e-257 beside x = 0, and the overlap step then left a strip with zero-width spikes, which enforce_gaps reported unresolved. With the same boxes at x = 0 the result is clean (no unresolved pair). Pixel contours in page mm never carry subnormal coordinates, so the generator now rounds to 0.01 mm; enforce_gaps is unchanged. 5 seeds and the whole file pass.
 - [ ] d8-35 At home: network and phone checklist [doing]
-  - Note: Done: item C, the servers for the iPhone (API :8000 live, dev:phone :5173, Gate B :8443), the hand tracker warm-up and Wake Lock fixes (d8-46, d8-47). Re-check on the phone: ?check=1 in Safari on a cold start (first tap after closing the tab), Explore Start cold, the Gate B page cold; then VoiceOver hold-to-talk, Gate B, the latency film, one live voice take.
+  - Note: NEEDS DEEPAK: on the phone during filming: ?check=1 cold start, Explore Start cold, Gate B page cold, VoiceOver hold-to-talk, Gate B, the latency film, one live voice take. Done before: item C, the iPhone servers, warm-up and Wake Lock fixes (d8-46, d8-47).
 - [x] d8-36 ask_e2e on the v2 recordings
   - Note: apps/web/e2e/ask_e2e.py now names qa6_ask_* (Nov 3, answer prompt v2). Its two typed questions, asked with no part under the finger as h15 and h19 were, recorded the same sentences as on v1 ('The left ventricle pumps blood out to the whole body through the aortic arch.'; 'This figure does not show that. Ask your teacher.'), so the expectations stand; PASS on the mock API. lat-answer set to 8496 ms (p50 release to first word, live, headless Chrome).
 - [x] d8-37 Mock answers finger-free questions anywhere: the demo's offline fallback
@@ -367,18 +393,23 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Day 9: Tue Nov 3. Gate D
 
-- [ ] d9-1 Feature freeze at noon (0)
+- [x] d9-1 Feature freeze at noon (0)
   - Only bug fixes, video and README after this.
+  - Note: DONE: feature freeze in force. Graded-figure baseline d8-6; d8-2 cut for the freeze; final phase declared Nov 3 (only docs and queued bug fixes).
 - [ ] d9-2 Demo readiness checklist (1 h)
   - demo-readiness skill. Passes twice in a row.
+  - Note: NEEDS DEEPAK: demo-readiness checklist live on the phone, twice in a row (Gate D).
 - [ ] d9-3 Record the demo video (2 h)
   - Two takes minimum. Only steps that work every time.
   - Fallback: Cut the failing step from the script.
-- [ ] d9-4 README with measured numbers (1.5 h)
+  - Note: NEEDS DEEPAK: filming, docs/DEMO.md and docs/submission/VIDEO_SCRIPT.md; captions in docs/submission/captions.srt.
+- [ ] d9-4 README with measured numbers (1.5 h) [doing]
   - Setup, models and why, numbers from RESULTS.md, honest tester status.
+  - Note: DO NOW (Phase A, A2): README rewrite; the phone numbers land in Phase B (make results).
 - [ ] d9-5 Credit the CC BY-SA heart figure in the README and demo video (15 min)
   - Use the credit line in ATTRIBUTION.md: Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. State that the tactile sheet and its files are adaptations shared under CC BY-SA 3.0.
   - Fallback: A credits slide at the end of the video and a Credits section in the README.
+  - Note: README part done (README.md:72, the credit line from ATTRIBUTION.md). NEEDS DEEPAK: the credit line in the recorded video, VIDEO_SCRIPT.md shots 1 and 10.
 - [x] d9-6 Answer latency: minimal reasoning effort with a 2000-token cap
   - Note: Live, 12 held questions a variant, interleaved (eval/qa/VOICE.md). Server p50/p95 ms: A shipped (v2, strict, full image, low) 9064/10338; B no strict 10248/13869 (never shipped); C image 768 px 8453/10863; D minimal + max_completion_tokens 400 4762/7010 with 3 of 12 answers cut (the cap counts reasoning tokens); E minimal + 2000, with A again: A 5924/7602, E 4557/5518, no errors. Docs quoted: reasoning_effort enum none..max, 'Muse Spark always reasons, so reasoning_effort: none returns HTTP 400'; max_completion_tokens 'counting both visible output and reasoning tokens'. Shipped E (live_client ASK_EFFORT minimal, ASK_MAX_TOKENS 2000): full eval live, recorded qa7, no worse: heart source 36/38 (citations 35, was 32; flags 3, was 5), brain 35/35 (34, flags 5), picture questions heart 5/6, brain 6/6 as before; Spark p50 3.5/3.2 s (was 7.7/6.7). Release to first word, headless Chrome, live: p50 5.0 s (was 8.5), 10 of 12 within 6.0 s, two at 13.8 and 14.7 s. Mock replays and the fallback now on qa7; ask_e2e sentences unchanged.
 - [x] d9-7 Student wait: Still working at 8 s, too long at 20 s, server 25 s
@@ -425,10 +456,11 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 - [ ] d10-1 Fresh clone test (45 min)
   - Clone, make dev, run the demo script once.
+  - Note: DO NOW (Phase A, A5): clean-clone quickstart again at HEAD; last pass d9-22 at 0fe7379.
 - [ ] d10-2 Submit by 3 PM ET (30 min)
   - The official deadline is 9 PM ET. Do not use it.
+  - Note: NEEDS DEEPAK: the submission form, text in docs/submission/FORM.md; target 3 PM ET Nov 4.
 
 ## Open issues
 
-- (medium) ASR heard "aorta" as "order" on a synthetic clip with no hints
-- (high) SAM returned zero instances for "left ventricle" on heart.png in 2 of 2 live calls; diagnostic in progress
+- (medium) ASR heard "aorta" as "order" on a synthetic clip with no hints: Mitigated: the figure's labels go as keyword hints (d9-8). On three synthetic clips every word was right with and without hints (eval/qa/VOICE.md). Accuracy on a real voice is not measured.
