@@ -70,8 +70,10 @@ npm run dev:phone
 
 Open, in Safari:
 
-- `https://Zedlers-MacBook-Pro.local:8443/`
+- `https://<your-mac>.local:8443/`
 - or `https://<LAN address>:8443/`, the address `npm run cert:phone` printed
+
+`<your-mac>` is this Mac's local name: `scutil --get LocalHostName`.
 
 Then:
 

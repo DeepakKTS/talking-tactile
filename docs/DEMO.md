@@ -91,13 +91,15 @@ caffeinate -dimsu
 ### URLs on the iPhone
 
 Use the `.local` name first; the IP is the address `npm run cert:phone` printed.
+`<your-mac>` is this Mac's local name: `scutil --get LocalHostName`. `make demo-live` prints
+these URLs with the real name.
 
 | Page | URL |
 |---|---|
-| Device check | `https://Zedlers-MacBook-Pro.local:5173/explore?check=1` |
-| Heart, version 4 | `https://Zedlers-MacBook-Pro.local:5173/explore?figure=913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada&version=4` |
-| Commons brain, version 4 | `https://Zedlers-MacBook-Pro.local:5173/explore?figure=046e94d4f0b53298900ab96754caeb348dbc624b35841512d4e5b1198a36a699&version=4` |
-| Author | `https://Zedlers-MacBook-Pro.local:5173/author` (film on the Mac at `http://localhost:5173/author`) |
+| Device check | `https://<your-mac>.local:5173/explore?check=1` |
+| Heart, version 4 | `https://<your-mac>.local:5173/explore?figure=913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada&version=4` |
+| Commons brain, version 4 | `https://<your-mac>.local:5173/explore?figure=046e94d4f0b53298900ab96754caeb348dbc624b35841512d4e5b1198a36a699&version=4` |
+| Author | `https://<your-mac>.local:5173/author` (film on the Mac at `http://localhost:5173/author`) |
 
 Published versions live in `data/published/` on this Mac (git-ignored). A fresh clone has
 none: upload and publish first (README quickstart).

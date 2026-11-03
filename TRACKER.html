@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 392,
- "updated_at": "2026-11-03T12:18:50.381Z",
+ "rev": 393,
+ "updated_at": "2026-11-03T18:59:20.022Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -1593,7 +1593,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "",
    "fallback": "",
    "status": "done",
-   "note": "Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), Zedlers-MacBook-Pro.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://Zedlers-MacBook-Pro.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.",
+   "note": "Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), \u003cyour-mac>.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://\u003cyour-mac>.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts.",
    "done_at": "2026-10-30T20:29:54.649Z",
    "tags": [
     "explore",
@@ -2029,7 +2029,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "",
    "fallback": "",
    "status": "done",
-   "note": "eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://Zedlers-MacBook-Pro.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands.",
+   "note": "eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://\u003cyour-mac>.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands.",
    "done_at": "2026-11-02T21:10:06.494Z",
    "tags": [
     "docs",
@@ -3914,6 +3914,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "log": [
   {
+   "ts": "2026-11-03T18:59:20.022Z",
+   "kind": "claude",
+   "text": "Redacted 6 passages (1 distinct): Release prep: the Mac's Bonjour name replaced with \u003cyour-mac>.local before the repo goes public."
+  },
+  {
    "ts": "2026-11-03T12:18:50.381Z",
    "kind": "claude",
    "text": "Task d9-24 \"Release check before going public (read-only)\" is now done. Note: Read-only, Nov 3. Never committed: fixtures/private/ (0 commits), fixtures/recorded/private_* (0), the private image's blob (0). Tracked tree: the private file name in services/api/app/meta/plan_eval.py (kept by d8-40) and apps/web/scripts/devserver.test.ts (Nov 3 security test, a path only); its id prefix in 36 lines of eval/live/ledger.jsonl (not edited, by decision); no /Users/ path, no user name, no email. History (no rewrite, by decision): the figure's old name in 8 commits, its file name in 4, its full id in 4, per-part plan rows in eval/plan before 7c59107; the Mac user name in 23 diff lines of commits since corrected; emails only the commit author, the Co-Authored-By noreply and a test's t@example.com. Docs name the Mac's Bonjour host (DEMO.md 4, eval/gate-b/README 1, tracker). LICENSE full Apache-2.0 text, GitHub detects apache-2.0; NOTICE and ATTRIBUTION cover every committed figure, audio clip, model file and library, the screenshots and the diagram. Left before public: decide on the host name in docs and the private file name in two files; repo description empty; optional license fields in package.json and pyproject.toml; early-start has no commits outside main."
@@ -4611,7 +4616,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   {
    "ts": "2026-11-02T21:10:06.494Z",
    "kind": "claude",
-   "text": "Task d8-8 \"Gate B guide: run the recorded protocol on the iPhone\" is now done. Note: eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://Zedlers-MacBook-Pro.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands."
+   "text": "Task d8-8 \"Gate B guide: run the recorded protocol on the iPhone\" is now done. Note: eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://\u003cyour-mac>.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands."
   },
   {
    "ts": "2026-11-02T21:10:06.454Z",
@@ -4796,7 +4801,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   {
    "ts": "2026-10-30T20:29:54.649Z",
    "kind": "claude",
-   "text": "Task d5-25 \"iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check\" is now done. Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), Zedlers-MacBook-Pro.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://Zedlers-MacBook-Pro.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts."
+   "text": "Task d5-25 \"iPhone HTTPS: mkcert certificate, npm run dev:phone, /explore?check=1 device check\" is now done. Note: Status check first: not there before. npm run cert:phone (apps/web/scripts/phone-cert.sh) makes an mkcert server certificate for the LAN address (192.168.1.10), \u003cyour-mac>.local, localhost and 127.0.0.1 into apps/web/.certs/ (git-ignored), signed by the existing local root (rootCA-key.pem untouched); valid to 30 Jan 2029. npm run dev:phone: HTTPS=1 Vite on every interface with that certificate, API proxied as before; checked with curl against the root certificate: https://192.168.1.10:5173/explore?check=1 and https://\u003cyour-mac>.local:5173/explore?check=1 both 200, verify 0. /explore?check=1 (DeviceCheck.tsx, check.ts): secure page, camera and which way it faces, hand tracker frames a second and MediaPipe delegate over 5 s, local voice, Screen Wake Lock held and released, microphone. Headless Chrome with a fake camera: hand tracker 19.2 fps GPU, voice Samantha, wake lock refused (headless), fake camera does not say its facing. Explore's camera now asks for the rear camera (facingMode ideal environment); before, an iPhone would open its front camera. Tests: check.test.ts, phone-https.test.ts."
   },
   {
    "ts": "2026-10-30T20:29:42.512Z",
