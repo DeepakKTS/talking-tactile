@@ -214,6 +214,14 @@ class _Fix:
         self.ing, self.u, self.g, self.rec = context
 
 
+# Accepting a previewed outline is answered from the cache, with no call
+# (Runner.outline_mask), so it still works at the cap.
+FIX_CAP = (
+    "This figure used its fix calls for this version. "
+    "An outline you already previewed can still be accepted: it needs no new call."
+)
+
+
 def _fix_errors(exc: Exception) -> ApiError:
     if isinstance(exc, MockFixtureMissingError):
         return ApiError(
@@ -222,7 +230,7 @@ def _fix_errors(exc: Exception) -> ApiError:
             "Fixing an outline needs live mode (LIVE=1), or recorded answers in mock mode.",
         )
     if isinstance(exc, LiveCallCapError):
-        return ApiError(429, "fix_cap", "This figure used its fix calls for this version.")
+        return ApiError(429, "fix_cap", FIX_CAP)
     return ApiError(502, "sam_failed", "SAM did not answer. Try the click again.", True)
 
 

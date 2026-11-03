@@ -31,7 +31,7 @@ filler, and it says what still works or what to do next.
 | # | Case | Current behavior | Expected | Status |
 |---|---|---|---|---|
 | E1 | Fix-outline click on the background | A positive point off the figure: 422 "Point ({x}, {y}) is on the page, not the figure." (`api/pipeline/outlines.py:40-41`); dropped in the panel with the message (`web/author/Review.tsx:514-515`). Test `test_outlines.py::test_a_positive_click_off_the_figure_is_refused_and_one_on_text_warned` | Same | ok |
-| E2 | Fix-call cap reached | 429 "This figure used its fix calls for this version." (`api/figures.py:224-225`); does not say what still works | Says a previewed outline can still be accepted | fix |
+| E2 | Fix-call cap reached | 429 "This figure used its fix calls for this version." (`api/figures.py:224-225`); does not say what still works | Says a previewed outline can still be accepted | fixed: `test_fix_api.py::test_at_the_fix_cap_a_new_point_is_refused_and_a_previewed_outline_still_accepted` |
 | E3 | Accept fails (cap, network) | `send()` swallows the error and the panel closes, losing the teacher's points (`Review.tsx:60-73,128-131`) | Panel stays open with its points and the error | fix |
 | E4 | Undo after accept | No undo: edits are append-only (`api/pipeline/edits.py:276-289`); rename again or accept a new outline; merge, delete and check are final. Delete asks to confirm, merge from a part's form does not (`Review.tsx:457-475`) | Undo | limitation |
 | E5 | Publish twice | Same job: same version, 200 `created: false` (`api/figures.py:476-478`). Tests `test_api_figures.py::test_upload_edit_publish_and_fetch`, `::test_a_new_edit_after_publishing_makes_version_two` | Same | ok |

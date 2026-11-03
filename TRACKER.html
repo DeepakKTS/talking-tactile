@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 288,
- "updated_at": "2026-11-03T02:08:58.120Z",
+ "rev": 290,
+ "updated_at": "2026-11-03T02:14:25.270Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2308,6 +2308,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T02:08:58.120Z"
   },
   {
+   "id": "d8-26",
+   "day": 8,
+   "title": "Edge case E2: the fix-call cap says a previewed outline can still be accepted",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/figures.py FIX_CAP: at the fix-call cap the 429 says 'This figure used its fix calls for this version. An outline you already previewed can still be accepted: it needs no new call.' Checked first: Runner.outline_mask serves an accepted outline from the cache. Test: test_fix_api.py::test_at_the_fix_cap_a_new_point_is_refused_and_a_previewed_outline_still_accepted (cap of one: a second point gets the 429 and the sentence; accepting the first preview succeeds, the job ends done, still one fix call).",
+   "done_at": "2026-11-03T02:14:25.270Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T02:14:25.270Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3220,6 +3236,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T02:14:25.270Z",
+   "kind": "claude",
+   "text": "Task d8-26 \"Edge case E2: the fix-call cap says a previewed outline can still be accepted\" is now done. Note: app/figures.py FIX_CAP: at the fix-call cap the 429 says 'This figure used its fix calls for this version. An outline you already previewed can still be accepted: it needs no new call.' Checked first: Runner.outline_mask serves an accepted outline from the cache. Test: test_fix_api.py::test_at_the_fix_cap_a_new_point_is_refused_and_a_previewed_outline_still_accepted (cap of one: a second point gets the 429 and the sentence; accepting the first preview succeeds, the job ends done, still one fix call)."
+  },
+  {
+   "ts": "2026-11-03T02:14:25.232Z",
+   "kind": "claude",
+   "text": "Task d8-26 \"Edge case E2: the fix-call cap says a previewed outline can still be accepted\" added to day 8."
+  },
   {
    "ts": "2026-11-03T02:08:58.120Z",
    "kind": "claude",

@@ -11,7 +11,9 @@ import cv2
 import httpx
 import numpy as np
 
+from app.figures import FIX_CAP
 from app.main import create_app
+from app.meta.live import LiveCallCapError
 from app.models.regions import RegionsFile
 from app.paths import FIXTURES_DIR
 from tests.test_runner_points import MASKS, FakeLive, W
@@ -151,3 +153,42 @@ def test_mock_mode_without_recordings_says_fix_needs_live_mode(tmp_path: Path) -
     got = run(tmp_path, MockMetaClient(RULES.meta), body)  # type: ignore[arg-type]
     assert got["fix"] == (503, "fix_unavailable")
     assert json.dumps(got)  # the answer is plain JSON
+
+
+class _CappedAtOne(FakeLive):
+    """One fix call per figure version, as the real counting client allows fix_call_cap."""
+
+    async def segment_points(self, *args: Any, **kw: Any) -> Any:
+        if kw.get("kind") == "fix" and self.calls.count("fix right chamber") >= 1:
+            raise LiveCallCapError("cap")
+        return await super().segment_points(*args, **kw)
+
+
+def test_at_the_fix_cap_a_new_point_is_refused_and_a_previewed_outline_still_accepted(
+    tmp_path: Path,
+) -> None:
+    client = _CappedAtOne()
+    point = inside("right chamber")
+
+    async def body(http: httpx.AsyncClient, service: Any, fid: str, out: dict[str, Any]) -> None:
+        base = f"/api/figures/{fid}"
+        draft = (await http.get(f"{base}/regions.json")).json()
+        (spill,) = [
+            r for r in draft["regions"] if any(f["reason"] == "spill" for f in r.get("flags", []))
+        ]
+        sid = spill["id"]
+        first = await http.post(f"{base}/regions/{sid}/fix", json={"positive": [point]})
+        assert first.json()["outcome"] == "ran"
+        other = [point[0] + 2, point[1]]
+        capped = await http.post(f"{base}/regions/{sid}/fix", json={"positive": [other]})
+        assert capped.status_code == 429
+        assert capped.json()["error"] == {"code": "fix_cap", "message": FIX_CAP, "retryable": False}
+        accepted = await http.patch(
+            f"{base}/regions/{sid}", json={"op": "outline", "positive": [point]}
+        )
+        assert accepted.status_code == 202
+        await service.drain()
+        assert (await http.get(base)).json()["job"]["status"] == "done"
+        assert client.calls.count("fix right chamber") == 1  # the accept made no call
+
+    run(tmp_path, client, body)
