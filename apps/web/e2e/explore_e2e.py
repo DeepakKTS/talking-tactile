@@ -70,6 +70,24 @@ SPEECH_JS = """
   };
 })();
 """
+# The order of the Wake Lock request and the camera and microphone requests, for the check
+# that the Wake Lock comes first in the tap. Headless Chrome has no screen to keep on, so the
+# Wake Lock here is granted by a stand-in that records the call.
+ORDER_JS = """
+(() => {
+  window.__order = [];
+  const sentinel = { release: () => Promise.resolve(), addEventListener: () => undefined };
+  Object.defineProperty(navigator, "wakeLock", { configurable: true, value: {
+    request: () => { window.__order.push("wakeLock"); return Promise.resolve(sentinel); },
+  } });
+  const md = navigator.mediaDevices;
+  if (md && md.getUserMedia) {
+    const gum = md.getUserMedia.bind(md);
+    md.getUserMedia = (c) => { window.__order.push(c && c.video ? "camera" : "microphone"); return gum(c); };
+  }
+})();
+"""
+SPEECH_JS += ORDER_JS
 # A device whose voices all need the network.
 NETWORK_VOICES_JS = """
 (() => {
@@ -461,6 +479,27 @@ def failed_loads_are_told(saved: tuple[Any, Requests], fresh: tuple[Any, Request
     return out
 
 
+def device_check(page: Page, base: str, fail: list[str]) -> dict[str, Any]:
+    """/explore?check=1 on Chrome's fake camera with the real MediaPipe: the Wake Lock is the
+    first request of the tap, the hand tracker is measured after it warms up and never
+    reported as loading, and every row comes back."""
+    page.goto(f"{base}/explore?check=1")
+    page.get_by_role("button", name="Check this device").click()
+    page.wait_for_function("() => Array.isArray(window.__ttCheck)", timeout=120000)
+    rows = page.evaluate("() => window.__ttCheck")
+    order = page.evaluate("() => window.__order")
+    hands = next((r for r in rows if r["name"] == "Hand tracker"), {})
+    out = {"order": order, "hands": hands, "rows": [f"{r['name']}: {r['state']}" for r in rows]}
+    if not order or order[0] != "wakeLock":
+        fail.append(f"device check: the Wake Lock was not the first request: {order}")
+    if "loading" in hands.get("detail", "") or hands.get("state") == "fail":
+        fail.append(f"device check: hand tracker {hands}")
+    wake = next((r for r in rows if r["name"] == "Screen Wake Lock"), {})
+    if len(rows) != 6 or wake.get("state") != "ok":
+        fail.append(f"device check rows: {out['rows']}")
+    return out
+
+
 CAMERA_DENIED = "The camera did not start. Allow the camera and press Start again."
 DENY_CAMERA_JS = """
 navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
@@ -499,6 +538,12 @@ def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
     page.route("**/*", guard)
     page.goto(f"{base}/explore?figure={fid}&corners=0,0,1280,0,1280,720,0,720")
     page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    # The tracker loads with the page: ready before Start is pressed, so Start never waits
+    # for the model download.
+    try:
+        page.wait_for_function("window.__tt.tracker && window.__tt.tracker.ready", timeout=60000)
+    except Exception:
+        fail.append("the hand tracker was not ready before Start: it did not preload")
     page.get_by_role("button", name="Start exploring").click()
     try:
         page.wait_for_function(
@@ -510,9 +555,14 @@ def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
     page.wait_for_timeout(5000)
     out = page.evaluate(
         "() => ({ backend: window.__tt.camera.backend, pump: { ...window.__tt.camera.stats },"
-        " captureToLandmarksMs: window.__tt.metrics.captureToLandmarksMs.summary() })"
+        " captureToLandmarksMs: window.__tt.metrics.captureToLandmarksMs.summary(),"
+        " delegate: window.__tt.tracker.delegate, timeToFirstResultMs: window.__tt.tracker.timeToFirstResultMs,"
+        " fps: window.__tt.tracker.fps(), order: window.__order })"
     )
     out["refused_requests"] = refused
+    order = out["order"]
+    if not order or order[0] != "wakeLock" or "camera" not in order:
+        fail.append(f"the Wake Lock was not requested before the camera: {order}")
     if refused:
         fail.append(f"Explore asked for remote files: {refused[:5]}")
     if out["captureToLandmarksMs"]["count"] < 10:
@@ -592,6 +642,8 @@ def explore_run(browser: Any, base: str, fid: str, regions: list[dict[str, Any]]
     result["failed_loads"] = failed_loads_are_told((script_ctx, script_reqs), (fresh_ctx, fresh_reqs), base, fid, fail)
     _, page, _ = context("explore camera denied")
     result["camera_denied"] = camera_denied(page, base, fid, fail)
+    _, page, _ = context("explore device check")
+    result["device_check"] = device_check(page, base, fail)
     _, cam, cam_reqs = context("explore camera")
     result["camera"] = camera(cam, base, fid, fail)
     # What /explore asked for, by path, in script mode and in camera mode with MediaPipe.

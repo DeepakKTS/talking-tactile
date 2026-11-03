@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cameraResult, handsResult, micResult, secureResult, summary, voiceResult, wakeResult } from "./check";
+import { SAMPLE_MS, WARM_MAX_MS, cameraResult, handsResult, measureHands, micResult, secureResult, summary, voiceResult, wakeResult } from "./check";
 
 const voice = (name: string, local: boolean, lang = "en-US") => ({ name, lang, localService: local, default: false }) as SpeechSynthesisVoice;
 
@@ -14,12 +14,50 @@ describe("device check", () => {
     });
   });
 
-  it("gives the hand tracker's frames a second and its delegate", () => {
-    expect(handsResult(150, 5000, "mediapipe GPU", [12, 14])).toEqual({
-      name: "Hand tracker", state: "ok", detail: "30.0 frames a second, delegate GPU, 13 ms a frame.",
+  it("gives the hand tracker's frames a second, ms a frame, delegate and first result", () => {
+    const gpu = { delegate: "GPU" as const, timeToFirstResultMs: 1240, fellBack: null };
+    expect(handsResult(150, 5000, gpu, [12, 14])).toEqual({
+      name: "Hand tracker", state: "ok",
+      detail: "30.0 frames a second, delegate GPU, 13 ms a frame, first result 1.2 s after the first frame.",
     });
-    expect(handsResult(25, 5000, "mediapipe CPU", [90]).state).toBe("warn");
-    expect(handsResult(0, 5000, "loading", []).state).toBe("fail");
+    const cpu = { delegate: "CPU" as const, timeToFirstResultMs: 900, fellBack: "no result from the GPU 8 s after its first frame" };
+    const slow = handsResult(25, 5000, cpu, [90]);
+    expect(slow.state).toBe("warn");
+    expect(slow.detail).toContain("delegate CPU (GPU dropped: no result from the GPU 8 s after its first frame)");
+    const never = handsResult(0, 0, gpu, [], false);
+    expect(never.state).toBe("fail");
+    expect(never.detail).toBe("No result within 30 s of warming up, on the GPU.");
+    expect(never.detail).not.toContain("loading");
+  });
+
+  it("waits for the tracker to warm up before measuring, and counts nothing from before", async () => {
+    const log: string[] = [];
+    let frames = 0;
+    let warmUp: (ok: boolean) => void = () => undefined;
+    const tracker = {
+      delegate: "CPU" as const, timeToFirstResultMs: 700, fellBack: "no result from the GPU 8 s after its first frame",
+      whenWarm: (maxMs: number) => { log.push(`wait ${String(maxMs)}`); return new Promise<boolean>((r) => { warmUp = r; }); },
+    };
+    let clock = 0;
+    const measuring = measureHands(
+      tracker,
+      { reset: () => { log.push("reset"); frames = 0; }, read: () => ({ frames, inferMs: [20] }) },
+      (ms) => { log.push(`sample ${String(ms)}`); frames += 100; clock += ms; return Promise.resolve(); },
+      () => clock,
+    );
+    frames = 37; // cold-start frames, before the first result: not counted
+    await Promise.resolve();
+    expect(log).toEqual([`wait ${String(WARM_MAX_MS)}`]);
+    warmUp(true);
+    const r = await measuring;
+    expect(log).toEqual([`wait ${String(WARM_MAX_MS)}`, "reset", `sample ${String(SAMPLE_MS)}`]);
+    expect(r.detail.startsWith("20.0 frames a second, delegate CPU")).toBe(true);
+  });
+
+  it("a tracker that never warms up is a failure with its delegate, not loading", async () => {
+    const tracker = { delegate: "GPU" as const, timeToFirstResultMs: null, fellBack: null, whenWarm: () => Promise.resolve(false) };
+    const r = await measureHands(tracker, { reset: () => undefined, read: () => ({ frames: 0, inferMs: [] }) }, () => Promise.resolve());
+    expect(r).toEqual({ name: "Hand tracker", state: "fail", detail: "No result within 30 s of warming up, on the GPU." });
   });
 
   it("finds a voice that works offline, or says there is none", () => {

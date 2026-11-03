@@ -1,9 +1,13 @@
 // /explore?check=1: the device check (check.ts), as a page. Each result is a line of text;
-// the summary is announced. A headless run reads window.__ttCheck.
-import { useRef, useState } from "react";
+// the summary is announced. A headless run reads window.__ttCheck. The hand tracker loads
+// with the page (tracker.ts), so its download and GPU set-up are not part of the check; the
+// Wake Lock is the first thing the Check tap asks for (wakeLock.ts).
+import { useEffect, useRef, useState } from "react";
 import { EXPLORE } from "../shared/config";
 import { CameraLoop } from "./camera";
-import { type CheckResult, SAMPLE_MS, cameraResult, handsResult, micResult, secureResult, summary, voiceResult, wakeResult } from "./check";
+import { type CheckResult, SAMPLE_MS, cameraResult, handsResult, measureHands, micResult, secureResult, summary, voiceResult, wakeResult } from "./check";
+import { HandTracker } from "./tracker";
+import { ScreenAwake } from "./wakeLock";
 
 declare global {
   interface Window {
@@ -25,17 +29,6 @@ async function voices(): Promise<SpeechSynthesisVoice[] | null> {
   return speechSynthesis.getVoices();
 }
 
-async function wakeLock(): Promise<CheckResult> {
-  if (!("wakeLock" in navigator)) return wakeResult(false);
-  try {
-    const lock = await navigator.wakeLock.request("screen");
-    await lock.release();
-    return wakeResult(true);
-  } catch (err) {
-    return wakeResult(true, message(err));
-  }
-}
-
 async function microphone(): Promise<CheckResult> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -46,24 +39,27 @@ async function microphone(): Promise<CheckResult> {
   }
 }
 
-async function cameraAndHands(video: HTMLVideoElement, onStatus: (s: string) => void): Promise<CheckResult[]> {
+async function cameraAndHands(video: HTMLVideoElement, tracker: HandTracker, cam: { current: CameraLoop | null }, onStatus: (s: string) => void): Promise<CheckResult[]> {
   let frames = 0;
   const infer: number[] = [];
-  const loop = new CameraLoop({ video, maxHands: EXPLORE.hands.max_hands, onStatus, onHands: (f) => { frames += 1; infer.push(f.inferMs); } });
+  const loop = new CameraLoop({ video, tracker, onHands: (f) => { frames += 1; infer.push(f.inferMs); } });
+  cam.current = loop;
   try {
     await loop.start();
   } catch (err) {
     loop.stop();
-    return [cameraResult(null, "", message(err)), handsResult(0, 1, loop.backend, [])];
+    cam.current = null;
+    return [cameraResult(null, "", message(err)), handsResult(0, 0, tracker, [], false)];
   }
   const track = video.srcObject instanceof MediaStream ? video.srcObject.getVideoTracks()[0] : undefined;
   const camera = cameraResult(track?.getSettings() ?? null, track?.label ?? "");
-  frames = 0;
-  infer.length = 0;
-  const t0 = performance.now();
-  await new Promise((r) => setTimeout(r, SAMPLE_MS));
-  const hands = handsResult(frames, performance.now() - t0, loop.backend, infer);
+  onStatus("Waiting for the hand tracker to warm up, then measuring for 5 seconds.");
+  const hands = await measureHands(tracker, {
+    reset: () => { frames = 0; infer.length = 0; },
+    read: () => ({ frames, inferMs: [...infer] }),
+  });
   loop.stop();
+  cam.current = null;
   return [camera, hands];
 }
 
@@ -72,18 +68,45 @@ export function DeviceCheck() {
   const [status, setStatus] = useState("Press Check this device. It asks for the camera and the microphone.");
   const [busy, setBusy] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
+  const tracker = useRef<HandTracker | null>(null);
+  const camera = useRef<CameraLoop | null>(null);
+  const awake = useRef<ScreenAwake | null>(null);
+
+  // Loads with the page: the model, the wasm and the GPU delegate, before Check is pressed.
+  useEffect(() => {
+    const t = new HandTracker({
+      maxHands: EXPLORE.hands.max_hands,
+      onResult: (msg) => camera.current?.result(msg),
+      onRestart: () => camera.current?.restart(),
+      onStatus: () => undefined,
+    });
+    tracker.current = t;
+    awake.current = new ScreenAwake((text) => {
+      setStatus(text);
+      if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+    });
+    return () => {
+      t.stop();
+      tracker.current = null;
+    };
+  }, []);
 
   const run = async () => {
+    // First, before any await: Safari grants the Wake Lock only within the tap.
+    const wake = awake.current?.request() ?? Promise.resolve("Not supported here");
     const v = video.current;
-    if (!v || busy) return;
+    const t = tracker.current;
+    if (!v || !t || busy) return;
     setBusy(true);
     const out: CheckResult[] = [secureResult(window.isSecureContext)];
     const show = (r: CheckResult[]) => { out.push(...r); setResults([...out]); };
     setResults([...out]);
-    setStatus(`Checking the camera and the hand tracker, about ${String(SAMPLE_MS / 1000)} seconds.`);
-    show(await cameraAndHands(v, () => undefined));
+    setStatus(`Checking the camera and the hand tracker, about ${String(SAMPLE_MS / 1000)} seconds after it warms up.`);
+    show(await cameraAndHands(v, t, camera, setStatus));
     show([voiceResult(await voices())]);
-    show([await wakeLock()]);
+    const refused = await wake;
+    if (refused === null) await awake.current?.release();
+    show([refused === null ? wakeResult(true) : wakeResult(refused !== "Not supported here", refused)]);
     show([await microphone()]);
     window.__ttCheck = out;
     setStatus(summary(out));

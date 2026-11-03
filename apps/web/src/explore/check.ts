@@ -2,12 +2,14 @@
 // since the camera, the microphone, speech and the wake lock all need a user gesture.
 // - Secure page: the camera and the microphone need HTTPS (npm run dev:phone on the LAN).
 // - Camera: opens the rear camera when there is one; says which way it faces.
-// - Hand tracker: the hand worker on that camera for SAMPLE_MS: frames a second and the
-//   MediaPipe delegate it got, GPU or CPU.
+// - Hand tracker: the page's tracker (loaded with the page), on that camera. The check waits
+//   for it to warm up (a first result, on GPU or after the fallback to CPU), then measures
+//   SAMPLE_MS: frames a second, ms a frame, the delegate in use, time to first result.
 // - Local voice: a speech voice that works offline (localService), as Explore needs.
-// - Screen Wake Lock: held and released, so the screen stays on while exploring.
+// - Screen Wake Lock: requested first in the tap, held, then released (wakeLock.ts).
 // - Microphone: opened, for spoken questions.
 import { pickVoice } from "./audio";
+import type { Delegate } from "./warmup";
 
 export type CheckState = "ok" | "warn" | "fail";
 
@@ -29,13 +31,56 @@ export function cameraResult(settings: MediaTrackSettings | null, label: string,
   return { name: "Camera", state: "warn", detail: `Opened ${which}, ${size}${label ? `, ${label}` : ""}. Explore needs the rear camera looking down at the sheet.` };
 }
 
-export function handsResult(frames: number, ms: number, backend: string, inferMs: number[]): CheckResult {
+/** The tracker as the check reads it, after warm-up (tracker.ts). */
+export interface WarmTracker {
+  delegate: Delegate;
+  timeToFirstResultMs: number | null;
+  fellBack: string | null;
+}
+
+/** Frames and ms a frame over the sample, after warm-up; never "loading": a tracker that
+ * gave no result within the warm-up wait is a failure with its delegate. */
+export function handsResult(frames: number, ms: number, t: WarmTracker, inferMs: number[], warm = true): CheckResult {
+  if (!warm) {
+    return { name: "Hand tracker", state: "fail", detail: `No result within ${String(WARM_MAX_MS / 1000)} s of warming up, on the ${t.delegate}.` };
+  }
   const fps = ms > 0 ? (frames * 1000) / ms : 0;
   const infer = inferMs.length ? inferMs.reduce((a, b) => a + b, 0) / inferMs.length : NaN;
-  const delegate = /\bGPU\b/.test(backend) ? "GPU" : /\bCPU\b/.test(backend) ? "CPU" : backend || "not loaded";
-  const detail = `${fps.toFixed(1)} frames a second, delegate ${delegate}${Number.isFinite(infer) ? `, ${infer.toFixed(0)} ms a frame` : ""}.`;
+  const first = t.timeToFirstResultMs;
+  const detail = [
+    `${fps.toFixed(1)} frames a second`,
+    `delegate ${t.delegate}${t.fellBack ? ` (GPU dropped: ${t.fellBack})` : ""}`,
+    ...(Number.isFinite(infer) ? [`${infer.toFixed(0)} ms a frame`] : []),
+    ...(first !== null ? [`first result ${(first / 1000).toFixed(1)} s after the first frame`] : []),
+  ].join(", ") + ".";
   if (frames === 0) return { name: "Hand tracker", state: "fail", detail: `No frame came back. ${detail}` };
   return { name: "Hand tracker", state: fps >= MIN_FPS ? "ok" : "warn", detail };
+}
+
+/** How long the check waits for the first result: the GPU's fallback time, a CPU start
+ * after it, and a cold model download on a slow network. */
+export const WARM_MAX_MS = 30000;
+
+export interface HandSample {
+  reset(): void;
+  read(): { frames: number; inferMs: number[] };
+}
+
+/** Waits for the tracker to warm up (a first result, on GPU or after the fallback to CPU),
+ * then measures for SAMPLE_MS. Nothing before the first result counts. */
+export async function measureHands(
+  t: WarmTracker & { whenWarm(maxMs: number): Promise<boolean> },
+  sample: HandSample,
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+  now: () => number = () => performance.now(),
+): Promise<CheckResult> {
+  const warm = await t.whenWarm(WARM_MAX_MS);
+  if (!warm) return handsResult(0, 0, t, [], false);
+  sample.reset();
+  const t0 = now();
+  await sleep(SAMPLE_MS);
+  const { frames, inferMs } = sample.read();
+  return handsResult(frames, now() - t0, t, inferMs);
 }
 
 export function voiceResult(voices: readonly SpeechSynthesisVoice[] | null): CheckResult {

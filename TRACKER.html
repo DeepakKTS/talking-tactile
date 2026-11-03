@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 341,
- "updated_at": "2026-11-03T05:34:19.721Z",
+ "rev": 343,
+ "updated_at": "2026-11-03T06:07:39.753Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2623,6 +2623,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T05:34:19.721Z"
   },
   {
+   "id": "d8-46",
+   "day": 8,
+   "title": "Hand tracker warm-up: preload, GPU first, CPU fallback 8 s after warm-up; check waits; Wake Lock first in the tap (app)",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "From the iPhone check: Safari's hand tracker gave no frame in the 5 s sample (delegate GPU), a second tap passed all 6 (20.8 fps, GPU, 24 ms a frame): a cold-start race (model and wasm download, GPU set-up, first frames compiling), not a broken GPU. Wake Lock NotAllowedError: the check asked for it after the camera and voices awaits, outside Safari's tap. App: explore/warmup.ts (Warmup, the shared policy: GPU first; the CPU fallback timer starts at the later of GPU ready and the first frame fed; 8 s; a GPU error drops it at once; CPU never dropped; time to first result, fps over 5 s); explore/tracker.ts (HandTracker: made with the page so the model, wasm and GPU load before Start or Check; frames fed only once ready; logs the delegate; delegate, timeToFirstResultMs, fps exposed, window.__tt.tracker in Explore); the worker initialises only the delegate it is given; CameraLoop takes the page's tracker. Device check: waits for warm-up (first result on GPU or after the CPU fallback, up to 30 s), then measures 5 s: delegate, time to first result, fps, ms a frame; never 'loading'. explore/wakeLock.ts ScreenAwake: requested first in the Start and Check handlers before any await, not awaited; again on visibilitychange to visible; refused or unsupported: shown and spoken once 'To keep the screen on, set Auto-Lock to Never in Settings.'. Tests: warmup.test.ts (a GPU that never returns, a 10 s cold start, ready long before Start, GPU error, fps), tracker.test.ts (fake workers: GPU never returns -> CPU at 8 s after the first frame; 10 s model load -> no fallback; error -> CPU; late messages ignored; whenWarm), check.test.ts (the warm-up wait, never loading), wakeLock.test.ts; explore_e2e: tracker ready before Start, Wake Lock before the camera in Explore and the check page, device check rows (GPU 20 fps, first result 0.2 s in headless Chrome). One commit for the app side: the three are in the same files.",
+   "done_at": "2026-11-03T06:07:39.753Z",
+   "tags": [
+    "fix",
+    "explore"
+   ],
+   "changed_at": "2026-11-03T06:07:39.753Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3536,6 +3552,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T06:07:39.753Z",
+   "kind": "claude",
+   "text": "Task d8-46 \"Hand tracker warm-up: preload, GPU first, CPU fallback 8 s after warm-up; check waits; Wake Lock first in the tap (app)\" is now done. Note: From the iPhone check: Safari's hand tracker gave no frame in the 5 s sample (delegate GPU), a second tap passed all 6 (20.8 fps, GPU, 24 ms a frame): a cold-start race (model and wasm download, GPU set-up, first frames compiling), not a broken GPU. Wake Lock NotAllowedError: the check asked for it after the camera and voices awaits, outside Safari's tap. App: explore/warmup.ts (Warmup, the shared policy: GPU first; the CPU fallback timer starts at the later of GPU ready and the first frame fed; 8 s; a GPU error drops it at once; CPU never dropped; time to first result, fps over 5 s); explore/tracker.ts (HandTracker: made with the page so the model, wasm and GPU load before Start or Check; frames fed only once ready; logs the delegate; delegate, timeToFirstResultMs, fps exposed, window.__tt.tracker in Explore); the worker initialises only the delegate it is given; CameraLoop takes the page's tracker. Device check: waits for warm-up (first result on GPU or after the CPU fallback, up to 30 s), then measures 5 s: delegate, time to first result, fps, ms a frame; never 'loading'. explore/wakeLock.ts ScreenAwake: requested first in the Start and Check handlers before any await, not awaited; again on visibilitychange to visible; refused or unsupported: shown and spoken once 'To keep the screen on, set Auto-Lock to Never in Settings.'. Tests: warmup.test.ts (a GPU that never returns, a 10 s cold start, ready long before Start, GPU error, fps), tracker.test.ts (fake workers: GPU never returns -> CPU at 8 s after the first frame; 10 s model load -> no fallback; error -> CPU; late messages ignored; whenWarm), check.test.ts (the warm-up wait, never loading), wakeLock.test.ts; explore_e2e: tracker ready before Start, Wake Lock before the camera in Explore and the check page, device check rows (GPU 20 fps, first result 0.2 s in headless Chrome). One commit for the app side: the three are in the same files."
+  },
+  {
+   "ts": "2026-11-03T06:07:39.707Z",
+   "kind": "claude",
+   "text": "Task d8-46 \"Hand tracker warm-up: preload, GPU first, CPU fallback 8 s after warm-up; check waits; Wake Lock first in the tap (app)\" added to day 8."
+  },
   {
    "ts": "2026-11-03T05:34:19.721Z",
    "kind": "claude",

@@ -1,8 +1,10 @@
-// The camera loop, outside React: getUserMedia, newest frame only to the hand worker, and
-// each result handed on with the time it was captured and the time it came back.
-import type { FromWorker, ToWorker, WorkerHand } from "../workers/protocol";
+// The camera loop, outside React: getUserMedia, newest frame only to the page's hand tracker
+// (tracker.ts), and each result handed on with the time it was captured and the time it came
+// back.
+import type { FromWorker, WorkerHand } from "../workers/protocol";
 import { FramePump } from "./pump";
 import { AskError, type AskReply, type AskRequest } from "./session";
+import type { HandTracker } from "./tracker";
 
 export interface HandsFrame {
   hands: WorkerHand[];
@@ -17,33 +19,27 @@ export interface HandsFrame {
 
 export interface CameraLoopOptions {
   video: HTMLVideoElement;
-  maxHands: number;
+  /** Made when the page loaded (tracker.ts), so Start never waits for the model download. */
+  tracker: HandTracker;
   onHands: (f: HandsFrame) => void;
-  onStatus: (text: string) => void;
-  stubMs?: number;
 }
 
-const MODEL_URL = "/models/hand_landmarker.task";
+type Result = Extract<FromWorker, { type: "result" }>;
 
 export class CameraLoop {
-  private readonly worker: Worker;
   private readonly pump: FramePump<{ bitmap: ImageBitmap; id: number }>;
   private readonly capturedAt = new Map<number, number>();
   private frameId = 0;
   private running = false;
-  backend = "loading";
 
   constructor(private readonly o: CameraLoopOptions) {
-    this.worker = new Worker(new URL("../workers/hand.worker.ts", import.meta.url), { type: "module" });
     this.pump = new FramePump(({ bitmap, id }) => {
-      const msg: ToWorker = { type: "frame", id, bitmap, ts: performance.now() };
-      this.worker.postMessage(msg, [bitmap]);
+      if (!o.tracker.feed(id, bitmap)) this.pump.done(); // not ready: the frame is dropped
     });
-    this.worker.onmessage = (e: MessageEvent<FromWorker>) => {
-      this.onWorker(e.data);
-    };
-    const init: ToWorker = { type: "init", modelUrl: MODEL_URL, maxHands: o.maxHands, ...(o.stubMs ? { stubMs: o.stubMs } : {}) };
-    this.worker.postMessage(init);
+  }
+
+  get backend(): string {
+    return this.o.tracker.backend;
   }
 
   get stats() {
@@ -67,6 +63,8 @@ export class CameraLoop {
     this.running = true;
     const tick = (now: number) => {
       if (!this.running) return;
+      v.requestVideoFrameCallback(tick);
+      if (!this.o.tracker.ready) return; // still warming up: no frame is fed, none is lost
       const id = ++this.frameId;
       this.capturedAt.set(id, now);
       this.pump
@@ -75,32 +73,31 @@ export class CameraLoop {
           if (!sent) this.capturedAt.delete(id);
         })
         .catch(() => this.capturedAt.delete(id));
-      v.requestVideoFrameCallback(tick);
     };
     v.requestVideoFrameCallback(tick);
   }
 
+  /** Stops the camera. The tracker is the page's, and keeps running. */
   stop(): void {
     this.running = false;
     const stream = this.o.video.srcObject;
     if (stream instanceof MediaStream) for (const t of stream.getTracks()) t.stop();
-    this.worker.terminate();
   }
 
-  private onWorker(msg: FromWorker): void {
-    if (msg.type === "ready") {
-      this.backend = msg.backend;
-      this.o.onStatus(`Hand tracker ready: ${msg.backend}.`);
-    } else if (msg.type === "error") {
-      this.o.onStatus(`Hand tracker error: ${msg.message}`);
-    } else {
-      this.pump.done();
-      const receivedAt = performance.now();
-      const capturedAt = this.capturedAt.get(msg.id) ?? receivedAt;
-      this.capturedAt.delete(msg.id);
-      const v = this.o.video;
-      this.o.onHands({ hands: msg.hands, width: v.videoWidth, height: v.videoHeight, capturedAt, receivedAt, inferMs: msg.inferMs, brightness: msg.brightness });
-    }
+  /** A result from the tracker, for the frame in flight. */
+  result(msg: Result): void {
+    this.pump.done();
+    const receivedAt = performance.now();
+    const capturedAt = this.capturedAt.get(msg.id) ?? receivedAt;
+    this.capturedAt.delete(msg.id);
+    const v = this.o.video;
+    this.o.onHands({ hands: msg.hands, width: v.videoWidth, height: v.videoHeight, capturedAt, receivedAt, inferMs: msg.inferMs, brightness: msg.brightness });
+  }
+
+  /** The tracker dropped a worker (GPU to CPU) with a frame in flight that will not return. */
+  restart(): void {
+    this.pump.done();
+    this.capturedAt.clear();
   }
 }
 

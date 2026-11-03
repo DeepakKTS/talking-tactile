@@ -9,6 +9,8 @@ import type { RegionsFile } from "../shared/regions";
 import type { WorkerHand } from "../workers/protocol";
 import { AudioEngine, type AudioPort, NO_LOCAL_VOICE, type VoiceMode, browserAudioDeps } from "./audio";
 import { CameraLoop, type HandsFrame, askApi, askAudioApi } from "./camera";
+import { HandTracker } from "./tracker";
+import { ScreenAwake } from "./wakeLock";
 import { CornerClicks, loadCorners, parseQuad, saveCorners } from "./corners";
 import { FingertipTracker } from "./fingertip";
 import type { Side } from "./hands";
@@ -60,6 +62,8 @@ interface Trace {
   calibrated: boolean;
   figure: string | null;
   camera: { readonly backend: string; readonly stats: PumpStats } | null;
+  /** The page's hand tracker: the delegate in use, time to first result, frames a second. */
+  tracker: HandTracker | null;
   inject: (hands: WorkerHand[], width: number, height: number, brightness?: number) => void;
   command: (text: string) => Promise<void>;
   /** The last spoken question's WAV, for a headless check of the encoding. */
@@ -165,6 +169,8 @@ function ExploreSheet() {
   const engine = useRef<AudioEngine | null>(null);
   const audio = useRef<AudioPort | null>(null);
   const camera = useRef<CameraLoop | null>(null);
+  const handTracker = useRef<HandTracker | null>(null);
+  const awake = useRef<ScreenAwake | null>(null);
   const tracker = useRef(new FingertipTracker(EXPLORE, { dominant: settings.dominant, cameraMirrored: settings.cameraMirrored }));
   const corners = useRef<CornerClicks | null>(null);
   const clicking = useRef(false);
@@ -182,6 +188,7 @@ function ExploreSheet() {
     calibrated: false,
     figure,
     camera: null,
+    tracker: null,
     inject: () => undefined,
     command: () => Promise.resolve(),
     lastWav: null,
@@ -255,6 +262,8 @@ function ExploreSheet() {
 
   const start = useCallback(async () => {
     if (!file || started) return;
+    // First, before any await: Safari grants the Wake Lock only within the tap. Not awaited.
+    void awake.current?.request();
     const m = mirror.current;
     if (!m) return;
     const eng = new AudioEngine(EXPLORE, browserAudioDeps(m), settings.voice);
@@ -295,13 +304,9 @@ function ExploreSheet() {
     }
     const v = video.current;
     if (!v) return;
-    const loop = new CameraLoop({
-      video: v,
-      maxHands: EXPLORE.hands.max_hands,
-      onHands,
-      onStatus: setStatus,
-      ...(stubMs ? { stubMs } : {}),
-    });
+    const t = handTracker.current;
+    if (!t) return;
+    const loop = new CameraLoop({ video: v, tracker: t, onHands });
     camera.current = loop;
     trace.current.camera = loop;
     try {
@@ -317,7 +322,7 @@ function ExploreSheet() {
     const saved = given ?? loadCorners(storage(), v.videoWidth, v.videoHeight);
     if (saved) setCorners(saved, v.videoWidth, v.videoHeight);
     else startCorners();
-  }, [file, notTouchable, started, settings.voice, scripted, stubMs, given, onHands, say, setCorners, startCorners]);
+  }, [file, notTouchable, started, settings.voice, scripted, given, onHands, say, setCorners, startCorners]);
 
   // Keys work everywhere except while typing, where only Escape does.
   useEffect(() => {
@@ -392,6 +397,29 @@ function ExploreSheet() {
   }, [settings]);
 
   useEffect(() => () => camera.current?.stop(), []);
+
+  // The hand tracker loads with the page (the model, the wasm, the GPU delegate), so Start
+  // never waits for the download. Script mode has no camera and no tracker.
+  useEffect(() => {
+    if (scripted) return;
+    const t = new HandTracker({
+      maxHands: EXPLORE.hands.max_hands,
+      onResult: (msg) => camera.current?.result(msg),
+      onRestart: () => camera.current?.restart(),
+      onStatus: setStatus,
+      ...(stubMs ? { stubMs } : {}),
+    });
+    handTracker.current = t;
+    trace.current.tracker = t;
+    return () => {
+      t.stop();
+      handTracker.current = null;
+    };
+  }, [scripted, stubMs]);
+
+  useEffect(() => {
+    awake.current = new ScreenAwake(say);
+  }, [say]);
 
   // The camera view, for the helper who clicks the corners.
   useEffect(() => {
