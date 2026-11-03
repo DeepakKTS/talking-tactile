@@ -106,11 +106,16 @@ export class CameraLoop {
 
 const NOT_WORKING = "Questions are not working right now. Labels still work.";
 
-// A server error's message is written to be spoken (services/api/app/routes/ask.py).
+// The ask route's own errors carry a sentence written to be spoken
+// (services/api/app/routes/ask.py). Any other error (a 500, a 503 naming a server setting, a
+// proxy's page) is said as NOT_WORKING.
+const SPOKEN_CODES = new Set(["invalid_request", "audio_invalid", "question_cap", "answer_failed"]);
+
 async function spokenError(res: Response): Promise<AskError> {
-  const body = (await res.json().catch(() => ({}))) as { error?: { message?: unknown } };
-  const message = body.error?.message;
-  return new AskError(res.status !== 404 && typeof message === "string" ? message : NOT_WORKING);
+  const body = (await res.json().catch(() => ({}))) as { error?: { code?: unknown; message?: unknown } };
+  const { code, message } = body.error ?? {};
+  const spoken = typeof code === "string" && SPOKEN_CODES.has(code) && typeof message === "string";
+  return new AskError(spoken ? message : NOT_WORKING);
 }
 
 /** The server stops a question at 12 s and says so (services/api/app/ask.py DEADLINE_S), so
@@ -126,6 +131,7 @@ async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<str
     return (await res.json()) as Record<string, unknown>;
   } catch (err) {
     if (err instanceof DOMException && err.name === "TimeoutError") throw new AskError(NOT_WORKING);
+    if (err instanceof SyntaxError) throw new AskError(NOT_WORKING); // a 200 that is not JSON
     throw err;
   }
 }

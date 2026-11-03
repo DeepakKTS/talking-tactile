@@ -30,3 +30,39 @@ describe("question timeout", () => {
     expect((err as AskError).spoken).toBe(NOT_WORKING);
   });
 });
+
+function server(status: number, body: string) {
+  vi.stubGlobal("navigator", { onLine: true });
+  vi.stubGlobal("fetch", () => Promise.resolve(new Response(body, { status })));
+}
+
+const said = async () => {
+  const err: unknown = await askApi({ question: "What is this?" }).catch((e: unknown) => e);
+  return (err as AskError).spoken;
+};
+
+describe("what a failed question says", () => {
+  it("says the ask route's own sentences as sent", async () => {
+    const capped = "That is 50 questions for this session. Ask your teacher.";
+    server(429, JSON.stringify({ error: { code: "question_cap", message: capped, retryable: false } }));
+    expect(await said()).toBe(capped);
+  });
+
+  it("never says a message not written for a student", async () => {
+    for (const [status, code, message] of [
+      [500, "internal", "Something went wrong."],
+      [503, "unavailable", "Live Meta calls need LIVE=1 in the environment."],
+      [404, "not_found", "No published version 4."],
+    ] as const) {
+      server(status, JSON.stringify({ error: { code, message, retryable: true } }));
+      expect(await said()).toBe(NOT_WORKING);
+    }
+    server(502, "<html>Bad gateway</html>");
+    expect(await said()).toBe(NOT_WORKING);
+  });
+
+  it("a 200 that is not JSON is not mistaken for the network being down", async () => {
+    server(200, "<html>captive portal</html>");
+    expect(await said()).toBe(NOT_WORKING);
+  });
+});

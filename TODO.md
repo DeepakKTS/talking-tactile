@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 259, updated 2026-11-02T21:23:57.585Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 261, updated 2026-11-03T00:43:11.593Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -286,6 +286,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: 41 cases in 5 areas (upload, edits, Explore sheet, questions, server), current behavior with file:line at 4debae0, expected, status. 17 to fix, 4 limitations (undo, auto registration, drift, plus the rules on unfixed figures in the README), the rest ok; 6 marked needs device. Client timeout chosen from measured latency: server deadline 12 s, client 15 s.
 - [x] d8-11 Edge case Q2: a question never hangs: server deadline 12 s, client timeout 15 s
   - Note: api/routes/ask.py waits DEADLINE_S 12 s (app/ask.py) for transcribe and Spark together, then 502 with FAILED. Explore's two ask requests carry AbortSignal.timeout(15000) (camera.ts ASK_TIMEOUT_MS) and end in 'Questions are not working right now. Labels still work.', so a hold is never stuck busy. Chosen from the measured latency: slowest server time about 8.3 s (Spark 6.9 s max of 61, transcribe p95 1.4 s), release to first word p95 5.9 s. Tests: test_ask.py::test_a_question_past_the_deadline_says_questions_are_not_working, camera.test.ts question timeout (2).
+- [x] d8-12 Edge case S5: a student hears only sentences written to be spoken
+  - Note: apps/web/src/explore/camera.ts: a failed question says the server's message only for the ask route's own codes (invalid_request, audio_invalid, question_cap, answer_failed); a 500 ('Something went wrong.'), a 503 naming LIVE=1, a 404 or a proxy page say 'Questions are not working right now. Labels still work.'; a 200 that is not JSON says the same instead of the offline sentence. Tests: camera.test.ts 'what a failed question says' (3).
 
 ## Day 9: Tue Nov 3. Gate D
 
