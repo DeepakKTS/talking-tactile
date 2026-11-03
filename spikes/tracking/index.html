@@ -17,6 +17,9 @@
   #status { font-weight: 600; min-height: 1.4em; }
   #target { font-size: 96px; font-weight: 700; text-align: center; color: var(--accent); min-height: 1.2em; }
   #results { font: 13px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+  /* Long tokens (the per-target JSON, the stats) wrap, so a phone never scrolls sideways or
+     zooms out and every button stays where a tap lands. */
+  #results, #stats, #status { overflow-wrap: anywhere; }
   video { display: none; }
   kbd { border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
 </style>
@@ -24,12 +27,14 @@
 <body>
 <h1>Tracking spike</h1>
 <p>Camera, hand landmarks in a worker, homography from 4 clicked corners, fingertip in sheet millimeters, and a 9 point touch test.
-Keys: <kbd>R</kbd> recalibrate, <kbd>T</kbd> start the touch test, <kbd>Space</kbd> record a touch now, <kbd>Escape</kbd> stop speech.</p>
+<span id="keys">Keys: <kbd>R</kbd> recalibrate, <kbd>T</kbd> start the touch test, <kbd>Space</kbd> record a touch now, <kbd>Escape</kbd> stop speech.</span></p>
 <div class="row">
   <label>Camera <select id="camera"></select></label>
   <button id="start">Start camera</button>
   <button id="calibrate" disabled>Calibrate (R)</button>
   <button id="test" disabled>Touch test (T)</button>
+  <button id="record" disabled>Record now</button>
+  <button id="hush">Stop speech</button>
   <label>Contact offset mm <input id="offset" type="number" step="0.5" value="4" style="width: 5em"></label>
 </div>
 <div id="status" aria-live="polite"></div>

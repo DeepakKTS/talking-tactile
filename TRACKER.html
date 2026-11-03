@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 358,
- "updated_at": "2026-11-03T08:07:40.052Z",
+ "rev": 360,
+ "updated_at": "2026-11-03T08:25:37.594Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2808,6 +2808,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T08:07:40.052Z"
   },
   {
+   "id": "d9-9",
+   "day": 9,
+   "title": "Gate B page by touch alone, with phone wording",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "spikes/tracking: every protocol action works by touch: Start camera, Calibrate, corners tapped on the view, Touch test, rest-to-record, new Record now (Space) and Stop speech (Escape) buttons, the download link. On a phone (lib/device.js, the same media query as Explore): 'Tap corner A, top left.'..., 'Calibrated. Check that the outline and targets sit on the printed ones, then tap Touch test.', crossed corners and 'Calibrate first: tap Calibrate.' name buttons; the button labels drop (R) and (T); the Keys sentence is hidden. Bug found: on a 390 px phone the page was 658 px wide (the per-target JSON in the results has no break points), so the browser zoomed out and taps missed; #results, #stats, #status now wrap anywhere. Test: e2e_check.py touch-session on an emulated phone (390 x 844, is_mobile, has_touch): the whole protocol by taps, wording, buttons, Record now only during the test, Wake Lock first, page width 390, the tapped download saved and analyzed: 45 touches, mean 0.03 mm, Gate B pass. Tracking code and parity-checked files unchanged; parity hashes unchanged.",
+   "done_at": "2026-11-03T08:25:37.594Z",
+   "tags": [
+    "fix",
+    "gate-b"
+   ],
+   "changed_at": "2026-11-03T08:25:37.594Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3648,6 +3664,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T08:25:37.594Z",
+   "kind": "claude",
+   "text": "Task d9-9 \"Gate B page by touch alone, with phone wording\" is now done. Note: spikes/tracking: every protocol action works by touch: Start camera, Calibrate, corners tapped on the view, Touch test, rest-to-record, new Record now (Space) and Stop speech (Escape) buttons, the download link. On a phone (lib/device.js, the same media query as Explore): 'Tap corner A, top left.'..., 'Calibrated. Check that the outline and targets sit on the printed ones, then tap Touch test.', crossed corners and 'Calibrate first: tap Calibrate.' name buttons; the button labels drop (R) and (T); the Keys sentence is hidden. Bug found: on a 390 px phone the page was 658 px wide (the per-target JSON in the results has no break points), so the browser zoomed out and taps missed; #results, #stats, #status now wrap anywhere. Test: e2e_check.py touch-session on an emulated phone (390 x 844, is_mobile, has_touch): the whole protocol by taps, wording, buttons, Record now only during the test, Wake Lock first, page width 390, the tapped download saved and analyzed: 45 touches, mean 0.03 mm, Gate B pass. Tracking code and parity-checked files unchanged; parity hashes unchanged."
+  },
+  {
+   "ts": "2026-11-03T08:25:37.508Z",
+   "kind": "claude",
+   "text": "Task d9-9 \"Gate B page by touch alone, with phone wording\" added to day 9."
+  },
   {
    "ts": "2026-11-03T08:07:40.052Z",
    "kind": "claude",

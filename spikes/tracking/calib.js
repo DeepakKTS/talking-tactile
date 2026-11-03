@@ -1,8 +1,12 @@
 import { state, view, say, setHandsListener, addOverlay, clickToVideo } from "./main.js";
 import { homographyFromPoints, applyHomography, isConvexQuad } from "./lib/homography.js";
 import { FingertipMapper } from "./lib/fingertip.js";
+import { touchOnly } from "./lib/device.js";
 
 const CORNER_NAMES = ["A, top left", "B, top right", "C, bottom right", "D, bottom left"];
+// A phone: the helper taps the corners and the buttons; no sentence names a key.
+const TOUCH = touchOnly();
+const cornerPrompt = (i) => `${TOUCH ? "Tap" : "Click"} corner ${CORNER_NAMES[i]}.`;
 
 const sheet = await (await fetch("./sheet.json")).json();
 const params = new URLSearchParams(location.search);
@@ -17,7 +21,9 @@ const storeKey = () => `tt-calib-${view.width}x${view.height}`;
 
 function setCorners(px) {
   if (!isConvexQuad(px)) {
-    say("Those corners cross over. Press R and click A, B, C, D in order around the sheet.");
+    say(TOUCH
+      ? "Those corners cross over. Tap Calibrate, then tap A, B, C, D in order around the sheet."
+      : "Those corners cross over. Press R and click A, B, C, D in order around the sheet.");
     return false;
   }
   calib.toMm = homographyFromPoints(px, sheet.corners_mm);
@@ -30,21 +36,23 @@ function setCorners(px) {
     localStorage.setItem(storeKey(), JSON.stringify(px));
   } catch {}
   document.getElementById("test").disabled = false;
-  say("Calibrated. Touch the sheet. Press T to start the touch test.");
+  say(TOUCH
+    ? "Calibrated. Check that the outline and targets sit on the printed ones, then tap Touch test."
+    : "Calibrated. Touch the sheet. Press T to start the touch test.");
   return true;
 }
 
 export function startCalibration() {
   calib.clicks = [];
   calib.active = true;
-  say(`Click corner ${CORNER_NAMES[0]}.`);
+  say(cornerPrompt(0));
 }
 
 view.addEventListener("click", (ev) => {
   if (!calib.active) return;
   calib.clicks.push(clickToVideo(ev));
   if (calib.clicks.length < 4) {
-    say(`Click corner ${CORNER_NAMES[calib.clicks.length]}.`);
+    say(cornerPrompt(calib.clicks.length));
     return;
   }
   calib.active = false;

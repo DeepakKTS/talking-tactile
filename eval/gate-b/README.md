@@ -87,12 +87,15 @@ Then:
    camera again.
 3. Wait for "Hand tracker ready".
 4. Press Calibrate, then tap the centers of corners A, B, C and D on the picture, in that
-   order.
+   order. The page asks for each: "Tap corner A, top left." and so on.
 5. Check that the magenta outline and targets sit on the printed ones. If not, press
    Calibrate and tap again. Write in `run.md` that the check was done.
 6. Press Touch test. For each number shown and spoken, put your index fingertip on that
-   target and hold still. A touch records itself after 0.6 s at rest. 45 touches, about 3
-   minutes. Do not move the phone or the sheet.
+   target and hold still. A touch records itself after 0.6 s at rest; Record now records one
+   at once, and Stop speech stops the voice. 45 touches, about 3 minutes. Do not move the
+   phone or the sheet. Every step works by touch: no keyboard is needed on the phone
+   (`uv run spikes/tracking/e2e_check.py touch-session` runs the protocol on an emulated
+   phone by taps alone).
 7. At the end the page shows the mean, the p95 and the bias. Press "Download the raw results
    (JSON)" and choose Download.
 

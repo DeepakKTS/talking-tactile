@@ -1,5 +1,10 @@
 import { state, say } from "./main.js";
 import { makeSequence, DwellDetector, TouchWindow, record, serializeSession, sessionFilename, sessionResult } from "./lib/touchtest.js";
+import { touchOnly } from "./lib/device.js";
+
+// A phone: every key has a button (Record now for Space, Stop speech for Escape), and the
+// buttons drop their key hints.
+const TOUCH = touchOnly();
 
 // Dwell values from config/explore.yaml; rearm distance keeps one rest from scoring twice.
 const DWELL = { speedBelowMmS: 15, holdMs: 600, rearmMm: 15 };
@@ -29,7 +34,7 @@ function prompt() {
 
 export function startTest() {
   if (!state.calib?.toMm) {
-    say("Calibrate first. Press R.");
+    say(TOUCH ? "Calibrate first: tap Calibrate." : "Calibrate first. Press R.");
     return;
   }
   const sheet = state.sheet;
@@ -41,6 +46,7 @@ export function startTest() {
   test.startedAt = new Date().toISOString();
   dwell.reset();
   $("results").textContent = "";
+  $("record").disabled = false;
   prompt();
 }
 
@@ -66,6 +72,7 @@ function capture(how) {
 
 function finish() {
   test.active = false;
+  document.getElementById("record").disabled = true;
   $("target").textContent = "";
   const result = sessionResult({
     startedAt: test.startedAt,
@@ -113,6 +120,13 @@ const tick = () => {
 requestAnimationFrame(tick);
 
 $("test").addEventListener("click", startTest);
+$("record").addEventListener("click", () => { if (test.active) capture("button"); });
+$("hush").addEventListener("click", () => { if ("speechSynthesis" in window) speechSynthesis.cancel(); });
+if (TOUCH) {
+  $("calibrate").textContent = "Calibrate";
+  $("test").textContent = "Touch test";
+  $("keys").hidden = true;
+}
 document.addEventListener("keydown", (ev) => {
   if (ev.key === "t" || ev.key === "T") startTest();
   else if (ev.key === " " && test.active) {

@@ -8,6 +8,7 @@
   uv run spikes/tracking/e2e_check.py fallback      stub GPU worker that never answers: the page must be on CPU 8 s after its first frame
   uv run spikes/tracking/e2e_check.py hands VIDEO [CPU|GPU]   MediaPipe on a y4m clip: hands must be found
   uv run spikes/tracking/e2e_check.py touch VIDEO [CPU|GPU]   same, then T and 3 Space presses record 3 touches
+  uv run spikes/tracking/e2e_check.py touch-session the whole protocol on an emulated phone, by taps alone
   uv run spikes/tracking/e2e_check.py session       a whole 45 touch test through the page, scripted hands,
                                                     then the downloaded JSON through analyze_touch.py
 
@@ -224,10 +225,92 @@ def session() -> list[str]:
     return fail
 
 
+def touch_session() -> list[str]:
+    """The whole Gate B protocol on an emulated phone (no hover, coarse pointer, no keyboard),
+    by taps alone: Start camera, Calibrate, the four corners tapped on the camera view, the
+    Calibrated sentence and a screenshot for the outline check, Touch test, 45 scripted
+    touches, then the download link tapped and the saved file analyzed."""
+    srv, port = serve()
+    fail: list[str] = []
+    corners = [[110, 20], [540, 35], [560, 465], [90, 450]]  # on the fake camera's 640 x 480
+    errors: list[str] = []
+    out: dict = {}
+    try:
+        with sync_playwright() as p:
+            args = ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"]
+            browser = p.chromium.launch(channel="chrome", headless=True, args=args)
+            ctx = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True,
+                                      has_touch=True, accept_downloads=True)
+            page = ctx.new_page()
+            page.on("pageerror", lambda e: errors.append(str(e)))
+            page.add_init_script(KEEP_WORKER)
+            page.add_init_script(ORDER_JS)
+            page.goto(f"http://127.0.0.1:{port}/index.html?stub=600000&seed=3")
+            out["touch_only"] = page.evaluate("() => matchMedia('(hover: none) and (pointer: coarse)').matches")
+            out["keys_hidden"] = page.evaluate("() => document.getElementById('keys').hidden")
+            out["buttons"] = page.evaluate("() => [...document.querySelectorAll('button')].map((b) => b.textContent)")
+            page.tap("#start")
+            page.wait_for_function("window.__tt.warmup.isReady && window.__tt.videoSize && !document.getElementById('calibrate').disabled", timeout=30000)
+            page.tap("#calibrate")
+            prompts = [page.inner_text("#status")]
+            box = page.locator("#view").bounding_box()
+            w, h = page.evaluate("() => window.__tt.videoSize")
+            for x, y in corners:
+                page.touchscreen.tap(box["x"] + x * box["width"] / w, box["y"] + y * box["height"] / h)
+                page.wait_for_timeout(100)
+                prompts.append(page.inner_text("#status"))
+            page.wait_for_function("window.__tt.calib && window.__tt.calib.toMm", timeout=5000)
+            OUT.mkdir(exist_ok=True)
+            page.screenshot(path=str(OUT / "tracking_touch_outline.png"), full_page=True)
+            out["prompts"] = prompts
+            page.tap("#test")
+            page.wait_for_function("window.__tt.touchTest.active")
+            out["record_during"] = page.evaluate("() => !document.getElementById('record').disabled")
+            page.tap("#hush")
+            page.evaluate(PLAY_SESSION)
+            out["record_after"] = page.evaluate("() => !document.getElementById('record').disabled")
+            out["layout"] = page.evaluate("""() => { const r = (el) => { const b = el.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y), Math.round(b.width), Math.round(b.height)]; };
+              const a = document.querySelector('#results a');
+              return { scrollWidth: document.documentElement.scrollWidth, inner: innerWidth, view: r(document.getElementById('view')), results: r(document.getElementById('results')), link: a ? r(a) : null, scrollY }; }""")
+            with page.expect_download() as dl:
+                page.get_by_text("Download the raw results (JSON)").tap()
+            path = OUT / dl.value.suggested_filename
+            dl.value.save_as(path)
+            out["saved"] = str(path)
+            out["order"] = page.evaluate("() => window.__order")
+            browser.close()
+    finally:
+        srv.shutdown()
+    py = subprocess.run([sys.executable, str(HERE / "analyze_touch.py"), str(path)], capture_output=True, text=True)
+    analysis = json.loads(py.stdout) if py.returncode == 0 else {}
+    out["analysis"] = {k: analysis.get(k) for k in ("n", "mean_mm", "p95_mm", "gate_b")}
+    out["page_errors"] = errors
+    print(json.dumps(out, indent=1))
+    want_prompts = ["Tap corner A, top left.", "Tap corner B, top right.", "Tap corner C, bottom right.", "Tap corner D, bottom left.",
+                    "Calibrated. Check that the outline and targets sit on the printed ones, then tap Touch test."]
+    if not out["touch_only"] or not out["keys_hidden"] or out["prompts"] != want_prompts:
+        fail.append(f"phone wording: {out['prompts']}, keys hidden {out['keys_hidden']}")
+    if any("(R)" in b or "(T)" in b for b in out["buttons"]) or "Record now" not in out["buttons"]:
+        fail.append(f"buttons: {out['buttons']}")
+    if out["layout"]["scrollWidth"] > 390:
+        fail.append(f"the page is wider than the phone: {out['layout']}")
+    if not out["record_during"] or out["record_after"]:
+        fail.append("Record now is not enabled only during the test")
+    if not out["order"] or out["order"][0] != "wakeLock":
+        fail.append(f"the Wake Lock was not requested first: {out['order']}")
+    if errors:
+        fail.append(f"page errors: {errors[:3]}")
+    if py.returncode != 0:
+        fail.append(f"analyze_touch.py failed on the saved file: {py.stderr[-300:]}")
+    elif analysis["n"] != 45 or analysis["gate_b"] != "pass":
+        fail.append(f"analysis: {analysis}")
+    return fail
+
+
 def main() -> None:
     mode = sys.argv[1] if len(sys.argv) > 1 else "loop"
-    if mode == "session":
-        failures = session()
+    if mode in ("session", "touch-session"):
+        failures = session() if mode == "session" else touch_session()
         print("FAIL: " + "; ".join(failures) if failures else "PASS")
         sys.exit(1 if failures else 0)
     video = sys.argv[2] if len(sys.argv) > 2 else None
