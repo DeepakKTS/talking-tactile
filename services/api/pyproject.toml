@@ -2,6 +2,7 @@
 name = "talking-tactile-api"
 version = "0.1.0"
 description = "Talking Tactile backend: authoring pipeline and Explore API"
+license = "Apache-2.0"
 requires-python = "==3.11.*"
 dependencies = [
   "fastapi>=0.162",
