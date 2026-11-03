@@ -31,6 +31,7 @@ class FakeServer {
   describeOnly: string | null = null; // Spark's reason, for a describe_only job
   created = true; // false: the same image was uploaded before
   refuseEdit: string | null = null; // a PATCH answers 409 with this message
+  holdRunning = false; // the job stays running until a test lets it finish
   published = 0;
   fixCalls = 0;
 
@@ -109,7 +110,7 @@ class FakeServer {
   }
 
   private job() {
-    const done = this.polls >= 2;
+    const done = this.polls >= 2 && !this.holdRunning;
     if (done) this.jobVersion = this.editVersion;
     const describe = done && this.describeOnly !== null;
     return {
@@ -155,9 +156,11 @@ describe("author page", () => {
     const input = screen.getByLabelText(/Figure \(PNG, JPEG or a PDF page\)/);
     fireEvent.change(input, { target: { files: [new File([new Uint8Array([1])], "figure.png", { type: "image/png" })] } });
     fireEvent.change(screen.getByLabelText("Grade band"), { target: { value: "k5" } });
+    server.holdRunning = true; // so the stages are still on screen when checked (CI is slower)
     fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
     expect(await screen.findByText("Outlining each part.")).toBeTruthy();
     expect(screen.getByText("Reading the file: done in 40 ms")).toBeTruthy();
+    server.holdRunning = false;
     await screen.findByRole("heading", { name: synthetic.title });
     const form = server.calls.find((c) => c.method === "POST")?.body as FormData;
     expect(form.get("grade_band")).toBe("k5");

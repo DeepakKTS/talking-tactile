@@ -131,15 +131,22 @@ def test_a_cut_that_splits_a_part_keeps_the_largest_piece() -> None:
     assert got["u"].polygon.distance(got["plug"].polygon) >= G
 
 
+def _mm(lo: float, hi: float) -> st.SearchStrategy[float]:
+    # Layout works on pixel contours scaled to page mm (about 0.1 mm a pixel), so coordinates
+    # come to 0.01 mm. Unrounded, Hypothesis drew x = 1.675e-209 beside x = 0 (Nov 2): the
+    # differences then had zero-width spikes no pixel outline has.
+    return st.floats(lo, hi).map(lambda v: round(v, 2))
+
+
 @st.composite
 def scattered_boxes(draw: st.DrawFn) -> list[LayoutRegion]:
     n = draw(st.integers(2, 6))
     out = []
     for i in range(n):
-        x = draw(st.floats(0, 150))
-        y = draw(st.floats(0, 150))
-        w = draw(st.floats(POINT + 4, 40))
-        h = draw(st.floats(POINT + 4, 40))
+        x = draw(_mm(0, 150))
+        y = draw(_mm(0, 150))
+        w = draw(_mm(POINT + 4, 40))
+        h = draw(_mm(POINT + 4, 40))
         out.append(region(f"r{i}", box(x, y, x + w, y + h)))
     return out
 

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 302, updated 2026-11-03T03:01:38.402Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 306, updated 2026-11-03T03:21:05.598Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -329,6 +329,10 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: README.md rewritten around the unchanged Privacy section: what it is and the three Meta models; a quickstart for a judge in mock mode (clone, make install, MOCK_META=1 make dev, Author upload of the heart, check, publish, Explore), with the mock question limit stated; S0 to S5 with the model each uses (S3 is code only: PLAN.md's Spark pass over numbered outlines is not built, said so); the safety rules (teacher confirmation, spill never touchable, lines, point symbols); the touch path (worker, homography, 4 mm contact offset, 1 euro, 1 mm/120 ms enter, 2 mm exit, 6 earcons a second, 600 ms rest); the question path (keywords, strict per-figure schema, code's last word, 50 per session, 20/25 s); results each citing its committed file; known limitations. Every claim checked against code or a result file before writing.
 - [x] d8-32 Public-release audit (read-only)
   - Note: Read-only, nothing changed, repo still private. No project license yet: options MIT, Apache-2.0, BSD-3-Clause, GPL-3.0, AGPL-3.0; the fixtures keep their own licenses (heart CC BY-SA 3.0, Japan CC BY-SA 4.0, brain CC BY 3.0, flower public domain). Not for public as is: the uploaded brain (not openly licensed) is named and counted in eval/plan/RESULTS.md and scores.json (part names, counts, figure id fa460241), TRACKER.html (10 mentions), TODO.md (3), and 36 lines of eval/live/ledger.jsonl (figure id, part names); local paths /Users/deepakzedler in docs/DEMO.md (1) and eval/gate-b/README.md (4). Never committed: .env, private fixtures, keys, certificates (history checked). No file over 10 MB, now or in history (largest: hand_landmarker.task 7.5 MB). ATTRIBUTION gaps: eval/s2-bakeoff/*/reference masks (16, derived from heart CC BY-SA 3.0, flower PD, Japan CC BY-SA 4.0), and derived heart and brain regions files in fixtures/ (pipeline, qa, recorded), not listed; own-work files not stated (fixtures/synthetic, spikes/tracking/test-sheet.pdf); meta-sam-parser 0.1.0 (Meta SAM License, PyPI, not stored) is a dependency to weigh in the license choice.
+- [x] d8-33 Flaky Author test: stages checked while the fake job runs
+  - Note: AuthorPage.test.tsx 'uploads with the options, shows the stages, then the review' failed on CI twice (c5d3f74, d5f49cf), passing elsewhere: it found 'Outlining each part.' and then checked a stage line synchronously, and a 5 ms poll could finish the fake job between them on a slower runner. The fake server now holds the job running (holdRunning) until the test has checked the progress lines. Test-only change; 22 of 22 three runs in a row.
+- [x] d8-34 Flaky layout property test: coordinates at 0.01 mm
+  - Note: The pre-commit hook failed on test_layout.py::test_gap_enforcement_only_shrinks_and_leaves_every_gap_clear: Hypothesis drew boxes at x = 1.675e-209 and 3.899e-257 beside x = 0, and the overlap step then left a strip with zero-width spikes, which enforce_gaps reported unresolved. With the same boxes at x = 0 the result is clean (no unresolved pair). Pixel contours in page mm never carry subnormal coordinates, so the generator now rounds to 0.01 mm; enforce_gaps is unchanged. 5 seeds and the whole file pass.
 
 ## Day 9: Tue Nov 3. Gate D
 
