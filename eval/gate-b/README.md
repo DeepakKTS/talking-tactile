@@ -44,9 +44,10 @@ start it in mock mode: it makes no Meta calls and costs nothing.
 
 ## Terminals
 
+Each terminal starts at the repo root (the folder you cloned).
+
 Terminal 1, the touch-test page over HTTPS on port 8443:
 ```
-cd /Users/deepakzedler/Downloads/talking-tactile
 python3 - <<'EOF'
 import functools, http.server, ssl
 handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory="spikes/tracking")
@@ -61,13 +62,13 @@ EOF
 
 Terminal 2, optional, the API in mock mode:
 ```
-cd /Users/deepakzedler/Downloads/talking-tactile/services/api
+cd services/api
 MOCK_META=1 uv run uvicorn app.main:app --port 8000
 ```
 
 Terminal 3, optional, the app for the phone (proxies the API on port 8000):
 ```
-cd /Users/deepakzedler/Downloads/talking-tactile/apps/web
+cd apps/web
 npm run dev:phone
 ```
 
@@ -103,7 +104,7 @@ Then:
 2. In Files, share it by AirDrop to the Mac. It lands in `~/Downloads`.
 3. Copy it in unedited, and check that the copy is the same file:
    ```
-   cd /Users/deepakzedler/Downloads/talking-tactile
+   # from the repo root
    cp ~/Downloads/touch-test-*.json eval/gate-b/
    shasum -a 256 ~/Downloads/touch-test-*.json eval/gate-b/touch-test-*.json
    ```

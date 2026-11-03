@@ -8,7 +8,7 @@ step fails twice, fix it or cut it.
 
 ## Start
 
-Paths are from the repo root, `/Users/deepakzedler/Downloads/talking-tactile`.
+Every command starts at the repo root (the folder you cloned).
 
 ### Mock mode (no network, no Meta calls, costs nothing)
 
