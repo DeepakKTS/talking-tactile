@@ -224,6 +224,8 @@ export class VoiceAsk {
   readonly hold = new HoldToTalk();
   private timer: unknown = null;
   private denied = false;
+  /** The microphone is recording this hold. False while it is still opening. */
+  private capturing = false;
   private readonly now: () => number;
   private readonly setTimer: (fn: () => void, ms: number) => unknown;
   private readonly clearTimer: (id: unknown) => void;
@@ -291,16 +293,27 @@ export class VoiceAsk {
         if (this.hold.state !== "listening") return; // let go while the microphone opened
         audio.stop();
         mic.start();
+        this.capturing = true;
         audio.listenStart();
         this.schedule();
       } else if (e === "too_short") {
-        mic.stop();
-        audio.listenEnd();
+        if (this.capturing) {
+          mic.stop();
+          audio.listenEnd();
+        }
+        this.capturing = false;
         audio.say(TOO_SHORT);
+      } else if (!this.capturing) {
+        // Let go while the microphone was still opening (the first hold asks permission):
+        // nothing was recorded, so nothing is sent.
+        this.hold.reset();
+        audio.say(TOO_SHORT);
+        return;
       } else {
         const releasedAt = this.now();
         await new Promise<void>((resolve) => { this.setTimer(resolve, POST_ROLL_MS); });
         const { samples, rate } = mic.stop();
+        this.capturing = false;
         audio.listenEnd(); // after the post-roll, so the earcon is not in the recording
         const t = this.now();
         const wav = encodeWav(resample(samples, rate));

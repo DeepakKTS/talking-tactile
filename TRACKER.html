@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 264,
- "updated_at": "2026-11-03T00:53:45.404Z",
+ "rev": 266,
+ "updated_at": "2026-11-03T00:57:11.453Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2116,6 +2116,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T00:49:06.159Z"
   },
   {
+   "id": "d8-14",
+   "day": 8,
+   "title": "Edge case Q8: letting go while the microphone opens sends nothing",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/voice.ts: VoiceAsk tracks capturing (set at mic.start). A hold released while the microphone is still opening (the first hold's permission prompt) used to send a WAV recorded before the microphone was open; now nothing is sent, the hold resets and the student hears 'Hold the screen while you ask, then let go.' The too_short path plays the release earcon only if capture started. Test: voice.test.ts 'first hold, microphone still opening' (fails on the old code). On the iPhone's permission prompt: needs device.",
+   "done_at": "2026-11-03T00:57:11.453Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T00:57:11.453Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3028,6 +3044,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T00:57:11.453Z",
+   "kind": "claude",
+   "text": "Task d8-14 \"Edge case Q8: letting go while the microphone opens sends nothing\" is now done. Note: apps/web/src/explore/voice.ts: VoiceAsk tracks capturing (set at mic.start). A hold released while the microphone is still opening (the first hold's permission prompt) used to send a WAV recorded before the microphone was open; now nothing is sent, the hold resets and the student hears 'Hold the screen while you ask, then let go.' The too_short path plays the release earcon only if capture started. Test: voice.test.ts 'first hold, microphone still opening' (fails on the old code). On the iPhone's permission prompt: needs device."
+  },
+  {
+   "ts": "2026-11-03T00:57:11.415Z",
+   "kind": "claude",
+   "text": "Task d8-14 \"Edge case Q8: letting go while the microphone opens sends nothing\" added to day 8."
+  },
   {
    "ts": "2026-11-03T00:53:45.404Z",
    "kind": "claude",

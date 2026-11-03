@@ -246,3 +246,45 @@ describe("post-roll", () => {
     expect(at(samples - tail - 1)).toBeCloseTo(0.25, 3);
   });
 });
+
+describe("first hold, microphone still opening", () => {
+  it("letting go before the microphone opens sends nothing and says to hold while asking", async () => {
+    let now = 0;
+    const timers: { at: number; fn: () => void }[] = [];
+    let open: () => void = () => {};
+    const audio = new Sounds();
+    const sent: Uint8Array[] = [];
+    let started = 0;
+    const mic: MicPort = {
+      open: () => new Promise<void>((resolve) => { open = resolve; }), // the permission prompt
+      start: () => { started += 1; },
+      stop: () => ({ samples: new Float32Array(0), rate: RATE }),
+    };
+    const v = new VoiceAsk({
+      audio, mic, online: () => true,
+      send: (wav) => { sent.push(wav); return Promise.resolve(); },
+      now: () => now,
+      setTimer: (fn, ms) => { const t = { at: now + ms, fn }; timers.push(t); return t; },
+      clearTimer: (t) => { const i = timers.indexOf(t as (typeof timers)[number]); if (i >= 0) timers.splice(i, 1); },
+    });
+    const advance = async (ms: number) => {
+      now += ms;
+      for (const t of timers.filter((x) => x.at <= now)) {
+        timers.splice(timers.indexOf(t), 1);
+        t.fn();
+      }
+      await new Promise((r) => setTimeout(r, 0));
+    };
+    v.down();
+    await advance(HOLD_MS); // listening, waiting for the microphone
+    await advance(MIN_MS + 200);
+    v.up();
+    await advance(POST_ROLL_MS);
+    open();
+    await advance(0);
+    expect(sent).toEqual([]);
+    expect(started).toBe(0);
+    expect(audio.log).toEqual([`say ${TOO_SHORT}`]);
+    expect(v.hold.state).toBe("idle");
+  });
+});
