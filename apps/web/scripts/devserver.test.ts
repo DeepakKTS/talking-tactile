@@ -1,7 +1,7 @@
 // The dev server that npm run dev:phone opens on the LAN serves the app and the two repo files
 // it imports, and nothing else from the repo (vite.config.ts DEV_FILES), with the security
 // headers (DEV_HEADERS).
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer, type ViteDevServer } from "vite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -32,7 +32,8 @@ describe("dev server files", () => {
   it("refuses the rest of the repo: the private figure, data, the ledger, the API, secrets", async () => {
     // Every one that exists is refused. The private ones exist only on the demo Mac, not in CI;
     // a missing file cannot be served (Vite answers with the app's page instead).
-    const present = ["fixtures/private/brain_upload.png", "data/jobs.sqlite", "eval/live/ledger.jsonl",
+    const priv = existsSync(`${ROOT}fixtures/private`) ? readdirSync(`${ROOT}fixtures/private`).map((f) => `fixtures/private/${f}`) : [];
+    const present = [...priv, "data/jobs.sqlite", "eval/live/ledger.jsonl",
       "services/api/app/ask.py", "services/api/.env", "apps/web/.certs/phone-key.pem", "README.md"]
       .filter((p) => existsSync(`${ROOT}${p}`));
     expect(present.length).toBeGreaterThanOrEqual(3); // the tracked ones, everywhere
