@@ -1,0 +1,69 @@
+# Privacy and the Meta Model API
+
+This is the full privacy note. README.md has the summary.
+
+This build sends a student's spoken question to Meta's API: when a student holds the screen
+and asks, Explore records the question in the browser and the backend sends that recording to
+Muse Voice Transcribe, then sends the transcript, with the published figure and its image, to
+Muse Spark. A typed question goes to Muse Spark the same way.
+
+What Meta's docs say (read on Oct 30, 2026 at dev.meta.ai; RULES.md 1.4):
+
+- The mode is chosen by the model in each request, not by a request field: on pay-as-you-go
+  you "switch between the two by choosing the model ID" (docs/models), and the Terms of
+  Service say "the designation of the Services as Contributor Services or Standard Services is
+  determined by the designation of the Model you are using" (section 1).
+- Standard: "In Standard mode, you pay standard prices and your content is not used to train
+  Meta models" (docs/pricing-rate-limits). Under the Terms, Meta "will not use Content
+  submitted in a request to the Standard Services to train Meta Models" (section 5.1).
+- Contributor: "discounted pricing or more usage in exchange for permission to use your
+  content", meaning "the prompts, code, files, and context you send, plus the model responses
+  you get back", "to train future Meta models" (docs/pricing-rate-limits). The Terms add "You
+  must not submit sensitive, confidential, or personal information to the Contributor
+  Services" and "the Contributor Services do not offer a mechanism to exclude specific traffic
+  from training" (section 6.2).
+- Which models: Muse Spark has both (`muse-spark-1.3` Standard, `muse-spark-1.3-contributor`
+  Contributor). "Contributor mode isn't available for Muse Voice Transcribe." SAM 3.1 and Muse
+  Voice Transcribe are listed as Standard Models (legal/geographic-use-policy).
+- Coding harness subscriptions (Muse Code) are Contributor by default "regardless of which
+  Meta Model you select"; Standard there needs "the applicable setting in your Account"
+  (Terms, section 3.3).
+- Credits, from the Model API dashboard rather than the docs: on 2026-10-27 the billing page at
+  dev.meta.ai showed, verbatim, "While using free credits your content may be used for product
+  improvement", with a "Stop using free credits" link (screenshot taken by Deepak, the project
+  owner). The docs pages read on Oct 30 do not mention this, and do not explain how it
+  interacts with Standard models, whose content "is not used to train Meta models". The Terms
+  mention promotional credits (section 13.3) and leave use "through promotional credits" out of
+  Meta's indemnity for the Standard Services (section 17.2), and say no more about them.
+- Retention: the pricing page mentions zero data retention ("priced at parity with Standard
+  mode" for Muse Voice Transcribe); the pages read do not say how to get it.
+
+What this build does: every call uses a Standard model (`muse-spark-1.3`, `sam-3.1`,
+`muse-voice-transcribe-1.0`), and the backend refuses to start with a Contributor model id
+(`services/api/app/config.py`, MetaModels).
+
+What the teacher or school must do before a class uses it:
+
+- Run it with an API key on the Model API, not through a Muse Code or other coding harness
+  subscription, or set that account to Standard (Terms, section 3.3).
+- Keep the models in `config/tactile_rules.yaml` as they are.
+- Stop using free credits before a class uses it (the "Stop using free credits" link on the
+  billing page), or confirm with Meta that content sent on free credits to Standard models is
+  not used for product improvement. Until one of these is done, assume a student's question may
+  be used, as the billing page says.
+- Read Meta's terms for retention and promotional credits themselves, or ask Meta: the pages
+  above do not settle how long request content is kept, or how to get zero data retention.
+
+What stays where:
+
+- The recording is made in the browser only while the screen is held, and a quarter second
+  after. The backend passes it to
+  the transcribe endpoint and keeps no copy; the transcript comes back to Explore with the
+  answer and is shown on the student's screen only. The page keeps the last recording in
+  memory (for its tests) until the next question or until the tab closes; it is never saved.
+- The cost ledger (`eval/live/ledger.jsonl`) logs every Meta call with its time and price. For a
+  question it logs the figure and the question's length, never its words. (Lines from the
+  question eval of Oct 30, logged before this rule, hold the eval's own synthetic questions.)
+- Recordings of calls are written only when a developer sets `META_RECORD`; the ones in
+  `fixtures/recorded/` are synthetic questions and synthetic speech.
+- Camera frames stay in the browser (RULES.md 1.2), and the API key stays on the backend.
