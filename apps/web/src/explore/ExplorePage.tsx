@@ -305,6 +305,10 @@ function ExploreSheet() {
     try {
       await loop.start();
     } catch {
+      // Start comes back (and takes the focus), so pressing it again retries the camera.
+      loop.stop();
+      camera.current = null;
+      setStarted(false);
       say("The camera did not start. Allow the camera and press Start again.");
       return;
     }

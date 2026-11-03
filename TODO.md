@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 270, updated 2026-11-03T01:06:43.555Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 272, updated 2026-11-03T01:23:12.554Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -297,6 +297,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: apps/web/src/explore/voice.ts: only NotAllowedError or SecurityError mark the microphone denied for the session (MIC_DENIED, said on every hold without asking again). Any other failure to open (NotReadableError when another app has it, NotFoundError) says 'The microphone did not open. Close any app using it, then hold again. Labels still work.' and the next hold tries again. Test: voice.test.ts 'a busy microphone says so and is tried again on the next hold'. On the iPhone: needs device.
 - [x] d8-16 Edge case Q10: a typed question plays the thinking tone while it waits
   - Note: apps/web/src/explore/session.ts: a typed question turns the thinking tone on before /api/ask and off before the answer is said, as a held question does; the wait is no longer silent. Test: session.test.ts 'sends other questions to /api/ask with the touch context' checks thinking, thinking off, then the answer.
+- [x] d8-17 Edge case X3: a refused camera brings Start back
+  - Note: apps/web/src/explore/ExplorePage.tsx: when the camera does not start, the loop is stopped (worker terminated), Start comes back and takes the focus, and the student hears 'The camera did not start. Allow the camera and press Start again.'; before, Start was already hidden, so the sentence could not be acted on. Test: explore_e2e.py camera_denied (getUserMedia rejected NotAllowedError): said, Start focused; it fails on the old page (start_focused false). Full explore_e2e PASS. On the iPhone: needs device.
 
 ## Day 9: Tue Nov 3. Gate D
 

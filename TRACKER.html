@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 270,
- "updated_at": "2026-11-03T01:06:43.555Z",
+ "rev": 272,
+ "updated_at": "2026-11-03T01:23:12.554Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2164,6 +2164,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:06:43.555Z"
   },
   {
+   "id": "d8-17",
+   "day": 8,
+   "title": "Edge case X3: a refused camera brings Start back",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/ExplorePage.tsx: when the camera does not start, the loop is stopped (worker terminated), Start comes back and takes the focus, and the student hears 'The camera did not start. Allow the camera and press Start again.'; before, Start was already hidden, so the sentence could not be acted on. Test: explore_e2e.py camera_denied (getUserMedia rejected NotAllowedError): said, Start focused; it fails on the old page (start_focused false). Full explore_e2e PASS. On the iPhone: needs device.",
+   "done_at": "2026-11-03T01:23:12.554Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:23:12.554Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3076,6 +3092,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:23:12.554Z",
+   "kind": "claude",
+   "text": "Task d8-17 \"Edge case X3: a refused camera brings Start back\" is now done. Note: apps/web/src/explore/ExplorePage.tsx: when the camera does not start, the loop is stopped (worker terminated), Start comes back and takes the focus, and the student hears 'The camera did not start. Allow the camera and press Start again.'; before, Start was already hidden, so the sentence could not be acted on. Test: explore_e2e.py camera_denied (getUserMedia rejected NotAllowedError): said, Start focused; it fails on the old page (start_focused false). Full explore_e2e PASS. On the iPhone: needs device."
+  },
+  {
+   "ts": "2026-11-03T01:23:12.516Z",
+   "kind": "claude",
+   "text": "Task d8-17 \"Edge case X3: a refused camera brings Start back\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:06:43.555Z",
    "kind": "claude",

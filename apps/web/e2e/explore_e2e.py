@@ -457,6 +457,30 @@ def failed_loads_are_told(saved: tuple[Any, Requests], fresh: tuple[Any, Request
     return out
 
 
+CAMERA_DENIED = "The camera did not start. Allow the camera and press Start again."
+DENY_CAMERA_JS = """
+navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+"""
+
+
+def camera_denied(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
+    """The camera refused: the student is told, and Start comes back with the focus."""
+    page.add_init_script(DENY_CAMERA_JS)
+    page.goto(f"{base}/explore?figure={fid}")
+    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    page.wait_for_function("document.activeElement && document.activeElement.textContent === 'Start exploring'")
+    n = log_len(page)
+    page.keyboard.press("Enter")
+    page.wait_for_function(f"() => window.__tt.log.slice({n}).some((e) => e.kind === 'say' && e.text === {CAMERA_DENIED!r})", timeout=10000)
+    out = {
+        "said": says(page, n)[-1:],
+        "start_focused": page.evaluate("() => document.activeElement && document.activeElement.textContent === 'Start exploring'"),
+    }
+    if not out["start_focused"]:
+        fail.append(f"camera denied: Start is not back with the focus: {out}")
+    return out
+
+
 def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
     refused: list[str] = []
 
@@ -562,6 +586,8 @@ def explore_run(browser: Any, base: str, fid: str, regions: list[dict[str, Any]]
     result["no_local_voice"] = no_local_voice(page, base, fid, regions, fail)
     fresh_ctx, _, fresh_reqs = context("explore no saved copy")
     result["failed_loads"] = failed_loads_are_told((script_ctx, script_reqs), (fresh_ctx, fresh_reqs), base, fid, fail)
+    _, page, _ = context("explore camera denied")
+    result["camera_denied"] = camera_denied(page, base, fid, fail)
     _, cam, cam_reqs = context("explore camera")
     result["camera"] = camera(cam, base, fid, fail)
     # What /explore asked for, by path, in script mode and in camera mode with MediaPipe.
