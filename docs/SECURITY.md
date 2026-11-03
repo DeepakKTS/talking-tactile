@@ -46,3 +46,28 @@ Fixed:
   transcription 2 MB (a 15 s recording is about 720 KB), anything else 64 KB. A body over its
   limit is refused with 413 before it is read, one with no length with 411
   (`app/middleware.py`, tests in `services/api/tests/test_body_guard.py`).
+
+## Network
+
+Checked (listening sockets on the Mac, `lsof`, during the demo setup):
+- The API (uvicorn) listens on 127.0.0.1:8000 only (`make dev`, `docs/DEMO.md`): the phone never
+  reaches it directly, only through the web server's proxy.
+- `npm run dev:phone` (Vite) listens on every interface at :5173, over HTTPS with the mkcert
+  certificate, so the iPhone on the same network can open it. That is what the demo needs.
+- The Gate B page's server listens on every interface at :8443, over HTTPS, and serves
+  `spikes/tracking` only (Python's handler refuses paths outside its folder).
+- CORS on the API allows only http://localhost:5173 and http://127.0.0.1:5173; the phone uses
+  the proxy, same origin, so it needs none.
+
+Found:
+- The LAN dev server was allowed to read the whole repository: with Vite's default deny list it
+  refused `.env`, `*.pem` and `.git`, but served any other file, among them the private test
+  figure (`fixtures/private/`, not openly licensed), the job database (`data/`), the cost
+  ledger and the API code. Checked on the running server: 200 for each.
+
+Fixed:
+- The dev server reads only `apps/web` and the two repo files the app imports,
+  `config/explore.yaml` and `docs/regions.schema.json` (`apps/web/vite.config.ts` DEV_FILES).
+  The running server now answers 403 for the private figure. Test:
+  `apps/web/scripts/devserver.test.ts` starts a dev server from the project config and checks
+  both lists; it fails on the old setting.

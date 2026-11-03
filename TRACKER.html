@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 364,
- "updated_at": "2026-11-03T08:50:56.950Z",
+ "rev": 366,
+ "updated_at": "2026-11-03T09:03:03.338Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2854,6 +2854,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T08:50:56.950Z"
   },
   {
+   "id": "d9-12",
+   "day": 9,
+   "title": "Security: the LAN dev server serves only the app and its two repo imports",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Network: API on 127.0.0.1:8000 only; dev:phone on all interfaces :5173 (HTTPS, needed for the iPhone); Gate B on :8443 serving spikes/tracking only; CORS localhost:5173 only. Found: the LAN dev server's fs.allow was the repo root, so it served the private test figure, data/jobs.sqlite, the ledger and API code (200 each on the running server; .env, *.pem, .git were already denied by Vite). vite.config.ts DEV_FILES: apps/web, config/explore.yaml, docs/regions.schema.json only; the running server now says 403 for the private figure. Test apps/web/scripts/devserver.test.ts (a real dev server from the config: the two imports 200, the rest 403); it fails on the old setting.",
+   "done_at": "2026-11-03T09:03:03.338Z",
+   "tags": [
+    "security"
+   ],
+   "changed_at": "2026-11-03T09:03:03.338Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3694,6 +3709,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T09:03:03.338Z",
+   "kind": "claude",
+   "text": "Task d9-12 \"Security: the LAN dev server serves only the app and its two repo imports\" is now done. Note: Network: API on 127.0.0.1:8000 only; dev:phone on all interfaces :5173 (HTTPS, needed for the iPhone); Gate B on :8443 serving spikes/tracking only; CORS localhost:5173 only. Found: the LAN dev server's fs.allow was the repo root, so it served the private test figure, data/jobs.sqlite, the ledger and API code (200 each on the running server; .env, *.pem, .git were already denied by Vite). vite.config.ts DEV_FILES: apps/web, config/explore.yaml, docs/regions.schema.json only; the running server now says 403 for the private figure. Test apps/web/scripts/devserver.test.ts (a real dev server from the config: the two imports 200, the rest 403); it fails on the old setting."
+  },
+  {
+   "ts": "2026-11-03T09:03:03.250Z",
+   "kind": "claude",
+   "text": "Task d9-12 \"Security: the LAN dev server serves only the app and its two repo imports\" added to day 9."
+  },
   {
    "ts": "2026-11-03T08:50:56.950Z",
    "kind": "claude",

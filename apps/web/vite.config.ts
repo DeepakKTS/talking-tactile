@@ -30,6 +30,12 @@ export function phoneHttps(env: NodeJS.ProcessEnv, dir: URL): { key: Buffer; cer
 }
 const HTTPS = phoneHttps(process.env, new URL("./.certs/", import.meta.url));
 
+export const DEV_FILES = [
+  fileURLToPath(new URL(".", import.meta.url)),
+  fileURLToPath(new URL("../../config/explore.yaml", import.meta.url)),
+  fileURLToPath(new URL("../../docs/regions.schema.json", import.meta.url)),
+];
+
 // TT_API lets the headless Explore run use its own API port.
 const API_PROXY = { "/api": process.env.TT_API ?? "http://127.0.0.1:8000" };
 
@@ -40,8 +46,10 @@ export default defineConfig({
     strictPort: true,
     proxy: API_PROXY,
     ...(HTTPS ? { https: HTTPS, host: true } : {}),
-    // The contract and shared fixtures live at the repo root, outside apps/web.
-    fs: { allow: [fileURLToPath(new URL("../..", import.meta.url))] },
+    // The app and the two repo files it imports, nothing else: dev:phone serves this on the
+    // LAN, and the repo root also holds the job database, the cost ledger and a private test
+    // figure. (.env, *.pem and .git are in Vite's default deny list as well.)
+    fs: { allow: DEV_FILES },
   },
   preview: { proxy: API_PROXY },
   worker: { format: "es" },
