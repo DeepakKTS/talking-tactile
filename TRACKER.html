@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 316,
- "updated_at": "2026-11-03T04:27:18.321Z",
+ "rev": 319,
+ "updated_at": "2026-11-03T04:34:35.781Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2481,6 +2481,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T04:27:18.321Z"
   },
   {
+   "id": "d8-37",
+   "day": 8,
+   "title": "Mock answers finger-free questions anywhere: the demo's offline fallback",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/meta/mock.py: when an answer request has no exact recording (599), mock mode serves a recording of the same question on the same published sheet that was asked with no part under the finger and nothing touched before; the prompts must be equal but for the two touch-context lines. So typed or transcribed questions from the eval's finger-free set (qa6) are answered offline wherever the finger is, and an answer tied to a finger position (h01 'What is this?' on the right atrium) is never served for another part. Tests: test_ask_replay.py::test_mock_answers_a_finger_free_question_wherever_the_finger_is, ::test_mock_never_serves_an_answer_tied_to_another_finger_position; both fail on the old mock.",
+   "done_at": "2026-11-03T04:34:35.781Z",
+   "tags": [
+    "test",
+    "demo"
+   ],
+   "changed_at": "2026-11-03T04:34:35.781Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -2691,10 +2707,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "target": 2.0,
    "unit": "s",
    "report_only": false,
-   "value": 8496,
-   "measured_at": "2026-11-03T04:27:18.239Z",
+   "value": 8.496,
+   "measured_at": "2026-11-03T04:30:18.576Z",
    "source": "live",
-   "changed_at": "2026-11-03T04:27:18.239Z"
+   "changed_at": "2026-11-03T04:30:18.576Z"
   },
   {
    "id": "auth-time",
@@ -3394,6 +3410,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T04:34:35.781Z",
+   "kind": "claude",
+   "text": "Task d8-37 \"Mock answers finger-free questions anywhere: the demo's offline fallback\" is now done. Note: app/meta/mock.py: when an answer request has no exact recording (599), mock mode serves a recording of the same question on the same published sheet that was asked with no part under the finger and nothing touched before; the prompts must be equal but for the two touch-context lines. So typed or transcribed questions from the eval's finger-free set (qa6) are answered offline wherever the finger is, and an answer tied to a finger position (h01 'What is this?' on the right atrium) is never served for another part. Tests: test_ask_replay.py::test_mock_answers_a_finger_free_question_wherever_the_finger_is, ::test_mock_never_serves_an_answer_tied_to_another_finger_position; both fail on the old mock."
+  },
+  {
+   "ts": "2026-11-03T04:34:35.739Z",
+   "kind": "claude",
+   "text": "Task d8-37 \"Mock answers finger-free questions anywhere: the demo's offline fallback\" added to day 8."
+  },
+  {
+   "ts": "2026-11-03T04:30:18.576Z",
+   "kind": "claude",
+   "text": "Metric \"Release Space to first word, p50\" set to 8.496 s (live)."
+  },
   {
    "ts": "2026-11-03T04:27:18.321Z",
    "kind": "claude",

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 316, updated 2026-11-03T04:27:18.321Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 319, updated 2026-11-03T04:34:35.781Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -338,6 +338,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: In order: 1 live eval on answer prompt v2 (item C: smoke call, qa_eval --live as qa6, re-index replays, update ask_e2e, release-to-first-word); 2 serve the phone (cert:phone if the address changed, API live, dev:phone); 3 ?check=1 readings on the iPhone; 4 hold-to-talk with VoiceOver off then on, plus the needs-device rows of docs/EDGE_CASES.md; 5 Gate B (eval/gate-b/README.md); 6 device latency film (latency.csv, videos.sha256); 7 one live voice take; 8 tracker.py spend.
 - [x] d8-36 ask_e2e on the v2 recordings
   - Note: apps/web/e2e/ask_e2e.py now names qa6_ask_* (Nov 3, answer prompt v2). Its two typed questions, asked with no part under the finger as h15 and h19 were, recorded the same sentences as on v1 ('The left ventricle pumps blood out to the whole body through the aortic arch.'; 'This figure does not show that. Ask your teacher.'), so the expectations stand; PASS on the mock API. lat-answer set to 8496 ms (p50 release to first word, live, headless Chrome).
+- [x] d8-37 Mock answers finger-free questions anywhere: the demo's offline fallback
+  - Note: app/meta/mock.py: when an answer request has no exact recording (599), mock mode serves a recording of the same question on the same published sheet that was asked with no part under the finger and nothing touched before; the prompts must be equal but for the two touch-context lines. So typed or transcribed questions from the eval's finger-free set (qa6) are answered offline wherever the finger is, and an answer tied to a finger position (h01 'What is this?' on the right atrium) is never served for another part. Tests: test_ask_replay.py::test_mock_answers_a_finger_free_question_wherever_the_finger_is, ::test_mock_never_serves_an_answer_tied_to_another_finger_position; both fail on the old mock.
 
 ## Day 9: Tue Nov 3. Gate D
 

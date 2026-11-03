@@ -4,11 +4,18 @@ The synthetic test figure's S1 answer and SAM masks come from fixtures/synthetic
 and its raw masks. Figures listed in fixtures/recorded/replays.json are answered from live
 recordings, through the live client's own code with a replay transport: the heart, from its
 live pipeline run and its Fix outline calls. An image with no recording is refused rather
-than guessed, and so is a request that was never recorded."""
+than guessed, and so is a request that was never recorded.
+
+One exception, so a demo has questions with no network: a question whose exact request was
+not recorded is answered from a recording of the same question on the same published sheet,
+recorded with no part under the finger and nothing touched before. Its prompt must equal the
+new one but for those two lines, so an answer that depends on where the finger is, such as
+"What is this?" recorded on the right atrium, is never served for another part."""
 
 import asyncio
 import hashlib
 import json
+import re
 import tempfile
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -18,6 +25,8 @@ from typing import Any, Literal
 
 from app.config import Meta
 from app.meta.cost import CostMeter
+from app.meta.live import LiveCallError
+from app.meta.record import NO_RECORDING
 from app.meta.types import PartPhrase, SheetContext, Understanding
 from app.models.image import RGB
 from app.models.mask import Mask
@@ -28,6 +37,10 @@ from app.synthetic.generate import OUT_DIR
 from app.synthetic.load import SyntheticFigure, load_synthetic
 
 REPLAYS = RECORDED_DIR / "replays.json"
+# The touch context in the answer prompt (app/prompts/ask_answer.v2.json), and its value with
+# no part under the finger and nothing touched before.
+_TOUCH = re.compile(r"The student's finger is on: (.*)\nTouched just before: (.*)\n")
+_UNTOUCHED = ("no part", "nothing")
 
 
 class MockFixtureMissingError(Exception):
@@ -224,5 +237,31 @@ class MockMetaClient:
         if replay is None:
             raise MockFixtureMissingError("Mock mode has no recorded answers for this figure.")
         self.calls.append(CallRecord(call="answer", figure_id=figure_id, phrase=what))
-        out: dict[str, Any] = await replay.answer(figure_id, png, system, user, schema, what)
+        try:
+            out: dict[str, Any] = await replay.answer(figure_id, png, system, user, schema, what)
+        except LiveCallError as exc:
+            if exc.status != NO_RECORDING:
+                raise
+            out = self._untouched_answer(figure_id, user)
         return out
+
+    def _untouched_answer(self, figure_id: str, user: str) -> dict[str, Any]:
+        """The recorded answer to the same question on the same sheet, asked with no part
+        under the finger and nothing touched before (the module docstring)."""
+        want = _TOUCH.sub("", user)
+        for path in self._replay_files.get(figure_id, []):
+            rec = json.loads(path.read_text("utf-8"))
+            body = rec["request"].get("json") or {}
+            if rec["request"]["path"] != "/chat/completions" or "messages" not in body:
+                continue
+            content = body["messages"][-1]["content"]
+            text = (
+                next((c["text"] for c in content if c.get("type") == "text"), "")
+                if isinstance(content, list)
+                else str(content)
+            )
+            touch = _TOUCH.search(text)
+            if touch and touch.groups() == _UNTOUCHED and _TOUCH.sub("", text) == want:
+                reply = rec["response"]["json"]["choices"][0]["message"]["content"]
+                return dict(json.loads(reply))
+        raise MockFixtureMissingError("Mock mode has no recorded answer to this question.")

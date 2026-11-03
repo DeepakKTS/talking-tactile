@@ -17,7 +17,7 @@ from app import ask
 from app.config import load_tactile_rules
 from app.main import create_app
 from app.meta import qa_eval
-from app.meta.mock import MockMetaClient
+from app.meta.mock import MockFixtureMissingError, MockMetaClient
 from app.models.regions import RegionsFile
 from app.paths import FIXTURES_DIR, REPO_ROOT
 from app.pipeline import s0_ingest
@@ -138,3 +138,23 @@ def test_the_route_answers_from_the_figure_and_deflects_off_it(tmp_path: Path) -
         ask.OFF_FIGURE,
         [],
     )
+
+
+def ask_on(question: str, finger: str | None, recent: list[str]) -> ask.Answer:
+    q = {"id": "fallback", "figure": "heart", "question": question, "finger": finger,
+         "recent": recent}  # fmt: skip
+    return asyncio.run(asker().ask(request(q), None))
+
+
+def test_mock_answers_a_finger_free_question_wherever_the_finger_is() -> None:
+    """The demo's offline fallback: h15 was recorded with no part under the finger; asked with
+    a finger on the right atrium after the aortic arch, the same recorded answer comes back."""
+    got = ask_on("What does the left ventricle do?", "right atrium", ["aortic arch"])
+    assert (got.answer, got.source) == (LIVE["h15"]["answer"], LIVE["h15"]["source"])
+
+
+def test_mock_never_serves_an_answer_tied_to_another_finger_position() -> None:
+    """h01 "What is this?" was recorded on the right atrium; on the left ventricle there is
+    no recording, and the fallback must not answer "the right atrium"."""
+    with pytest.raises(MockFixtureMissingError):
+        ask_on("What is this?", "left ventricle", [])
