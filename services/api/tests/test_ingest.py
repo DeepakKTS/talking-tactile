@@ -9,6 +9,7 @@ import pytest
 from PIL import Image
 
 from app.config import load_tactile_rules
+from app.pipeline import s0_ingest
 from app.pipeline.s0_ingest import IngestError, ingest, sharpness
 from app.synthetic.load import SyntheticFigure
 
@@ -92,6 +93,27 @@ def test_pdf_page_is_picked_by_index(synthetic: SyntheticFigure) -> None:
 def test_uploads_over_the_limit_are_refused_before_decoding() -> None:
     limit = int(RULES.max_upload_mb * 1024 * 1024)
     assert code_of(b"\x89PNG\r\n\x1a\n" + b"\0" * limit) == "too_large"
+
+
+def test_too_many_pixels_are_refused_before_decoding(
+    synthetic: SyntheticFigure, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # A one-color PNG of 9000 x 9000 (81 million pixels) is a few hundred KB.
+    big = Image.new("L", (9000, 9000), 255)
+    buf = io.BytesIO()
+    big.save(buf, format="PNG")
+    assert len(buf.getvalue()) < RULES.max_upload_mb * 1024 * 1024
+    assert code_of(buf.getvalue()) == "too_many_pixels"
+    h, w = synthetic.image.shape[:2]  # a PDF page whose render would pass the limit
+    monkeypatch.setattr(s0_ingest, "MAX_PIXELS", (w * h) // 2)
+    assert code_of(pdf_of(synthetic.image)) == "too_many_pixels"
+
+
+def test_pillows_own_bomb_limit_is_the_same_refusal(
+    synthetic: SyntheticFigure, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Image, "MAX_IMAGE_PIXELS", 1000)  # open raises over twice this
+    assert code_of(encode(synthetic.image, "PNG")) == "too_many_pixels"
 
 
 @pytest.mark.parametrize(

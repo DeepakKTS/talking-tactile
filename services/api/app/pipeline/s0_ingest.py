@@ -21,7 +21,9 @@ from app.config import Pipeline
 from app.models.image import RGB
 
 SourceType = Literal["png", "jpeg", "pdf"]
-IngestCode = Literal["too_large", "unsupported_type", "unreadable", "bad_page", "blurry"]
+IngestCode = Literal[
+    "too_large", "too_many_pixels", "unsupported_type", "unreadable", "bad_page", "blurry"
+]
 
 _MAGIC: dict[bytes, SourceType] = {
     b"\x89PNG\r\n\x1a\n": "png",
@@ -36,6 +38,13 @@ _APPROX_FRACTION = 0.02  # polygon approximation tolerance, as a share of the pe
 _GRADIENT_PERCENTILE = 99.5
 _RANGE_PERCENTILES = (1, 99)
 _SOBEL_NORM = 8  # a unit step gives a Sobel response of 8 with the 3 x 3 kernel
+# Checked before decoding. S0 brings every figure to 2048 px on its longest side, so more
+# pixels add nothing; 50 million still takes a 48 MP phone photo (8064 x 6048). A flat PNG
+# under the 10 MB limit can hold billions, and decoding one would fill memory.
+MAX_PIXELS = 50_000_000
+_TOO_MANY = (
+    f"The image is over {MAX_PIXELS // 1_000_000} million pixels. Use a smaller scan or photo."
+)
 
 
 class IngestError(Exception):
@@ -67,6 +76,8 @@ def _sniff(data: bytes) -> SourceType:
 def _decode_image(data: bytes) -> RGB:
     try:
         with Image.open(io.BytesIO(data)) as opened:
+            if opened.width * opened.height > MAX_PIXELS:
+                raise IngestError("too_many_pixels", _TOO_MANY)
             opened.load()
             upright: Image.Image = ImageOps.exif_transpose(opened)
             if upright.mode in {"RGBA", "LA", "P"} or "transparency" in upright.info:
@@ -75,6 +86,8 @@ def _decode_image(data: bytes) -> RGB:
                 flat.paste(rgba, mask=rgba.getchannel("A"))
                 upright = flat
             return np.asarray(upright.convert("RGB"), dtype=np.uint8).copy()
+    except Image.DecompressionBombError as exc:  # Pillow's own limit, met at open
+        raise IngestError("too_many_pixels", _TOO_MANY) from exc
     except (UnidentifiedImageError, OSError, SyntaxError, ValueError) as exc:
         raise IngestError("unreadable", "The image file could not be read.") from exc
 
@@ -87,7 +100,11 @@ def _decode_pdf(data: bytes, page_index: int, dpi: int) -> RGB:
     try:
         if not 0 <= page_index < len(pdf):
             raise IngestError("bad_page", f"The PDF has {len(pdf)} pages. Pick one of them.")
-        bitmap = pdf[page_index].render(scale=dpi / _POINTS_PER_INCH)
+        page = pdf[page_index]
+        w, h = page.get_size()  # points
+        if w * h * (dpi / _POINTS_PER_INCH) ** 2 > MAX_PIXELS:
+            raise IngestError("too_many_pixels", _TOO_MANY)
+        bitmap = page.render(scale=dpi / _POINTS_PER_INCH)
         return np.asarray(bitmap.to_pil().convert("RGB"), dtype=np.uint8).copy()
     finally:
         pdf.close()

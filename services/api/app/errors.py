@@ -13,7 +13,7 @@ from app.pipeline.s0_ingest import IngestError
 
 log = logging.getLogger(__name__)
 
-_INGEST_STATUS = {"too_large": 413, "unsupported_type": 415}
+_INGEST_STATUS = {"too_large": 413, "too_many_pixels": 413, "unsupported_type": 415}
 _HTTP_CODES = {404: "not_found", 405: "method_not_allowed"}
 _STATUS_UNPROCESSABLE = 422
 _STATUS_INTERNAL = 500

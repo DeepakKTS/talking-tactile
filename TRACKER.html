@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 278,
- "updated_at": "2026-11-03T01:42:12.553Z",
+ "rev": 280,
+ "updated_at": "2026-11-03T01:47:45.864Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2228,6 +2228,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:42:12.553Z"
   },
   {
+   "id": "d8-21",
+   "day": 8,
+   "title": "Edge case U2: an image over 50 million pixels is refused before decoding",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/pipeline/s0_ingest.py: MAX_PIXELS 50 million, checked on the size Pillow reads before decoding (S0 brings every figure to 2048 px, so more adds nothing; a 48 MP phone photo, 8064 x 6048, still fits). Over it: 413 too_many_pixels 'The image is over 50 million pixels. Use a smaller scan or photo.' Pillow's own DecompressionBombError gets the same refusal (before: an uncaught 500 'Something went wrong.', marked retryable). A PDF page whose render at pdf_render_dpi would pass the limit is refused before rendering. Tests: test_ingest.py::test_too_many_pixels_are_refused_before_decoding (a 9000 x 9000 one-color PNG, under 10 MB; a PDF page), ::test_pillows_own_bomb_limit_is_the_same_refusal.",
+   "done_at": "2026-11-03T01:47:45.864Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:47:45.864Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3140,6 +3156,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:47:45.864Z",
+   "kind": "claude",
+   "text": "Task d8-21 \"Edge case U2: an image over 50 million pixels is refused before decoding\" is now done. Note: app/pipeline/s0_ingest.py: MAX_PIXELS 50 million, checked on the size Pillow reads before decoding (S0 brings every figure to 2048 px, so more adds nothing; a 48 MP phone photo, 8064 x 6048, still fits). Over it: 413 too_many_pixels 'The image is over 50 million pixels. Use a smaller scan or photo.' Pillow's own DecompressionBombError gets the same refusal (before: an uncaught 500 'Something went wrong.', marked retryable). A PDF page whose render at pdf_render_dpi would pass the limit is refused before rendering. Tests: test_ingest.py::test_too_many_pixels_are_refused_before_decoding (a 9000 x 9000 one-color PNG, under 10 MB; a PDF page), ::test_pillows_own_bomb_limit_is_the_same_refusal."
+  },
+  {
+   "ts": "2026-11-03T01:47:45.810Z",
+   "kind": "claude",
+   "text": "Task d8-21 \"Edge case U2: an image over 50 million pixels is refused before decoding\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:42:12.553Z",
    "kind": "claude",
