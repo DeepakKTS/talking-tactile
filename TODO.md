@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 282, updated 2026-11-03T01:53:04.785Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 284, updated 2026-11-03T01:57:41.869Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -309,6 +309,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: app/pipeline/s0_ingest.py: MAX_PIXELS 50 million, checked on the size Pillow reads before decoding (S0 brings every figure to 2048 px, so more adds nothing; a 48 MP phone photo, 8064 x 6048, still fits). Over it: 413 too_many_pixels 'The image is over 50 million pixels. Use a smaller scan or photo.' Pillow's own DecompressionBombError gets the same refusal (before: an uncaught 500 'Something went wrong.', marked retryable). A PDF page whose render at pdf_render_dpi would pass the limit is refused before rendering. Tests: test_ingest.py::test_too_many_pixels_are_refused_before_decoding (a 9000 x 9000 one-color PNG, under 10 MB; a PDF page), ::test_pillows_own_bomb_limit_is_the_same_refusal.
 - [x] d8-22 Edge case U4: a one-color image is called blank, not blurry
   - Note: app/pipeline/s0_ingest.py: an image (after deskew) whose darkest and lightest pixels are within 16 of 255 levels is refused as 422 blank 'The image is one color, with no figure on it.' instead of 'too blurry'. 16 leaves room for JPEG noise on an empty page and is far under any drawn line. Test: test_ingest.py::test_a_one_color_image_is_called_blank_not_blurry (black, gray, white, each with +-5 noise).
+- [x] d8-23 Edge case U7: an image's page error says page 1, as the form counts
+  - Note: app/pipeline/s0_ingest.py: a PNG or JPEG sent with a page other than the first now says 'An image has one page. Leave the page number at 1.' The Author form counts pages from 1 (it sends n - 1); the old 'Use page 0.' asked for a number the form refuses (min 1). Test: test_ingest.py::test_a_page_other_than_the_first_for_an_image_says_page_1.
 
 ## Day 9: Tue Nov 3. Gate D
 

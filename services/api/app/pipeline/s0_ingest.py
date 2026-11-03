@@ -184,7 +184,8 @@ def ingest(data: bytes, page_index: int, rules: Pipeline) -> Ingested:
         img = _decode_pdf(data, page_index, rules.pdf_render_dpi)
     else:
         if page_index != 0:
-            raise IngestError("bad_page", "An image has one page. Use page 0.")
+            # The Author form counts pages from 1 and sends page 1 as index 0.
+            raise IngestError("bad_page", "An image has one page. Leave the page number at 1.")
         img = _decode_image(data)
     original = (img.shape[1], img.shape[0])
     flat = _deskew(img, rules)

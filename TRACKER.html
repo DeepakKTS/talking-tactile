@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 282,
- "updated_at": "2026-11-03T01:53:04.785Z",
+ "rev": 284,
+ "updated_at": "2026-11-03T01:57:41.869Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2260,6 +2260,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:53:04.785Z"
   },
   {
+   "id": "d8-23",
+   "day": 8,
+   "title": "Edge case U7: an image's page error says page 1, as the form counts",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/pipeline/s0_ingest.py: a PNG or JPEG sent with a page other than the first now says 'An image has one page. Leave the page number at 1.' The Author form counts pages from 1 (it sends n - 1); the old 'Use page 0.' asked for a number the form refuses (min 1). Test: test_ingest.py::test_a_page_other_than_the_first_for_an_image_says_page_1.",
+   "done_at": "2026-11-03T01:57:41.869Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:57:41.869Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3172,6 +3188,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:57:41.869Z",
+   "kind": "claude",
+   "text": "Task d8-23 \"Edge case U7: an image's page error says page 1, as the form counts\" is now done. Note: app/pipeline/s0_ingest.py: a PNG or JPEG sent with a page other than the first now says 'An image has one page. Leave the page number at 1.' The Author form counts pages from 1 (it sends n - 1); the old 'Use page 0.' asked for a number the form refuses (min 1). Test: test_ingest.py::test_a_page_other_than_the_first_for_an_image_says_page_1."
+  },
+  {
+   "ts": "2026-11-03T01:57:41.830Z",
+   "kind": "claude",
+   "text": "Task d8-23 \"Edge case U7: an image's page error says page 1, as the form counts\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:53:04.785Z",
    "kind": "claude",

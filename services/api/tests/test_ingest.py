@@ -192,3 +192,14 @@ def test_a_one_color_image_is_called_blank_not_blurry(level: int) -> None:
     rng = np.random.default_rng(0)
     flat = np.full((600, 800, 3), level, np.int16) + rng.integers(-5, 6, (600, 800, 3))
     assert code_of(encode(np.clip(flat, 0, 255).astype(np.uint8), "PNG")) == "blank"
+
+
+def test_a_page_other_than_the_first_for_an_image_says_page_1(
+    synthetic: SyntheticFigure,
+) -> None:
+    with pytest.raises(IngestError) as err:
+        ingest(encode(synthetic.image, "PNG"), 1, RULES)
+    assert (err.value.code, err.value.message) == (
+        "bad_page",
+        "An image has one page. Leave the page number at 1.",
+    )
