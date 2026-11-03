@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 442,
- "updated_at": "2026-11-03T22:16:58.335Z",
+ "rev": 447,
+ "updated_at": "2026-11-03T22:55:48.399Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2562,7 +2562,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "",
    "fallback": "",
    "status": "done",
-   "note": "The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name fixtures/private/brain_upload.png in plan_eval.py (a git-ignored file of the user's).",
+   "note": "The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name of the private figure in plan_eval.py (a git-ignored file of the user's).",
    "done_at": "2026-11-03T04:53:35.909Z",
    "tags": [
     "release"
@@ -3142,13 +3142,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "timebox": "after filming",
    "fallback": "",
    "status": "todo",
-   "note": "",
+   "note": "Done from this list on Nov 3: the private file name in plan_eval.py (allowed in the filming window). Left, after filming, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13; F17; F24; F16; F14; F12; F23; F33; seed of version 4 sheets for qa_eval and mock questions; eval/run.py; FORM.md in results.py DOCS; spikes/tracking/README stale line. Then Deepak's own voice clips and the replays.",
    "done_at": null,
    "tags": [
     "fix",
     "security"
    ],
-   "changed_at": "2026-11-03T22:16:43.893Z"
+   "changed_at": "2026-11-03T22:55:48.399Z"
   },
   {
    "id": "d10-1",
@@ -3916,6 +3916,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "decision": "ask_answer.v1 with the image, as now.",
    "why": "On 12 new picture questions (shape, biggest part, top and bottom, next to, which is bigger), live on version 4: with the image heart 5/6 source and citations, brain 6/6; without it 3/6 and 3/6 (it deflects shape and size). The no-image variant was faster (Spark p50 about 0.9 s) and no worse on the other 61 questions, but worse here, so the rule 'switch if no worse' keeps the image.",
    "changed_at": "2026-10-30T21:49:00.667Z"
+  },
+  {
+   "id": "dec-mw1adqo9lthj",
+   "date": "2026-11-03",
+   "title": "Owner decisions after the reviews (Nov 3)",
+   "decision": "Prune the old-key object (done). Remove APPLICATION.md from the tree, keep history. No history rewrite for the commit email; Deepak sets the GitHub noreply address. Keep the macOS say clips for now under Apple's terms. Track Indie, problem statement Push the Frontier. Judging criteria marked to confirm against the Official Rules. plan_eval's private file name fixed in the filming window.",
+   "why": "After filming Deepak records his own voice; then the replays are recorded again and aorta is measured on a real voice. The plan_eval fix is safe while filming: no server imports it and the API runs without reload. Deepak pastes the judging section later.",
+   "changed_at": "2026-11-03T22:55:48.307Z"
   }
  ],
  "risks": [
@@ -3982,9 +3990,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "ts": "2026-11-03T22:16:58.335Z",
    "title": "An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.",
    "severity": "medium",
-   "status": "open",
-   "note": "",
-   "changed_at": "2026-11-03T22:16:58.335Z"
+   "status": "closed",
+   "note": "Deepak approved; Nov 3: git reflog expire --expire-unreachable=now --all && git gc --prune=now. The object is gone and git fsck --unreachable --no-reflogs lists nothing. The current key is still to be rotated after the demo.",
+   "changed_at": "2026-11-03T22:55:48.355Z"
   },
   {
    "id": "i-mvtub2znb0gu",
@@ -4015,6 +4023,31 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T22:55:48.399Z",
+   "kind": "claude",
+   "text": "Task d9-28 \"Phase B: code fixes queued from the review\" note updated, still todo. Note: Done from this list on Nov 3: the private file name in plan_eval.py (allowed in the filming window). Left, after filming, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13; F17; F24; F16; F14; F12; F23; F33; seed of version 4 sheets for qa_eval and mock questions; eval/run.py; FORM.md in results.py DOCS; spikes/tracking/README stale line. Then Deepak's own voice clips and the replays."
+  },
+  {
+   "ts": "2026-11-03T22:55:48.355Z",
+   "kind": "claude",
+   "text": "Issue closed: An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.. Deepak approved; Nov 3: git reflog expire --expire-unreachable=now --all && git gc --prune=now. The object is gone and git fsck --unreachable --no-reflogs lists nothing. The current key is still to be rotated after the demo."
+  },
+  {
+   "ts": "2026-11-03T22:55:48.307Z",
+   "kind": "claude",
+   "text": "Decision: Owner decisions after the reviews (Nov 3)."
+  },
+  {
+   "ts": "2026-11-03T22:55:40.946Z",
+   "kind": "claude",
+   "text": "Issue closed: An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.. Deepak approved; Nov 3: git reflog expire --expire-unreachable=now --all && git gc --prune=now. The object is gone (git cat-file -e fails) and git fsck --unreachable --no-reflogs lists nothing. The current key is still to be rotated after the demo."
+  },
+  {
+   "ts": "2026-11-03T22:55:40.896Z",
+   "kind": "claude",
+   "text": "Redacted 2 passages (1 distinct): Release prep: the private figure's local file name removed from the tracker (review finding QA F32)."
+  },
   {
    "ts": "2026-11-03T22:16:58.335Z",
    "kind": "claude",
@@ -4593,7 +4626,7 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   {
    "ts": "2026-11-03T04:53:35.909Z",
    "kind": "claude",
-   "text": "Task d8-40 \"Redact the private test figure in current files\" is now done. Note: The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name fixtures/private/brain_upload.png in plan_eval.py (a git-ignored file of the user's)."
+   "text": "Task d8-40 \"Redact the private test figure in current files\" is now done. Note: The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name of the private figure in plan_eval.py (a git-ignored file of the user's)."
   },
   {
    "ts": "2026-11-03T04:53:35.865Z",

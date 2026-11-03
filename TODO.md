@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 442, updated 2026-11-03T22:16:58.335Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 447, updated 2026-11-03T22:55:48.399Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -371,7 +371,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d8-39 README accuracy pass; PLAN.md S3 Spark pass marked not built
   - Note: Every README claim checked against code or a committed result. Changed: the mock-question paragraph (now: typed eval questions asked with no finger are answered offline, from qa6); the results table moved to the v2 eval (heart 36 of 38 and 32, brain 35 of 35 and 34, unsure fallback 0; the old 'no answer used a word from outside the figure' is now false: 5 flags a figure, one outside knowledge, 'great vessels'); picture questions from the same run (heart 5 of 6 and 4, brain 6 of 6 and 5); release to first word 8.5 s p50, 9.6 s p95; the questions limitation (slow, mock answers only recorded questions) and a new one on wording. Already right and rechecked: S3 code only, SAM four at a time (sam_concurrency 4), H for help, the touch path numbers (explore.yaml), the 30/35 s deadline. PLAN.md S3: only the code part is built; the Spark pass is marked not built.
 - [x] d8-40 Redact the private test figure in current files
-  - Note: The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name fixtures/private/brain_upload.png in plan_eval.py (a git-ignored file of the user's).
+  - Note: The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name of the private figure in plan_eval.py (a git-ignored file of the user's).
 - [x] d8-41 Repo-relative paths in docs/DEMO.md and eval/gate-b/README.md
   - Note: The 5 absolute paths (DEMO.md 1, gate-b README 4) are now repo-relative: each terminal starts at the repo root (the folder you cloned), then cd services/api or apps/web. The tracker's audit note no longer quotes the home path (tracker.py redact). git grep finds no home path in tracked files but eval/live/ledger.jsonl, which is left as it is.
 - [x] d8-42 ATTRIBUTION: derived masks, regions files, recordings; own work marked
@@ -459,6 +459,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: docs/submission/FORM.md (81f1147). Deepak confirms: Indie, Push the Frontier, repo public, the video link.
 - [ ] d9-28 Phase B: code fixes queued from the review (after filming)
   - docs/review/TRIAGE.md, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13 non-UTF-8 500; F17 clip length; F24 trusted hosts; F16 question maxLength; F14 control characters; F12 aspect ratio; F23 Gate B listing; F33 .env* in the secret check; qa_eval seed of version 4 sheets plus the mock-question seed; eval/run.py; FORM.md in results.py DOCS; private file name in plan_eval.py; spikes/tracking/README stale line
+  - Note: Done from this list on Nov 3: the private file name in plan_eval.py (allowed in the filming window). Left, after filming, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13; F17; F24; F16; F14; F12; F23; F33; seed of version 4 sheets for qa_eval and mock questions; eval/run.py; FORM.md in results.py DOCS; spikes/tracking/README stale line. Then Deepak's own voice clips and the replays.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.
@@ -474,5 +475,4 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Open issues
 
-- (medium) An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.
 - (medium) ASR heard "aorta" as "order" on a synthetic clip with no hints: Mitigated: the figure's labels go as keyword hints (d9-8). On three synthetic clips every word was right with and without hints (eval/qa/VOICE.md). Accuracy on a real voice is not measured.
