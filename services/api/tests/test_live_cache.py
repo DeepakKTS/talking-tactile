@@ -24,6 +24,7 @@ from app.pipeline.edits import EditStore
 from app.pipeline.jobs import JobStore
 from app.pipeline.runner import JobOptions, NotReadyError, Runner
 from app.prompts import Prompt
+from tests.recorded_png import mac_png
 
 RULES = load_tactile_rules()
 SYNTHETIC_PNG = (FIXTURES_DIR / "synthetic" / "figure.png").read_bytes()
@@ -100,6 +101,7 @@ def test_a_cached_s1_and_s2_are_ledger_hits_when_given_a_ledger(tmp_path: Path) 
     assert hits == [("s1", RULES.meta.models.spark, "hit"), ("s2", RULES.meta.models.sam, "hit")]
 
 
+@mac_png
 def test_replay_of_the_live_cache_check(tmp_path: Path) -> None:
     """The Oct 27 live run (app/meta/cache_check.py) replayed: the real SAM answer on heart.png
     after S0, zero instances, then a cache hit with no second call."""

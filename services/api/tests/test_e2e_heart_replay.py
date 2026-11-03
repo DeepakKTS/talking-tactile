@@ -28,6 +28,7 @@ from app.meta.mock import MockMetaClient
 from app.meta.smoke import HEART
 from app.models.regions import RegionsFile, check_references
 from app.paths import FIXTURES_DIR
+from tests.recorded_png import mac_png
 
 RULES = load_tactile_rules()
 DRAFT = json.loads((FIXTURES_DIR / "pipeline" / "heart_regions.json").read_text("utf-8"))
@@ -62,6 +63,7 @@ async def heart(body: Any) -> dict[str, Any]:
         return out
 
 
+@mac_png
 def test_the_heart_through_the_api_on_replay() -> None:
     async def body(http: httpx.AsyncClient, service: Any, base: str, out: dict[str, Any]) -> None:
         out["draft"] = (await http.get(f"{base}/regions.json")).json()
@@ -91,6 +93,7 @@ def test_the_heart_through_the_api_on_replay() -> None:
     assert got["draft"] == DRAFT
 
 
+@mac_png
 def test_fix_outline_on_replay_gives_the_live_fixes() -> None:
     async def body(http: httpx.AsyncClient, service: Any, base: str, out: dict[str, Any]) -> None:
         for part, steps in (("aorta", AORTA), ("left ventricle", LEFT_VENTRICLE)):
