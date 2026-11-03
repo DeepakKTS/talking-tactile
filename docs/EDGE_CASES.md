@@ -70,7 +70,7 @@ p95 5.9 s (12 holds); Spark p95 5.3 s on the heart, slowest of 61 answers 6.9 s
 | Q7 | Microphone busy (another app) | Any failure to open counts as denied for good (`voice.ts:283-289`): the wrong sentence, and no retry once the other app lets go | Says the microphone is busy; tries again on the next hold | fixed: `voice.test.ts` a busy microphone says so and is tried again; on the iPhone: needs device |
 | Q8 | Let go while the microphone is opening (first hold) | The hold is already listening (`voice.ts:49`); letting go after 400 ms sends a WAV recorded before the microphone was open, with no start earcon (`voice.ts:291`) | Nothing sent; says to hold while asking | fixed: `voice.test.ts` first hold, microphone still opening; on the iPhone: needs device |
 | Q9 | Question while an answer is spoken | The hold stops the answer and listens (`voice.ts:292`), as intended; a screen reader's speech cannot be stopped (`web/explore/audio.ts:208-212`). Test `voice.test.ts:139-148` | Same | ok, needs device |
-| Q10 | Typed question while waiting | No thinking tone for a typed question (`session.ts:338-347`) | Thinking tone, as for a spoken one | fix |
+| Q10 | Typed question while waiting | No thinking tone for a typed question (`session.ts:338-347`) | Thinking tone, as for a spoken one | fixed: `session.test.ts` sends other questions to /api/ask |
 
 Timeout choice: the server stops a question at 12 s and answers "Questions are not working
 right now. Labels still work."; that is 1.4 times the slowest observed server time (8.3 s)

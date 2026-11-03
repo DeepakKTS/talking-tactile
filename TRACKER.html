@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 268,
- "updated_at": "2026-11-03T01:01:54.098Z",
+ "rev": 270,
+ "updated_at": "2026-11-03T01:06:43.555Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2148,6 +2148,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:01:54.098Z"
   },
   {
+   "id": "d8-16",
+   "day": 8,
+   "title": "Edge case Q10: a typed question plays the thinking tone while it waits",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/session.ts: a typed question turns the thinking tone on before /api/ask and off before the answer is said, as a held question does; the wait is no longer silent. Test: session.test.ts 'sends other questions to /api/ask with the touch context' checks thinking, thinking off, then the answer.",
+   "done_at": "2026-11-03T01:06:43.555Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:06:43.555Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3060,6 +3076,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:06:43.555Z",
+   "kind": "claude",
+   "text": "Task d8-16 \"Edge case Q10: a typed question plays the thinking tone while it waits\" is now done. Note: apps/web/src/explore/session.ts: a typed question turns the thinking tone on before /api/ask and off before the answer is said, as a held question does; the wait is no longer silent. Test: session.test.ts 'sends other questions to /api/ask with the touch context' checks thinking, thinking off, then the answer."
+  },
+  {
+   "ts": "2026-11-03T01:06:43.513Z",
+   "kind": "claude",
+   "text": "Task d8-16 \"Edge case Q10: a typed question plays the thinking tone while it waits\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:01:54.098Z",
    "kind": "claude",

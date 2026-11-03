@@ -185,6 +185,7 @@ describe("explore session", () => {
       session_id: session.sessionId,
     }]);
     expect(audio.said().at(-1)).toBe("It joins the two lobes.");
+    expect(audio.log.slice(-3)).toEqual(["thinking", "thinking off", "say It joins the two lobes."]);
   });
 
   it("keeps labels, earcons and guidance working when the network is off", async () => {

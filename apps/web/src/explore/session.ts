@@ -338,10 +338,13 @@ export class ExploreSession {
   private async ask(question: string): Promise<void> {
     const req = this.request(question);
     let answer: string;
+    this.deps.audio.thinking(true); // the same tone a held question plays while it waits
     try {
       answer = await this.deps.ask(req);
     } catch (err) {
       answer = err instanceof AskError ? err.spoken : OFFLINE_ANSWER;
+    } finally {
+      this.deps.audio.thinking(false);
     }
     this.deps.audio.say(answer);
   }
