@@ -190,7 +190,7 @@ def main() -> None:
     result: dict[str, Any] = {}
     try:
         subprocess.run(["npx", "vite", "build", "--logLevel", "error"], cwd=WEB, env=env, check=True)
-        procs.append(subprocess.Popen(["npx", "vite", "preview", "--port", str(web_port), "--strictPort"],
+        procs.append(subprocess.Popen(["npx", "vite", "preview", "--host", "127.0.0.1", "--port", str(web_port), "--strictPort"],
                                       cwd=WEB, env=env, stdout=subprocess.DEVNULL))
         wait_http(f"{api}/api/health")
         wait_http(base)
