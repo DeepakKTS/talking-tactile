@@ -46,7 +46,8 @@ with `LIVE=1` (`docs/DEMO.md` has the commands, terminal by terminal).
 
 For a demo with the iPhone: `make preflight` checks the setup (OK or FAIL per check), and
 `make demo-live` or `make demo-mock` starts the API, the phone's web server and the Gate B page
-together and prints the iPhone URLs (`docs/DEMO.md`).
+together and prints the iPhone URLs (`docs/DEMO.md`). The submission write-up and video script
+are in `docs/submission/`; the security pass is in `docs/SECURITY.md`.
 
 Checks: `make check` runs every test suite, lint and type check, as the pre-commit hook and CI
 (`.github/workflows/tests.yml`) do.

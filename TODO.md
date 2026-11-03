@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 379, updated 2026-11-03T10:55:19.994Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 381, updated 2026-11-03T11:06:20.323Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -405,6 +405,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: scripts/preflight.py (make preflight; PREFLIGHT=--live adds app.meta.smoke under caffeinate -i): OK or FAIL for the key file (non-empty key line, git-ignored, value never printed), the phone certificate (valid a day more, for the LAN address and the .local name), ports 8000/5173/8443 (free or the expected server), the heart and the Commons brain v4 regions.json through the API (a temporary mock API when :8000 is down) and through dev:phone, CI on HEAD, git clean and pushed, credits left from the ledger (FAIL under $10); exit 1 on any FAIL. 8 unit tests (scripts/test_preflight.py, in the hook and CI). scripts/demo.sh (make demo-live / demo-mock): API, dev:phone and Gate B serve.py under caffeinate -i, refuses busy ports, prints the iPhone URLs .local first; Ctrl-C stops all three. Run: demo-mock up, preflight correct (heart 12 regions, brain 5, both paths), stopped with all three ports freed; demo-live left running. docs/DEMO.md Start and Pre-flight, README.
 - [x] d9-18 Submission write-up and video script
   - Note: docs/submission/WRITEUP.md: short 155 words, long about 520 (prose); every number names its file (eval/plan/RESULTS.md 14/15, 9/9, 5/6, 7/13; eval/qa/RESULTS.md 36/38 and 35/35, all 9 off-figure and 7 injections deflected; eval/qa/VOICE.md p50 5.0 s Mac; ledger $5.31 over 1,012 calls); Gate B accuracy and iPhone latency TBD. docs/submission/VIDEO_SCRIPT.md: DEMO.md's 10 shots at 2:50 with on-screen, narration (235 words), captions, criterion and phone-footage columns; shot 5 says only tones and names are offline (spoken commands go through Voice Transcribe, which needs the network; DEMO.md's M and W keys do not exist on the phone).
+- [x] d9-19 Overnight close-out: docs aligned for the phone, spend recorded
+  - Note: DEMO.md shots 5 and 6: spoken commands on the phone (no M or W key there) and what needs the network; links to VIDEO_SCRIPT.md. README points to docs/submission and docs/SECURITY.md. Every overnight commit (c41ecdf headers, 1d7a873 cleanup, aea8f0c demo tooling, 49dbb34 submission) passed the gates: pre-commit (752 pytest, 357 vitest, lint, mypy, tsc, 80 script tests, tracking node tests), graded figures unchanged (heart 14 of 15, flower 7 of 13, Japan 9 of 9), session and touch-session, the four app e2e flows, CI green. make demo-live running for the morning.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.

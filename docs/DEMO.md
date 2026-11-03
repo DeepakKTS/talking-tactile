@@ -129,7 +129,8 @@ card covering every shot it appears in.
 
 ## Shots
 
-Planned at 2:50, leaving 10 s under 3 minutes. If the form's limit is shorter, cut shot 9
+Planned at 2:50, leaving 10 s under 3 minutes. The narration, captions and the criterion each
+shot serves are in `docs/submission/VIDEO_SCRIPT.md`. If the form's limit is shorter, cut shot 9
 first, then shot 6. Words to say are a suggestion; keep them plain, with no claim the result
 files do not back. Pipeline and question waits are real: cut them in the edit, and say on
 screen when a wait was shortened.
@@ -140,8 +141,8 @@ screen when a wait was shortened.
 | 2 | 0:12 to 0:40 | 28 | Author on the Mac: upload heart.png, the parts Spark lists, SAM's outlines, the "Needs you" list, the aortic arch merge in one press (the pipeline wait cut) | Spark reads the figure and plans the parts; SAM outlines each one; code decides geometry; the teacher confirms | Network in live mode; mock replays the same recorded answers |
 | 3 | 0:40 to 0:55 | 15 | Check the parts, describe the left ventricle, Publish; the print PDF with the 100 mm bar | Nothing is touchable until the teacher checks it; publish refuses a sheet with nothing checked or a broken tactile rule | Mock or live |
 | 4 | 0:55 to 1:07 | 12 | The phone in its mount over the sheet; Start; a helper sets the corners | The phone camera watches the sheet; the outline is checked against the printed marks | No network (the app is served from the Mac on the LAN) |
-| 5 | 1:07 to 1:30 | 23 | A finger enters parts: an earcon on entry, the name after a rest; M for more on the left ventricle; W | Labels and earcons come from the sheet's file, with no network | No network |
-| 6 | 1:30 to 1:42 | 12 | "Where is the aorta?": guidance beeps toward it | Directions come from code, never from the language model | No network |
+| 5 | 1:07 to 1:30 | 23 | A finger enters parts: an earcon on entry, the name after a rest; on the left ventricle, hold and say "tell me more" (M on a keyboard) | Labels and earcons come from the sheet's file, with no network | No network for earcons and names; a spoken command needs the network |
+| 6 | 1:30 to 1:42 | 12 | "Where is the aorta?": guidance beeps toward it | Directions come from code, never from the language model | The guidance needs no network; the spoken words do (Voice Transcribe) |
 | 7 | 1:42 to 2:12 | 30 | Hold to talk: "What does the left ventricle do?"; the answer from the teacher's description. Then "What does the right ventricle do?": the deflection to the teacher. Each answer takes about 5 s live (p50 5.0 s), now and then near 15 s: keep one wait whole, cut the other | Muse Voice Transcribe with the figure's part names as hints; Spark answers from the figure's data under a strict schema | Network, live |
 | 8 | 2:12 to 2:24 | 12 | Wi-Fi off on the phone: touch still speaks; a question says "Questions need the network. Labels still work." | It still works offline, and says what does not | No network |
 | 9 | 2:24 to 2:36 | 12 | The Commons brain sheet, a few touches | The same pipeline on a second figure | No network for touch |
