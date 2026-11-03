@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 370, updated 2026-11-03T09:48:07.150Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 372, updated 2026-11-03T10:19:20.965Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -397,6 +397,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: There was a per-session cap (50, session ids are client-made), a fix cap per figure version and a live call cap, but no per-client limit. middleware.py RateLimit: 30 questions (/api/ask and /api/transcribe together) and 30 fix calls per client in any minute, 429 rate_limited ('Too many questions at once. Wait a moment, then ask again.', spoken by Explore). Client: the connecting address, or the first X-Forwarded-For only from loopback (the Vite proxy, now xfwd: true). tests/test_rate_limit.py (shared question limit, fix apart, a minute later, forwarded only through this machine, the app's 429 sentence).
 - [x] d9-14 Security: pypdf 6.21.4 (7 known vulnerabilities fixed); npm advisories listed
   - Note: pip-audit (uv export, dev group): pypdf 6.21.2, 7 CVEs (CVE-2026-119203 to 119209), fixed in 6.21.3/6.21.4: pinned pypdf>=6.21.4, uv lock --upgrade-package pypdf; now no known vulnerability. npm audit: 11 moderate, 0 high, 0 critical, all in the lint chain (eslint, @eslint/js, typescript-eslint, minimatch), fixes only by major versions: listed in docs/SECURITY.md, not changed.
+- [x] d9-15 Security: CSP, nosniff and no-referrer on the app, the API and the Gate B page
+  - Note: Headers: API nosniff on every response; web app CSP (own origin only, blob: workers and camera, no framing, no plugins) plus nosniff and no-referrer in dev and preview; Gate B page served by spikes/tracking/serve.py with the same, plus jsDelivr and Google model storage. script-src keeps 'unsafe-eval' because Ajv compiles the regions.json check with new Function (Author and Explore do not load without it); left until after the hackathon. Headless waits poll page.evaluate (wait_for_function uses eval). Verified: Gate B loop, fallback, session, touch-session and the new mediapipe mode (real MediaPipe from the CDN, GPU); the four app e2e on the built preview; device check on the running dev:phone (GPU, 20 fps, no policy errors). Logs and storage checked, nothing to fix. docs/SECURITY.md Headers and Logs sections.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.

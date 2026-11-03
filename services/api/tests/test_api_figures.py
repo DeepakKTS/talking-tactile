@@ -495,6 +495,14 @@ def test_every_response_has_a_request_id_and_errors_one_envelope(tmp_path: Path)
     run(tmp_path, body)
 
 
+def test_every_response_says_nosniff(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        for r in (await api.http.get("/api/health"), await api.http.get("/api/nothing-here")):
+            assert r.headers["x-content-type-options"] == "nosniff"
+
+    run(tmp_path, body)
+
+
 def test_live_mode_without_a_client_says_what_is_missing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

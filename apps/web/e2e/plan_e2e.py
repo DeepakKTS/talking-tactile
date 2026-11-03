@@ -56,6 +56,7 @@ from explore_e2e import (  # noqa: E402
     play,
     start_by_keys,
     wait_http,
+    wait_js,
 )
 from fix_e2e import enabled  # noqa: E402
 
@@ -227,7 +228,7 @@ def main() -> None:
             page = ex.new_page()
             page.on("pageerror", lambda e: errors.append(str(e)))
             page.goto(explore_url(base, fid))
-            page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+            wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
             result["explore"] = explore(page, published, fail)
             result["silent_failures"] = reqs.silent()
             result["page_errors"] = errors

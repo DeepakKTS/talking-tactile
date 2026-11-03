@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 370,
- "updated_at": "2026-11-03T09:48:07.150Z",
+ "rev": 372,
+ "updated_at": "2026-11-03T10:19:20.965Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2899,6 +2899,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T09:48:07.150Z"
   },
   {
+   "id": "d9-15",
+   "day": 9,
+   "title": "Security: CSP, nosniff and no-referrer on the app, the API and the Gate B page",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Headers: API nosniff on every response; web app CSP (own origin only, blob: workers and camera, no framing, no plugins) plus nosniff and no-referrer in dev and preview; Gate B page served by spikes/tracking/serve.py with the same, plus jsDelivr and Google model storage. script-src keeps 'unsafe-eval' because Ajv compiles the regions.json check with new Function (Author and Explore do not load without it); left until after the hackathon. Headless waits poll page.evaluate (wait_for_function uses eval). Verified: Gate B loop, fallback, session, touch-session and the new mediapipe mode (real MediaPipe from the CDN, GPU); the four app e2e on the built preview; device check on the running dev:phone (GPU, 20 fps, no policy errors). Logs and storage checked, nothing to fix. docs/SECURITY.md Headers and Logs sections.",
+   "done_at": "2026-11-03T10:19:20.965Z",
+   "tags": [
+    "security",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T10:19:20.965Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3739,6 +3755,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T10:19:20.965Z",
+   "kind": "claude",
+   "text": "Task d9-15 \"Security: CSP, nosniff and no-referrer on the app, the API and the Gate B page\" is now done. Note: Headers: API nosniff on every response; web app CSP (own origin only, blob: workers and camera, no framing, no plugins) plus nosniff and no-referrer in dev and preview; Gate B page served by spikes/tracking/serve.py with the same, plus jsDelivr and Google model storage. script-src keeps 'unsafe-eval' because Ajv compiles the regions.json check with new Function (Author and Explore do not load without it); left until after the hackathon. Headless waits poll page.evaluate (wait_for_function uses eval). Verified: Gate B loop, fallback, session, touch-session and the new mediapipe mode (real MediaPipe from the CDN, GPU); the four app e2e on the built preview; device check on the running dev:phone (GPU, 20 fps, no policy errors). Logs and storage checked, nothing to fix. docs/SECURITY.md Headers and Logs sections."
+  },
+  {
+   "ts": "2026-11-03T10:19:20.921Z",
+   "kind": "claude",
+   "text": "Task d9-15 \"Security: CSP, nosniff and no-referrer on the app, the API and the Gate B page\" added to day 9."
+  },
   {
    "ts": "2026-11-03T09:48:07.150Z",
    "kind": "claude",

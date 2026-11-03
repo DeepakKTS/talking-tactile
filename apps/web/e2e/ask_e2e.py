@@ -47,6 +47,7 @@ from explore_e2e import (  # noqa: E402
     start_by_keys,
     typed,
     wait_http,
+    wait_js,
 )
 from fix_e2e import enabled  # noqa: E402
 from plan_e2e import MERGE  # noqa: E402
@@ -118,12 +119,13 @@ def main() -> None:
             explore = ex.new_page()
             explore.on("pageerror", lambda e: errors.append(str(e)))
             explore.goto(explore_url(base, fid))
-            explore.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+            wait_js(explore, "window.__tt && window.__tt.ready", timeout=30000)
             start_by_keys(explore)
             for name, (question, want) in (("from_figure", FROM_FIGURE), ("off_figure", OFF_FIGURE)):
                 n = len(explore.evaluate("() => window.__tt.log"))
                 typed(explore, question)
-                explore.wait_for_function(
+                wait_js(
+                    explore,
                     f"() => window.__tt.log.slice({n}).some((e) => e.kind === 'say')", timeout=30000
                 )
                 said = explore.evaluate(

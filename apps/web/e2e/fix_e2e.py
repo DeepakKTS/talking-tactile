@@ -49,6 +49,7 @@ from explore_e2e import (  # noqa: E402
     start_by_keys,
     touch_all,
     wait_http,
+    wait_js,
 )
 
 HEART = ROOT / "fixtures" / "heart.png"
@@ -57,7 +58,8 @@ BRANCHES = ["brachiocephalic artery", "left common carotid artery", "left subcla
 
 
 def enabled(page: Page, name: str) -> None:
-    page.wait_for_function(
+    wait_js(
+        page,
         "(n) => [...document.querySelectorAll('button')].some((b) => b.textContent === n && !b.disabled)",
         arg=name,
         timeout=120000,
@@ -88,7 +90,8 @@ def fix_aorta(page: Page, fail: list[str]) -> dict[str, Any]:
         )
         before = status.text_content()
         page.mouse.click(x, y)
-        page.wait_for_function(
+        wait_js(
+            page,
             "([el, before]) => el.textContent !== before && !el.textContent.startsWith('Asking')",
             arg=[status.element_handle(), before],
             timeout=120000,
@@ -174,7 +177,7 @@ def main() -> None:
             explore = ex.new_page()
             explore.on("pageerror", lambda e: errors.append(str(e)))
             explore.goto(explore_url(base, fid))
-            explore.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+            wait_js(explore, "window.__tt && window.__tt.ready", timeout=30000)
             start_by_keys(explore)
             intro = [e.get("text", "") for e in log_since(explore, 0) if e["kind"] == "say"]
             result["explore_intro"] = intro[:1]

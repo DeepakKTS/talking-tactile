@@ -48,17 +48,11 @@ Each terminal starts at the repo root (the folder you cloned).
 
 Terminal 1, the touch-test page over HTTPS on port 8443:
 ```
-python3 - <<'EOF'
-import functools, http.server, ssl
-handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory="spikes/tracking")
-server = http.server.ThreadingHTTPServer(("0.0.0.0", 8443), handler)
-tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-tls.load_cert_chain("apps/web/.certs/phone.pem", "apps/web/.certs/phone-key.pem")
-server.socket = tls.wrap_socket(server.socket, server_side=True)
-print("Touch test on https://<this Mac>:8443/", flush=True)
-server.serve_forever()
-EOF
+python3 spikes/tracking/serve.py
 ```
+It serves `spikes/tracking` only, with the certificate from `npm run cert:phone` and a
+Content-Security-Policy that lets in MediaPipe from jsDelivr and the hand model from Google's
+storage and nothing else, so the phone needs the internet for the first load.
 
 Terminal 2, optional, the API in mock mode:
 ```

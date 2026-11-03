@@ -1,5 +1,6 @@
 // The dev server that npm run dev:phone opens on the LAN serves the app and the two repo files
-// it imports, and nothing else from the repo (vite.config.ts DEV_FILES).
+// it imports, and nothing else from the repo (vite.config.ts DEV_FILES), with the security
+// headers (DEV_HEADERS).
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer, type ViteDevServer } from "vite";
@@ -36,5 +37,16 @@ describe("dev server files", () => {
       .filter((p) => existsSync(`${ROOT}${p}`));
     expect(present.length).toBeGreaterThanOrEqual(3); // the tracked ones, everywhere
     for (const p of present) expect([p, await status(p)]).toEqual([p, 403]);
+  });
+
+  it("sends the security headers: no other origin, no framing, nosniff", async () => {
+    const h = (await fetch(`${base}/explore`)).headers;
+    const csp = h.get("content-security-policy") ?? "";
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("connect-src 'self' ws: wss:");
+    expect(csp).toContain("object-src 'none'");
+    expect(csp).toContain("frame-ancestors 'none'");
+    expect(h.get("x-content-type-options")).toBe("nosniff");
+    expect(h.get("referrer-policy")).toBe("no-referrer");
   });
 });

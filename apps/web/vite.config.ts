@@ -36,6 +36,31 @@ export const DEV_FILES = [
   fileURLToPath(new URL("../../docs/regions.schema.json", import.meta.url)),
 ];
 
+// Security headers on every page and file the web servers send. The policy allows the app's own
+// files, its module workers, the camera stream, and data: and blob: images (SAM previews, the
+// WAV); no other origin. 'unsafe-eval' is there because Ajv compiles the regions.json schema
+// check with new Function (src/shared/regions.ts); it also covers MediaPipe's wasm. The dev
+// server (dev:phone) adds what Vite's live reload needs: React's inline refresh preamble and
+// the reload websocket.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-eval'",
+  "worker-src 'self' blob:",
+  "connect-src 'self'",
+  "img-src 'self' data: blob:",
+  "media-src 'self' blob: mediastream:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+];
+const devCsp = CSP.map((d) =>
+  d.startsWith("script-src") ? `${d} 'unsafe-inline'` : d.startsWith("connect-src") ? `${d} ws: wss:` : d);
+export const SECURITY_HEADERS = { "Content-Security-Policy": CSP.join("; "), "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" };
+export const DEV_HEADERS = { ...SECURITY_HEADERS, "Content-Security-Policy": devCsp.join("; ") };
+
 // TT_API lets the headless Explore run use its own API port. xfwd passes the phone's address
 // on (X-Forwarded-For), so the API's rate limit counts each client apart.
 const API_PROXY = { "/api": { target: process.env.TT_API ?? "http://127.0.0.1:8000", xfwd: true } };
@@ -46,13 +71,14 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     proxy: API_PROXY,
+    headers: DEV_HEADERS,
     ...(HTTPS ? { https: HTTPS, host: true } : {}),
     // The app and the two repo files it imports, nothing else: dev:phone serves this on the
     // LAN, and the repo root also holds the job database, the cost ledger and a private test
     // figure. (.env, *.pem and .git are in Vite's default deny list as well.)
     fs: { allow: DEV_FILES },
   },
-  preview: { proxy: API_PROXY },
+  preview: { proxy: API_PROXY, headers: SECURITY_HEADERS },
   worker: { format: "es" },
   test: {
     include: ["src/**/*.test.ts", "src/**/*.test.tsx", "scripts/**/*.test.ts"],

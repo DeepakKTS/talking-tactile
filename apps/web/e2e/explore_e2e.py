@@ -51,6 +51,23 @@ ROOT = Path(__file__).resolve().parents[3]
 WEB = ROOT / "apps" / "web"
 API = ROOT / "services" / "api"
 FIGURE = ROOT / "fixtures" / "synthetic" / "figure.png"
+
+def wait_js(page: Any, expression: str, arg: Any = None, timeout: float = 30000) -> None:
+    """page.wait_for_function without eval in the page: it polls page.evaluate, which the pages'
+    Content-Security-Policy (no 'unsafe-eval') does not block; wait_for_function builds its
+    predicate with eval and is blocked."""
+    end = time.monotonic() + timeout / 1000
+    while True:
+        try:
+            if page.evaluate(f"(a) => {{ const v = ({expression}); return !!(typeof v === 'function' ? v(a) : v); }}", arg):
+                return
+        except Exception:
+            if time.monotonic() > end:
+                raise
+        if time.monotonic() > end:
+            raise TimeoutError(f"waited {timeout:.0f} ms for {expression[:100]}")
+        page.wait_for_timeout(50)
+
 SCALE = 3  # px per mm in the scripted camera view
 PAGE_MM = (215.9, 279.4)
 W, H = round(PAGE_MM[0] * SCALE), round(PAGE_MM[1] * SCALE)
@@ -194,9 +211,9 @@ def explore_url(base: str, fid: str) -> str:
 
 def start_by_keys(page: Page) -> None:
     # Keyboard only: Start has the focus once the sheet loads, Enter presses it.
-    page.wait_for_function("document.activeElement && document.activeElement.textContent === 'Start exploring'")
+    wait_js(page, "document.activeElement && document.activeElement.textContent === 'Start exploring'")
     page.keyboard.press("Enter")
-    page.wait_for_function("window.__tt.started && window.__tt.calibrated", timeout=10000)
+    wait_js(page, "window.__tt.started && window.__tt.calibrated", timeout=10000)
     page.wait_for_timeout(300)
 
 
@@ -312,11 +329,11 @@ def touch_wording(browser: Any, base: str, fid: str, fail: list[str]) -> dict[st
     ctx.add_init_script(SPEECH_JS)
     page = ctx.new_page()
     page.goto(explore_url(base, fid))
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
     out: dict[str, Any] = {"touch_only": page.evaluate("() => matchMedia('(hover: none) and (pointer: coarse)').matches")}
     n = log_len(page)
     page.get_by_role("button", name="Start exploring").tap()
-    page.wait_for_function("window.__tt.started", timeout=10000)
+    wait_js(page, "window.__tt.started", timeout=10000)
     page.wait_for_timeout(300)
     out["said"] = says(page, n)
     body = page.inner_text("main")
@@ -331,7 +348,7 @@ def touch_wording(browser: Any, base: str, fid: str, fail: list[str]) -> dict[st
 
 def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str]) -> dict[str, Any]:
     page.goto(explore_url(base, fid))
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
     start_by_keys(page)
     out: dict[str, Any] = {"no_selection": no_selection(page, fail)}
 
@@ -425,7 +442,7 @@ def check_all(page: Page) -> list[str]:
     listed = warned.locator("li").all_text_contents() if warned.count() else []
     confirm.get_by_role("button", name=re.compile(r"^Yes, mark all \d+ checked$")).click()
     page.get_by_text("Every part is checked.").wait_for(timeout=120000)
-    page.wait_for_function("() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
+    wait_js(page, "() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
     return listed
 
 
@@ -451,10 +468,10 @@ def author(page: Page, base: str, api: str, fail: list[str]) -> tuple[str, dict[
     page.get_by_label("New name for pore").fill("pore opening")
     page.get_by_role("button", name="Rename pore").click()
     parts.get_by_text("pore opening", exact=True).wait_for(timeout=30000)
-    page.wait_for_function("() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
+    wait_js(page, "() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
     page.get_by_role("button", name="Mark left lobe checked").click()
     page.get_by_role("button", name="Mark left lobe checked").wait_for(state="detached", timeout=30000)
-    page.wait_for_function("() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
+    wait_js(page, "() => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Publish for students' && !b.disabled)")
     out["not_checked_after_edits"] = parts.get_by_text("Not checked").count()
     if out["not_checked_after_edits"] != out["not_checked_at_start"] - 2:
         fail.append(f"checked flags: {out['not_checked_at_start']} then {out['not_checked_after_edits']}")
@@ -480,7 +497,7 @@ def offline_from_load(page: Page, reqs: Requests, base: str, fid: str, regions: 
     """Offline from the moment the published regions.json has loaded."""
     out: dict[str, Any] = {}
     page.goto(explore_url(base, fid))
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
     sheet = [r["url"] for r in reqs.seen if r["url"].endswith("/regions.json")]
     out["regions_json"] = [u.split("/", 3)[3] for u in sheet]
     if len(sheet) != 1 or "/published/" not in sheet[0]:
@@ -506,7 +523,7 @@ def no_local_voice(page: Page, base: str, fid: str, regions: list[dict[str, Any]
     """Only network voices: the app voice must step aside, and say so."""
     page.add_init_script(NETWORK_VOICES_JS)
     page.goto(explore_url(base, fid))
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
     start_by_keys(page)
     out: dict[str, Any] = {"voices_listed": page.evaluate("() => speechSynthesis.getVoices().length")}
     notice = page.get_by_role("alert").filter(has_text=NO_VOICE)
@@ -552,7 +569,7 @@ def device_check(page: Page, base: str, fail: list[str]) -> dict[str, Any]:
     reported as loading, and every row comes back."""
     page.goto(f"{base}/explore?check=1")
     page.get_by_role("button", name="Check this device").click()
-    page.wait_for_function("() => Array.isArray(window.__ttCheck)", timeout=120000)
+    wait_js(page, "() => Array.isArray(window.__ttCheck)", timeout=120000)
     rows = page.evaluate("() => window.__ttCheck")
     order = page.evaluate("() => window.__order")
     hands = next((r for r in rows if r["name"] == "Hand tracker"), {})
@@ -577,11 +594,11 @@ def camera_denied(page: Page, base: str, fid: str, fail: list[str]) -> dict[str,
     """The camera refused: the student is told, and Start comes back with the focus."""
     page.add_init_script(DENY_CAMERA_JS)
     page.goto(f"{base}/explore?figure={fid}")
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
-    page.wait_for_function("document.activeElement && document.activeElement.textContent === 'Start exploring'")
+    wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
+    wait_js(page, "document.activeElement && document.activeElement.textContent === 'Start exploring'")
     n = log_len(page)
     page.keyboard.press("Enter")
-    page.wait_for_function(f"() => window.__tt.log.slice({n}).some((e) => e.kind === 'say' && e.text === {CAMERA_DENIED!r})", timeout=10000)
+    wait_js(page, f"() => window.__tt.log.slice({n}).some((e) => e.kind === 'say' && e.text === {CAMERA_DENIED!r})", timeout=10000)
     out = {
         "said": says(page, n)[-1:],
         "start_focused": page.evaluate("() => document.activeElement && document.activeElement.textContent === 'Start exploring'"),
@@ -604,16 +621,17 @@ def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
 
     page.route("**/*", guard)
     page.goto(f"{base}/explore?figure={fid}&corners=0,0,1280,0,1280,720,0,720")
-    page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
+    wait_js(page, "window.__tt && window.__tt.ready", timeout=30000)
     # The tracker loads with the page: ready before Start is pressed, so Start never waits
     # for the model download.
     try:
-        page.wait_for_function("window.__tt.tracker && window.__tt.tracker.ready", timeout=60000)
+        wait_js(page, "window.__tt.tracker && window.__tt.tracker.ready", timeout=60000)
     except Exception:
         fail.append("the hand tracker was not ready before Start: it did not preload")
     page.get_by_role("button", name="Start exploring").click()
     try:
-        page.wait_for_function(
+        wait_js(
+            page,
             "window.__tt.camera && window.__tt.camera.backend.startsWith('mediapipe')", timeout=60000
         )
     except Exception:

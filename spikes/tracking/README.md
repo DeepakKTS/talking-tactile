@@ -6,7 +6,7 @@ A standalone page that covers Day 2 (d2-1 to d2-4) as a prototype. The camera ke
 
 1. Print `test-sheet.pdf` on US Letter at 100 percent ("Actual size", not "Fit"). Measure the bar with a ruler. It must be 100 mm.
 2. Tape the sheet flat. Fix the camera above it so all 4 corner marks are in view. For Gate B the page runs in the demo phone's own browser, with the phone in a fixed mount (see `eval/gate-b/README.md`). For practice, a laptop with an iPhone as a Continuity Camera works, and so does a webcam on a stand.
-3. Serve this folder: `python3 -m http.server 8000 -d spikes/tracking`. Open http://localhost:8000 in Chrome. A phone needs the page over HTTPS: `eval/gate-b/README.md` has the command and the iPhone URL.
+3. Serve this folder: `python3 spikes/tracking/serve.py --http --port 8000`. Open http://localhost:8000 in Chrome. A phone needs the page over HTTPS: `eval/gate-b/README.md` has the command and the iPhone URL.
 4. Pick the camera and press Start camera. Wait for "Hand tracker ready".
 5. Press R and click the centers of corners A, B, C, D on the video, in that order. The magenta outline and targets should land on the printed ones. If they do not, press R again.
 6. Press T. For each number shown and spoken, put your index fingertip on that target and hold still. The touch records itself after 0.6 s at rest. Space records one at once. There are 45 touches, about 3 minutes.

@@ -38,7 +38,11 @@ class RequestContext:
             nonlocal status
             if message["type"] == "http.response.start":
                 status = message["status"]
-                message["headers"] = [*message.get("headers", []), (b"x-request-id", rid.encode())]
+                message["headers"] = [
+                    *message.get("headers", []),
+                    (b"x-request-id", rid.encode()),
+                    (b"x-content-type-options", b"nosniff"),
+                ]
             await send(message)
 
         try:

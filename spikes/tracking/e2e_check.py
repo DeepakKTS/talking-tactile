@@ -5,6 +5,7 @@
 """Headless browser check for the tracking spike, using the installed Google Chrome and a fake camera.
 
   uv run spikes/tracking/e2e_check.py loop          stub worker with a 100 ms delay: frames must drop, never queue
+  uv run spikes/tracking/e2e_check.py mediapipe     the real MediaPipe from the CDN under the page's security headers (network)
   uv run spikes/tracking/e2e_check.py fallback      stub GPU worker that never answers: the page must be on CPU 8 s after its first frame
   uv run spikes/tracking/e2e_check.py hands VIDEO [CPU|GPU]   MediaPipe on a y4m clip: hands must be found
   uv run spikes/tracking/e2e_check.py touch VIDEO [CPU|GPU]   same, then T and 3 Space presses record 3 touches
@@ -17,7 +18,6 @@ Prints the page's stats as JSON. Exits non-zero if a check fails.
 
 from __future__ import annotations
 
-import functools
 import http.server
 import json
 import subprocess
@@ -25,8 +25,26 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import Any
 
 from playwright.sync_api import sync_playwright
+
+
+def wait_js(page: Any, expression: str, arg: Any = None, timeout: float = 30000) -> None:
+    """page.wait_for_function without eval in the page: it polls page.evaluate, which the pages'
+    Content-Security-Policy (no 'unsafe-eval') does not block; wait_for_function builds its
+    predicate with eval and is blocked."""
+    end = time.monotonic() + timeout / 1000
+    while True:
+        try:
+            if page.evaluate(f"(a) => {{ const v = ({expression}); return !!(typeof v === 'function' ? v(a) : v); }}", arg):
+                return
+        except Exception:
+            if time.monotonic() > end:
+                raise
+        if time.monotonic() > end:
+            raise TimeoutError(f"waited {timeout:.0f} ms for {expression[:100]}")
+        page.wait_for_timeout(50)
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE.parent / "out"  # git-ignored
@@ -47,14 +65,12 @@ ORDER_JS = """
 """
 
 
-class QuietHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, *args: object) -> None:
-        pass
-
-
 def serve() -> tuple[http.server.ThreadingHTTPServer, int]:
-    handler = functools.partial(QuietHandler, directory=str(HERE))
-    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    # The Gate B server's own handler (serve.py), so the checks run under its security headers.
+    sys.path.insert(0, str(HERE))
+    from serve import Handler  # noqa: PLC0415
+
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv, srv.server_address[1]
 
@@ -65,6 +81,8 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
     if video:
         args.append(f"--use-file-for-fake-video-capture={Path(video).resolve()}")
     query = {"loop": "?stub=100", "fallback": "?stub=600000"}.get(mode) or (f"?delegate={delegate}" if delegate else "")
+    if mode == "mediapipe":
+        query = "?corners=0,0,640,0,640,480,0,480"
     if mode in ("hands", "touch"):
         # Whole 640x480 frame as the sheet, so the fingertip lands at a known place in mm.
         query += ("&" if query else "?") + "corners=0,0,640,0,640,480,0,480"
@@ -78,9 +96,9 @@ def run(mode: str, video: str | None, seconds: float, delegate: str | None = Non
             page.on("pageerror", lambda e: logs.append(f"pageerror: {e}"))
             page.goto(f"http://127.0.0.1:{port}/index.html{query}")
             page.click("#start")
-            if mode in ("hands", "touch"):
+            if mode in ("hands", "touch", "mediapipe"):
                 try:
-                    page.wait_for_function("window.__tt.backend && !window.__tt.backend.startsWith('stub')", timeout=60000)
+                    wait_js(page, "window.__tt.backend && !window.__tt.backend.startsWith('stub')", timeout=60000)
                 except Exception:
                     print("model did not load. status:", page.inner_text("#status"))
                     print("\n".join(logs[-20:]))
@@ -184,9 +202,9 @@ def session() -> list[str]:
             page.add_init_script(KEEP_WORKER)
             page.goto(f"http://127.0.0.1:{port}/index.html{query}")
             page.click("#start")
-            page.wait_for_function("window.__tt.calib && window.__tt.calib.toMm && window.__worker", timeout=30000)
+            wait_js(page, "window.__tt.calib && window.__tt.calib.toMm && window.__worker", timeout=30000)
             page.keyboard.press("t")
-            page.wait_for_function("window.__tt.touchTest.active")
+            wait_js(page, "window.__tt.touchTest.active")
             result = page.evaluate(PLAY_SESSION)
             link = page.evaluate("() => { const a = document.querySelector('#results a'); return a && a.download; }")
             browser.close()
@@ -250,7 +268,7 @@ def touch_session() -> list[str]:
             out["keys_hidden"] = page.evaluate("() => document.getElementById('keys').hidden")
             out["buttons"] = page.evaluate("() => [...document.querySelectorAll('button')].map((b) => b.textContent)")
             page.tap("#start")
-            page.wait_for_function("window.__tt.warmup.isReady && window.__tt.videoSize && !document.getElementById('calibrate').disabled", timeout=30000)
+            wait_js(page, "window.__tt.warmup.isReady && window.__tt.videoSize && !document.getElementById('calibrate').disabled", timeout=30000)
             page.tap("#calibrate")
             prompts = [page.inner_text("#status")]
             box = page.locator("#view").bounding_box()
@@ -259,12 +277,12 @@ def touch_session() -> list[str]:
                 page.touchscreen.tap(box["x"] + x * box["width"] / w, box["y"] + y * box["height"] / h)
                 page.wait_for_timeout(100)
                 prompts.append(page.inner_text("#status"))
-            page.wait_for_function("window.__tt.calib && window.__tt.calib.toMm", timeout=5000)
+            wait_js(page, "window.__tt.calib && window.__tt.calib.toMm", timeout=5000)
             OUT.mkdir(exist_ok=True)
             page.screenshot(path=str(OUT / "tracking_touch_outline.png"), full_page=True)
             out["prompts"] = prompts
             page.tap("#test")
-            page.wait_for_function("window.__tt.touchTest.active")
+            wait_js(page, "window.__tt.touchTest.active")
             out["record_during"] = page.evaluate("() => !document.getElementById('record').disabled")
             page.tap("#hush")
             page.evaluate(PLAY_SESSION)
@@ -321,6 +339,10 @@ def main() -> None:
     order = stats.get("order") or []
     if not order or order[0] != "wakeLock" or "camera" not in order:
         failures.append(f"the Wake Lock was not requested before the camera: {order}")
+    if mode == "mediapipe":
+        # MediaPipe from the CDN under serve.py's Content-Security-Policy (needs the network).
+        if not str(stats["backend"]).startswith("mediapipe") or any("Content Security Policy" in line for line in stats["console"]):
+            failures.append(f"MediaPipe did not load under the page's policy: {stats['backend']}, {stats['console'][-3:]}")
     if mode == "fallback":
         # A stub GPU that never answers: 8 s after its first frame the page is on CPU.
         if stats["delegate"] != "CPU" or not (stats["fellBack"] or "").startswith("no result from the GPU 8 s"):

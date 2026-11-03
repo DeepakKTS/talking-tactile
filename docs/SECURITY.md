@@ -54,8 +54,9 @@ Checked (listening sockets on the Mac, `lsof`, during the demo setup):
   reaches it directly, only through the web server's proxy.
 - `npm run dev:phone` (Vite) listens on every interface at :5173, over HTTPS with the mkcert
   certificate, so the iPhone on the same network can open it. That is what the demo needs.
-- The Gate B page's server listens on every interface at :8443, over HTTPS, and serves
-  `spikes/tracking` only (Python's handler refuses paths outside its folder).
+- The Gate B page's server (`spikes/tracking/serve.py`) listens on every interface at :8443,
+  over HTTPS, and serves `spikes/tracking` only (Python's handler refuses paths outside its
+  folder).
 - CORS on the API allows only http://localhost:5173 and http://127.0.0.1:5173; the phone uses
   the proxy, same origin, so it needs none.
 
@@ -108,3 +109,52 @@ Left, with the reason:
   `@eslint/js`, `typescript-eslint` and their `minimatch` and `@eslint/*` dependencies), which
   never ships to the browser. Every fix npm offers is a major version change of those tools,
   which is not a patch; left for after the hackathon.
+
+## Logs and storage
+
+Checked:
+- What a question leaves behind. `services/api/tests/test_ask_retention.py` sends a spoken
+  question, a typed one, a transcription and a heard question through the real live client (a
+  fake network underneath) and searches every file written and every log record: no audio, no
+  transcript and no question text. The access log has the method, path, status, time and a
+  request id; the cost ledger has one line per Meta call with the figure, the question's length
+  (or, for audio, the number of keyword hints), the tokens, the cost and the time, not the text.
+- What the phone keeps (`localStorage`): the published regions.json of each sheet opened (so
+  it reopens offline), the Explore settings and the calibration corners. No question or answer.
+- What the phone prints: only the hand tracker's start, ready and GPU fallback lines. The dev
+  server copies the phone's console to the Mac's terminal, so nothing else is said there.
+
+Found: nothing to fix.
+
+## Headers
+
+Checked: the response headers of the API, the web app (dev server and built preview) and the
+Gate B page's server. None sent a Content-Security-Policy or X-Content-Type-Options.
+
+Fixed:
+- Every API response says `X-Content-Type-Options: nosniff` (`app/middleware.py`
+  RequestContext, test in `services/api/tests/test_api_figures.py`).
+- The web app's pages and files come with a Content-Security-Policy, nosniff and
+  `Referrer-Policy: no-referrer` (`apps/web/vite.config.ts` SECURITY_HEADERS, DEV_HEADERS;
+  test in `apps/web/scripts/devserver.test.ts`). Scripts, workers, connections, images and
+  media only from the app's own origin (plus blob: for workers and the camera stream), no
+  plugins, no framing, no other `<base>`. The page can send nothing to another host.
+- The Gate B page gets the same headers, with jsDelivr (MediaPipe's bundle and wasm) and
+  Google's model storage (the hand model) as the only other origins (`spikes/tracking/serve.py`;
+  `spikes/tracking/e2e_check.py` serves the page through the same handler).
+
+Left, with the reason:
+- `script-src` allows `'unsafe-eval'` in the app: Ajv compiles the regions.json schema check
+  with `new Function` (`src/shared/regions.ts`), and without it neither Author nor Explore loads.
+  Building the check ahead of time would remove it; that changes the contract check, so it waits
+  until after the hackathon. The dev server also allows inline scripts and its reload websocket,
+  which Vite needs.
+- `style-src` allows inline styles, which React's `style` attributes use.
+
+Verified by running: every Gate B check (`loop`, `fallback`, `session`, `touch-session` and
+`mediapipe`, which loads the real MediaPipe from the CDN and fails on any policy message), the
+four app e2e flows on the built preview (Explore's device check runs the real MediaPipe on the
+GPU), and the device check in Chrome against the running `dev:phone`: hand tracker on the GPU at
+20 frames a second, no policy or page errors. The headless checks wait with `page.evaluate`
+polling instead of Playwright's `wait_for_function`, which builds its test with eval and is
+blocked by the policy.
