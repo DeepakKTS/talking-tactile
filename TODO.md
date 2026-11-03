@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 263, updated 2026-11-03T00:49:06.159Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 264, updated 2026-11-03T00:53:45.404Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -281,7 +281,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: spikes/tracking/main.js: no camera picked asks for facingMode environment (a phone opened the front one); Start again stops the old tracks, keeps the picked camera selected and does not add a second frame loop (it doubled the camera count: 81 fps for a 20 fps fake camera); rates reset per Start. e2e_check.py loop now presses Start twice and fails on two loops: fails on the old page, passes on the new. session check passes; graded figures unchanged (plan_eval, fresh cache). On the iPhone: needs device.
 - [x] d8-8 Gate B guide: run the recorded protocol on the iPhone
   - Note: eval/gate-b/README.md: the five protocol conditions (any other run is practice); the page is spikes/tracking/index.html, which never calls the API (mock API optional, for Explore after); served over HTTPS on 8443 with the phone certificate (checked: index, main.js, sheet.json, worker.js 200 with the mkcert root verified); iPhone URL https://Zedlers-MacBook-Pro.local:8443/ first; phone steps; the JSON lands in Files > Downloads, AirDrop to ~/Downloads, cp unedited into eval/gate-b/ with a sha256 check; analyze_touch.py; run.md template; tracker metric and gate commands.
-- [ ] d8-9 CI: GitHub Actions runs the hook's checks, no LIVE, no secrets [doing]
+- [x] d8-9 CI: GitHub Actions runs the hook's checks, no LIVE, no secrets
+  - Note: .github/workflows/tests.yml on ubuntu-24.04: liblouis, uv, node 24; scripts tests, tracking node tests, make check. No secrets, no LIVE; the network guard fails any outbound test. First run (4debae0) failed: 3 replay tests found no recording on Linux; cause confirmed in a Linux container: same S0 pixels, different PNG bytes from Pillow's Linux build (heart PNG sha fae9b099 macOS vs 983aacf9 Linux), and the replay matches on the PNG's sha256. An arm64 runner did not help (ee35b1f, failed). Fix d731aec: those 3 skip off macOS (tests/recorded_png.py), still run in the Mac hook. First green run d731aec: job 4 min 43 s; 68 scripts tests, pytest 639 passed 66 skipped, vitest 320. Headless e2e not added: needs the Chrome channel, ask_e2e waits on the live eval (v1 answers), reliability on a runner unproven.
 - [x] d8-10 Edge-case audit: docs/EDGE_CASES.md
   - Note: 41 cases in 5 areas (upload, edits, Explore sheet, questions, server), current behavior with file:line at 4debae0, expected, status. 17 to fix, 4 limitations (undo, auto registration, drift, plus the rules on unfixed figures in the README), the rest ok; 6 marked needs device. Client timeout chosen from measured latency: server deadline 12 s, client 15 s.
 - [x] d8-11 Edge case Q2: a question never hangs: server deadline 12 s, client timeout 15 s

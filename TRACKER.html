@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 263,
- "updated_at": "2026-11-03T00:49:06.159Z",
+ "rev": 264,
+ "updated_at": "2026-11-03T00:53:45.404Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2043,13 +2043,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "",
    "timebox": "",
    "fallback": "",
-   "status": "doing",
-   "note": "",
-   "done_at": null,
+   "status": "done",
+   "note": ".github/workflows/tests.yml on ubuntu-24.04: liblouis, uv, node 24; scripts tests, tracking node tests, make check. No secrets, no LIVE; the network guard fails any outbound test. First run (4debae0) failed: 3 replay tests found no recording on Linux; cause confirmed in a Linux container: same S0 pixels, different PNG bytes from Pillow's Linux build (heart PNG sha fae9b099 macOS vs 983aacf9 Linux), and the replay matches on the PNG's sha256. An arm64 runner did not help (ee35b1f, failed). Fix d731aec: those 3 skip off macOS (tests/recorded_png.py), still run in the Mac hook. First green run d731aec: job 4 min 43 s; 68 scripts tests, pytest 639 passed 66 skipped, vitest 320. Headless e2e not added: needs the Chrome channel, ask_e2e waits on the live eval (v1 answers), reliability on a runner unproven.",
+   "done_at": "2026-11-03T00:53:45.404Z",
    "tags": [
     "ci"
    ],
-   "changed_at": "2026-11-02T21:14:50.890Z"
+   "changed_at": "2026-11-03T00:53:45.404Z"
   },
   {
    "id": "d8-10",
@@ -3028,6 +3028,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T00:53:45.404Z",
+   "kind": "claude",
+   "text": "Task d8-9 \"CI: GitHub Actions runs the hook's checks, no LIVE, no secrets\" is now done. Note: .github/workflows/tests.yml on ubuntu-24.04: liblouis, uv, node 24; scripts tests, tracking node tests, make check. No secrets, no LIVE; the network guard fails any outbound test. First run (4debae0) failed: 3 replay tests found no recording on Linux; cause confirmed in a Linux container: same S0 pixels, different PNG bytes from Pillow's Linux build (heart PNG sha fae9b099 macOS vs 983aacf9 Linux), and the replay matches on the PNG's sha256. An arm64 runner did not help (ee35b1f, failed). Fix d731aec: those 3 skip off macOS (tests/recorded_png.py), still run in the Mac hook. First green run d731aec: job 4 min 43 s; 68 scripts tests, pytest 639 passed 66 skipped, vitest 320. Headless e2e not added: needs the Chrome channel, ask_e2e waits on the live eval (v1 answers), reliability on a runner unproven."
+  },
   {
    "ts": "2026-11-03T00:49:06.159Z",
    "kind": "claude",
