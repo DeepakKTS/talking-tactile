@@ -51,6 +51,28 @@ async def _read(request: Request) -> tuple[AskRequest, bytes | None]:
     return req, None
 
 
+@router.post("/transcribe")
+async def transcribe(request: Request) -> dict[str, Any]:
+    """A held question's words, for Explore to parse on the device before asking (multipart,
+    as a spoken /api/ask: a request part and an audio part)."""
+    service = request.app.state.figure_service()
+    req, audio = await _read(request)
+    if audio is None:
+        raise ApiError(422, "invalid_request", "Send a request part and an audio part.")
+    try:
+        heard = await asyncio.wait_for(service.asker().transcribe(req, audio), asking.DEADLINE_S)
+    except WavError as exc:
+        raise ApiError(
+            422, "audio_invalid", "That recording could not be read. Ask again."
+        ) from exc
+    except QuestionCapError as exc:
+        raise ApiError(429, "question_cap", str(exc)) from exc
+    except (*_CALL_ERRORS, TimeoutError) as exc:
+        raise ApiError(502, "answer_failed", FAILED, True) from exc
+    out: dict[str, Any] = heard.model_dump(mode="json")
+    return out
+
+
 @router.post("/ask")
 async def ask(request: Request) -> dict[str, Any]:
     service = request.app.state.figure_service()

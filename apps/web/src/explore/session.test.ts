@@ -3,7 +3,7 @@ import { EXPLORE } from "../shared/config";
 import type { AudioPort } from "./audio";
 import type { Pt } from "./homography";
 import { Metrics } from "./metrics";
-import { AskError, type AskRequest, ExploreSession, OFFLINE_ANSWER, STILL_WORKING, STILL_WORKING_MS, keyAction, notTouchableSentence } from "./session";
+import { AskError, type AskRequest, ExploreSession, NOT_HEARD, OFFLINE_ANSWER, STILL_WORKING, STILL_WORKING_MS, keyAction, notTouchableSentence } from "./session";
 import { untouchableNames } from "../shared/regions";
 import { SYNTHETIC, sheet, square } from "./testkit";
 
@@ -317,45 +317,72 @@ describe("groups in speech", () => {
 
 describe("spoken questions", () => {
   const wav = new Uint8Array(44);
+  const heard = (transcript: string) => () => Promise.resolve({ transcript, timings_ms: { transcribe: 300 } });
 
-  it("sends the WAV with the touch context, says the answer and times it from the release", async () => {
+  it("asks what was heard with the touch context, says the answer and times it from the release", async () => {
     const audio = new FakeAudio();
     const metrics = new Metrics();
-    const sent: AskRequest[] = [];
+    const transcribed: AskRequest[] = [];
+    const asked: AskRequest[] = [];
     const session = new ExploreSession(SYNTHETIC, EXPLORE, {
       audio, metrics, ask: () => Promise.resolve(""),
-      askAudio: (_w, req) => {
-        sent.push(req);
-        return Promise.resolve({ answer: "This is the stem.", transcript: "what is this", timings_ms: { transcribe: 300, spark: 900 } });
+      transcribe: (_w, req) => { transcribed.push(req); return Promise.resolve({ transcript: "what does the stem do", timings_ms: { transcribe: 300 } }); },
+      askReply: (req) => {
+        asked.push(req);
+        return Promise.resolve({ answer: "It joins the two lobes.", transcript: req.question, timings_ms: { spark: 900 } });
       },
     });
     const released = performance.now() - 50;
     await session.askSpoken(wav, released, 4);
-    expect(audio.said()).toEqual(["This is the stem."]);
-    expect(session.heard).toBe("what is this");
-    expect(sent[0]?.question).toBe("");
-    expect(sent[0]?.session_id).toBe(session.sessionId);
+    expect(audio.said()).toEqual(["It joins the two lobes."]);
+    expect(session.heard).toBe("what does the stem do");
+    expect(transcribed[0]?.question).toBe("");
+    expect([asked[0]?.question, asked[0]?.heard, asked[0]?.session_id]).toEqual(["what does the stem do", true, session.sessionId]);
     expect(metrics.askTranscribeMs.p50).toBe(300);
     expect(metrics.askSparkMs.p50).toBe(900);
     expect(metrics.askEncodeMs.p50).toBe(4);
     expect(metrics.askReleaseToSayMs.p50).toBeGreaterThanOrEqual(50);
-    session.speechStarted(performance.now() + 120, "This is the stem.");
+    session.speechStarted(performance.now() + 120, "It joins the two lobes.");
     expect(metrics.askReleaseToSpeechMs.count).toBe(1);
     expect(metrics.askReleaseToSpeechMs.p50).toBeGreaterThanOrEqual(170);
-    session.speechStarted(performance.now(), "This is the stem."); // only the first word counts
+    session.speechStarted(performance.now(), "It joins the two lobes."); // only the first word counts
     expect(metrics.askReleaseToSpeechMs.count).toBe(1);
+  });
+
+  it("spoken commands are handled on the device, with no question sent", async () => {
+    const audio = new FakeAudio();
+    let asked = 0;
+    const deps = (words: string) => ({
+      audio, metrics: new Metrics(), ask: () => { asked += 1; return Promise.resolve(""); },
+      transcribe: heard(words),
+      askReply: () => { asked += 1; return Promise.resolve({ answer: "", transcript: "", timings_ms: {} }); },
+    });
+    for (const words of ["more", "Repeat that.", "stop", "what is here", "where is the stem"]) {
+      await new ExploreSession(SYNTHETIC, EXPLORE, deps(words)).askSpoken(wav, performance.now());
+    }
+    expect(asked).toBe(0);
+    expect(audio.log).toContain("stop");
+  });
+
+  it("nothing heard asks again, with no question sent", async () => {
+    const audio = new FakeAudio();
+    const session = new ExploreSession(SYNTHETIC, EXPLORE, {
+      audio, metrics: new Metrics(), ask: () => Promise.reject(new Error("not asked")), transcribe: heard("  "),
+    });
+    await session.askSpoken(wav, performance.now());
+    expect(audio.said()).toEqual([NOT_HEARD]);
   });
 
   it("says the server's sentence when the question fails, and the offline one with no network", async () => {
     const audio = new FakeAudio();
     const failing = new ExploreSession(SYNTHETIC, EXPLORE, {
       audio, metrics: new Metrics(), ask: () => Promise.resolve(""),
-      askAudio: () => Promise.reject(new AskError("That is 50 questions for this session. Ask your teacher.")),
+      transcribe: () => Promise.reject(new AskError("That is 50 questions for this session. Ask your teacher.")),
     });
     await failing.askSpoken(wav, performance.now());
     const offline = new ExploreSession(SYNTHETIC, EXPLORE, {
       audio, metrics: new Metrics(), ask: () => Promise.resolve(""),
-      askAudio: () => Promise.reject(new TypeError("offline")),
+      transcribe: () => Promise.reject(new TypeError("offline")),
     });
     await offline.askSpoken(wav, performance.now());
     expect(audio.said()).toEqual(["That is 50 questions for this session. Ask your teacher.", OFFLINE_ANSWER]);
@@ -397,7 +424,8 @@ describe("a student waiting for an answer", () => {
     const audio = new FakeAudio();
     const session = new ExploreSession(SYNTHETIC, EXPLORE, {
       audio, metrics: new Metrics(), ask: () => Promise.resolve(""),
-      askAudio: () => later(9000, "It joins the two lobes.").then((answer) => ({ answer, transcript: "what does the stem connect to", timings_ms: {} })),
+      transcribe: () => Promise.resolve({ transcript: "what does the stem connect to", timings_ms: {} }),
+      askReply: () => later(9000, "It joins the two lobes.").then((answer) => ({ answer, transcript: "", timings_ms: {} })),
     });
     const asking = session.askSpoken(new Uint8Array(44), performance.now());
     await vi.advanceTimersByTimeAsync(10000);

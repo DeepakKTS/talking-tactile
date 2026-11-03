@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TOO_LONG, askApi, askAudioApi } from "./camera";
-import { AskError } from "./session";
+import { askApi, transcribeApi } from "./camera";
+import { AskError, type AskRequest, TOO_LONG } from "./session";
 
 const NOT_WORKING = "Questions are not working right now. Labels still work.";
+const REQ: AskRequest = { figure_id: "a".repeat(64), question: "What is this?", region_id: null, recent_region_ids: [], session_id: "s" };
 
 // A server that never answers: the request ends only when its signal aborts.
 function silentServer() {
@@ -18,7 +19,7 @@ afterEach(() => { vi.unstubAllGlobals(); });
 describe("question timeout", () => {
   it("a typed question to a server that never answers ends in the too-long sentence", async () => {
     silentServer();
-    const err: unknown = await askApi({ question: "What is this?" }, 20).catch((e: unknown) => e);
+    const err: unknown = await askApi(REQ, 20).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(AskError);
     expect((err as AskError).spoken).toBe(TOO_LONG);
     expect(TOO_LONG).toBe("That took too long. Please ask again.");
@@ -26,8 +27,7 @@ describe("question timeout", () => {
 
   it("so does a held question", async () => {
     silentServer();
-    const req = { figure_id: "a".repeat(64), question: "", region_id: null, recent_region_ids: [], session_id: "s" };
-    const err: unknown = await askAudioApi(new Uint8Array(44), req, 20).catch((e: unknown) => e);
+    const err: unknown = await transcribeApi(new Uint8Array(44), REQ, 20).catch((e: unknown) => e);
     expect((err as AskError).spoken).toBe(TOO_LONG);
   });
 });
@@ -38,7 +38,7 @@ function server(status: number, body: string) {
 }
 
 const said = async () => {
-  const err: unknown = await askApi({ question: "What is this?" }).catch((e: unknown) => e);
+  const err: unknown = await askApi(REQ).catch((e: unknown) => e);
   return (err as AskError).spoken;
 };
 

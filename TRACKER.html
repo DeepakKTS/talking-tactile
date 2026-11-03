@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 356,
- "updated_at": "2026-11-03T07:54:44.246Z",
+ "rev": 358,
+ "updated_at": "2026-11-03T08:07:40.052Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2792,6 +2792,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T07:54:44.246Z"
   },
   {
+   "id": "d9-8",
+   "day": 9,
+   "title": "Held questions go through the local command recognizer first",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "New POST /api/transcribe (multipart like a spoken /api/ask) returns the words with the figure's keyword hints; it takes the session's question slot and leaves a one-use credit. Explore's askSpoken parses them with the same recognizer as typed text: more, repeat, stop, what is here and where is are handled on the device with no Spark call; empty or filler says 'I did not catch a question...'; anything else goes to /api/ask with heard: true, which uses the credit, so a held question costs one slot. The 8 s and 20 s wait spans both requests (the ask gets the time left). The multipart /api/ask stays for the eval and latency tools. Tests: test_ask.py (transcribe route, one slot, bad audio, no audio part), test_ask_retention.py (the transcribe path leaves no words or audio on disk or in logs), session.test.ts (asked with heard and the context; five spoken commands send nothing; nothing heard; failures), camera.test.ts. Not verified live in a browser: the mock cannot replay a browser's fake-microphone audio, and this step had no live calls.",
+   "done_at": "2026-11-03T08:07:40.052Z",
+   "tags": [
+    "fix",
+    "ask"
+   ],
+   "changed_at": "2026-11-03T08:07:40.052Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3632,6 +3648,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T08:07:40.052Z",
+   "kind": "claude",
+   "text": "Task d9-8 \"Held questions go through the local command recognizer first\" is now done. Note: New POST /api/transcribe (multipart like a spoken /api/ask) returns the words with the figure's keyword hints; it takes the session's question slot and leaves a one-use credit. Explore's askSpoken parses them with the same recognizer as typed text: more, repeat, stop, what is here and where is are handled on the device with no Spark call; empty or filler says 'I did not catch a question...'; anything else goes to /api/ask with heard: true, which uses the credit, so a held question costs one slot. The 8 s and 20 s wait spans both requests (the ask gets the time left). The multipart /api/ask stays for the eval and latency tools. Tests: test_ask.py (transcribe route, one slot, bad audio, no audio part), test_ask_retention.py (the transcribe path leaves no words or audio on disk or in logs), session.test.ts (asked with heard and the context; five spoken commands send nothing; nothing heard; failures), camera.test.ts. Not verified live in a browser: the mock cannot replay a browser's fake-microphone audio, and this step had no live calls."
+  },
+  {
+   "ts": "2026-11-03T08:07:39.962Z",
+   "kind": "claude",
+   "text": "Task d9-8 \"Held questions go through the local command recognizer first\" added to day 9."
+  },
   {
    "ts": "2026-11-03T07:54:44.246Z",
    "kind": "claude",

@@ -186,8 +186,11 @@ def test_the_route_answers_typed_and_spoken_questions_and_says_what_went_wrong(
                 "/api/ask", json={"figure_id": FID, "question": "What is this?", "region_id": "r2"}
             )
             assert typed.status_code == 200 and typed.json()["answer"] == "This is the core."
-            spoken = await http.post("/api/ask", files={"audio": ("q.wav", wav(), "audio/wav")},
-                                     data={"request": json.dumps({"figure_id": FID})})  # fmt: skip
+            spoken = await http.post(
+                "/api/ask",
+                files={"audio": ("q.wav", wav(), "audio/wav")},
+                data={"request": json.dumps({"figure_id": FID})},
+            )
             assert spoken.status_code == 200 and spoken.json()["transcript"] == "what is this"
             bad = await http.post("/api/ask", files={"audio": ("q.wav", wav(44100), "audio/wav")},
                                   data={"request": json.dumps({"figure_id": FID})})  # fmt: skip
@@ -307,5 +310,43 @@ def test_a_malformed_answer_says_questions_are_not_working(
         ) as http:
             r = await http.post("/api/ask", json={"figure_id": FID, "question": "What is this?"})
             assert (r.status_code, r.json()["error"]["message"]) == (502, ask.FAILED)
+
+    asyncio.run(body())
+
+
+def test_a_held_question_is_transcribed_first_and_costs_one_slot(tmp_path: Path) -> None:
+    client = FakeClient(
+        {"answer_text": "This is the core.", "source": "figure", "cited_part_ids": ["r2"]},
+        transcript="what does the core do",
+    )
+
+    async def body() -> None:
+        app = create_app(data_dir=tmp_path, client=MockMetaClient(load_tactile_rules().meta))
+        one = asker(client, cap=1)
+        app.state.figure_service().asker = lambda: one
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://t"
+        ) as http:
+            spoken = {
+                "files": {"audio": ("q.wav", wav(), "audio/wav")},
+                "data": {"request": json.dumps({"figure_id": FID, "session_id": "s"})},
+            }
+            words = await http.post("/api/transcribe", **spoken)
+            assert words.status_code == 200
+            assert words.json()["transcript"] == "what does the core do"
+            assert client.asked == []  # no Spark call: the device decides what the words are
+            q = {"figure_id": FID, "question": "what does the core do", "session_id": "s"}
+            asked = await http.post("/api/ask", json={**q, "heard": True})
+            assert asked.status_code == 200, asked.text  # the transcription's slot, not a second
+            again = await http.post("/api/ask", json={**q, "heard": True})
+            assert (again.status_code, again.json()["error"]["code"]) == (429, "question_cap")
+            bad = await http.post(
+                "/api/transcribe",
+                files={"audio": ("q.wav", wav(44100), "audio/wav")},
+                data={"request": json.dumps({"figure_id": FID, "session_id": "t"})},
+            )
+            assert (bad.status_code, bad.json()["error"]["code"]) == (422, "audio_invalid")
+            typed = await http.post("/api/transcribe", json={"figure_id": FID, "question": "x"})
+            assert typed.status_code == 422
 
     asyncio.run(body())

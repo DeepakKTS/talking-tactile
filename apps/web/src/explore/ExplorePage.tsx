@@ -8,7 +8,7 @@ import { EXPLORE } from "../shared/config";
 import type { RegionsFile } from "../shared/regions";
 import type { WorkerHand } from "../workers/protocol";
 import { AudioEngine, type AudioPort, NO_LOCAL_VOICE, type VoiceMode, browserAudioDeps } from "./audio";
-import { CameraLoop, type HandsFrame, askApi, askAudioApi } from "./camera";
+import { CameraLoop, type HandsFrame, askApi, askReplyApi, transcribeApi } from "./camera";
 import { touchOnly } from "./device";
 import { HandTracker } from "./tracker";
 import { ScreenAwake } from "./wakeLock";
@@ -273,7 +273,7 @@ function ExploreSheet() {
     eng.onVoiceChange = () => { setNoLocalVoice(eng.noLocalVoice); };
     const port = new TracingAudio(eng, trace.current.log);
     audio.current = port;
-    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, askAudio: askAudioApi, notTouchable, touch });
+    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, transcribe: transcribeApi, askReply: askReplyApi, notTouchable, touch });
     session.current = s;
     eng.onSpeechStart = (at, text) => {
       s.speechStarted(at, text);

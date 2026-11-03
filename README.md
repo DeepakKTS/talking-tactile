@@ -97,8 +97,10 @@ guesses geometry.
 - Hold the screen to talk. Capture runs on 250 ms after letting go, up to 15 s; the WAV is
   16 kHz mono, made in the browser.
 - The backend sends it to Muse Voice Transcribe with the figure's part, line and group names
-  as keywords, then sends the transcript, the touch context and the published figure (its
-  image and its parts in words) to Muse Spark.
+  as keywords (`POST /api/transcribe`) and returns the words. Explore reads them first: "more",
+  "repeat", "stop", "what is here" and "where is ..." are handled on the phone, with no model
+  call. Anything else goes to `POST /api/ask` with the touch context, and the backend sends it
+  with the published figure (its image and its parts in words) to Muse Spark.
 - Spark answers under a strict JSON schema built per figure: a source (figure, teacher
   description, off figure, unsure) and the parts it cites, from the figure's ids only. An
   answer from a teacher description must name a part that has one.

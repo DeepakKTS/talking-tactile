@@ -3,7 +3,7 @@
 // back.
 import type { FromWorker, WorkerHand } from "../workers/protocol";
 import { FramePump } from "./pump";
-import { AskError, type AskReply, type AskRequest } from "./session";
+import { ASK_TIMEOUT_MS, AskError, type AskReply, type AskRequest, type Heard, TOO_LONG } from "./session";
 import type { HandTracker } from "./tracker";
 
 export interface HandsFrame {
@@ -115,17 +115,10 @@ async function spokenError(res: Response): Promise<AskError> {
   return new AskError(spoken ? message : NOT_WORKING);
 }
 
-/** A student waits at most this long: at 8 s the session says "Still working on that."
- * (session.ts), at 20 s the request stops and TOO_LONG is said, and the next hold works. The
- * server's own deadline is 25 s (services/api/app/ask.py DEADLINE_S), so it never runs on
- * long after the student has been told. */
-export const ASK_TIMEOUT_MS = 20000;
-export const TOO_LONG = "That took too long. Please ask again.";
-
-async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<string, unknown>> {
+async function post(path: string, init: RequestInit, timeoutMs: number): Promise<Record<string, unknown>> {
   if (!navigator.onLine) throw new TypeError("offline");
   try {
-    const res = await fetch("/api/ask", { ...init, signal: AbortSignal.timeout(timeoutMs) });
+    const res = await fetch(path, { ...init, signal: AbortSignal.timeout(timeoutMs) });
     if (!res.ok) throw await spokenError(res);
     return (await res.json()) as Record<string, unknown>;
   } catch (err) {
@@ -135,21 +128,28 @@ async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<str
   }
 }
 
-/** A held question: the WAV and the touch context, as multipart. */
-export async function askAudioApi(wav: Uint8Array, req: AskRequest, timeoutMs = ASK_TIMEOUT_MS): Promise<AskReply> {
+/** A held question's words (POST /api/transcribe): the WAV and the touch context, as
+ * multipart. The session parses them on the device before asking (session.ts). */
+export async function transcribeApi(wav: Uint8Array, req: AskRequest, timeoutMs = ASK_TIMEOUT_MS): Promise<Heard> {
   const form = new FormData();
   form.append("request", JSON.stringify({ ...req, question: undefined }));
   form.append("audio", new Blob([new Uint8Array(wav)], { type: "audio/wav" }), "question.wav");
-  const body = (await postAsk({ method: "POST", body: form }, timeoutMs)) as Partial<AskReply>;
+  const body = (await post("/api/transcribe", { method: "POST", body: form }, timeoutMs)) as Partial<Heard>;
+  if (typeof body.transcript !== "string") throw new AskError(NOT_WORKING);
+  return { transcript: body.transcript, timings_ms: body.timings_ms ?? {} };
+}
+
+/** A question as text, with the server's times. */
+export async function askReplyApi(req: AskRequest, timeoutMs = ASK_TIMEOUT_MS): Promise<AskReply> {
+  const body = (await post(
+    "/api/ask",
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) },
+    timeoutMs,
+  )) as Partial<AskReply>;
   if (typeof body.answer !== "string") throw new AskError(NOT_WORKING);
   return { answer: body.answer, transcript: body.transcript ?? "", timings_ms: body.timings_ms ?? {} };
 }
 
-export async function askApi(req: unknown, timeoutMs = ASK_TIMEOUT_MS): Promise<string> {
-  const body = await postAsk(
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) },
-    timeoutMs,
-  );
-  if (typeof body.answer !== "string") throw new AskError(NOT_WORKING);
-  return body.answer;
+export async function askApi(req: AskRequest, timeoutMs = ASK_TIMEOUT_MS): Promise<string> {
+  return (await askReplyApi(req, timeoutMs)).answer;
 }

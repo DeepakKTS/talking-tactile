@@ -7,7 +7,7 @@ import type { RegionsFile } from "../shared/regions";
 import type { AudioPort } from "./audio";
 import { Guide } from "./guidance";
 import type { Pt } from "./homography";
-import { parseIntent } from "./intents";
+import { type Intent, parseIntent } from "./intents";
 import type { Metrics } from "./metrics";
 import { type IndexedRegion, RegionIndex } from "./regionIndex";
 import { TouchMachine } from "./touch";
@@ -18,6 +18,14 @@ export interface AskRequest {
   region_id: string | null;
   recent_region_ids: string[];
   session_id?: string;
+  /** The question is a held question's transcript (POST /api/transcribe took the slot). */
+  heard?: boolean;
+}
+
+/** What /api/transcribe answers: the words of a held question. */
+export interface Heard {
+  transcript: string;
+  timings_ms: { transcribe?: number };
 }
 
 /** What /api/ask answers: the sentence to say, what was heard, and the server's times. */
@@ -41,8 +49,10 @@ export interface SessionDeps {
   /** The answer text. Throws AskError with a sentence to say when the service fails, or
    * anything else when the network is not there. */
   ask: (req: AskRequest) => Promise<string>;
-  /** A spoken question: the WAV and the touch context. Throws like ask. */
-  askAudio?: (wav: Uint8Array, req: AskRequest) => Promise<AskReply>;
+  /** A held question's words. Throws like ask. */
+  transcribe?: (wav: Uint8Array, req: AskRequest) => Promise<Heard>;
+  /** A question with the server's times, given the time left of ASK_TIMEOUT_MS. */
+  askReply?: (req: AskRequest, timeoutMs: number) => Promise<AskReply>;
   /** Parts on the sheet a student cannot touch yet, said once in the intro. */
   notTouchable?: readonly string[];
   /** A phone (device.ts): sentences name what to tap, never a key. */
@@ -87,6 +97,13 @@ export const OFFLINE_ANSWER = "Questions need the network. Labels still work.";
  * (camera.ts ASK_TIMEOUT_MS) with "That took too long. Please ask again." */
 export const STILL_WORKING = "Still working on that.";
 export const STILL_WORKING_MS = 8000;
+/** A student waits at most this long for an answer, transcription included; then TOO_LONG is
+ * said and the next hold works. The server's own deadline is 25 s
+ * (services/api/app/ask.py DEADLINE_S), so it never runs on long after the student is told. */
+export const ASK_TIMEOUT_MS = 20000;
+export const TOO_LONG = "That took too long. Please ask again.";
+export const NOT_HEARD = "I did not catch a question. Hold the screen and ask again.";
+const MIN_LEFT_MS = 1000;
 /** The thinking tone comes back after the sentence, while the question still waits. */
 const RESUME_TONE_MS = 1500;
 const OFF_SHEET = "Your finger is off the sheet. Press R to set the corners again.";
@@ -226,9 +243,15 @@ export class ExploreSession {
     }
   }
 
-  /** A typed or spoken request. */
+  /** A typed request. */
   async command(text: string): Promise<void> {
     const intent = parseIntent(text, this.index.regions, this.cfg.intents.min_label_similarity);
+    if (intent.kind === "ask") await this.ask(intent.text);
+    else this.act(intent);
+  }
+
+  /** A request handled on the device: never sent to /api/ask. */
+  private act(intent: Exclude<Intent, { kind: "ask" }>): void {
     const { audio } = this.deps;
     switch (intent.kind) {
       case "none":
@@ -250,9 +273,6 @@ export class ExploreSession {
         return;
       case "where_unknown":
         audio.say(`There is no ${intent.name} on this sheet.`);
-        return;
-      case "ask":
-        await this.ask(intent.text);
         return;
     }
   }
@@ -312,25 +332,21 @@ export class ExploreSession {
     };
   }
 
-  /** A held question: sent as a WAV with the touch context, the answer spoken. releasedAt
-   * is when the finger let go of the screen; encodeMs the WAV's encoding time. */
+  /** A held question: its words come back first (POST /api/transcribe) and go through the
+   * same recognizer as typed ones, so "more", "repeat", "stop", "what is here" and "where is"
+   * are handled here with no question sent; anything else is asked, and the answer spoken.
+   * releasedAt is when the finger let go of the screen; encodeMs the WAV's encoding time. */
   async askSpoken(wav: Uint8Array, releasedAt: number, encodeMs = NaN): Promise<void> {
     const { audio, metrics } = this.deps;
     const sent = performance.now();
-    let answer: string;
+    let answer: string | null;
     try {
-      if (!this.deps.askAudio) throw new TypeError("no spoken questions here");
-      const reply = await this.patient(this.deps.askAudio(wav, this.request("")));
-      answer = reply.answer;
-      this.heard = reply.transcript;
-      const t = reply.timings_ms;
-      metrics.askTranscribeMs.push(t.transcribe ?? NaN);
-      metrics.askSparkMs.push(t.spark ?? NaN);
-      metrics.askNetworkMs.push(performance.now() - sent - (t.transcribe ?? 0) - (t.spark ?? 0));
+      answer = await this.patient(this.heardThen(wav, sent));
     } catch (err) {
       answer = err instanceof AskError ? err.spoken : OFFLINE_ANSWER;
     }
     metrics.askEncodeMs.push(encodeMs);
+    if (answer === null) return; // a command, handled on the device
     metrics.askReleaseToSayMs.push(performance.now() - releasedAt);
     this.spokenAnswer = { text: answer, releasedAt, sayAt: performance.now() };
     audio.say(answer);
@@ -357,6 +373,33 @@ export class ExploreSession {
       this.deps.audio.thinking(false);
     }
     this.deps.audio.say(answer);
+  }
+
+  /** The words of a held question, then the answer to say, or null for a command handled
+   * on the device. */
+  private async heardThen(wav: Uint8Array, sent: number): Promise<string | null> {
+    const { metrics } = this.deps;
+    if (!this.deps.transcribe) throw new TypeError("no spoken questions here");
+    const heard = await this.deps.transcribe(wav, this.request(""));
+    this.heard = heard.transcript;
+    metrics.askTranscribeMs.push(heard.timings_ms.transcribe ?? NaN);
+    const text = heard.transcript.trim();
+    if (!text) return NOT_HEARD;
+    const intent = parseIntent(text, this.index.regions, this.cfg.intents.min_label_similarity);
+    if (intent.kind === "none") return NOT_HEARD;
+    if (intent.kind !== "ask") {
+      this.act(intent);
+      return null;
+    }
+    const left = Math.max(MIN_LEFT_MS, ASK_TIMEOUT_MS - (performance.now() - sent));
+    const req = { ...this.request(intent.text), heard: true };
+    const reply = this.deps.askReply
+      ? await this.deps.askReply(req, left)
+      : { answer: await this.deps.ask(req), transcript: text, timings_ms: {} };
+    const t = reply.timings_ms;
+    metrics.askSparkMs.push(t.spark ?? NaN);
+    metrics.askNetworkMs.push(performance.now() - sent - (heard.timings_ms.transcribe ?? 0) - (t.spark ?? 0));
+    return reply.answer;
   }
 
   /** At STILL_WORKING_MS with no answer, says so once; the thinking tone comes back after. */

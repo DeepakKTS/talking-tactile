@@ -84,18 +84,32 @@ def test_a_question_leaves_no_audio_transcript_or_question_text_behind(
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://t"
         ) as http:
-            spoken = await http.post("/api/ask", files={"audio": ("q.wav", wav(), "audio/wav")},
-                                     data={"request": json.dumps({"figure_id": FID})})  # fmt: skip
+            spoken = await http.post(
+                "/api/ask",
+                files={"audio": ("q.wav", wav(), "audio/wav")},
+                data={"request": json.dumps({"figure_id": FID})},
+            )
             typed = await http.post("/api/ask", json={"figure_id": FID, "question": QUESTION})
-            for r in (spoken, typed):
+            # Explore's path for a held question: the words first, then, unless they are a
+            # command handled on the device, a question with the heard flag.
+            words = await http.post(
+                "/api/transcribe",
+                files={"audio": ("q.wav", wav(), "audio/wav")},
+                data={"request": json.dumps({"figure_id": FID})},
+            )
+            heard = await http.post(
+                "/api/ask", json={"figure_id": FID, "question": HEARD, "heard": True}
+            )
+            for r in (spoken, typed, words, heard):
                 assert r.status_code == 200, r.text
                 out.append(r.json())
         return out
 
     with caplog.at_level(logging.DEBUG):
-        spoken, typed = asyncio.run(body())
+        spoken, typed, words, heard = asyncio.run(body())
     assert spoken["transcript"] == HEARD and typed["transcript"] == QUESTION  # back to Explore
-    assert ledger.path.exists() and len(ledger.path.read_text().splitlines()) == 3  # calls logged
+    assert words["transcript"] == HEARD and heard["transcript"] == HEARD
+    assert ledger.path.exists() and len(ledger.path.read_text().splitlines()) == 5  # calls logged
     written = everything_written(tmp_path)
     for secret in (HEARD.encode(), QUESTION.encode(), PCM[:200], b"quokka", b"zebrafinch"):
         assert secret not in written, f"{secret[:20]!r} was written to disk"

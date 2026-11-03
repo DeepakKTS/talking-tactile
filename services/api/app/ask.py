@@ -132,6 +132,17 @@ class AskRequest(BaseModel):
     region_id: RegionId | None = None
     recent_region_ids: Annotated[list[RegionId], Field(max_length=10)] = []
     session_id: Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_-]{1,64}$")] = "none"
+    # The question is a transcript from POST /api/transcribe, which already took this
+    # session's question slot; the slot is not taken twice.
+    heard: bool = False
+
+
+class Transcript(BaseModel):
+    """What POST /api/transcribe returns: Explore parses it on the device (more, repeat,
+    stop, what is here, where is) and sends anything else to /api/ask as a question."""
+
+    transcript: str
+    timings_ms: dict[str, float]
 
 
 class SparkAnswer(BaseModel):
@@ -271,12 +282,20 @@ class SessionCap:
     def __init__(self, cap: int = SESSION_QUESTIONS) -> None:
         self.cap = cap
         self.asked: dict[str, int] = defaultdict(int)
+        self.credits: set[str] = set()  # sessions whose last transcription is not yet asked
 
     def take(self, session: str) -> bool:
         if self.asked[session] >= self.cap:
             return False
         self.asked[session] += 1
         return True
+
+    def take_heard(self, session: str) -> bool:
+        """A transcription took the slot; the question it becomes uses that credit, once."""
+        if session in self.credits:
+            self.credits.discard(session)
+            return True
+        return self.take(session)
 
 
 def ms_since(t0: float) -> float:
@@ -300,6 +319,20 @@ class Asker:
         self.cap = cap or SessionCap()
         self.image = image  # False: Spark gets the figure data in words only
 
+    async def transcribe(self, req: AskRequest, audio: bytes) -> Transcript:
+        """A held question's words only, with the figure's names as keyword hints. Takes the
+        session's question slot and leaves a credit for the /api/ask that may follow."""
+        t0 = time.perf_counter()
+        f, _ = self.figure(req.figure_id, req.version)
+        check_wav(audio)
+        if not self.cap.take(req.session_id):
+            raise QuestionCapError(CAPPED)
+        self.cap.credits.add(req.session_id)
+        client = self.client.for_job()
+        client.cap_calls(1)
+        text = await client.transcribe(req.figure_id, audio, keywords(f))
+        return Transcript(transcript=text, timings_ms={"transcribe": ms_since(t0)})
+
     async def ask(self, req: AskRequest, audio: bytes | None) -> Answer:
         """Raises WavError for bad audio and QuestionCapError past the session's cap; a Meta
         call that fails raises its own error."""
@@ -307,7 +340,8 @@ class Asker:
         f, png = self.figure(req.figure_id, req.version)
         if audio is not None:
             check_wav(audio)
-        if not self.cap.take(req.session_id):
+        took = self.cap.take_heard(req.session_id) if req.heard else self.cap.take(req.session_id)
+        if not took:
             raise QuestionCapError(CAPPED)
         client = self.client.for_job()
         client.cap_calls(CALLS_PER_QUESTION)
