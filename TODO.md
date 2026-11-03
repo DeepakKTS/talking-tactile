@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 330, updated 2026-11-03T04:58:22.573Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 331, updated 2026-11-03T05:01:27.016Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -347,7 +347,7 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d8-40 Redact the private test figure in current files
   - Note: The figure is 'a private test figure, not distributed' everywhere current; counts kept only with no part names. plan_eval.py: the figure is called private and written as counts only (PRIVATE, redact); eval/plan regenerated on a fresh cache: only its section and the shared nesting histogram changed (pairs from it dropped), every graded line unchanged. TRACKER.html through a new tracker.py redact command (a JSON list of exact old/new pairs applied to every text field, the log names only the count and reason; tests in test_tracker.py): 17 passages, then 1 more for the redaction's own log line; TODO.md regenerated. README, ATTRIBUTION.md, boundaries.py comments, test_boundaries.py docstrings reworded. Not changed, by decision: git history, eval/live/ledger.jsonl. Left: the local file name fixtures/private/brain_upload.png in plan_eval.py (a git-ignored file of the user's).
 - [x] d8-41 Repo-relative paths in docs/DEMO.md and eval/gate-b/README.md
-  - Note: The 5 absolute paths (DEMO.md 1, gate-b README 4) are now repo-relative: each terminal starts at the repo root (the folder you cloned), then cd services/api or apps/web. The tracker's audit note no longer quotes the home path (tracker.py redact). git grep finds no /Users/ in tracked files but eval/live/ledger.jsonl, which is left as it is.
+  - Note: The 5 absolute paths (DEMO.md 1, gate-b README 4) are now repo-relative: each terminal starts at the repo root (the folder you cloned), then cd services/api or apps/web. The tracker's audit note no longer quotes the home path (tracker.py redact). git grep finds no home path in tracked files but eval/live/ledger.jsonl, which is left as it is.
 
 ## Day 9: Tue Nov 3. Gate D
 
