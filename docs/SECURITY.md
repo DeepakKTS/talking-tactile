@@ -92,3 +92,19 @@ Fixed:
   X-Forwarded-For address; the header is ignored from any other machine, so it cannot be used
   to claim a fresh address (`app/middleware.py` RateLimit, `apps/web/vite.config.ts` xfwd,
   tests in `services/api/tests/test_rate_limit.py`).
+
+## Dependencies
+
+Checked (Nov 3): `uvx pip-audit` on every pinned Python package of `services/api/uv.lock`
+(`uv export`, with the dev group), and `npm audit` on `apps/web`.
+
+Found and fixed:
+- `pypdf` 6.21.2 had 7 known vulnerabilities (CVE-2026-119203 to CVE-2026-119209), fixed in
+  6.21.3 and 6.21.4. Upgraded to 6.21.4, a patch release; the render and ingest tests pass.
+  pip-audit now finds no known vulnerability.
+
+Left, with the reason:
+- npm: 11 moderate advisories, no high or critical one, all in the lint tool chain (`eslint`,
+  `@eslint/js`, `typescript-eslint` and their `minimatch` and `@eslint/*` dependencies), which
+  never ships to the browser. Every fix npm offers is a major version change of those tools,
+  which is not a patch; left for after the hackathon.

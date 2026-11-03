@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 368, updated 2026-11-03T09:36:52.390Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 370, updated 2026-11-03T09:48:07.150Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -395,6 +395,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: Network: API on 127.0.0.1:8000 only; dev:phone on all interfaces :5173 (HTTPS, needed for the iPhone); Gate B on :8443 serving spikes/tracking only; CORS localhost:5173 only. Found: the LAN dev server's fs.allow was the repo root, so it served the private test figure, data/jobs.sqlite, the ledger and API code (200 each on the running server; .env, *.pem, .git were already denied by Vite). vite.config.ts DEV_FILES: apps/web, config/explore.yaml, docs/regions.schema.json only; the running server now says 403 for the private figure. Test apps/web/scripts/devserver.test.ts (a real dev server from the config: the two imports 200, the rest 403); it fails on the old setting.
 - [x] d9-13 Security: a per-client rate limit on questions and fix calls
   - Note: There was a per-session cap (50, session ids are client-made), a fix cap per figure version and a live call cap, but no per-client limit. middleware.py RateLimit: 30 questions (/api/ask and /api/transcribe together) and 30 fix calls per client in any minute, 429 rate_limited ('Too many questions at once. Wait a moment, then ask again.', spoken by Explore). Client: the connecting address, or the first X-Forwarded-For only from loopback (the Vite proxy, now xfwd: true). tests/test_rate_limit.py (shared question limit, fix apart, a minute later, forwarded only through this machine, the app's 429 sentence).
+- [x] d9-14 Security: pypdf 6.21.4 (7 known vulnerabilities fixed); npm advisories listed
+  - Note: pip-audit (uv export, dev group): pypdf 6.21.2, 7 CVEs (CVE-2026-119203 to 119209), fixed in 6.21.3/6.21.4: pinned pypdf>=6.21.4, uv lock --upgrade-package pypdf; now no known vulnerability. npm audit: 11 moderate, 0 high, 0 critical, all in the lint chain (eslint, @eslint/js, typescript-eslint, minimatch), fixes only by major versions: listed in docs/SECURITY.md, not changed.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.
