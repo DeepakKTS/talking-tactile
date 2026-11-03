@@ -55,6 +55,15 @@ WORK = DATA_DIR / "plan_eval"
 INDEX = RECORDED_DIR / "private_plan_replays.json"  # git-ignored: it names private recordings
 V2F = REPO_ROOT / "eval" / "s2-bakeoff" / "scores_v2f.json"
 
+
+def _private_image() -> Path:
+    """The private test figure: the one image in git-ignored fixtures/private/, whatever its
+    name, so the name is never in the repo. None there, or more than one: not present."""
+    folder = FIXTURES_DIR / "private"
+    found = sorted(p for p in folder.glob("*") if p.suffix.lower() in (".png", ".jpg", ".jpeg"))
+    return found[0] if len(found) == 1 else folder / "not-present"
+
+
 # name: (image, recording prefixes, grade band, graded references)
 _EVAL = FIXTURES_DIR / "eval"
 FIGURES: dict[str, tuple[Path, list[str], GradeBand | None, bool]] = {
@@ -67,7 +76,7 @@ FIGURES: dict[str, tuple[Path, list[str], GradeBand | None, bool]] = {
     ),
     "japan_regions": (_EVAL / "japan_regions.png", ["plan_japan_"], None, True),
     "private": (
-        FIXTURES_DIR / "private" / "brain_upload.png",
+        _private_image(),
         ["private_brain_"],
         "6_8",
         False,
