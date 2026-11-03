@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 366,
- "updated_at": "2026-11-03T09:03:03.338Z",
+ "rev": 368,
+ "updated_at": "2026-11-03T09:36:52.390Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2869,6 +2869,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T09:03:03.338Z"
   },
   {
+   "id": "d9-13",
+   "day": 9,
+   "title": "Security: a per-client rate limit on questions and fix calls",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "There was a per-session cap (50, session ids are client-made), a fix cap per figure version and a live call cap, but no per-client limit. middleware.py RateLimit: 30 questions (/api/ask and /api/transcribe together) and 30 fix calls per client in any minute, 429 rate_limited ('Too many questions at once. Wait a moment, then ask again.', spoken by Explore). Client: the connecting address, or the first X-Forwarded-For only from loopback (the Vite proxy, now xfwd: true). tests/test_rate_limit.py (shared question limit, fix apart, a minute later, forwarded only through this machine, the app's 429 sentence).",
+   "done_at": "2026-11-03T09:36:52.390Z",
+   "tags": [
+    "security"
+   ],
+   "changed_at": "2026-11-03T09:36:52.390Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3709,6 +3724,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T09:36:52.390Z",
+   "kind": "claude",
+   "text": "Task d9-13 \"Security: a per-client rate limit on questions and fix calls\" is now done. Note: There was a per-session cap (50, session ids are client-made), a fix cap per figure version and a live call cap, but no per-client limit. middleware.py RateLimit: 30 questions (/api/ask and /api/transcribe together) and 30 fix calls per client in any minute, 429 rate_limited ('Too many questions at once. Wait a moment, then ask again.', spoken by Explore). Client: the connecting address, or the first X-Forwarded-For only from loopback (the Vite proxy, now xfwd: true). tests/test_rate_limit.py (shared question limit, fix apart, a minute later, forwarded only through this machine, the app's 429 sentence)."
+  },
+  {
+   "ts": "2026-11-03T09:36:52.302Z",
+   "kind": "claude",
+   "text": "Task d9-13 \"Security: a per-client rate limit on questions and fix calls\" added to day 9."
+  },
   {
    "ts": "2026-11-03T09:03:03.338Z",
    "kind": "claude",

@@ -71,3 +71,24 @@ Fixed:
   The running server now answers 403 for the private figure. Test:
   `apps/web/scripts/devserver.test.ts` starts a dev server from the project config and checks
   both lists; it fails on the old setting.
+
+## Abuse
+
+Checked:
+- Each Explore session has 50 questions (`app/ask.py` SessionCap), counted in memory; a new
+  session id starts a new count, so it limits one student, not a client that makes up ids.
+- Fix outline calls have a cap per figure and edit version (30 live SAM calls).
+- Every live run has a cap of calls (`config/tactile_rules.yaml` live_call_cap).
+
+Found:
+- No limit per client: a client could ask questions or send fix calls as fast as it liked,
+  each a paid Meta call.
+
+Fixed:
+- Per client, at most 30 questions (`/api/ask` and `/api/transcribe` together) and 30 fix calls
+  in any minute; more get 429 `rate_limited`, which Explore says as "Too many questions at once.
+  Wait a moment, then ask again." The client is the connecting address or, through the web
+  server's proxy on this machine (which now forwards the phone's address), the first
+  X-Forwarded-For address; the header is ignored from any other machine, so it cannot be used
+  to claim a fresh address (`app/middleware.py` RateLimit, `apps/web/vite.config.ts` xfwd,
+  tests in `services/api/tests/test_rate_limit.py`).

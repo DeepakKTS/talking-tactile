@@ -7,6 +7,8 @@ import logging
 import re
 import time
 import uuid
+from collections import deque
+from collections.abc import Callable
 
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
@@ -95,6 +97,65 @@ class UploadGuard:
             if int(length) > limit:
                 await _refuse(send, 413, "too_large", message)
                 return
+        await self.app(scope, receive, send)
+
+
+_LOOPBACK = ("127.0.0.1", "::1")
+_WINDOW_S = 60.0
+RATE_PER_MINUTE = 30  # questions, and fix calls, per client: a student asks far fewer
+_RATE_MESSAGES = {
+    "question": "Too many questions at once. Wait a moment, then ask again.",
+    "fix": "Too many fix calls at once. Wait a moment, then try again.",
+}
+
+
+class RateLimit:
+    """Per client, at most RATE_PER_MINUTE questions (/api/ask and /api/transcribe together)
+    and RATE_PER_MINUTE fix calls in any minute; more is refused with 429 before the route
+    runs. The client is the connecting address or, when that is this machine (the web server's
+    proxy, which forwards the phone's address), the first X-Forwarded-For address."""
+
+    def __init__(
+        self,
+        app: ASGIApp,
+        per_minute: int = RATE_PER_MINUTE,
+        now: Callable[[], float] = time.monotonic,
+    ) -> None:
+        self.app = app
+        self.per_minute = per_minute
+        self.now = now
+        self.seen: dict[tuple[str, str], deque[float]] = {}
+
+    @staticmethod
+    def _kind(scope: Scope) -> str | None:
+        if scope["type"] != "http" or scope["method"] != "POST":
+            return None
+        path = str(scope["path"])
+        if path in _ASK_PATHS:
+            return "question"
+        return "fix" if path.endswith("/fix") else None
+
+    @staticmethod
+    def _client(scope: Scope) -> str:
+        host = (scope.get("client") or ("", 0))[0]
+        if host in _LOOPBACK:
+            forwarded = dict(scope["headers"]).get(b"x-forwarded-for", b"").decode("latin-1")
+            first = forwarded.split(",")[0].strip()
+            if first:
+                return str(first)
+        return str(host)
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        kind = self._kind(scope)
+        if kind is not None:
+            t = self.now()
+            times = self.seen.setdefault((kind, self._client(scope)), deque())
+            while times and times[0] <= t - _WINDOW_S:
+                times.popleft()
+            if len(times) >= self.per_minute:
+                await _refuse(send, 429, "rate_limited", _RATE_MESSAGES[kind])
+                return
+            times.append(t)
         await self.app(scope, receive, send)
 
 

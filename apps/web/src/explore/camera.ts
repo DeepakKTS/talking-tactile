@@ -106,7 +106,7 @@ const NOT_WORKING = "Questions are not working right now. Labels still work.";
 // The ask route's own errors carry a sentence written to be spoken
 // (services/api/app/routes/ask.py). Any other error (a 500, a 503 naming a server setting, a
 // proxy's page) is said as NOT_WORKING.
-const SPOKEN_CODES = new Set(["invalid_request", "audio_invalid", "question_cap", "answer_failed"]);
+const SPOKEN_CODES = new Set(["invalid_request", "audio_invalid", "question_cap", "answer_failed", "rate_limited"]);
 
 async function spokenError(res: Response): Promise<AskError> {
   const body = (await res.json().catch(() => ({}))) as { error?: { code?: unknown; message?: unknown } };

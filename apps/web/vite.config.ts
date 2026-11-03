@@ -36,8 +36,9 @@ export const DEV_FILES = [
   fileURLToPath(new URL("../../docs/regions.schema.json", import.meta.url)),
 ];
 
-// TT_API lets the headless Explore run use its own API port.
-const API_PROXY = { "/api": process.env.TT_API ?? "http://127.0.0.1:8000" };
+// TT_API lets the headless Explore run use its own API port. xfwd passes the phone's address
+// on (X-Forwarded-For), so the API's rate limit counts each client apart.
+const API_PROXY = { "/api": { target: process.env.TT_API ?? "http://127.0.0.1:8000", xfwd: true } };
 
 export default defineConfig({
   plugins: [react(), yamlConfig()],
