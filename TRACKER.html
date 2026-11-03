@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 372,
- "updated_at": "2026-11-03T10:19:20.965Z",
+ "rev": 375,
+ "updated_at": "2026-11-03T10:33:23.021Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2915,6 +2915,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T10:19:20.965Z"
   },
   {
+   "id": "d9-16",
+   "day": 9,
+   "title": "Stale code removal: dead functions, unloaded prompts and recordings",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Removed: CostMeter.remaining_usd and record.multipart_summary (vulture; no caller anywhere, tests included); prompts ask_answer.v1, ask_answer_text.v1 and s1_locate.v1 (no code loads them; stages name v2, and the stage cache keys on the loaded file only); recordings qa2_ to qa6_ (219 files, 1.4 MB: earlier question-eval rounds; the mock indexes qa_ and qa7_ only, ask_e2e and the replay test use qa7). Fixed two stale v1 mentions (ask.py docstring, qa_eval's no-image label now from TEXT_PROMPT). Kept: armav2/armav2f recordings (bake-off evidence cited by eval/s2-bakeoff), Files (smoke.py uses it), every knip export (each used in its own file; several in parity-checked tracking files), src/yaml.d.ts (types for the yaml imports), all dependencies (knip: none unused; every Python one imported or run). Dependency lists unchanged.",
+   "done_at": "2026-11-03T10:33:23.021Z",
+   "tags": [
+    "cleanup",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T10:33:23.021Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3263,9 +3279,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  "costs": [
   {
    "source": "ledger",
-   "ts": "2026-11-03T07:14:03.388Z",
-   "item": "Meta Model API, 771 live calls, from eval/live/ledger.jsonl (4 unpriced)",
-   "usd": 4.174987
+   "ts": "2026-11-03T10:24:53.501Z",
+   "item": "Meta Model API, 1012 live calls, from eval/live/ledger.jsonl (4 unpriced)",
+   "usd": 5.308222
   }
  ],
  "outreach": [
@@ -3755,6 +3771,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T10:33:23.021Z",
+   "kind": "claude",
+   "text": "Task d9-16 \"Stale code removal: dead functions, unloaded prompts and recordings\" is now done. Note: Removed: CostMeter.remaining_usd and record.multipart_summary (vulture; no caller anywhere, tests included); prompts ask_answer.v1, ask_answer_text.v1 and s1_locate.v1 (no code loads them; stages name v2, and the stage cache keys on the loaded file only); recordings qa2_ to qa6_ (219 files, 1.4 MB: earlier question-eval rounds; the mock indexes qa_ and qa7_ only, ask_e2e and the replay test use qa7). Fixed two stale v1 mentions (ask.py docstring, qa_eval's no-image label now from TEXT_PROMPT). Kept: armav2/armav2f recordings (bake-off evidence cited by eval/s2-bakeoff), Files (smoke.py uses it), every knip export (each used in its own file; several in parity-checked tracking files), src/yaml.d.ts (types for the yaml imports), all dependencies (knip: none unused; every Python one imported or run). Dependency lists unchanged."
+  },
+  {
+   "ts": "2026-11-03T10:33:22.980Z",
+   "kind": "claude",
+   "text": "Task d9-16 \"Stale code removal: dead functions, unloaded prompts and recordings\" added to day 9."
+  },
+  {
+   "ts": "2026-11-03T10:24:53.501Z",
+   "kind": "claude",
+   "text": "Spend set from the ledger: $5.308222 over 1012 live calls, 4 of them unpriced."
+  },
   {
    "ts": "2026-11-03T10:19:20.965Z",
    "kind": "claude",

@@ -54,10 +54,6 @@ def _part(content: bytes | str, ctype: str) -> Any:
     return _digest(ctype, data)
 
 
-def multipart_summary(files: Files) -> dict[str, Any]:
-    return {name: _part(content, ctype) for name, (_, content, ctype) in files.items()}
-
-
 def request_summary(request: httpx.Request) -> dict[str, Any]:
     """What a recording holds for this request, from the request httpx would send."""
     ctype = request.headers.get("content-type", "")

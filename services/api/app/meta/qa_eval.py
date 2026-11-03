@@ -185,7 +185,7 @@ def summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def markdown(rows: list[dict[str, Any]], s: dict[str, Any], live: bool, image: bool = True) -> str:
-    variant = "" if image else " (no figure image: ask_answer_text.v1)"
+    variant = "" if image else f" (no figure image: {TEXT_PROMPT.removesuffix('.json')})"
     out = [f"# Explore question eval{variant}", "",
            f"{'Live' if live else 'Replay of the live recordings'}; "
            f"published version {VERSION} of each "

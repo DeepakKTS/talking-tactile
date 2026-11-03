@@ -4,7 +4,7 @@ answered by Muse Spark from that figure alone.
 - Audio is a WAV of mono 16-bit PCM at 16 or 24 kHz (the transcribe endpoint's input). It
   goes to the file transcribe endpoint, push to talk, with the figure's part, line and group
   names as keyword hints (`keywords`, docs: voice/schemas, Transcribe Request).
-- The answer prompt (app/prompts/ask_answer.v1.json) gets the published regions.json in
+- The answer prompt (app/prompts/ask_answer.v2.json) gets the published regions.json in
   words: title, subject, summary, each touchable part with its neighbors and their
   directions (computed in code when the figure was laid out), what it is inside, its group
   and the teacher's description; the parts not touchable yet; the lines; the part under

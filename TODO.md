@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 372, updated 2026-11-03T10:19:20.965Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 375, updated 2026-11-03T10:33:23.021Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -399,6 +399,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: pip-audit (uv export, dev group): pypdf 6.21.2, 7 CVEs (CVE-2026-119203 to 119209), fixed in 6.21.3/6.21.4: pinned pypdf>=6.21.4, uv lock --upgrade-package pypdf; now no known vulnerability. npm audit: 11 moderate, 0 high, 0 critical, all in the lint chain (eslint, @eslint/js, typescript-eslint, minimatch), fixes only by major versions: listed in docs/SECURITY.md, not changed.
 - [x] d9-15 Security: CSP, nosniff and no-referrer on the app, the API and the Gate B page
   - Note: Headers: API nosniff on every response; web app CSP (own origin only, blob: workers and camera, no framing, no plugins) plus nosniff and no-referrer in dev and preview; Gate B page served by spikes/tracking/serve.py with the same, plus jsDelivr and Google model storage. script-src keeps 'unsafe-eval' because Ajv compiles the regions.json check with new Function (Author and Explore do not load without it); left until after the hackathon. Headless waits poll page.evaluate (wait_for_function uses eval). Verified: Gate B loop, fallback, session, touch-session and the new mediapipe mode (real MediaPipe from the CDN, GPU); the four app e2e on the built preview; device check on the running dev:phone (GPU, 20 fps, no policy errors). Logs and storage checked, nothing to fix. docs/SECURITY.md Headers and Logs sections.
+- [x] d9-16 Stale code removal: dead functions, unloaded prompts and recordings
+  - Note: Removed: CostMeter.remaining_usd and record.multipart_summary (vulture; no caller anywhere, tests included); prompts ask_answer.v1, ask_answer_text.v1 and s1_locate.v1 (no code loads them; stages name v2, and the stage cache keys on the loaded file only); recordings qa2_ to qa6_ (219 files, 1.4 MB: earlier question-eval rounds; the mock indexes qa_ and qa7_ only, ask_e2e and the replay test use qa7). Fixed two stale v1 mentions (ask.py docstring, qa_eval's no-image label now from TEXT_PROMPT). Kept: armav2/armav2f recordings (bake-off evidence cited by eval/s2-bakeoff), Files (smoke.py uses it), every knip export (each used in its own file; several in parity-checked tracking files), src/yaml.d.ts (types for the yaml imports), all dependencies (knip: none unused; every Python one imported or run). Dependency lists unchanged.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.

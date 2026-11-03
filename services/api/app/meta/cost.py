@@ -32,10 +32,6 @@ class CostMeter:
         self.spent_usd = 0.0
         self.warnings: list[float] = []
 
-    @property
-    def remaining_usd(self) -> float:
-        return self._rules.budget_usd - self.spent_usd
-
     def price(
         self,
         model: str,
