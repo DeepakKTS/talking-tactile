@@ -22,7 +22,7 @@ from app.models.image import RGB
 
 SourceType = Literal["png", "jpeg", "pdf"]
 IngestCode = Literal[
-    "too_large", "too_many_pixels", "unsupported_type", "unreadable", "bad_page", "blurry"
+    "too_large", "too_many_pixels", "unsupported_type", "unreadable", "bad_page", "blank", "blurry"
 ]
 
 _MAGIC: dict[bytes, SourceType] = {
@@ -42,6 +42,9 @@ _SOBEL_NORM = 8  # a unit step gives a Sobel response of 8 with the 3 x 3 kernel
 # pixels add nothing; 50 million still takes a 48 MP phone photo (8064 x 6048). A flat PNG
 # under the 10 MB limit can hold billions, and decoding one would fill memory.
 MAX_PIXELS = 50_000_000
+# Levels of 0 to 255 between the darkest and lightest pixel at or under which an image is one
+# color: room for a JPEG's noise on an empty page, far under any drawn line on white.
+_BLANK_RANGE = 16
 _TOO_MANY = (
     f"The image is over {MAX_PIXELS // 1_000_000} million pixels. Use a smaller scan or photo."
 )
@@ -186,6 +189,8 @@ def ingest(data: bytes, page_index: int, rules: Pipeline) -> Ingested:
     original = (img.shape[1], img.shape[0])
     flat = _deskew(img, rules)
     page = img if flat is None else flat
+    if int(page.max()) - int(page.min()) <= _BLANK_RANGE:
+        raise IngestError("blank", "The image is one color, with no figure on it.")
     score = sharpness(page, rules.normalize_max_side_px)
     if score < rules.min_sharpness:
         raise IngestError(

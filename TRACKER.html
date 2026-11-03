@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 280,
- "updated_at": "2026-11-03T01:47:45.864Z",
+ "rev": 282,
+ "updated_at": "2026-11-03T01:53:04.785Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2244,6 +2244,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:47:45.864Z"
   },
   {
+   "id": "d8-22",
+   "day": 8,
+   "title": "Edge case U4: a one-color image is called blank, not blurry",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/pipeline/s0_ingest.py: an image (after deskew) whose darkest and lightest pixels are within 16 of 255 levels is refused as 422 blank 'The image is one color, with no figure on it.' instead of 'too blurry'. 16 leaves room for JPEG noise on an empty page and is far under any drawn line. Test: test_ingest.py::test_a_one_color_image_is_called_blank_not_blurry (black, gray, white, each with +-5 noise).",
+   "done_at": "2026-11-03T01:53:04.785Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:53:04.785Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3156,6 +3172,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:53:04.785Z",
+   "kind": "claude",
+   "text": "Task d8-22 \"Edge case U4: a one-color image is called blank, not blurry\" is now done. Note: app/pipeline/s0_ingest.py: an image (after deskew) whose darkest and lightest pixels are within 16 of 255 levels is refused as 422 blank 'The image is one color, with no figure on it.' instead of 'too blurry'. 16 leaves room for JPEG noise on an empty page and is far under any drawn line. Test: test_ingest.py::test_a_one_color_image_is_called_blank_not_blurry (black, gray, white, each with +-5 noise)."
+  },
+  {
+   "ts": "2026-11-03T01:53:04.748Z",
+   "kind": "claude",
+   "text": "Task d8-22 \"Edge case U4: a one-color image is called blank, not blurry\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:47:45.864Z",
    "kind": "claude",

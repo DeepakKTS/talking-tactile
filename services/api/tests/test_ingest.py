@@ -185,3 +185,10 @@ def test_a_figure_with_a_big_frame_is_not_cropped() -> None:
     out = ingest(encode(chart, "PNG"), 0, RULES)
     assert not out.deskewed
     assert out.image.shape == (round(1500 * SIDE / 2000), SIDE, 3)
+
+
+@pytest.mark.parametrize("level", [0, 128, 255])
+def test_a_one_color_image_is_called_blank_not_blurry(level: int) -> None:
+    rng = np.random.default_rng(0)
+    flat = np.full((600, 800, 3), level, np.int16) + rng.integers(-5, 6, (600, 800, 3))
+    assert code_of(encode(np.clip(flat, 0, 255).astype(np.uint8), "PNG")) == "blank"

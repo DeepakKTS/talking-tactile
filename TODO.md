@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 280, updated 2026-11-03T01:47:45.864Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 282, updated 2026-11-03T01:53:04.785Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -307,6 +307,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: app/pipeline/runner.py meta_failure: a job stopped by the Meta API gets a code and a sentence for the teacher instead of stage_failed and the raw httpx text: 401/403 meta_key 'The Meta API refused the key. Check MODEL_API_KEY in services/api/.env.' (not retryable); 429 meta_busy (retryable); no answer, timeout or 5xx meta_unreachable 'The Meta API could not be reached. Try again later.'; a malformed answer meta_malformed. A replay's 599 no-recording keeps its old handling. app/pipeline/s2_points.py: when every part's first SAM call fails on Meta itself (not the call cap, not a missing recording), S2 raises that error, so the job fails with the reason instead of finishing done with every part sent to the teacher. Covers EDGE_CASES S1, S2, S3. No automatic retry in the freeze. Tests: test_runner.py::test_a_meta_failure_tells_the_teacher_what_happened (6), test_s2_points.py::test_when_every_first_call_fails_on_meta_the_job_fails_with_that_error, ::test_a_cap_or_a_missing_recording_on_every_part_still_goes_to_the_teacher (2).
 - [x] d8-21 Edge case U2: an image over 50 million pixels is refused before decoding
   - Note: app/pipeline/s0_ingest.py: MAX_PIXELS 50 million, checked on the size Pillow reads before decoding (S0 brings every figure to 2048 px, so more adds nothing; a 48 MP phone photo, 8064 x 6048, still fits). Over it: 413 too_many_pixels 'The image is over 50 million pixels. Use a smaller scan or photo.' Pillow's own DecompressionBombError gets the same refusal (before: an uncaught 500 'Something went wrong.', marked retryable). A PDF page whose render at pdf_render_dpi would pass the limit is refused before rendering. Tests: test_ingest.py::test_too_many_pixels_are_refused_before_decoding (a 9000 x 9000 one-color PNG, under 10 MB; a PDF page), ::test_pillows_own_bomb_limit_is_the_same_refusal.
+- [x] d8-22 Edge case U4: a one-color image is called blank, not blurry
+  - Note: app/pipeline/s0_ingest.py: an image (after deskew) whose darkest and lightest pixels are within 16 of 255 levels is refused as 422 blank 'The image is one color, with no figure on it.' instead of 'too blurry'. 16 leaves room for JPEG noise on an empty page and is far under any drawn line. Test: test_ingest.py::test_a_one_color_image_is_called_blank_not_blurry (black, gray, white, each with +-5 noise).
 
 ## Day 9: Tue Nov 3. Gate D
 
