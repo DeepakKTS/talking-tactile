@@ -3,7 +3,7 @@ API := services/api
 WEB := apps/web
 UV := uv run --project $(API)
 
-.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet preflight demo-live demo-mock
+.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet preflight demo-live demo-mock results
 
 install:
 	@command -v lou_translate > /dev/null || { echo "liblouis is missing: brew install liblouis"; exit 1; }
@@ -60,3 +60,8 @@ demo-live:
 
 demo-mock:
 	sh scripts/demo.sh mock
+
+# The phone measurements (eval/gate-b/: the Gate B JSON, latency.csv, voice-latency.csv) into
+# eval/gate-b/RESULTS.md, the TBDs in README and docs/submission, and the tracker's metrics.
+results:
+	python3 scripts/results.py

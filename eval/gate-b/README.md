@@ -148,8 +148,31 @@ One file per counted run, written by hand after the run:
   of each touch (landmark pixels, the point before and after the filter).
 - `run.md`: as above.
 - `latency.csv`, from the separate latency film: columns `touch_no, part, frame_enter,
-  frame_earcon, fps`. `frame_enter` is the first frame where the fingertip visibly crosses
-  the traced outline. `frame_earcon` is the first frame where the audio waveform rises above
-  background noise. `fps` is read from the video's file info, not assumed.
+  frame_earcon, fps, video`. `frame_enter` is the first frame where the fingertip visibly
+  crosses the traced outline. `frame_earcon` is the first frame where the audio waveform rises
+  above background noise. `fps` is read from the video's file info, not assumed.
+- `voice-latency.csv`, from hold-to-talk takes in the same film: columns `take, question,
+  frame_release, frame_first_word, fps, video`. `frame_release` is the first frame where the
+  finger is off the talk button; `frame_first_word` the first frame of the spoken answer (not
+  the thinking tone).
 - `videos.sha256`: name and sha256 of each latency video. The videos are too large for
   git and stay outside it. These hashes tie the frame counts to the exact files.
+- `RESULTS.md`: written by `make results` from the files above.
+
+## The latency film, step by step
+
+1. Film the phone over the sheet from the side, sound on, at the camera's highest frame rate.
+   For touch to tone, enter parts one at a time and rest; for questions, hold the talk button,
+   ask, let go. Keep each clip short. AirDrop the videos to the Mac; they stay outside git.
+2. Hash them and start the tables (needs `brew install ffmpeg`):
+   ```
+   python3 scripts/latency_film.py touch ~/Downloads/IMG_*.MOV    # writes latency.csv and videos.sha256
+   python3 scripts/latency_film.py voice ~/Downloads/IMG_*.MOV    # writes voice-latency.csv
+   ```
+   The touch table gets one row per sound, `frame_earcon` and `fps` filled in from the audio
+   and the file info. Step through each video (QuickTime: arrow keys) and fill in `part` and
+   `frame_enter`; delete rows for sounds that are not an earcon. Fill the voice table's frames.
+3. `make results`: writes `RESULTS.md`, puts the measured values with their file in place of
+   each TBD in README.md, docs/submission/WRITEUP.md and VIDEO_SCRIPT.md, sets the tracker's
+   metrics, and prints the Gate B command to run once `run.md` is written. A row left
+   unfinished stops it with the row number.

@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 383, updated 2026-11-03T11:31:47.599Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 386, updated 2026-11-03T11:42:35.136Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -409,6 +409,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: DEMO.md shots 5 and 6: spoken commands on the phone (no M or W key there) and what needs the network; links to VIDEO_SCRIPT.md. README points to docs/submission and docs/SECURITY.md. Every overnight commit (c41ecdf headers, 1d7a873 cleanup, aea8f0c demo tooling, 49dbb34 submission) passed the gates: pre-commit (752 pytest, 357 vitest, lint, mypy, tsc, 80 script tests, tracking node tests), graded figures unchanged (heart 14 of 15, flower 7 of 13, Japan 9 of 9), session and touch-session, the four app e2e flows, CI green. make demo-live running for the morning.
 - [x] d9-20 WebKit check of the security headers; one-command rollback
   - Note: Playwright WebKit 26.6 through dev:phone and :8443 with the real headers: device check (camera, hand tracker GPU 29.6 fps, microphone ok), heart v4 Explore Start (GPU ready 107 ms) and Gate B (mediapipe 1.1.0 GPU ready 517 ms from the CDN): no CSP violation, no blocked wasm or worker. Wake Lock row failed only under Playwright's grant_permissions (WebKit refuses every unlisted permission); without the grant held and released, with and without headers. No policy change needed. Rollback: TT_CSP=off make demo-live drops the policy only (vite.config.ts and serve.py; devserver test). docs/DEMO.md and SECURITY.md.
+- [x] d9-21 Result pipelines: latency film tool and make results, dry-run on synthetic data
+  - Note: Dry run in a scratch copy (nothing synthetic committed): the Gate B JSON was the page's own download from the touch-session gate with seeded noise (version 2, 45 records); analyze_touch.py gave mean 2.25 mm, p95 4.32 mm, max 5.2, bias and scale ratio 0.9914; run.md filled from the README template. Latency film: two ffmpeg videos (30 and 29.97 fps, beeps at known times); scripts/latency_film.py found the earcons at frames 60, 150, 240 exactly and wrote latency.csv, voice-latency.csv and videos.sha256 (matching shasum). make results (scripts/results.py) refused the unfinished rows by number, then wrote eval/gate-b/RESULTS.md (100/133 ms and 3203 ms, checked by hand), filled every marked TBD in README, WRITEUP and VIDEO_SCRIPT (a rerun changes nothing), set touch-mean, touch-p95, lat-earcon-device (renamed) and the new lat-answer-device, and printed the Gate B command (left to the user until run.md says the protocol was met). 6 unit tests in scripts/test_results.py (hook and CI).
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.

@@ -185,6 +185,7 @@ Only these, from committed files, re-read on the day:
 - Question answers: `eval/qa/RESULTS.md` (live, answer prompt v2 at minimal effort, Nov 3:
   heart source right 36 of 38, Commons brain 35 of 35).
 - Release to first spoken word: `eval/qa/VOICE.md` (p50 5.0 s, two of 12 near 14 s, headless
-  Chrome on the Mac; the iPhone figure is item "device latency film").
+  Chrome on the Mac; on the iPhone, the latency film's hold-to-talk takes,
+  `eval/gate-b/voice-latency.csv`, once `make results` has run).
 - Part plan on the eval figures: `eval/plan/RESULTS.md`.
 - Spend: `python3 scripts/tracker.py spend`.

@@ -45,7 +45,7 @@ jobs:
           (cd apps/web && npm ci)
 
       - name: Scripts tests
-        run: python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py scripts/test_pre_commit.py scripts/test_preflight.py
+        run: python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py scripts/test_pre_commit.py scripts/test_preflight.py scripts/test_results.py
 
       - name: Tracking node tests
         working-directory: spikes/tracking

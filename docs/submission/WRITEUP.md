@@ -65,9 +65,12 @@ picture.
   on the brain. All 9 questions the figures do not answer, and all 7 prompt injections, were
   sent back to the teacher.
 - Release of the talk button to the first spoken word (`eval/qa/VOICE.md`): p50 5.0 s over 12
-  runs in Chrome on the Mac; two of the 12 took about 14 s. On the iPhone: TBD.
+  runs in Chrome on the Mac; two of the 12 took about 14 s. On the iPhone:
+  <!-- tt:voice-device -->TBD<!-- /tt:voice-device -->.
 - Fingertip accuracy on the 9-point test sheet (`eval/gate-b/README.md`, target a mean error of
-  4 mm or less): TBD.
+  4 mm or less): <!-- tt:gate-b -->TBD<!-- /tt:gate-b -->.
+- Touch to tone on the iPhone, from the latency film:
+  <!-- tt:earcon-device -->TBD<!-- /tt:earcon-device -->.
 - Spend: $5.31 of the $150 credits over 1,012 live calls (`eval/live/ledger.jsonl`, as of
   Nov 3).
 

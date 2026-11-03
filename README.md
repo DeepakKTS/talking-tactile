@@ -132,9 +132,11 @@ Every number here is from a committed result file; rerun the command to reproduc
 
 ## Known limitations
 
+<!-- tt:limits-touch -->
 - **Touch accuracy on the phone is not measured yet.** Gate B (mean fingertip error 4 mm or
   less, `eval/gate-b/README.md`) has not run on the demo iPhone, and the device latency film
-  has not been made.
+  has not been made. `make results` fills this in from the measurements.
+<!-- /tt:limits-touch -->
 - **A sighted helper sets the corners.** There is no automatic registration and no check that
   the phone or the sheet moved after it (`docs/EDGE_CASES.md` X5, X6).
 - **Questions need the network and the Meta API**, and can be slow: 5.0 s at p50 from letting

@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 383,
- "updated_at": "2026-11-03T11:31:47.599Z",
+ "rev": 386,
+ "updated_at": "2026-11-03T11:42:35.136Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2996,6 +2996,23 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T11:31:47.599Z"
   },
   {
+   "id": "d9-21",
+   "day": 9,
+   "title": "Result pipelines: latency film tool and make results, dry-run on synthetic data",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Dry run in a scratch copy (nothing synthetic committed): the Gate B JSON was the page's own download from the touch-session gate with seeded noise (version 2, 45 records); analyze_touch.py gave mean 2.25 mm, p95 4.32 mm, max 5.2, bias and scale ratio 0.9914; run.md filled from the README template. Latency film: two ffmpeg videos (30 and 29.97 fps, beeps at known times); scripts/latency_film.py found the earcons at frames 60, 150, 240 exactly and wrote latency.csv, voice-latency.csv and videos.sha256 (matching shasum). make results (scripts/results.py) refused the unfinished rows by number, then wrote eval/gate-b/RESULTS.md (100/133 ms and 3203 ms, checked by hand), filled every marked TBD in README, WRITEUP and VIDEO_SCRIPT (a rerun changes nothing), set touch-mean, touch-p95, lat-earcon-device (renamed) and the new lat-answer-device, and printed the Gate B command (left to the user until run.md says the protocol was met). 6 unit tests in scripts/test_results.py (hook and CI).",
+   "done_at": "2026-11-03T11:42:35.136Z",
+   "tags": [
+    "eval",
+    "tooling",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T11:42:35.136Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3339,6 +3356,19 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "measured_at": "2026-10-29T20:35:16.196Z",
    "source": "live",
    "changed_at": "2026-10-29T20:35:16.196Z"
+  },
+  {
+   "id": "lat-answer-device",
+   "suite": "Latency",
+   "name": "Release to first word on the iPhone, p50, from the latency film (eval/gate-b/voice-latency.csv)",
+   "cmp": "\u003c=",
+   "target": 2,
+   "unit": "s",
+   "report_only": false,
+   "value": null,
+   "measured_at": null,
+   "source": "",
+   "changed_at": "2026-11-03T11:38:11.554Z"
   }
  ],
  "costs": [
@@ -3836,6 +3866,21 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T11:42:35.136Z",
+   "kind": "claude",
+   "text": "Task d9-21 \"Result pipelines: latency film tool and make results, dry-run on synthetic data\" is now done. Note: Dry run in a scratch copy (nothing synthetic committed): the Gate B JSON was the page's own download from the touch-session gate with seeded noise (version 2, 45 records); analyze_touch.py gave mean 2.25 mm, p95 4.32 mm, max 5.2, bias and scale ratio 0.9914; run.md filled from the README template. Latency film: two ffmpeg videos (30 and 29.97 fps, beeps at known times); scripts/latency_film.py found the earcons at frames 60, 150, 240 exactly and wrote latency.csv, voice-latency.csv and videos.sha256 (matching shasum). make results (scripts/results.py) refused the unfinished rows by number, then wrote eval/gate-b/RESULTS.md (100/133 ms and 3203 ms, checked by hand), filled every marked TBD in README, WRITEUP and VIDEO_SCRIPT (a rerun changes nothing), set touch-mean, touch-p95, lat-earcon-device (renamed) and the new lat-answer-device, and printed the Gate B command (left to the user until run.md says the protocol was met). 6 unit tests in scripts/test_results.py (hook and CI)."
+  },
+  {
+   "ts": "2026-11-03T11:42:35.092Z",
+   "kind": "claude",
+   "text": "Task d9-21 \"Result pipelines: latency film tool and make results, dry-run on synthetic data\" added to day 9."
+  },
+  {
+   "ts": "2026-11-03T11:38:11.554Z",
+   "kind": "claude",
+   "text": "Metric added: \"Release to first word on the iPhone, p50, from the latency film (eval/gate-b/voice-latency.csv)\", not measured yet."
+  },
   {
    "ts": "2026-11-03T11:31:47.599Z",
    "kind": "claude",

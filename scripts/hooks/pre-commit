@@ -66,7 +66,7 @@ main() {
   staged=$(git write-tree)
 
   echo "pre-commit: tracker, secret check and hook tests"
-  python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py scripts/test_pre_commit.py scripts/test_preflight.py
+  python3 -m unittest scripts/test_tracker.py scripts/test_check_secrets.py scripts/test_pre_commit.py scripts/test_preflight.py scripts/test_results.py
 
   echo "pre-commit: tracking node tests"
   (cd spikes/tracking && node --test --test-reporter=dot test/*.test.mjs)
