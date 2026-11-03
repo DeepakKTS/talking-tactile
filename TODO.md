@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 300, updated 2026-11-03T02:57:31.201Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 302, updated 2026-11-03T03:01:38.402Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -327,6 +327,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: The Q2 fix (d8-11, ba6b527) set the server deadline at 12 s and the client at 15 s from eval/qa/scores.json alone (slowest Spark 6.9 s). eval/qa/scores_image.json, the 12 picture questions, has Spark at 10.2 s and 8.7 s: with transcribe p95 1.4 s the slowest observed server time is about 11.6 s, so 12 s would cut a valid answer. Now DEADLINE_S 20 s (1.7 times 11.6) and ASK_TIMEOUT_MS 25 s (5 s for the phone network); the thinking tone plays during the wait. EDGE_CASES Q2 and its timeout paragraph say so. Tests unchanged (they set their own deadline): test_ask.py and camera.test.ts pass.
 - [x] d8-31 README: judge quickstart, architecture, results with sources, limitations
   - Note: README.md rewritten around the unchanged Privacy section: what it is and the three Meta models; a quickstart for a judge in mock mode (clone, make install, MOCK_META=1 make dev, Author upload of the heart, check, publish, Explore), with the mock question limit stated; S0 to S5 with the model each uses (S3 is code only: PLAN.md's Spark pass over numbered outlines is not built, said so); the safety rules (teacher confirmation, spill never touchable, lines, point symbols); the touch path (worker, homography, 4 mm contact offset, 1 euro, 1 mm/120 ms enter, 2 mm exit, 6 earcons a second, 600 ms rest); the question path (keywords, strict per-figure schema, code's last word, 50 per session, 20/25 s); results each citing its committed file; known limitations. Every claim checked against code or a result file before writing.
+- [x] d8-32 Public-release audit (read-only)
+  - Note: Read-only, nothing changed, repo still private. No project license yet: options MIT, Apache-2.0, BSD-3-Clause, GPL-3.0, AGPL-3.0; the fixtures keep their own licenses (heart CC BY-SA 3.0, Japan CC BY-SA 4.0, brain CC BY 3.0, flower public domain). Not for public as is: the uploaded brain (not openly licensed) is named and counted in eval/plan/RESULTS.md and scores.json (part names, counts, figure id fa460241), TRACKER.html (10 mentions), TODO.md (3), and 36 lines of eval/live/ledger.jsonl (figure id, part names); local paths /Users/deepakzedler in docs/DEMO.md (1) and eval/gate-b/README.md (4). Never committed: .env, private fixtures, keys, certificates (history checked). No file over 10 MB, now or in history (largest: hand_landmarker.task 7.5 MB). ATTRIBUTION gaps: eval/s2-bakeoff/*/reference masks (16, derived from heart CC BY-SA 3.0, flower PD, Japan CC BY-SA 4.0), and derived heart and brain regions files in fixtures/ (pipeline, qa, recorded), not listed; own-work files not stated (fixtures/synthetic, spikes/tracking/test-sheet.pdf); meta-sam-parser 0.1.0 (Meta SAM License, PyPI, not stored) is a dependency to weigh in the license choice.
 
 ## Day 9: Tue Nov 3. Gate D
 
