@@ -21,13 +21,17 @@ liblouis for braille (`brew install liblouis`, or `apt install liblouis-bin libl
 git clone https://github.com/DeepakKTS/talking-tactile.git
 cd talking-tactile
 make install
-MOCK_META=1 make dev        # API on :8000, web on http://localhost:5173
+MOCK_META=1 make dev        # API on :8000, web on http://localhost:5173; Ctrl-C stops both
 ```
+
+`make install` ends with npm reporting 11 moderate advisories, all in the lint tools that never
+reach the browser (`docs/SECURITY.md`), and a note that `fsevents` has install scripts. Neither
+stops anything.
 
 Author (the teacher):
 
 1. Open http://localhost:5173/author and upload `fixtures/heart.png`.
-2. Wait for "Ready for review." The parts Spark listed and SAM outlined appear, with what
+2. Wait for "Ready for review." (about 25 s in mock mode). The parts Spark listed and SAM outlined appear, with what
    needs the teacher (the septum, which spilled onto its neighbor) and a merge proposal (the
    aortic arch, drawn as one shape).
 3. Press "Mark all parts checked" and confirm, then "Publish for students". A sheet with no
