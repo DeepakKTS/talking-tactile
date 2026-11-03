@@ -68,7 +68,8 @@ def test_the_heart_through_the_api_on_replay() -> None:
     async def body(http: httpx.AsyncClient, service: Any, base: str, out: dict[str, Any]) -> None:
         out["draft"] = (await http.get(f"{base}/regions.json")).json()
         out["report"] = (await http.get(f"{base}/report.json")).json()
-        out["publish"] = (await http.post(f"{base}/publish")).status_code
+        r = await http.post(f"{base}/publish")
+        out["publish"] = (r.status_code, r.json().get("error", {}).get("code"))
 
     got = asyncio.run(heart(body))
     assert [s["outcome"] for s in got["status"]["job"]["stages"]] == ["ran"] * 6
@@ -89,7 +90,8 @@ def test_the_heart_through_the_api_on_replay() -> None:
         ("aortic arch", ["r1", "r8", "r9", "r10"])
     ]
     assert draft.subject is not None and draft.subject.label == "heart"
-    assert got["report"] == [] and got["publish"] == 201
+    # The rules pass, but nothing is checked yet, so there is nothing a student could touch.
+    assert got["report"] == [] and got["publish"] == (409, "nothing_touchable")
     assert got["draft"] == DRAFT
 
 

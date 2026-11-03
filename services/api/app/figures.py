@@ -167,6 +167,20 @@ def job_json(job: JobRecord) -> dict[str, object]:
     }
 
 
+NOTHING_TOUCHABLE = (
+    "No part is checked yet, so a student could touch nothing on this sheet. "
+    "Check the parts you have looked at, then publish."
+)
+
+
+def check_touchable(out: Path) -> None:
+    """Raises a 409 when no region of these outputs is touchable: a part is touchable only
+    once the teacher checks it, and a sheet with nothing to touch is no use to a student."""
+    regions = RegionsFile.from_json_obj(json.loads((out / "regions.json").read_text("utf-8")))
+    if not any(r.touchable for r in regions.regions):
+        raise ApiError(409, "nothing_touchable", NOTHING_TOUCHABLE)
+
+
 def check_report(out: Path, edit_version: int) -> None:
     """Raises a 409 unless the rules report next to these outputs is present and empty."""
     try:
@@ -485,6 +499,7 @@ class FigureService(FixMixin):
             if latest is not None and latest.job_id == job.id:
                 return latest, False
             check_report(out, job.edit_version)
+            check_touchable(out)
             return await asyncio.to_thread(self.publications.publish, job, out), True
 
     def published(self, figure_id: str, version: int | None) -> Publication:

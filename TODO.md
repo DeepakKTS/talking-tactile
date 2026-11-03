@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 292, updated 2026-11-03T02:20:18.546Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 294, updated 2026-11-03T02:40:52.862Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -319,6 +319,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: app/figures.py FIX_CAP: at the fix-call cap the 429 says 'This figure used its fix calls for this version. An outline you already previewed can still be accepted: it needs no new call.' Checked first: Runner.outline_mask serves an accepted outline from the cache. Test: test_fix_api.py::test_at_the_fix_cap_a_new_point_is_refused_and_a_previewed_outline_still_accepted (cap of one: a second point gets the 429 and the sentence; accepting the first preview succeeds, the job ends done, still one fix call).
 - [x] d8-27 Edge case E3: a failed accept keeps the Fix outline panel and its points
   - Note: apps/web/src/author/Review.tsx: send() reports whether the call went through; accepting an outline closes the Fix outline panel only on success. On a failure (cap, conflict, network) the panel stays with the teacher's points and the review's status line says why; before, the panel closed and the points were lost. Test: AuthorPage.test.tsx 'a failed accept keeps the Fix outline panel and its points, and says why' (a 409 on the PATCH); fails on the old code.
+- [x] d8-28 Edge case E6: publish is refused while no part is checked
+  - Note: app/figures.py check_touchable: after the rules report passes, publish refuses a version with no touchable region: 409 nothing_touchable 'No part is checked yet, so a student could touch nothing on this sheet. Check the parts you have looked at, then publish.' A part is touchable only once the teacher checks it, so before this a sheet with nothing to touch could be published. The Author page shows the message. Tests: test_api_figures.py::test_publish_is_refused_until_a_part_is_checked (new); six API tests now check their parts first (Api.check_all, one check edit; two version numbers moved by one); test_e2e_heart_replay asserts the refusal on the unchecked live heart; AuthorPage.test.tsx fake server mirrors check and the refusal, 'publish is refused while none is checked'. fix_e2e, plan_e2e, explore_e2e PASS (each checks all before publishing).
 
 ## Day 9: Tue Nov 3. Gate D
 

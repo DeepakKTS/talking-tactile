@@ -19,7 +19,7 @@ from PIL import Image
 from shapely.geometry import Point
 
 from app.config import TactileRules, load_tactile_rules
-from app.figures import FigureService
+from app.figures import NOTHING_TOUCHABLE, FigureService
 from app.geometry.sheet import Sheet
 from app.geometry.validate import Violation, validate_sheet
 from app.logs import JsonFormatter, request_id
@@ -56,6 +56,17 @@ class Api:
         body: dict[str, Any] = (await self.http.get(f"/api/figures/{fid}")).json()
         assert body["job"]["status"] in FINISHED, body
         return body
+
+    async def check_all(self, fid: str) -> dict[str, Any]:
+        """The teacher marks every part checked, as Mark all parts checked does: one edit.
+        Publish refuses a sheet with nothing touchable."""
+        draft = (await self.http.get(f"/api/figures/{fid}/regions.json")).json()
+        ids = list(dict.fromkeys(r["id"].split("_")[0] for r in draft["regions"]))
+        r = await self.http.patch(
+            f"/api/figures/{fid}/regions/{ids[0]}", json={"op": "check", "also": ids[1:]}
+        )
+        assert r.status_code == 202, r.text
+        return await self.wait(fid)
 
     def understand_calls(self) -> int:
         return sum(c.call == "understand" for c in self.client.calls)
@@ -203,6 +214,7 @@ def test_a_new_edit_after_publishing_makes_version_two(tmp_path: Path) -> None:
     async def body(api: Api) -> None:
         fid = (await api.upload()).json()["figure_id"]
         await api.wait(fid)
+        await api.check_all(fid)
         assert (await api.http.post(f"/api/figures/{fid}/publish")).json()["version"] == 1
         r = await api.http.patch(f"/api/figures/{fid}/regions/r3", json={"op": "delete"})
         assert r.status_code == 202
@@ -541,6 +553,7 @@ def test_concurrent_publishes_and_edits_take_distinct_versions(tmp_path: Path) -
     async def body(api: Api) -> None:
         fid = (await api.upload()).json()["figure_id"]
         await api.wait(fid)
+        await api.check_all(fid)
         base = f"/api/figures/{fid}"
         a, b = await asyncio.gather(api.http.post(f"{base}/publish"),
                                     api.http.post(f"{base}/publish"))  # fmt: skip
@@ -550,9 +563,9 @@ def test_concurrent_publishes_and_edits_take_distinct_versions(tmp_path: Path) -
             api.http.patch(f"{base}/regions/r1", json={"op": "label", "label": "shell"}),
             api.http.patch(f"{base}/regions/r2", json={"op": "label", "label": "kernel"}),
         )
-        assert sorted(r.json()["edit_version"] for r in edits) == [1, 2]
+        assert sorted(r.json()["edit_version"] for r in edits) == [2, 3]  # 1 is the check
         status = await api.wait(fid)
-        assert status["job"]["edit_version"] == 2
+        assert status["job"]["edit_version"] == 3
         labels = {x["id"]: x["label"] for x in
                   (await api.http.get(f"{base}/regions.json")).json()["regions"]}  # fmt: skip
         assert (labels["r1"], labels["r2"]) == ("shell", "kernel")
@@ -633,6 +646,7 @@ def test_publish_checks_the_report_of_the_exact_version(tmp_path: Path) -> None:
     async def body(api: Api) -> None:
         fid = (await api.upload()).json()["figure_id"]
         await api.wait(fid)
+        await api.check_all(fid)
         assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
         await api.http.patch(f"/api/figures/{fid}/regions/r3",
                                  json={"op": "label", "label": PLANTED})  # fmt: skip
@@ -708,6 +722,7 @@ def test_the_teacher_gets_the_source_image_and_the_draft_rules_report(tmp_path: 
     async def body(api: Api) -> None:
         fid = (await api.upload()).json()["figure_id"]
         await api.wait(fid)
+        await api.check_all(fid)
         r = await api.http.get(f"/api/figures/{fid}/source.png")
         assert r.status_code == 200
         assert r.headers["content-type"] == "image/png"
@@ -839,9 +854,10 @@ def test_deleting_a_part_recomputes_the_report_for_the_new_version(tmp_path: Pat
         draft = (await api.http.get(f"/api/figures/{fid}/regions.json")).json()
         assert "r3" not in {x["id"] for x in draft["regions"]}
 
+        await api.check_all(fid)  # edit 3: publish needs a touchable part
         r = await api.http.post(f"/api/figures/{fid}/publish")
         assert r.status_code == 201, r.text
-        assert (r.json()["version"], r.json()["edit_version"]) == (1, 2)
+        assert (r.json()["version"], r.json()["edit_version"]) == (1, 3)
 
     run(tmp_path, body)
 
@@ -853,6 +869,7 @@ def test_draft_only_files_never_reach_a_published_version(tmp_path: Path) -> Non
     async def body(api: Api) -> None:
         fid = (await api.upload()).json()["figure_id"]
         await api.wait(fid)
+        await api.check_all(fid)
         source = (await api.http.get(f"/api/figures/{fid}/source.png")).content
         assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
         await api.http.patch(
@@ -906,5 +923,19 @@ def test_the_planted_violations_never_fire_in_production(tmp_path: Path) -> None
         assert (await api.http.get(f"/api/figures/{fid}/report.json")).json() == []
         r = await api.http.post(f"/api/figures/{fid}/publish")
         assert r.status_code == 201, r.text
+
+    run(tmp_path, body)
+
+
+def test_publish_is_refused_until_a_part_is_checked(tmp_path: Path) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        r = await api.http.post(f"/api/figures/{fid}/publish")
+        assert_envelope(r, 409, "nothing_touchable")
+        assert r.json()["error"]["message"] == NOTHING_TOUCHABLE
+        assert (await api.http.get(f"/api/figures/{fid}")).json()["published"] == []
+        await api.check_all(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).status_code == 201
 
     run(tmp_path, body)

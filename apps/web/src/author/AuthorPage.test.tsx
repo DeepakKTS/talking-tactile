@@ -8,6 +8,7 @@ import { FigureApi, type OverlapWarning, type Repair, type Violation, describeVi
 import { AuthorPage } from "./AuthorPage";
 
 const ID = "b".repeat(64);
+const NOTHING_TOUCHABLE = "No part is checked yet, so a student could touch nothing on this sheet. Check the parts you have looked at, then publish.";
 
 interface Call {
   method: string;
@@ -73,9 +74,14 @@ class FakeServer {
     }
     if (method === "PATCH" && edit) {
       const r = this.regions.regions.find((x) => x.id === edit[1]);
-      const e = body as { op: string; label?: string; description?: string };
-      if (r && e.op === "label" && e.label) Object.assign(r, { label: e.label, verified_by_teacher: true });
-      if (r && e.op === "describe") Object.assign(r, { description: e.description, verified_by_teacher: true });
+      const e = body as { op: string; label?: string; description?: string; also?: string[] };
+      const checked = { verified_by_teacher: true, touchable: !r?.flags?.some((f) => f.reason === "spill") };
+      if (r && e.op === "label" && e.label) Object.assign(r, { label: e.label, ...checked });
+      if (r && e.op === "describe") Object.assign(r, { description: e.description, ...checked });
+      if (e.op === "check") {
+        const ids = [edit[1], ...(e.also ?? [])];
+        for (const x of this.regions.regions.filter((x) => ids.includes(x.id))) Object.assign(x, checked);
+      }
       if (e.op === "delete" || e.op === "merge") this.regions.regions = this.regions.regions.filter((x) => x !== r);
       this.editVersion++;
       this.polls = 0;
@@ -90,6 +96,9 @@ class FakeServer {
       if (this.refuse) {
         return json({ error: { code: "rules_violated", message: "This version breaks 1 tactile rule.", retryable: false,
           edit_version: this.editVersion, violations: this.refuse } }, 409);
+      }
+      if (!this.regions.regions.some((r) => r.touchable)) {
+        return json({ error: { code: "nothing_touchable", message: NOTHING_TOUCHABLE, retryable: false } }, 409);
       }
       this.published++;
       const base = `/api/figures/${ID}/published/${this.published}`;
@@ -164,7 +173,7 @@ describe("author page", () => {
     expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet. A student can touch a part only once you check it.`)).toBeTruthy();
   });
 
-  it("lists parts that are not touchable apart, with the reason, and publish still goes ahead", async () => {
+  it("lists parts that are not touchable apart, with the reason, and publish is refused while none is checked", async () => {
     const first = server.regions.regions[0];
     if (!first) throw new Error("the fixture has regions");
     server.regions.regions.push({ ...structuredClone(first), id: "s1", label: "septum", touchable: false,
@@ -189,7 +198,8 @@ describe("author page", () => {
     expect(listed.slice(2).every((t) => t.endsWith(": Not checked yet."))).toBe(true);
     expect(screen.getByText(`${synthetic.regions.length} of ${synthetic.regions.length} parts not checked yet. A student can touch a part only once you check it.`)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
-    expect(await screen.findByText("Published as version 1.")).toBeTruthy();
+    expect(await screen.findByText(NOTHING_TOUCHABLE)).toBeTruthy();
+    expect(screen.queryByText("Published as version 1.")).toBeNull();
   });
 
   it("splits the live heart's parts into needs you and for your information, and merges a proposal in one press", async () => {
@@ -413,6 +423,11 @@ describe("author page", () => {
 
   it("a publish gives the print PDF, the print steps and the Explore link for that version", async () => {
     await upload();
+    fireEvent.click(screen.getByRole("button", { name: "Mark left lobe checked" }));
+    await waitFor(() => { expect(screen.queryByRole("button", { name: "Mark left lobe checked" })).toBeNull(); });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Publish for students" }).hasAttribute("disabled")).toBe(false);
+    });
     fireEvent.click(screen.getByRole("button", { name: "Publish for students" }));
     const pdf = await screen.findByRole("link", { name: "Download print PDF, version 1" });
     expect(pdf.getAttribute("href")).toBe(`/api/figures/${ID}/published/1/print.pdf`);

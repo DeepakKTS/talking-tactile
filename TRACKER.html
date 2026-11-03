@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 292,
- "updated_at": "2026-11-03T02:20:18.546Z",
+ "rev": 294,
+ "updated_at": "2026-11-03T02:40:52.862Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2340,6 +2340,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T02:20:18.546Z"
   },
   {
+   "id": "d8-28",
+   "day": 8,
+   "title": "Edge case E6: publish is refused while no part is checked",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "app/figures.py check_touchable: after the rules report passes, publish refuses a version with no touchable region: 409 nothing_touchable 'No part is checked yet, so a student could touch nothing on this sheet. Check the parts you have looked at, then publish.' A part is touchable only once the teacher checks it, so before this a sheet with nothing to touch could be published. The Author page shows the message. Tests: test_api_figures.py::test_publish_is_refused_until_a_part_is_checked (new); six API tests now check their parts first (Api.check_all, one check edit; two version numbers moved by one); test_e2e_heart_replay asserts the refusal on the unchecked live heart; AuthorPage.test.tsx fake server mirrors check and the refusal, 'publish is refused while none is checked'. fix_e2e, plan_e2e, explore_e2e PASS (each checks all before publishing).",
+   "done_at": "2026-11-03T02:40:52.862Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T02:40:52.862Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3252,6 +3268,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T02:40:52.862Z",
+   "kind": "claude",
+   "text": "Task d8-28 \"Edge case E6: publish is refused while no part is checked\" is now done. Note: app/figures.py check_touchable: after the rules report passes, publish refuses a version with no touchable region: 409 nothing_touchable 'No part is checked yet, so a student could touch nothing on this sheet. Check the parts you have looked at, then publish.' A part is touchable only once the teacher checks it, so before this a sheet with nothing to touch could be published. The Author page shows the message. Tests: test_api_figures.py::test_publish_is_refused_until_a_part_is_checked (new); six API tests now check their parts first (Api.check_all, one check edit; two version numbers moved by one); test_e2e_heart_replay asserts the refusal on the unchecked live heart; AuthorPage.test.tsx fake server mirrors check and the refusal, 'publish is refused while none is checked'. fix_e2e, plan_e2e, explore_e2e PASS (each checks all before publishing)."
+  },
+  {
+   "ts": "2026-11-03T02:40:52.823Z",
+   "kind": "claude",
+   "text": "Task d8-28 \"Edge case E6: publish is refused while no part is checked\" added to day 8."
+  },
   {
    "ts": "2026-11-03T02:20:18.546Z",
    "kind": "claude",

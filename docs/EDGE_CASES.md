@@ -35,7 +35,7 @@ filler, and it says what still works or what to do next.
 | E3 | Accept fails (cap, network) | `send()` swallows the error and the panel closes, losing the teacher's points (`Review.tsx:60-73,128-131`) | Panel stays open with its points and the error | fixed: `AuthorPage.test.tsx` a failed accept keeps the Fix outline panel (fails on the old code) |
 | E4 | Undo after accept | No undo: edits are append-only (`api/pipeline/edits.py:276-289`); rename again or accept a new outline; merge, delete and check are final. Delete asks to confirm, merge from a part's form does not (`Review.tsx:457-475`) | Undo | limitation |
 | E5 | Publish twice | Same job: same version, 200 `created: false` (`api/figures.py:476-478`). Tests `test_api_figures.py::test_upload_edit_publish_and_fetch`, `::test_a_new_edit_after_publishing_makes_version_two` | Same | ok |
-| E6 | Publish with every part unchecked | Allowed (`api/figures.py:466-480`); Explore gets no touchable region (`web/shared/regions.ts:41-43`). Test `AuthorPage.test.tsx` "publish still goes ahead" | Refused: a sheet with nothing to touch is not published | fix |
+| E6 | Publish with every part unchecked | Allowed (`api/figures.py:466-480`); Explore gets no touchable region (`web/shared/regions.ts:41-43`). Test `AuthorPage.test.tsx` "publish still goes ahead" | Refused: a sheet with nothing to touch is not published | fixed: `test_api_figures.py::test_publish_is_refused_until_a_part_is_checked`, `AuthorPage.test.tsx` publish refused while none is checked |
 
 ## Explore sheet
 
