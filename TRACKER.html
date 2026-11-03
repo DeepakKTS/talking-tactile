@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 346,
- "updated_at": "2026-11-03T06:24:59.098Z",
+ "rev": 348,
+ "updated_at": "2026-11-03T07:00:43.486Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2655,6 +2655,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T06:16:31.606Z"
   },
   {
+   "id": "d8-48",
+   "day": 8,
+   "title": "Explore: holding to ask starts no iOS text selection or callout",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "iPhone: holding the screen to ask showed iOS selection handles on 'Set corners (R)'. ExplorePage: main gets -webkit-user-select none beside user-select none and -webkit-touch-callout none; the body gets the three while Explore is open (restored on leaving); selectstart is cancelled outside text fields; the long-press contextmenu is cancelled outside text fields; the Ask box keeps user-select text and the default callout (FIELD_STYLE). No pointer or touch event is cancelled, so VoiceOver's double tap and hold still reaches the page. Test: explore_e2e no_selection (computed user-select none on main and body, text on the Ask box; selectstart and contextmenu cancelled on page text, not in the box; a drag selects nothing; the box takes typing). -webkit-touch-callout is Safari only: Chrome drops it, so it needs the device. Tracking code unchanged.",
+   "done_at": "2026-11-03T07:00:43.486Z",
+   "tags": [
+    "fix",
+    "explore"
+   ],
+   "changed_at": "2026-11-03T07:00:43.486Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3568,6 +3584,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T07:00:43.486Z",
+   "kind": "claude",
+   "text": "Task d8-48 \"Explore: holding to ask starts no iOS text selection or callout\" is now done. Note: iPhone: holding the screen to ask showed iOS selection handles on 'Set corners (R)'. ExplorePage: main gets -webkit-user-select none beside user-select none and -webkit-touch-callout none; the body gets the three while Explore is open (restored on leaving); selectstart is cancelled outside text fields; the long-press contextmenu is cancelled outside text fields; the Ask box keeps user-select text and the default callout (FIELD_STYLE). No pointer or touch event is cancelled, so VoiceOver's double tap and hold still reaches the page. Test: explore_e2e no_selection (computed user-select none on main and body, text on the Ask box; selectstart and contextmenu cancelled on page text, not in the box; a drag selects nothing; the box takes typing). -webkit-touch-callout is Safari only: Chrome drops it, so it needs the device. Tracking code unchanged."
+  },
+  {
+   "ts": "2026-11-03T07:00:43.444Z",
+   "kind": "claude",
+   "text": "Task d8-48 \"Explore: holding to ask starts no iOS text selection or callout\" added to day 8."
+  },
   {
    "ts": "2026-11-03T06:24:59.098Z",
    "kind": "claude",

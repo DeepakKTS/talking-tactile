@@ -262,11 +262,54 @@ def guide_to_stem(page: Page, regions: list[dict[str, Any]], fail: list[str], wh
     return out
 
 
+NO_SELECTION_JS = """() => {
+  const main = document.querySelector("main");
+  const field = document.querySelector("form input");
+  const text = [...document.querySelectorAll("main p")].find((p) => p.textContent.includes("Hold anywhere"));
+  const fire = (el, type) => { const e = new Event(type, { bubbles: true, cancelable: true }); el.dispatchEvent(e); return e.defaultPrevented; };
+  return {
+    main: getComputedStyle(main).userSelect, mainWebkit: getComputedStyle(main).webkitUserSelect,
+    body: getComputedStyle(document.body).userSelect, field: getComputedStyle(field).userSelect,
+    selectstartOnText: fire(text.firstChild, "selectstart"), selectstartInField: fire(field, "selectstart"),
+    menuOnText: fire(text, "contextmenu"), menuInField: fire(field, "contextmenu"),
+  };
+}"""
+
+
+def no_selection(page: Page, fail: list[str]) -> dict[str, Any]:
+    """Holding to ask must not start a text selection or a callout (an iPhone showed selection
+    handles on Set corners); the Ask box stays selectable and editable."""
+    out: dict[str, Any] = page.evaluate(NO_SELECTION_JS)
+    # -webkit-touch-callout is Safari's alone: Chrome drops it, so it is checked on the iPhone.
+    want = {"main": "none", "mainWebkit": "none", "body": "none", "field": "text",
+            "selectstartOnText": True, "selectstartInField": False, "menuOnText": True, "menuInField": False}
+    if out != want:
+        fail.append(f"selection: {out}")
+    # A quick drag across page text selects nothing.
+    box = page.get_by_text("Hold anywhere on the screen").bounding_box()
+    if box:
+        page.mouse.move(box["x"] + 2, box["y"] + box["height"] / 2)
+        page.mouse.down()
+        page.mouse.move(box["x"] + box["width"] - 2, box["y"] + box["height"] / 2, steps=5)
+        page.mouse.up()
+    out["dragSelected"] = page.evaluate("() => String(window.getSelection())")
+    if out["dragSelected"]:
+        fail.append(f"a drag selected page text: {out['dragSelected']!r}")
+    field = page.locator("form input")
+    field.fill("what is here")
+    out["fieldValue"] = field.input_value()
+    field.fill("")
+    page.evaluate("() => document.activeElement && document.activeElement.blur()")  # keys go to the page again
+    if out["fieldValue"] != "what is here":
+        fail.append("the Ask box did not take typing")
+    return out
+
+
 def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fail: list[str]) -> dict[str, Any]:
     page.goto(explore_url(base, fid))
     page.wait_for_function("window.__tt && window.__tt.ready", timeout=30000)
     start_by_keys(page)
-    out: dict[str, Any] = {}
+    out: dict[str, Any] = {"no_selection": no_selection(page, fail)}
 
     def keys(*presses: str) -> list[str]:
         n = log_len(page)

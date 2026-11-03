@@ -345,6 +345,25 @@ function ExploreSheet() {
     };
   }, [startCorners]);
 
+  // No text selection and no long-press callout on the page: holding to ask must not start
+  // an iOS selection (seen on an iPhone: handles on "Set corners"). The body too, while
+  // Explore is open. Text fields keep their own (FIELD_STYLE); no touch or pointer event is
+  // cancelled, so VoiceOver's double tap and hold still reaches the page.
+  useEffect(() => {
+    const b = document.body.style;
+    const props = ["user-select", "-webkit-user-select", "-webkit-touch-callout"];
+    const before = props.map((k) => b.getPropertyValue(k));
+    for (const k of props) b.setProperty(k, "none");
+    const select = (e: Event) => {
+      if (!inField(e.target)) e.preventDefault();
+    };
+    document.addEventListener("selectstart", select);
+    return () => {
+      document.removeEventListener("selectstart", select);
+      props.forEach((k, i) => { b.setProperty(k, before[i] ?? ""); });
+    };
+  }, []);
+
   // Hold anywhere to ask out loud (voice.ts), except in a text field or a list to choose
   // from. A hold that started a question swallows the click its release would make.
   useEffect(() => {
@@ -366,7 +385,9 @@ function ExploreSheet() {
       e.preventDefault();
       e.stopPropagation();
     };
-    const menu = (e: Event) => { e.preventDefault(); }; // a long press opens no menu
+    const menu = (e: Event) => {
+      if (!inField(e.target)) e.preventDefault(); // a long press opens no menu, but in the Ask box
+    };
     document.addEventListener("pointerdown", down);
     document.addEventListener("pointerup", up);
     document.addEventListener("pointercancel", up);
@@ -487,7 +508,7 @@ function ExploreSheet() {
   }
 
   return (
-    <main style={{ WebkitTouchCallout: "none", userSelect: "none", minHeight: "100vh" }}>
+    <main style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none", minHeight: "100vh" }}>
       <h1>Explore{file ? `: ${file.title}` : ""}</h1>
       {loadError ? <p role="alert">{loadError}</p> : <p>{status}</p>}
       {!started && (
@@ -501,7 +522,7 @@ function ExploreSheet() {
           <form onSubmit={onAsk}>
             <label>
               Ask, or say where is, more, repeat, stop, what is here{" "}
-              <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" />
+              <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" style={FIELD_STYLE} />
             </label>
             <button type="submit">Ask</button>
           </form>
@@ -544,6 +565,15 @@ function ExploreSheet() {
       <div ref={mirror} />
     </main>
   );
+}
+
+// The Ask box stays selectable and editable inside the unselectable page.
+const FIELD_STYLE = { WebkitUserSelect: "text", userSelect: "text", WebkitTouchCallout: "default" } as const;
+
+/** A text field or a list, where selection and the callout keep working. */
+function inField(t: EventTarget | null): boolean {
+  const el = t instanceof Element ? t : t instanceof Node ? t.parentElement : null;
+  return el?.closest("input, textarea, select") != null;
 }
 
 function drawOverlay(
