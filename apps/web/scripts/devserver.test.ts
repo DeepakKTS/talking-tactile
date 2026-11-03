@@ -29,11 +29,12 @@ describe("dev server files", () => {
   });
 
   it("refuses the rest of the repo: the private figure, data, the ledger, the API, secrets", async () => {
-    // Never served. Where the file exists (the private ones exist only on the demo Mac, not
-    // in CI), the answer is 403; a missing file is a 404.
-    for (const p of ["fixtures/private/brain_upload.png", "data/jobs.sqlite", "eval/live/ledger.jsonl",
-      "services/api/app/ask.py", "services/api/.env", "apps/web/.certs/phone-key.pem", "README.md"]) {
-      expect([p, await status(p)]).toEqual([p, existsSync(`${ROOT}${p}`) ? 403 : 404]);
-    }
+    // Every one that exists is refused. The private ones exist only on the demo Mac, not in CI;
+    // a missing file cannot be served (Vite answers with the app's page instead).
+    const present = ["fixtures/private/brain_upload.png", "data/jobs.sqlite", "eval/live/ledger.jsonl",
+      "services/api/app/ask.py", "services/api/.env", "apps/web/.certs/phone-key.pem", "README.md"]
+      .filter((p) => existsSync(`${ROOT}${p}`));
+    expect(present.length).toBeGreaterThanOrEqual(3); // the tracked ones, everywhere
+    for (const p of present) expect([p, await status(p)]).toEqual([p, 403]);
   });
 });
