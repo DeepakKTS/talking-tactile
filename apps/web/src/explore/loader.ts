@@ -1,6 +1,7 @@
 // Loads the sheet Explore runs on. Only published versions, which the API locks after the
 // tactile rules pass; a draft URL is never built here. The last good copy of each version
 // is kept in localStorage, so the page can reopen a sheet with the network down.
+import schema from "../../../../docs/regions.schema.json";
 import { RegionsError, type RegionsFile, parseRegions, touchableOnly, untouchableNames } from "../shared/regions";
 
 export class LoadError extends Error {
@@ -15,6 +16,9 @@ interface LoaderDeps {
 }
 
 const FIGURE_ID = /^[0-9a-f]{64}$/;
+const SCHEMA_VERSION = schema.properties.schema_version.const;
+export const OTHER_VERSION = "This sheet was made for another version of Explore. Ask your teacher to publish it again.";
+export const DAMAGED = "The sheet is damaged. Ask your teacher to publish it again.";
 const NOT_FOUND = 404;
 
 export function publishedUrl(figureId: string, version: Version): string {
@@ -59,14 +63,16 @@ export interface Loaded {
 }
 
 // The file as Explore uses it: valid, touchable regions only, and the names of the rest.
+// The messages are read to a student: plain words, and what to do next.
 function parse(text: string): Omit<Loaded, "from"> {
   try {
-    const file = parseRegions(JSON.parse(text));
+    const json: unknown = JSON.parse(text);
+    const version = typeof json === "object" && json !== null ? (json as { schema_version?: unknown }).schema_version : undefined;
+    if (version !== undefined && version !== SCHEMA_VERSION) throw new LoadError(OTHER_VERSION);
+    const file = parseRegions(json);
     return { file: touchableOnly(file), notTouchable: untouchableNames(file) };
   } catch (err) {
-    if (err instanceof RegionsError || err instanceof SyntaxError) {
-      throw new LoadError(`The sheet is damaged: ${err.message}`);
-    }
+    if (err instanceof RegionsError || err instanceof SyntaxError) throw new LoadError(DAMAGED);
     throw err;
   }
 }

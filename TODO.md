@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 272, updated 2026-11-03T01:23:12.554Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 274, updated 2026-11-03T01:28:25.640Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -299,6 +299,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: apps/web/src/explore/session.ts: a typed question turns the thinking tone on before /api/ask and off before the answer is said, as a held question does; the wait is no longer silent. Test: session.test.ts 'sends other questions to /api/ask with the touch context' checks thinking, thinking off, then the answer.
 - [x] d8-17 Edge case X3: a refused camera brings Start back
   - Note: apps/web/src/explore/ExplorePage.tsx: when the camera does not start, the loop is stopped (worker terminated), Start comes back and takes the focus, and the student hears 'The camera did not start. Allow the camera and press Start again.'; before, Start was already hidden, so the sentence could not be acted on. Test: explore_e2e.py camera_denied (getUserMedia rejected NotAllowedError): said, Start focused; it fails on the old page (start_focused false). Full explore_e2e PASS. On the iPhone: needs device.
+- [x] d8-18 Edge case X2: a sheet from another schema version is told in plain words
+  - Note: apps/web/src/explore/loader.ts: a regions.json whose schema_version is not the schema's const (3, read from docs/regions.schema.json) is refused with 'This sheet was made for another version of Explore. Ask your teacher to publish it again.'; any other contract break or bad JSON with 'The sheet is damaged. Ask your teacher to publish it again.' instead of the raw validator text. Neither is saved. Tests: loader.test.ts 'says a sheet from another schema version needs publishing again' (2 and 4), 'refuses a file that breaks the contract, in plain words'.
 
 ## Day 9: Tue Nov 3. Gate D
 

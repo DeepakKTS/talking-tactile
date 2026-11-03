@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 272,
- "updated_at": "2026-11-03T01:23:12.554Z",
+ "rev": 274,
+ "updated_at": "2026-11-03T01:28:25.640Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2180,6 +2180,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T01:23:12.554Z"
   },
   {
+   "id": "d8-18",
+   "day": 8,
+   "title": "Edge case X2: a sheet from another schema version is told in plain words",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/loader.ts: a regions.json whose schema_version is not the schema's const (3, read from docs/regions.schema.json) is refused with 'This sheet was made for another version of Explore. Ask your teacher to publish it again.'; any other contract break or bad JSON with 'The sheet is damaged. Ask your teacher to publish it again.' instead of the raw validator text. Neither is saved. Tests: loader.test.ts 'says a sheet from another schema version needs publishing again' (2 and 4), 'refuses a file that breaks the contract, in plain words'.",
+   "done_at": "2026-11-03T01:28:25.640Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:28:25.640Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3092,6 +3108,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:28:25.640Z",
+   "kind": "claude",
+   "text": "Task d8-18 \"Edge case X2: a sheet from another schema version is told in plain words\" is now done. Note: apps/web/src/explore/loader.ts: a regions.json whose schema_version is not the schema's const (3, read from docs/regions.schema.json) is refused with 'This sheet was made for another version of Explore. Ask your teacher to publish it again.'; any other contract break or bad JSON with 'The sheet is damaged. Ask your teacher to publish it again.' instead of the raw validator text. Neither is saved. Tests: loader.test.ts 'says a sheet from another schema version needs publishing again' (2 and 4), 'refuses a file that breaks the contract, in plain words'."
+  },
+  {
+   "ts": "2026-11-03T01:28:25.601Z",
+   "kind": "claude",
+   "text": "Task d8-18 \"Edge case X2: a sheet from another schema version is told in plain words\" added to day 8."
+  },
   {
    "ts": "2026-11-03T01:23:12.554Z",
    "kind": "claude",

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import heart from "../../../../fixtures/pipeline/heart_regions.json";
 import synthetic from "../../../../fixtures/synthetic/regions.json";
-import { LoadError, loadPublished, publishedUrl } from "./loader";
+import { DAMAGED, LoadError, OTHER_VERSION, loadPublished, publishedUrl } from "./loader";
 
 const ID = "a".repeat(64);
 const BODY = JSON.stringify(synthetic);
@@ -123,10 +123,17 @@ describe("published regions loader", () => {
     );
   });
 
-  it("refuses a file that breaks the contract, and does not save it", async () => {
+  it("refuses a file that breaks the contract, in plain words, and does not save it", async () => {
     const storage = new MemoryStorage();
     const { f } = fetcher(() => new Response(JSON.stringify({ ...synthetic, regions: "no" })));
-    await expect(loadPublished(ID, "latest", { fetch: f, storage })).rejects.toThrow(LoadError);
+    await expect(loadPublished(ID, "latest", { fetch: f, storage })).rejects.toThrow(new LoadError(DAMAGED));
     expect(storage.data.size).toBe(0);
+  });
+
+  it("says a sheet from another schema version needs publishing again", async () => {
+    for (const v of [2, 4]) {
+      const { f } = fetcher(() => new Response(JSON.stringify({ ...synthetic, schema_version: v })));
+      await expect(loadPublished(ID, "latest", { fetch: f, storage: new MemoryStorage() })).rejects.toThrow(new LoadError(OTHER_VERSION));
+    }
   });
 });
