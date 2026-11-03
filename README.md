@@ -1,21 +1,158 @@
-# Talking Tactile: planning kit
+# Talking Tactile
 
-Drop these files into the root of the repo on Day 1.
+Talking Tactile turns a printed STEM figure into a raised graphic that a blind student explores
+by touch. A teacher uploads the figure; Meta's models find its parts; the teacher checks them
+and prints the sheet. A phone camera over the sheet finds the student's fingertip and speaks
+the part under it, and the student can ask questions out loud, answered from that figure only.
+
+Built for the Meta Global AI Developer Hackathon (Indie track). Uses `muse-spark-1.3`,
+`sam-3.1` and `muse-voice-transcribe-1.0` through the Meta Model API.
+
+## Quickstart for a judge (mock mode, no key, no network calls)
+
+Mock mode replays live Meta answers recorded in `fixtures/recorded/` for two figures: the heart
+(`fixtures/heart.png`) and the Commons brain (`fixtures/eval/brain_lobes.png`). It costs
+nothing and needs no API key.
+
+Needs: macOS or Linux, [uv](https://docs.astral.sh/uv/) (it fetches Python 3.11), Node 24 and
+liblouis for braille (`brew install liblouis`, or `apt install liblouis-bin liblouis-data`).
+
+```
+git clone https://github.com/DeepakKTS/talking-tactile.git
+cd talking-tactile
+make install
+MOCK_META=1 make dev        # API on :8000, web on http://localhost:5173
+```
+
+Author (the teacher):
+
+1. Open http://localhost:5173/author and upload `fixtures/heart.png`.
+2. Wait for "Ready for review." The parts Spark listed and SAM outlined appear, with what
+   needs the teacher (the septum, which spilled onto its neighbor) and a merge proposal (the
+   aortic arch, drawn as one shape).
+3. Press "Mark all parts checked" and confirm, then "Publish for students". A sheet with no
+   checked part, or one that breaks a tactile rule, is refused.
+4. Download the print PDF, or press "Open version 1 in Explore".
+
+Explore (the student): touching needs the printed sheet under a camera (a phone in a mount,
+`docs/DEMO.md`). Without one, Explore still starts from the keyboard: Enter presses Start, H
+says the help. Questions in mock mode answer only the eval's recorded questions, and until
+the answers are re-recorded for answer prompt v2 they say "Questions are not working right
+now. Labels still work." (Known limitations.)
+
+Live mode: copy `.env.example` to `services/api/.env`, set `MODEL_API_KEY`, and run the API
+with `LIVE=1` (`docs/DEMO.md` has the commands, terminal by terminal).
+
+Checks: `make check` runs every test suite, lint and type check, as the pre-commit hook and CI
+(`.github/workflows/tests.yml`) do.
+
+## How it works
+
+### Author: S0 to S5
+
+Each stage is a file in `services/api/app/pipeline/`, cached per stage so an edit reruns only
+what it changes. The job's identity includes the pipeline version.
+
+| Stage | What it does | Model |
+|---|---|---|
+| S0 ingest | Checks type and size (10 MB, 50 million pixels), renders a PDF page, deskews a photographed page, refuses a blank or blurry image, brings the longest side to 2048 px, hashes the pixels as the figure id | none |
+| S1 understand | Lists the parts as short phrases with the subject, title, summary and a verdict (make tactile, two sheets, or describe in words only). A second call plans for touch: each part an area, a line or a group, with points on the figure | Muse Spark |
+| S2 ground | One point-prompt call per located part, four at a time. Code guards the points (off text and leader lines), retries a mask that spills onto a neighbor's points, refuses an oversize mask, and gives contested pixels to the smaller mask. Print text is found in code | SAM 3.1 |
+| S3 reconcile | Code merges near duplicates, nests a part inside its parent, gives partial overlaps to the smaller part and drops slivers. (A Spark pass over numbered outlines is planned in PLAN.md and not built) | none |
+| S4 layout | Contours to polygons in page millimeters, the 3.2 mm gap kept by shrinking (never moving), up to 5 textures, parts too small to enter as point symbols, lines listed in the key, the subject's outline raised | none |
+| S5 render | `tactile.svg`, `print.pdf` at exact scale with a 100 mm bar, `regions.json` (the contract, `docs/regions.schema.json`), UEB braille through liblouis, and the tactile rules report | none |
+
+Directions, neighbors, distances and every geometric decision come from code; the model never
+guesses geometry.
+
+### Safety rules on the sheet
+
+- **The teacher confirms.** A part is touchable only after the teacher checks, renames,
+  describes, merges into, adds or outlines it (`app/pipeline/edits.py`). Publishing is refused while no part is checked, and while the rules report
+  lists a violation.
+- **A spill is never touchable.** A mask that holds another part's points, even after a
+  retry, goes to "Needs you" as a suggestion only.
+- **Lines are not areas.** A valve or a sulcus is a line between two areas: listed in the key,
+  never raised as an area, and spoken when the finger crosses it.
+- **Point symbols.** A part whose longest side is under 6.4 mm, or whose enterable area is
+  under a 6.4 mm point symbol's (about 23 mm²), becomes a point symbol
+  (`config/tactile_rules.yaml`, with sources).
+
+### Explore: the touch path
+
+- MediaPipe Hand Landmarker runs in a Web Worker (`apps/web/src/workers/`), on the newest
+  camera frame only; the model file is served by the app, so touch works with no internet.
+- A homography from the four printed corner marks maps the fingertip to sheet millimeters;
+  the contact point sits 4 mm back from the tip, through a 1 euro filter.
+- The region engine enters a part when the point is 1 mm inside it for 120 ms and leaves it
+  2 mm outside, so edges do not flicker. Entering plays the part's texture earcon (at most 6
+  earcons a second); resting 600 ms says its name. M says more (the teacher's description),
+  W says what is here, "where is the aorta" guides with beeps.
+- Labels and earcons come from `regions.json` alone: Explore works offline, with the last
+  good copy of each sheet kept on the device.
+
+### Explore: the question path
+
+- Hold the screen to talk. Capture runs on 250 ms after letting go, up to 15 s; the WAV is
+  16 kHz mono, made in the browser.
+- The backend sends it to Muse Voice Transcribe with the figure's part, line and group names
+  as keywords, then sends the transcript, the touch context and the published figure (its
+  image and its parts in words) to Muse Spark.
+- Spark answers under a strict JSON schema built per figure: a source (figure, teacher
+  description, off figure, unsure) and the parts it cites, from the figure's ids only. An
+  answer from a teacher description must name a part that has one.
+- Code has the last word: off-figure and unsure answers get fixed sentences that send the
+  student to the teacher, an answer keeps at most two sentences, and cited ids must exist.
+- A session has 50 questions; a question has 20 s on the server and 25 s in the browser
+  before the student hears "Questions are not working right now. Labels still work."
+- The API key stays on the backend. Camera frames never leave the browser.
+
+## Results
+
+Every number here is from a committed result file; rerun the command to reproduce it.
+
+| What | Result | File |
+|---|---|---|
+| Questions, live, answer prompt v1 | Heart: source right 30 of 32, citations right 28. Commons brain: 29 of 29, 28. No answer used a word from outside the figure | `eval/qa/RESULTS.md` |
+| Questions about the picture (shape, biggest, top and bottom) | With the image: heart 5 of 6, brain 6 of 6. Without it: 3 of 6 each | `eval/qa/RESULTS_image.md`, `RESULTS_image_no_image.md` |
+| Release to first spoken word (headless Chrome on a Mac, live) | p50 4.5 s, p95 5.9 s over 12 held questions | `eval/qa/VOICE.md` |
+| Transcribe on synthetic speech | Every word right on 3 clips, with and without keywords | `eval/qa/VOICE.md` |
+| Part plan, touchable areas | Heart 14 of 15, Japan regions 9 of 9, flower 7 of 13 | `eval/plan/RESULTS.md` |
+| S2 against the graded reference masks | Heart 0 regressions of 4, flower 3 of 3 | `eval/plan/RESULTS.md` |
+| Spend so far | `python3 scripts/tracker.py spend` | `TRACKER.html` |
+
+## Known limitations
+
+- **Touch accuracy on the phone is not measured yet.** Gate B (mean fingertip error 4 mm or
+  less, `eval/gate-b/README.md`) has not run on the demo iPhone, and the device latency film
+  has not been made.
+- **A sighted helper sets the corners.** There is no automatic registration and no check that
+  the phone or the sheet moved after it (`docs/EDGE_CASES.md` X5, X6).
+- **Questions need the network and the Meta API.** The live question eval on answer prompt v2
+  has not run yet, so the v2 numbers and the mock replays of its answers are pending.
+- **Voice is tested on synthetic speech only**, and English only.
+- **Small parts are hard for S2.** On the flower, 6 of 13 areas need the teacher and all 3
+  reference parts regressed (`eval/plan/RESULTS.md`).
+- **Some figures cannot publish as made.** The flower has 2 tactile rule violations and the
+  uploaded brain 1; the teacher must edit them first.
+- **No undo** for a merge, delete or check (`docs/EDGE_CASES.md` E4).
+- iPhone HEIC photos are refused: upload PNG, JPEG or PDF.
+- The question cap lives in server memory and starts over when Explore reloads.
+- CI on Linux skips three replay tests (their recorded requests hold PNGs encoded on macOS),
+  and the headless browser tests run locally, not in CI.
+
+## Documents
 
 | File | What it is for |
 |---|---|
-| CLAUDE.md | Read automatically by Claude Code at the repo root. The project map |
+| CLAUDE.md | The project map |
+| PLAN.md | The full plan: architecture, pipeline, edge cases, eval, risks |
 | RULES.md | Hard rules: privacy, grounding, tactile design, budgets, accessibility, style |
-| SKILLS.md | Index of the project skills in `.claude/skills/` |
-| TODO.md | Day by day checklist with gates and fallbacks. Generated from TRACKER.html by `python scripts/tracker.py todo` |
-| PLAN.md | The full plan: architecture, pipeline, edge cases, eval, risks, demo |
-| APPLICATION.md | What to type into the hackathon application |
-| config/tactile_rules.yaml | Design constants with their sources |
-| config/explore.yaml | Starting values for the region engine |
-| docs/regions.schema.json | The contract between Author and Explore |
-| .env.example | Backend settings. Copy to services/api/.env |
-
-The PDF "Talking Tactile Build Plan" explains all of this with diagrams.
+| docs/EDGE_CASES.md | Edge cases: what the code does, what it should, and the fixes |
+| docs/DEMO.md | Filming runbook |
+| eval/gate-b/README.md | The touch accuracy protocol |
+| ATTRIBUTION.md | Every third-party figure, model file and library, with its license |
+| TRACKER.html, TODO.md | Project memory, through `scripts/tracker.py` |
 
 ## Privacy
 
