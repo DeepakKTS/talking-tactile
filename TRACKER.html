@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 266,
- "updated_at": "2026-11-03T00:57:11.453Z",
+ "rev": 268,
+ "updated_at": "2026-11-03T01:01:54.098Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2132,6 +2132,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T00:57:11.453Z"
   },
   {
+   "id": "d8-15",
+   "day": 8,
+   "title": "Edge case Q7: a busy microphone is not treated as refused",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "apps/web/src/explore/voice.ts: only NotAllowedError or SecurityError mark the microphone denied for the session (MIC_DENIED, said on every hold without asking again). Any other failure to open (NotReadableError when another app has it, NotFoundError) says 'The microphone did not open. Close any app using it, then hold again. Labels still work.' and the next hold tries again. Test: voice.test.ts 'a busy microphone says so and is tried again on the next hold'. On the iPhone: needs device.",
+   "done_at": "2026-11-03T01:01:54.098Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T01:01:54.098Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3044,6 +3060,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T01:01:54.098Z",
+   "kind": "claude",
+   "text": "Task d8-15 \"Edge case Q7: a busy microphone is not treated as refused\" is now done. Note: apps/web/src/explore/voice.ts: only NotAllowedError or SecurityError mark the microphone denied for the session (MIC_DENIED, said on every hold without asking again). Any other failure to open (NotReadableError when another app has it, NotFoundError) says 'The microphone did not open. Close any app using it, then hold again. Labels still work.' and the next hold tries again. Test: voice.test.ts 'a busy microphone says so and is tried again on the next hold'. On the iPhone: needs device."
+  },
+  {
+   "ts": "2026-11-03T01:01:54.061Z",
+   "kind": "claude",
+   "text": "Task d8-15 \"Edge case Q7: a busy microphone is not treated as refused\" added to day 8."
+  },
   {
    "ts": "2026-11-03T00:57:11.453Z",
    "kind": "claude",

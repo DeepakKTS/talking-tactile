@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 266, updated 2026-11-03T00:57:11.453Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 268, updated 2026-11-03T01:01:54.098Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -293,6 +293,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: New MalformedResponseError (app/meta/live.py). A 200 that is not JSON writes its ledger line (unpriced, error 'the response is not JSON') and raises it, in post_json and post_multipart. LiveMetaClient.answer raises it for empty choices or content that is not a JSON object; transcribe for a body that is not an object; the Asker for a reply that fails SparkAnswer. The ask route maps it to 502 with FAILED instead of 500 'Something went wrong.'. Tests: test_ask.py::test_a_malformed_answer_says_questions_are_not_working (2), test_live_ledger.py::test_a_200_that_is_not_json_is_logged_and_raised_as_malformed, test_live_client.py::test_an_answer_without_a_json_object_is_malformed (3).
 - [x] d8-14 Edge case Q8: letting go while the microphone opens sends nothing
   - Note: apps/web/src/explore/voice.ts: VoiceAsk tracks capturing (set at mic.start). A hold released while the microphone is still opening (the first hold's permission prompt) used to send a WAV recorded before the microphone was open; now nothing is sent, the hold resets and the student hears 'Hold the screen while you ask, then let go.' The too_short path plays the release earcon only if capture started. Test: voice.test.ts 'first hold, microphone still opening' (fails on the old code). On the iPhone's permission prompt: needs device.
+- [x] d8-15 Edge case Q7: a busy microphone is not treated as refused
+  - Note: apps/web/src/explore/voice.ts: only NotAllowedError or SecurityError mark the microphone denied for the session (MIC_DENIED, said on every hold without asking again). Any other failure to open (NotReadableError when another app has it, NotFoundError) says 'The microphone did not open. Close any app using it, then hold again. Labels still work.' and the next hold tries again. Test: voice.test.ts 'a busy microphone says so and is tried again on the next hold'. On the iPhone: needs device.
 
 ## Day 9: Tue Nov 3. Gate D
 

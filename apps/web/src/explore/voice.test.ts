@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { AudioPort } from "./audio";
 import { OFFLINE_ANSWER } from "./session";
-import { HOLD_MS, HoldToTalk, MAX_MS, MIC_DENIED, MIN_MS, type MicPort, POST_ROLL_MS, RATE, TOO_SHORT, VoiceAsk, encodeWav, resample } from "./voice";
+import { HOLD_MS, HoldToTalk, MAX_MS, MIC_BUSY, MIC_DENIED, MIN_MS, type MicPort, POST_ROLL_MS, RATE, TOO_SHORT, VoiceAsk, encodeWav, resample } from "./voice";
 
 describe("WAV encoder", () => {
   it("writes a RIFF WAVE header for mono 16-bit PCM at 16 kHz, then the samples", () => {
@@ -102,20 +102,20 @@ class Sounds implements AudioPort {
 
 class Mic implements MicPort {
   opened = 0;
-  constructor(private readonly deny = false) {}
+  constructor(private readonly deny = false, private readonly fail = "NotAllowedError") {}
   open() {
     this.opened += 1;
-    return this.deny ? Promise.reject(new DOMException("denied", "NotAllowedError")) : Promise.resolve();
+    return this.deny ? Promise.reject(new DOMException("denied", this.fail)) : Promise.resolve();
   }
   start() {}
   stop() { return { samples: new Float32Array(4800).fill(0.1), rate: 48000 }; }
 }
 
-function rig(opts: { deny?: boolean; online?: boolean } = {}) {
+function rig(opts: { deny?: boolean; fail?: string; online?: boolean } = {}) {
   let now = 0;
   const timers: { at: number; fn: () => void }[] = [];
   const audio = new Sounds();
-  const mic = new Mic(opts.deny);
+  const mic = new Mic(opts.deny, opts.fail);
   const sent: Uint8Array[] = [];
   const v = new VoiceAsk({
     audio, mic, online: () => opts.online ?? true,
@@ -161,6 +161,19 @@ describe("voice ask", () => {
     }
     expect(audio.log).toEqual([`say ${MIC_DENIED}`, `say ${MIC_DENIED}`]);
     expect(mic.opened).toBe(1);
+    expect(sent).toEqual([]);
+  });
+
+  it("a busy microphone says so and is tried again on the next hold", async () => {
+    const { v, audio, mic, sent, advance } = rig({ deny: true, fail: "NotReadableError" });
+    for (let i = 0; i < 2; i++) {
+      v.down();
+      await advance(HOLD_MS);
+      v.up();
+      await advance(0);
+    }
+    expect(audio.log).toEqual([`say ${MIC_BUSY}`, `say ${MIC_BUSY}`]);
+    expect(mic.opened).toBe(2);
     expect(sent).toEqual([]);
   });
 

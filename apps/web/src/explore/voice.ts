@@ -26,6 +26,13 @@ export const POST_ROLL_MS = 250;
 export const MIC_DENIED =
   "The microphone is not allowed, so I cannot hear questions. Type a question instead. Labels still work.";
 export const TOO_SHORT = "Hold the screen while you ask, then let go.";
+export const MIC_BUSY = "The microphone did not open. Close any app using it, then hold again. Labels still work.";
+
+/** Permission refused: asking again will not help until the setting changes. Anything else
+ * (another app has the microphone, none is found) may clear, so the next hold tries again. */
+function refused(err: unknown): boolean {
+  return err instanceof DOMException && (err.name === "NotAllowedError" || err.name === "SecurityError");
+}
 
 export type HoldState = "idle" | "pressed" | "listening" | "busy";
 export type HoldEvent = "listen" | "send" | "too_short";
@@ -284,10 +291,10 @@ export class VoiceAsk {
         }
         try {
           await mic.open();
-        } catch {
-          this.denied = true;
+        } catch (err) {
+          this.denied = refused(err);
           this.hold.reset();
-          audio.say(MIC_DENIED);
+          audio.say(this.denied ? MIC_DENIED : MIC_BUSY);
           return;
         }
         if (this.hold.state !== "listening") return; // let go while the microphone opened
