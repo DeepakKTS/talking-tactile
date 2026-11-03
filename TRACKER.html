@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 381,
- "updated_at": "2026-11-03T11:06:20.323Z",
+ "rev": 383,
+ "updated_at": "2026-11-03T11:31:47.599Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2980,6 +2980,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T11:06:20.323Z"
   },
   {
+   "id": "d9-20",
+   "day": 9,
+   "title": "WebKit check of the security headers; one-command rollback",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Playwright WebKit 26.6 through dev:phone and :8443 with the real headers: device check (camera, hand tracker GPU 29.6 fps, microphone ok), heart v4 Explore Start (GPU ready 107 ms) and Gate B (mediapipe 1.1.0 GPU ready 517 ms from the CDN): no CSP violation, no blocked wasm or worker. Wake Lock row failed only under Playwright's grant_permissions (WebKit refuses every unlisted permission); without the grant held and released, with and without headers. No policy change needed. Rollback: TT_CSP=off make demo-live drops the policy only (vite.config.ts and serve.py; devserver test). docs/DEMO.md and SECURITY.md.",
+   "done_at": "2026-11-03T11:31:47.599Z",
+   "tags": [
+    "security",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T11:31:47.599Z"
+  },
+  {
    "id": "d10-1",
    "day": 10,
    "title": "Fresh clone test",
@@ -3820,6 +3836,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T11:31:47.599Z",
+   "kind": "claude",
+   "text": "Task d9-20 \"WebKit check of the security headers; one-command rollback\" is now done. Note: Playwright WebKit 26.6 through dev:phone and :8443 with the real headers: device check (camera, hand tracker GPU 29.6 fps, microphone ok), heart v4 Explore Start (GPU ready 107 ms) and Gate B (mediapipe 1.1.0 GPU ready 517 ms from the CDN): no CSP violation, no blocked wasm or worker. Wake Lock row failed only under Playwright's grant_permissions (WebKit refuses every unlisted permission); without the grant held and released, with and without headers. No policy change needed. Rollback: TT_CSP=off make demo-live drops the policy only (vite.config.ts and serve.py; devserver test). docs/DEMO.md and SECURITY.md."
+  },
+  {
+   "ts": "2026-11-03T11:31:47.558Z",
+   "kind": "claude",
+   "text": "Task d9-20 \"WebKit check of the security headers; one-command rollback\" added to day 9."
+  },
   {
    "ts": "2026-11-03T11:06:20.323Z",
    "kind": "claude",

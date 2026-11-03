@@ -58,8 +58,11 @@ const CSP = [
 ];
 const devCsp = CSP.map((d) =>
   d.startsWith("script-src") ? `${d} 'unsafe-inline'` : d.startsWith("connect-src") ? `${d} ws: wss:` : d);
-export const SECURITY_HEADERS = { "Content-Security-Policy": CSP.join("; "), "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" };
-export const DEV_HEADERS = { ...SECURITY_HEADERS, "Content-Security-Policy": devCsp.join("; ") };
+// TT_CSP=off leaves the policy out (nosniff and no-referrer stay): the one-command rollback in
+// docs/DEMO.md if a phone's browser refuses something the policy blocks.
+const policy = (p: string[]) => (process.env.TT_CSP === "off" ? {} : { "Content-Security-Policy": p.join("; ") });
+export const SECURITY_HEADERS = { ...policy(CSP), "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" };
+export const DEV_HEADERS = { ...SECURITY_HEADERS, ...policy(devCsp) };
 
 // TT_API lets the headless Explore run use its own API port. xfwd passes the phone's address
 // on (X-Forwarded-For), so the API's rate limit counts each client apart.

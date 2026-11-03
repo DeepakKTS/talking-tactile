@@ -12,6 +12,7 @@ model from Google's model storage; nothing else leaves this origin."""
 from __future__ import annotations
 
 import argparse
+import os
 import http.server
 import ssl
 from pathlib import Path
@@ -33,7 +34,9 @@ CSP = "; ".join([
     "form-action 'self'",
     "frame-ancestors 'none'",
 ])
-HEADERS = {"Content-Security-Policy": CSP, "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer"}
+HEADERS = {"X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer"}
+if os.environ.get("TT_CSP") != "off":  # TT_CSP=off: the one-command rollback in docs/DEMO.md
+    HEADERS["Content-Security-Policy"] = CSP
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):

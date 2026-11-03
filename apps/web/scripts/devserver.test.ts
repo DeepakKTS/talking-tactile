@@ -49,4 +49,19 @@ describe("dev server files", () => {
     expect(h.get("x-content-type-options")).toBe("nosniff");
     expect(h.get("referrer-policy")).toBe("no-referrer");
   });
+
+  it("leaves the policy out with TT_CSP=off, the rollback, and keeps the other headers", async () => {
+    process.env.TT_CSP = "off";
+    const off = await createServer({ configFile: fileURLToPath(new URL("../vite.config.ts", import.meta.url)), server: { host: "127.0.0.1", port: 0, strictPort: false }, logLevel: "silent" });
+    try {
+      await off.listen();
+      const addr = off.httpServer?.address();
+      const h = (await fetch(`http://127.0.0.1:${typeof addr === "object" && addr ? String(addr.port) : ""}/explore`)).headers;
+      expect(h.get("content-security-policy")).toBeNull();
+      expect(h.get("x-content-type-options")).toBe("nosniff");
+    } finally {
+      delete process.env.TT_CSP;
+      await off.close();
+    }
+  }, 30000);
 });

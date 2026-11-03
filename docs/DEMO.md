@@ -28,6 +28,25 @@ tree is clean and pushed, and the credits left in the ledger. It exits non-zero 
 
 The sections below start the same servers one terminal at a time.
 
+### If iPhone Safari breaks on the security headers
+
+Signs: the device check's hand tracker row fails or never finishes, Start does nothing, or a
+page stays blank where it worked before Nov 3. Stop the servers (Ctrl-C), then run:
+
+```
+TT_CSP=off make demo-live      # or TT_CSP=off make demo-mock
+```
+
+Every page is then served without the Content-Security-Policy, as before commit c41ecdf
+(nosniff and no-referrer stay). Reload the page on the phone. Terminal by terminal, put
+`TT_CSP=off` before `npm run dev:phone` and before `python3 spikes/tracking/serve.py`. Do not
+`git revert c41ecdf`: it also removes `spikes/tracking/serve.py`, which `make demo-live` starts.
+
+Checked on Nov 3 in WebKit 26.6 (Playwright) through dev:phone and :8443 with the real headers:
+no policy violation on the device check, the heart's version 4 in Explore or the Gate B page;
+MediaPipe's wasm and worker ran on the GPU in all three. iPhone Safari itself is checked in the
+morning's device check.
+
 ### Mock mode (no network, no Meta calls, costs nothing)
 
 Author's upload and pipeline replay the live recordings in `fixtures/recorded/replays.json`

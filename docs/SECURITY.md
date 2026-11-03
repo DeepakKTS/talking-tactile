@@ -158,3 +158,12 @@ GPU), and the device check in Chrome against the running `dev:phone`: hand track
 20 frames a second, no policy or page errors. The headless checks wait with `page.evaluate`
 polling instead of Playwright's `wait_for_function`, which builds its test with eval and is
 blocked by the policy.
+
+WebKit (Nov 3): Playwright's WebKit 26.6, the engine closest to iPhone Safari, through dev:phone
+and the Gate B server with the real headers: no policy violation and no blocked wasm or worker
+on the device check, the heart's version 4 in Explore (Start) or the Gate B page; MediaPipe
+ran on the GPU in all three, and the device check came back with the camera, hand tracker and
+microphone ok. Its Wake Lock row failed only when the test granted the camera: Playwright's
+permission grant in WebKit refuses every permission it does not list. With no grant, the Wake
+Lock was held and released, with and without the headers. If a phone still refuses something,
+`TT_CSP=off` leaves the policy out (`docs/DEMO.md`; tests in `apps/web/scripts/devserver.test.ts`).
