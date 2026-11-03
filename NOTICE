@@ -1,0 +1,24 @@
+Talking Tactile
+Copyright 2026 the Talking Tactile authors (https://github.com/DeepakKTS/talking-tactile)
+
+The project's code is licensed under the Apache License, Version 2.0 (LICENSE).
+
+Figures and the files made from them keep their own licenses, not the Apache License.
+ATTRIBUTION.md lists each one with its author, source, license and credit line:
+- fixtures/heart.png and everything derived from it: CC BY-SA 3.0 (share-alike).
+- fixtures/eval/japan_regions.png and everything derived from it: CC BY-SA 4.0
+  (share-alike).
+- fixtures/eval/brain_lobes.png and everything derived from it: CC BY 3.0.
+- fixtures/eval/flower.png and everything derived from it: public domain.
+- fixtures/control/banana.png: CC BY-SA 3.0.
+
+Third-party software:
+- MediaPipe Hand Landmarker model (apps/web/public/models/hand_landmarker.task) and
+  @mediapipe/tasks-vision: Apache License 2.0, Copyright The MediaPipe Authors. Their
+  license text is in apps/web/public/models/LICENSE and apps/web/public/licenses/.
+- meta-sam-parser 0.1.0 is under Meta's SAM License. It is a dependency installed from PyPI
+  (services/api/pyproject.toml) and is not distributed here.
+- liblouis, for braille, is installed on the system (brew or apt) and is not distributed
+  here.
+- Other Python and npm dependencies are installed from their registries through the lock
+  files and are not distributed here; each keeps its own license.

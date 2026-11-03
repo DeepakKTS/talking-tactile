@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 333, updated 2026-11-03T05:05:16.693Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 335, updated 2026-11-03T05:08:41.370Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -350,6 +350,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: The 5 absolute paths (DEMO.md 1, gate-b README 4) are now repo-relative: each terminal starts at the repo root (the folder you cloned), then cd services/api or apps/web. The tracker's audit note no longer quotes the home path (tracker.py redact). git grep finds no home path in tracked files but eval/live/ledger.jsonl, which is left as it is.
 - [x] d8-42 ATTRIBUTION: derived masks, regions files, recordings; own work marked
   - Note: ATTRIBUTION.md: 'Derived from the figures above': the 16 S2 reference masks by folder (heart 4 CC BY-SA 3.0, flower 5 public domain, Japan 7 CC BY-SA 4.0, names listed, plus index.json), the regions files (fixtures/pipeline heart_regions and heart_fixed_draft, fixtures/qa heart_v4 CC BY-SA 3.0, brain_lobes_v4 CC BY 3.0), and the recordings in fixtures/recorded, each under its figure's license. 'Own work, under the project's license': fixtures/synthetic (figure, 26 masks, regions, truth), spikes/tracking/test-sheet.pdf, fixtures/regions golden and cases.
+- [x] d8-43 LICENSE Apache-2.0 and NOTICE
+  - Note: LICENSE: the Apache License 2.0 text, the same file (sha256 cfc7749b...) the repo already holds from apache.org for MediaPipe. NOTICE: copyright line for the Talking Tactile authors (the repo URL; no personal name assumed), the code under Apache-2.0, the figures and files made from them under their own licenses (heart and Japan share-alike, brain CC BY 3.0, flower public domain, banana CC BY-SA 3.0; ATTRIBUTION.md), MediaPipe Apache-2.0, meta-sam-parser under Meta's SAM License installed from PyPI and not distributed here, liblouis and other dependencies installed, not distributed. README: a License section.
 
 ## Day 9: Tue Nov 3. Gate D
 

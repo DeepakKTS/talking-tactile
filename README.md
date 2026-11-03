@@ -145,6 +145,12 @@ Every number here is from a committed result file; rerun the command to reproduc
 - CI on Linux skips three replay tests (their recorded requests hold PNGs encoded on macOS),
   and the headless browser tests run locally, not in CI.
 
+## License
+
+The code is under the Apache License 2.0 (`LICENSE`). The figures, the sheets and data made
+from them, and the recorded model answers keep their own licenses (`NOTICE`,
+`ATTRIBUTION.md`): the heart's and the Japan map's are share-alike.
+
 ## Documents
 
 | File | What it is for |
