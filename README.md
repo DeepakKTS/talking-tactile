@@ -137,8 +137,8 @@ Every number here is from a committed result file; rerun the command to reproduc
 - **Voice is tested on synthetic speech only**, and English only.
 - **Small parts are hard for S2.** On the flower, 6 of 13 areas need the teacher and all 3
   reference parts regressed (`eval/plan/RESULTS.md`).
-- **Some figures cannot publish as made.** The flower has 2 tactile rule violations and the
-  uploaded brain 1; the teacher must edit them first.
+- **Some figures cannot publish as made.** The flower has 2 tactile rule violations and a
+  private test figure (not distributed) 1; the teacher must edit them first.
 - **No undo** for a merge, delete or check (`docs/EDGE_CASES.md` E4).
 - iPhone HEIC photos are refused: upload PNG, JPEG or PDF.
 - The question cap lives in server memory and starts over when Explore reloads.

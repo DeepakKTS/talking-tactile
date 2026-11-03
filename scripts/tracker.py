@@ -390,6 +390,45 @@ def cmd_decision_edit(state: dict, args: argparse.Namespace) -> str | None:
     return text
 
 
+def _replace_text(value: object, pairs: list[tuple[str, str]], hits: list[int]) -> object:
+    if isinstance(value, str):
+        for i, (old, new) in enumerate(pairs):
+            hits[i] += value.count(old)
+            value = value.replace(old, new)
+        return value
+    if isinstance(value, list):
+        return [_replace_text(v, pairs, hits) for v in value]
+    if isinstance(value, dict):
+        return {k: _replace_text(v, pairs, hits) for k, v in value.items()}
+    return value
+
+
+def cmd_redact(state: dict, args: argparse.Namespace) -> str | None:
+    """Replaces exact passages everywhere in the tracker: task details and notes, decisions,
+    issues and log entries. The log line names the reason and the count, never the old text."""
+    try:
+        raw = json.loads(Path(args.map).read_text(encoding="utf-8"))
+        pairs = [(str(old), str(new)) for old, new in raw]
+    except (OSError, ValueError, TypeError) as exc:
+        raise TrackerError(f"The map must be a JSON list of [old, new] pairs: {exc}") from exc
+    if not pairs or any(not old for old, _ in pairs):
+        raise TrackerError("Give at least one pair, each with old text.")
+    if not args.reason.strip():
+        raise TrackerError("Give the reason for the redaction.")
+    hits = [0] * len(pairs)
+    replaced = _replace_text({k: v for k, v in state.items() if k != "log"}, pairs, hits)
+    log = _replace_text(state["log"], pairs, hits)
+    missing = [old[:40] for (old, _), n in zip(pairs, hits, strict=True) if n == 0]
+    if missing:
+        raise TrackerError(f"Not found, nothing changed: {missing}")
+    assert isinstance(replaced, dict) and isinstance(log, list)
+    state.update(replaced)
+    state["log"] = log
+    text = f"Redacted {sum(hits)} passages ({len(pairs)} distinct): {sentence(args.reason)}"
+    commit(state, None, text)
+    return text
+
+
 def cmd_gate(state: dict, args: argparse.Namespace) -> str | None:
     g = find(state["gates"], args.gate_id, "gate")
     g["status"] = args.status
@@ -600,6 +639,11 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--chose")
     s.add_argument("--why")
     s.set_defaults(func=cmd_decision_edit)
+
+    s = sub.add_parser("redact", help="replace exact passages everywhere, from a JSON map")
+    s.add_argument("map", help="JSON file: a list of [old, new] text pairs")
+    s.add_argument("--reason", required=True)
+    s.set_defaults(func=cmd_redact)
 
     s = sub.add_parser("gate", help="set a gate status")
     s.add_argument("gate_id", choices=["A", "B", "C", "D"])

@@ -72,17 +72,12 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 | Shikoku region | Shikoku island area | word | 0.982 | 0.983 | held |
 | Kyushu region | Kyushu island area | word | 0.986 | 0.985 | held |
 
-## brain_upload
+## private
 
-- Subject: human brain. Grade band: 6_8.
+A private test figure, not distributed: counts only. Grade band: 6_8.
 - Listed 12: areas 10, lines 2, groups 0, not located 0.
 - Touchable areas: 8 of 10. Touchable parts in regions.json: 0.
-- Needs you: 2. parietal lobe (same_outline: same outline as postcentral gyrus; a drawn line or color edge lies between them); pons (same_outline: same outline as cerebellum; a drawn line or color edge lies between them)
-- Lines: central sulcus between precentral gyrus and postcentral gyrus; lateral sulcus between frontal lobe and temporal lobe.
-- Nested by geometry: medulla in cerebellum, spinal cord in cerebellum.
-- Merge proposals: 1. pons, medulla, spinal cord as 'brainstem' (Spark marked them as one unbroken shape)
-- Left out of a merge Spark marked: none.
-- Silhouette: SAM 1 instance(s), 1042167 px; in regions.json: True, 0 raised contour piece(s).
+- Needs you: 2. Merge proposals: 1.
 - Rules report: 1 violation(s). Replayed calls: 13.
 
 ## brain_lobes
@@ -102,13 +97,13 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 
 | Share inside | Pairs |
 |---|---|
-| 0.25 to 0.50 | 12 |
+| 0.25 to 0.50 | 8 |
 | 0.50 to 0.70 | 5 |
 | 0.70 to 0.80 | 2 |
 | 0.80 to 0.85 | 3 |
-| 0.85 to 0.90 | 5 |
+| 0.85 to 0.90 | 4 |
 | 0.90 to 0.95 | 6 |
-| 0.95 to 1.00 | 27 |
+| 0.95 to 1.00 | 17 |
 
 | Figure | Part | Inside | Share | IoU | Spark |
 |---|---|---|---|---|---|
@@ -144,17 +139,6 @@ S2 settings: nest inside 0.95, shared IoU 0.8. Written by app/meta/plan_eval.py.
 | flower | stigma | ovules | 0.839 | 0.000 |  |
 | flower | style | ovules | 0.804 | 0.271 |  |
 | flower | style | stigma | 0.716 | 0.661 |  |
-| brain_upload | parietal lobe | postcentral gyrus | 0.995 | 0.964 |  |
-| brain_upload | spinal cord | medulla | 0.993 | 0.973 |  |
-| brain_upload | medulla | pons | 0.992 | 0.404 |  |
-| brain_upload | spinal cord | pons | 0.991 | 0.399 |  |
-| brain_upload | medulla | spinal cord | 0.980 | 0.973 |  |
-| brain_upload | pons | cerebellum | 0.973 | 0.935 |  |
-| brain_upload | postcentral gyrus | parietal lobe | 0.969 | 0.964 | parent |
-| brain_upload | spinal cord | cerebellum | 0.963 | 0.378 |  |
-| brain_upload | medulla | cerebellum | 0.962 | 0.383 |  |
-| brain_upload | cerebellum | pons | 0.961 | 0.935 |  |
-| brain_upload | precentral gyrus | frontal lobe | 0.893 | 0.000 | parent |
 
 ## Drawn boundaries, for EDGE_STEP and FILL_DELTA
 
@@ -177,8 +161,3 @@ Edge step 14, fill delta 55. Joins at: the smallest edge step, 4 to 40, at which
 | flower | ovary and stigma | Spark: pistil column | never | 47.3 | a drawn line or color edge lies between them |
 | flower | ovary and style | Spark: pistil column | 40 | 81.9 | a drawn line or color edge lies between them |
 | flower | stigma and style | Spark: pistil column | never | 40.6 | a drawn line or color edge lies between them |
-| brain_upload | cerebellum and pons | IoU 0.935 | never | 21.2 | a drawn line or color edge lies between them |
-| brain_upload | medulla and pons | Spark: brainstem | 10 | 0.0 | none |
-| brain_upload | medulla and spinal cord | IoU 0.973 | 4 | 0.0 | none |
-| brain_upload | parietal lobe and postcentral gyrus | IoU 0.964 | 17 | 31.0 | a drawn line or color edge lies between them |
-| brain_upload | pons and spinal cord | Spark: brainstem | 10 | 0.0 | none |

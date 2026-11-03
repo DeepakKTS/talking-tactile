@@ -346,6 +346,32 @@ class TestDecision(TrackerTestCase):
         self.assert_fails_unchanged("decision-edit", dec_id, "--title", " ")
 
 
+class TestRedact(TrackerTestCase):
+    def write_map(self, pairs: list[list[str]]) -> str:
+        # Outside the tracker's folder, which the checks expect to hold the tracker alone.
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        path = Path(folder.name) / "map.json"
+        path.write_text(json.dumps(pairs), encoding="utf-8")
+        return str(path)
+
+    def test_redact_replaces_in_notes_decisions_and_the_log_and_logs_no_old_text(self) -> None:
+        s = self.assert_ok_write("decision", "Keep", "--chose", "A", "--why", "Seen on figure Q7 here.")
+        s = self.assert_ok_write("log", "Ran figure Q7 twice.")
+        m = self.write_map([["figure Q7", "a private test figure"]])
+        s = self.assert_ok_write("redact", m, "--reason", "not distributed")
+        self.assertEqual(s["decisions"][-1]["why"], "Seen on a private test figure here.")
+        self.assertNotIn("figure Q7", json.dumps(s))
+        self.assertEqual(s["log"][0]["text"], "Redacted 2 passages (1 distinct): not distributed.")
+
+    def test_redact_changes_nothing_when_a_passage_is_missing(self) -> None:
+        self.assert_ok_write("log", "Ran figure Q7.")
+        m = self.write_map([["figure Q7", "x"], ["never written", "y"]])
+        self.assert_fails_unchanged("redact", m, "--reason", "r")
+        self.assert_fails_unchanged("redact", self.write_map([]), "--reason", "r")
+        self.assert_fails_unchanged("redact", m.replace("map.json", "none.json"), "--reason", "r")
+
+
 class TestGate(TrackerTestCase):
     def test_gate_with_and_without_evidence(self) -> None:
         s = self.assert_ok_write("gate", "A", "pass", "--evidence", "spikes/ p50 and p95 written")

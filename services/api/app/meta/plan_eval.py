@@ -3,8 +3,8 @@ recordings: no live call, nothing spent.
 
     uv run python -m app.meta.plan_eval
 
-Each figure was run live once through the pipeline (META_RECORD=plan_NAME, or private_brain
-for the uploaded brain, which is not openly licensed). Heart and flower ran S2 live a second
+Each figure was run live once through the pipeline (META_RECORD=plan_NAME, or a private_
+prefix for a private test figure, which is not distributed). Heart and flower ran S2 live a second
 time (plan2_NAME) once NEST_INSIDE moved to 0.95, which changed two retries' negatives.
 The flower's stigma, style and ovary retries, asked for once drawn boundaries stopped them
 sharing a region, were sent live on their own (plan3_flower, Oct 30).
@@ -23,8 +23,9 @@ of SHARED_IOU or more, and the parts of each group Spark marked as one shape), t
 boundary evidence: the edge step at which they first share a drawn region, and how far
 their fill colors differ, the data EDGE_STEP and FILL_DELTA are chosen from.
 
-Writes eval/plan/RESULTS.md and eval/plan/scores.json; the uploaded brain's numbers go in
-them, but nothing drawn from its image. The pipeline's cache is data/plan_eval/."""
+Writes eval/plan/RESULTS.md and eval/plan/scores.json. A private test figure (PRIVATE), when
+present here, goes in them as counts only: no part names, no figure id, nothing drawn from its
+image. The pipeline's cache is data/plan_eval/."""
 
 import argparse
 import asyncio
@@ -65,7 +66,7 @@ FIGURES: dict[str, tuple[Path, list[str], GradeBand | None, bool]] = {
         True,
     ),
     "japan_regions": (_EVAL / "japan_regions.png", ["plan_japan_"], None, True),
-    "brain_upload": (
+    "private": (
         FIXTURES_DIR / "private" / "brain_upload.png",
         ["private_brain_"],
         "6_8",
@@ -74,6 +75,8 @@ FIGURES: dict[str, tuple[Path, list[str], GradeBand | None, bool]] = {
     "brain_lobes": (_EVAL / "brain_lobes.png", ["plan_brain_lobes_"], "6_8", False),
 }
 BINS = (0.25, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0001)
+PRIVATE = {"private"}  # git-ignored figures that are not openly licensed
+NOT_DISTRIBUTED = "a private test figure, not distributed"
 STEPS = range(4, 41)
 
 
@@ -310,6 +313,43 @@ def nesting_table(rows: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+def redact(row: dict[str, Any]) -> dict[str, Any]:
+    """A private figure's row as counts only (module docstring)."""
+    if row["figure"] not in PRIVATE:
+        return row
+    out: dict[str, Any] = {
+        "figure": row["figure"],
+        "status": row["status"],
+        "note": NOT_DISTRIBUTED,
+    }
+    if row["status"] != "done":
+        return out
+    return out | {
+        "grade_band": row["grade_band"],
+        "listed": row["listed"],
+        **{k: len(row[k]) for k in ("areas", "lines", "groups", "unlocated", "touchable_areas")},
+        "needs_you": len(row["needs_you"]),
+        "merges": len(row["merges"]),
+        "regions_json_touchable": row["regions_json"]["touchable"],
+        "rules_report": row["rules_report"],
+        "live_calls": row["live_calls"],
+    }
+
+
+def _private_section(r: dict[str, Any]) -> list[str]:
+    if r["status"] != "done":
+        return [f"{NOT_DISTRIBUTED.capitalize()}. Run {r['status']}."]
+    return [
+        f"{NOT_DISTRIBUTED.capitalize()}: counts only. Grade band: {r['grade_band'] or 'none'}.",
+        f"- Listed {r['listed']}: areas {r['areas']}, lines {r['lines']}, groups {r['groups']}, "
+        f"not located {r['unlocated']}.",
+        f"- Touchable areas: {r['touchable_areas']} of {r['areas']}. "
+        f"Touchable parts in regions.json: {r['regions_json_touchable']}.",
+        f"- Needs you: {r['needs_you']}. Merge proposals: {r['merges']}.",
+        f"- Rules report: {r['rules_report']} violation(s). Replayed calls: {r['live_calls']}.",
+    ]
+
+
 def markdown(rows: list[dict[str, Any]]) -> str:
     out = [
         "# Tactile-aware part plan, from the live recordings",
@@ -319,6 +359,9 @@ def markdown(rows: list[dict[str, Any]]) -> str:
     ]
     for r in rows:
         out += ["", f"## {r['figure']}", ""]
+        if "note" in r:
+            out += _private_section(r)
+            continue
         if r["status"] != "done":
             out.append(f"Run {r['status']}: {r.get('error')}")
             continue
@@ -373,7 +416,7 @@ def main() -> None:
     asked = ap.parse_args().figures or list(FIGURES)
     names = [n for n in asked if FIGURES[n][0].is_file()]
     write_index(names)
-    rows = asyncio.run(main_async(names))
+    rows = [redact(r) for r in asyncio.run(main_async(names))]
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "scores.json").write_text(json.dumps(rows, indent=1) + "\n", "utf-8")
     (OUT / "RESULTS.md").write_text(markdown(rows), "utf-8")

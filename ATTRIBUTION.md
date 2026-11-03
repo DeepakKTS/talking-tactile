@@ -121,5 +121,5 @@ The license text in both places is the Apache License 2.0 from https://www.apach
 ## Not stored here
 
 - The other 17 eval figures in `spikes/eval-figures.md` are listed by URL, with their licenses, but not downloaded into the repository. Add each one here if it is ever committed.
-- The lateral-view brain figure uploaded on Oct 30 (figure fa460241...) is not openly licensed. It and its live recordings stay local, git-ignored as `fixtures/private/` and `fixtures/recorded/private_*`.
+- A private test figure, not distributed: it is not openly licensed. It and its live recordings stay local, git-ignored as `fixtures/private/` and `fixtures/recorded/private_*`; eval/plan/ keeps its counts only.
 - The fake camera clip for the tracking checks is built locally from File:Index finger 2.JPG by Than Ball (public domain, PD-user-en), https://commons.wikimedia.org/wiki/File:Index_finger_2.JPG. It is not committed.

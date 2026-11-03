@@ -35,8 +35,8 @@ def test_an_outline_between_two_shapes_is_a_drawn_boundary() -> None:
 
 
 def test_an_open_crease_inside_one_shape_is_no_boundary() -> None:
-    """The uploaded brain's brainstem: a crease drawn across it, open at one end. The
-    straight segment from pons to medulla crosses it; a path around it does not."""
+    """One shape with a crease drawn across it, open at one end (as on a private test figure).
+    The straight segment between its two sides crosses it; a path around it does not."""
     img = page()
     img[12:98, 12:188] = (240, 200, 120)
     outlined(img, 10, 190)
@@ -45,7 +45,7 @@ def test_an_open_crease_inside_one_shape_is_no_boundary() -> None:
 
 
 def test_a_sharp_color_edge_with_no_line_is_a_drawn_boundary() -> None:
-    """Postcentral gyrus and parietal lobe: red against pink, no line between, 31 apart."""
+    """Two parts in red against pink, no line between, 31 apart (as on a private test figure)."""
     img = page()
     img[12:98, 12:100] = (235, 124, 120)
     img[12:98, 100:188] = (242, 150, 140)

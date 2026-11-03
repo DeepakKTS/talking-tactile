@@ -12,20 +12,19 @@ every region one of its points is in; two parts share a drawn region when those 
 A crease or a sulcus that does not close is no barrier, since a path goes around it.
 
 The straight segment between two points, crossing ink, was tried first (Oct 30, the five
-eval figures) and fails: inside one part it crosses the gyri lines of a lobe (6 to 26 ink px
-on the uploaded brain), the prefecture lines of a Japan region (2 to 18) and the crease
-drawn across the uploaded brain's brainstem (pons to medulla, 6 px); and the cerebellum's
-outline against the brainstem is taken for a leader line, so the segment from pons to
-cerebellum crossed 1 ink px. A difference of fill color at the two points alone fails too:
-the aortic arch's branches, one shape shaded, differ by up to 48.8 (left common carotid
-artery and aorta), more than the postcentral gyrus and parietal lobe of the uploaded brain,
-drawn in two colors with no line between (31.0).
+eval figures) and fails: inside one part it crosses the lines drawn inside a part (6 to 26
+ink px on a private test figure, not distributed), the prefecture lines of a Japan region (2
+to 18) and a crease drawn across one shape of that private figure (6 px); and an outline there
+is taken for a leader line, so one segment crossed 1 ink px. A difference of fill color at the
+two points alone fails too: the aortic arch's branches, one shape shaded, differ by up to 48.8
+(left common carotid artery and aorta), more than two parts of the private figure drawn in
+two colors with no line between (31.0).
 
 EDGE_STEP, from the pairs S2 judged on the five figures (eval/plan/RESULTS.md, Drawn
-boundaries, Oct 30), where the answer is known by eye: the uploaded brain's pons, medulla
-and spinal cord (one shape, a crease across it) share a drawn region from a step of 10, the
-heart's aortic arch from 5; the uploaded brain's postcentral gyrus and parietal lobe (red
-against pink, no line) and the flower's petal and filament join at 17. So 14, inside 10 to
+boundaries, Oct 30), where the answer is known by eye: three parts of the private figure
+drawn as one shape with a crease across it share a drawn region from a step of 10, the
+heart's aortic arch from 5; two parts of the private figure (red against pink, no line) and
+the flower's petal and filament join at 17. So 14, inside 10 to
 16.
 
 FILL_DELTA, RGB distance between the median colors within FILL_RADIUS px of the two
