@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 321,
- "updated_at": "2026-11-03T04:39:27.805Z",
+ "rev": 323,
+ "updated_at": "2026-11-03T04:45:05.115Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2513,6 +2513,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T04:39:27.805Z"
   },
   {
+   "id": "d8-39",
+   "day": 8,
+   "title": "README accuracy pass; PLAN.md S3 Spark pass marked not built",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "Every README claim checked against code or a committed result. Changed: the mock-question paragraph (now: typed eval questions asked with no finger are answered offline, from qa6); the results table moved to the v2 eval (heart 36 of 38 and 32, brain 35 of 35 and 34, unsure fallback 0; the old 'no answer used a word from outside the figure' is now false: 5 flags a figure, one outside knowledge, 'great vessels'); picture questions from the same run (heart 5 of 6 and 4, brain 6 of 6 and 5); release to first word 8.5 s p50, 9.6 s p95; the questions limitation (slow, mock answers only recorded questions) and a new one on wording. Already right and rechecked: S3 code only, SAM four at a time (sam_concurrency 4), H for help, the touch path numbers (explore.yaml), the 30/35 s deadline. PLAN.md S3: only the code part is built; the Spark pass is marked not built.",
+   "done_at": "2026-11-03T04:45:05.115Z",
+   "tags": [
+    "docs",
+    "release"
+   ],
+   "changed_at": "2026-11-03T04:45:05.115Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3426,6 +3442,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T04:45:05.115Z",
+   "kind": "claude",
+   "text": "Task d8-39 \"README accuracy pass; PLAN.md S3 Spark pass marked not built\" is now done. Note: Every README claim checked against code or a committed result. Changed: the mock-question paragraph (now: typed eval questions asked with no finger are answered offline, from qa6); the results table moved to the v2 eval (heart 36 of 38 and 32, brain 35 of 35 and 34, unsure fallback 0; the old 'no answer used a word from outside the figure' is now false: 5 flags a figure, one outside knowledge, 'great vessels'); picture questions from the same run (heart 5 of 6 and 4, brain 6 of 6 and 5); release to first word 8.5 s p50, 9.6 s p95; the questions limitation (slow, mock answers only recorded questions) and a new one on wording. Already right and rechecked: S3 code only, SAM four at a time (sam_concurrency 4), H for help, the touch path numbers (explore.yaml), the 30/35 s deadline. PLAN.md S3: only the code part is built; the Spark pass is marked not built."
+  },
+  {
+   "ts": "2026-11-03T04:45:05.066Z",
+   "kind": "claude",
+   "text": "Task d8-39 \"README accuracy pass; PLAN.md S3 Spark pass marked not built\" added to day 8."
+  },
   {
    "ts": "2026-11-03T04:39:27.805Z",
    "kind": "claude",

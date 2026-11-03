@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 321, updated 2026-11-03T04:39:27.805Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 323, updated 2026-11-03T04:45:05.115Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -342,6 +342,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: app/meta/mock.py: when an answer request has no exact recording (599), mock mode serves a recording of the same question on the same published sheet that was asked with no part under the finger and nothing touched before; the prompts must be equal but for the two touch-context lines. So typed or transcribed questions from the eval's finger-free set (qa6) are answered offline wherever the finger is, and an answer tied to a finger position (h01 'What is this?' on the right atrium) is never served for another part. Tests: test_ask_replay.py::test_mock_answers_a_finger_free_question_wherever_the_finger_is, ::test_mock_never_serves_an_answer_tied_to_another_finger_position; both fail on the old mock.
 - [x] d8-38 Question deadline 30 s, client 35 s, from the v2 eval
   - Note: The Nov 3 v2 eval (73 questions) has Spark at up to 18.7 s; with transcribe p95 1.4 s the slowest server time is about 20.1 s, past the 20 s deadline of d8-30. DEADLINE_S 30 s (1.5 times), ASK_TIMEOUT_MS 35 s; EDGE_CASES Q2 and README updated. Tests unchanged (they set their own deadline): test_ask.py, camera.test.ts pass. The live API on :8000 is restarted to load it.
+- [x] d8-39 README accuracy pass; PLAN.md S3 Spark pass marked not built
+  - Note: Every README claim checked against code or a committed result. Changed: the mock-question paragraph (now: typed eval questions asked with no finger are answered offline, from qa6); the results table moved to the v2 eval (heart 36 of 38 and 32, brain 35 of 35 and 34, unsure fallback 0; the old 'no answer used a word from outside the figure' is now false: 5 flags a figure, one outside knowledge, 'great vessels'); picture questions from the same run (heart 5 of 6 and 4, brain 6 of 6 and 5); release to first word 8.5 s p50, 9.6 s p95; the questions limitation (slow, mock answers only recorded questions) and a new one on wording. Already right and rechecked: S3 code only, SAM four at a time (sam_concurrency 4), H for help, the touch path numbers (explore.yaml), the 30/35 s deadline. PLAN.md S3: only the code part is built; the Spark pass is marked not built.
 
 ## Day 9: Tue Nov 3. Gate D
 
