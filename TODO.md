@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 296, updated 2026-11-03T02:47:09.521Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 298, updated 2026-11-03T02:51:19.889Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -323,6 +323,8 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
   - Note: app/figures.py check_touchable: after the rules report passes, publish refuses a version with no touchable region: 409 nothing_touchable 'No part is checked yet, so a student could touch nothing on this sheet. Check the parts you have looked at, then publish.' A part is touchable only once the teacher checks it, so before this a sheet with nothing to touch could be published. The Author page shows the message. Tests: test_api_figures.py::test_publish_is_refused_until_a_part_is_checked (new); six API tests now check their parts first (Api.check_all, one check edit; two version numbers moved by one); test_e2e_heart_replay asserts the refusal on the unchecked live heart; AuthorPage.test.tsx fake server mirrors check and the refusal, 'publish is refused while none is checked'. fix_e2e, plan_e2e, explore_e2e PASS (each checks all before publishing).
 - [x] d8-29 docs/DEMO.md: filming runbook
   - Note: docs/DEMO.md: start commands mock and live, terminal by terminal, with the iPhone URLs (.local first); pre-flight (code checks, fresh clone, mock run offline, live run twice, power, caffeinate -dimsu, Wake Lock or Auto-Lock Never, silent switch and volume, device check, sheet at 100 percent with the bar measured, mount, light, credits, numbers, audio levels); heart v4 and Commons brain v4 with sources, licenses and credit lines (share-alike on the heart); 10 shots with what to show, say and need, length TBD; a fallback for every network step. Checked: in mock mode a question on heart v4 now gets the failure sentence (answers recorded on prompt v1), so the runbook says questions are live only until item C.
+- [x] d8-30 Edge case Q2 corrected: question deadline 20 s, client 25 s
+  - Note: The Q2 fix (d8-11, ba6b527) set the server deadline at 12 s and the client at 15 s from eval/qa/scores.json alone (slowest Spark 6.9 s). eval/qa/scores_image.json, the 12 picture questions, has Spark at 10.2 s and 8.7 s: with transcribe p95 1.4 s the slowest observed server time is about 11.6 s, so 12 s would cut a valid answer. Now DEADLINE_S 20 s (1.7 times 11.6) and ASK_TIMEOUT_MS 25 s (5 s for the phone network); the thinking tone plays during the wait. EDGE_CASES Q2 and its timeout paragraph say so. Tests unchanged (they set their own deadline): test_ask.py and camera.test.ts pass.
 
 ## Day 9: Tue Nov 3. Gate D
 

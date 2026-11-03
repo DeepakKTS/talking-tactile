@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 296,
- "updated_at": "2026-11-03T02:47:09.521Z",
+ "rev": 298,
+ "updated_at": "2026-11-03T02:51:19.889Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -2372,6 +2372,22 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "changed_at": "2026-11-03T02:47:09.521Z"
   },
   {
+   "id": "d8-30",
+   "day": 8,
+   "title": "Edge case Q2 corrected: question deadline 20 s, client 25 s",
+   "detail": "",
+   "timebox": "",
+   "fallback": "",
+   "status": "done",
+   "note": "The Q2 fix (d8-11, ba6b527) set the server deadline at 12 s and the client at 15 s from eval/qa/scores.json alone (slowest Spark 6.9 s). eval/qa/scores_image.json, the 12 picture questions, has Spark at 10.2 s and 8.7 s: with transcribe p95 1.4 s the slowest observed server time is about 11.6 s, so 12 s would cut a valid answer. Now DEADLINE_S 20 s (1.7 times 11.6) and ASK_TIMEOUT_MS 25 s (5 s for the phone network); the thinking tone plays during the wait. EDGE_CASES Q2 and its timeout paragraph say so. Tests unchanged (they set their own deadline): test_ask.py and camera.test.ts pass.",
+   "done_at": "2026-11-03T02:51:19.889Z",
+   "tags": [
+    "fix",
+    "freeze"
+   ],
+   "changed_at": "2026-11-03T02:51:19.889Z"
+  },
+  {
    "id": "d9-1",
    "day": 9,
    "title": "Feature freeze at noon",
@@ -3284,6 +3300,16 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-03T02:51:19.889Z",
+   "kind": "claude",
+   "text": "Task d8-30 \"Edge case Q2 corrected: question deadline 20 s, client 25 s\" is now done. Note: The Q2 fix (d8-11, ba6b527) set the server deadline at 12 s and the client at 15 s from eval/qa/scores.json alone (slowest Spark 6.9 s). eval/qa/scores_image.json, the 12 picture questions, has Spark at 10.2 s and 8.7 s: with transcribe p95 1.4 s the slowest observed server time is about 11.6 s, so 12 s would cut a valid answer. Now DEADLINE_S 20 s (1.7 times 11.6) and ASK_TIMEOUT_MS 25 s (5 s for the phone network); the thinking tone plays during the wait. EDGE_CASES Q2 and its timeout paragraph say so. Tests unchanged (they set their own deadline): test_ask.py and camera.test.ts pass."
+  },
+  {
+   "ts": "2026-11-03T02:51:19.845Z",
+   "kind": "claude",
+   "text": "Task d8-30 \"Edge case Q2 corrected: question deadline 20 s, client 25 s\" added to day 8."
+  },
   {
    "ts": "2026-11-03T02:47:09.521Z",
    "kind": "claude",

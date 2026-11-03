@@ -118,10 +118,11 @@ async function spokenError(res: Response): Promise<AskError> {
   return new AskError(spoken ? message : NOT_WORKING);
 }
 
-/** The server stops a question at 12 s and says so (services/api/app/ask.py DEADLINE_S), so
- * its sentence normally arrives first. This is for a server or network that never answers:
- * the student hears that questions are not working and the next hold works. */
-export const ASK_TIMEOUT_MS = 15000;
+/** The server stops a question at 20 s and says so (services/api/app/ask.py DEADLINE_S), so
+ * its sentence normally arrives first; 5 s more covers the phone's network. This is for a
+ * server or network that never answers: the student hears that questions are not working and
+ * the next hold works. The thinking tone plays all the while. */
+export const ASK_TIMEOUT_MS = 25000;
 
 async function postAsk(init: RequestInit, timeoutMs: number): Promise<Record<string, unknown>> {
   if (!navigator.onLine) throw new TypeError("offline");
