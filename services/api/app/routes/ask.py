@@ -42,6 +42,8 @@ async def _read(request: Request) -> tuple[AskRequest, bytes | None]:
                 if not isinstance(audio, UploadFile) or not isinstance(raw, str):
                     raise ApiError(422, "invalid_request", "Send a request part and an audio part.")
                 return AskRequest.model_validate(json.loads(raw)), await audio.read()
+        if not ctype.startswith("application/json"):
+            raise ApiError(415, "invalid_request", "Send the question as JSON.")
         body: Any = await request.json()
         req = AskRequest.model_validate(body)
     except (ValidationError, json.JSONDecodeError) as exc:

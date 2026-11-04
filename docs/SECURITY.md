@@ -20,9 +20,11 @@ open internet.
 
 - No route has a login. Anyone who can reach the Mac's web server can upload, edit, publish and
   read a figure whose id they know.
-- Cross-site requests: a page on another site, open in a browser on the same network, can send
-  simple POSTs (a typed question as `text/plain`, an upload, a publish) that the API runs. CORS
-  hides the answer only. A fix is queued (`docs/review/QA.md` F02).
+- Cross-site requests (fixed Nov 3, `docs/review/QA.md` F02): a request that changes something
+  and that the browser marks `Sec-Fetch-Site: cross-site` is refused with 403 before the route
+  runs (`services/api/app/middleware.py` CrossSiteGuard), and a typed question must be JSON
+  (415 otherwise). A request with no such header (curl, an older browser) still passes; CORS
+  hides every answer (`services/api/tests/test_cross_site.py`).
 - Uploads have no rate limit, and the fix-call cap starts over with each edit version
   (`docs/review/QA.md` F04, F05).
 - The API on 127.0.0.1:8000 accepts any Host header, so DNS rebinding from a browser on the Mac

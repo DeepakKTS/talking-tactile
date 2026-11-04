@@ -104,6 +104,28 @@ class UploadGuard:
         await self.app(scope, receive, send)
 
 
+_CHANGES = ("POST", "PATCH", "PUT", "DELETE")
+
+
+class CrossSiteGuard:
+    """A request that changes something (POST, PATCH, PUT, DELETE) and that the browser marks
+    as coming from another site (Sec-Fetch-Site: cross-site) is refused before the route runs:
+    a page elsewhere must not start uploads, questions or publishes here. CORS alone hides
+    only the answer; the route would still run. Requests with no such header (curl, tests,
+    an older browser) pass. The app's own pages are same-origin through the web server."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http" and scope["method"] in _CHANGES:
+            site = dict(scope["headers"]).get(b"sec-fetch-site", b"").decode("latin-1")
+            if site.strip().lower() == "cross-site":
+                await _refuse(send, 403, "cross_site", "This request came from another site.")
+                return
+        await self.app(scope, receive, send)
+
+
 _LOOPBACK = ("127.0.0.1", "::1")
 _WINDOW_S = 60.0
 RATE_PER_MINUTE = 30  # questions, and fix calls, per client: a student asks far fewer

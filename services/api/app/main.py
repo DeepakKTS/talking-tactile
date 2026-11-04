@@ -13,7 +13,7 @@ from app.config import ExploreConfig, TactileRules, load_explore, load_tactile_r
 from app.errors import ApiError
 from app.figures import FigureService, PublishStore
 from app.meta.client import LiveClientUnavailableError, MetaClient, make_client
-from app.middleware import RateLimit, RequestContext, UploadGuard
+from app.middleware import CrossSiteGuard, RateLimit, RequestContext, UploadGuard
 from app.paths import DATA_DIR, EXPLORE_YAML, TACTILE_RULES_YAML
 from app.pipeline.edits import EditStore
 from app.pipeline.jobs import JobStore
@@ -82,11 +82,12 @@ def create_app(
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    # The last one added runs first: request id, then CORS, then the body guard, then the
-    # rate limit.
+    # The last one added runs first: request id, then CORS, then the cross-site guard, then
+    # the body guard, then the rate limit.
     max_bytes = int(tactile_rules.pipeline.max_upload_mb * _BYTES_PER_MB)
     app.add_middleware(RateLimit)
     app.add_middleware(UploadGuard, max_bytes=max_bytes)
+    app.add_middleware(CrossSiteGuard)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=list(WEB_ORIGINS),

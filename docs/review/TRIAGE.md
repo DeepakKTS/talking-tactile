@@ -50,7 +50,7 @@ key and in mock mode only. Each finding is one of:
 | ID | Decision |
 |---|---|
 | F01 old key in an unreachable git object | Checked: the blob's key is not the current key (compared in code, nothing printed); it is the earlier key, which returned 401 on Nov 3. The two scratch clones that copied it are deleted. Deepak approved; pruned on Nov 3 (`git reflog expire --expire-unreachable=now --all && git gc --prune=now`): the object is gone and no unreachable object is left. Rotate the current key after the demo. Fixed (docs): `docs/SECURITY.md` says the scan now covers unreachable objects |
-| F02 cross-site simple POSTs reach paid routes | Phase B (code): refuse a browser request whose `Sec-Fetch-Site` is `cross-site`, and require JSON on `/api/ask`. Fixed (docs): listed in SECURITY.md known gaps until then |
+| F02 cross-site simple POSTs reach paid routes | Fixed (code): a change marked `Sec-Fetch-Site: cross-site` gets 403 before the route (CrossSiteGuard); a typed question must be JSON (415). Tests in `services/api/tests/test_cross_site.py` |
 | F03 rate limit reads the client's first `X-Forwarded-For` entry | Phase B (code): use the address uvicorn sets; fix the test. Fixed (docs): SECURITY.md states the real mechanism |
 | F04 uploads have no rate limit | Phase B (code): rate-limit `POST /api/figures` |
 | F05 fix-call cap starts over per edit version | Phase B (code), low priority; known gap in SECURITY.md |
