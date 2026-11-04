@@ -526,7 +526,7 @@ function ExploreSheet() {
           <form onSubmit={onAsk}>
             <label>
               Ask, or say where is, more, repeat, stop, what is here{" "}
-              <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" style={FIELD_STYLE} />
+              <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" maxLength={500} style={FIELD_STYLE} />
             </label>
             <button type="submit">Ask</button>
           </form>

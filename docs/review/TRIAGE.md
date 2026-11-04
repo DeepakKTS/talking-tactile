@@ -61,11 +61,11 @@ key and in mock mode only. Each finding is one of:
 | F10 SECURITY.md: no reporting route, no threat model | Fixed (docs): "Reporting a vulnerability" and "Threat model and known gaps". Deepak: turn on private vulnerability reporting in the repo settings |
 | F11 APPLICATION.md personal data | Deepak, Nov 3: removed from the tree; history stays |
 | F12 extreme aspect ratio gives a 500 | Phase B (code) |
-| F13 non-UTF-8 JSON gives a 500 | Phase B (code) |
+| F13 non-UTF-8 JSON gives a 500 | Fixed (code): 422 invalid_request (`services/api/tests/test_ask.py`) |
 | F14 control characters in edits fail at S4 | Phase B (code) |
 | F15 Author stops polling after one failed poll | Rejected: after the hackathon; a reload recovers |
-| F16 no `maxLength` on the question box | Phase B (code) |
-| F17 server does not cap clip length | Phase B (code) |
+| F16 no `maxLength` on the question box | Fixed (code): the box takes 500 characters (checked in `explore_e2e.py`); past 500 the server says "That question is too long. Ask a shorter one." |
+| F17 server does not cap clip length | Fixed (code): a clip over 16 s is refused as audio_invalid before any call |
 | F18 POST with no Content-Length gets 411 | Rejected: browsers send the length; documented in SECURITY.md |
 | F19 "1 pages", encrypted PDF message | Phase B (code), low priority |
 | F20 in-memory maps never shrink | Rejected: one process per demo, restarted per session; known gap |

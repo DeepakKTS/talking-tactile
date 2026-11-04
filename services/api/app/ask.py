@@ -128,7 +128,7 @@ class AskRequest(BaseModel):
 
     figure_id: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
     version: int | None = None  # the published version Explore loaded; None for the latest
-    question: Annotated[str, StringConstraints(strip_whitespace=True, max_length=500)] = ""
+    question: Annotated[str, StringConstraints(strip_whitespace=True)] = ""
     region_id: RegionId | None = None
     recent_region_ids: Annotated[list[RegionId], Field(max_length=10)] = []
     session_id: Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_-]{1,64}$")] = "none"
@@ -173,9 +173,14 @@ class WavError(ValueError):
     """Audio the transcribe endpoint would not take."""
 
 
+MAX_CLIP_S = 16.0  # Explore sends at most 15 s plus its 250 ms post-roll; audio is billed by length
+QUESTION_CHARS = 500
+TOO_LONG_QUESTION = "That question is too long. Ask a shorter one."
+
+
 def check_wav(data: bytes) -> float:
     """The clip's length in seconds; raises WavError unless it is mono 16-bit PCM WAV at
-    16 or 24 kHz."""
+    16 or 24 kHz and at most MAX_CLIP_S long."""
     try:
         with wave.open(io.BytesIO(data)) as w:
             ok = (
@@ -185,9 +190,12 @@ def check_wav(data: bytes) -> float:
             )
             if not ok:
                 raise WavError("Audio must be mono 16-bit PCM WAV at 16 or 24 kHz.")
-            return float(w.getnframes() / w.getframerate())
+            seconds = float(w.getnframes() / w.getframerate())
     except (wave.Error, EOFError) as exc:
         raise WavError("The audio is not a WAV file.") from exc
+    if seconds > MAX_CLIP_S:
+        raise WavError("The recording is too long. Hold the screen for a shorter question.")
+    return seconds
 
 
 def keywords(f: RegionsFile) -> list[str]:

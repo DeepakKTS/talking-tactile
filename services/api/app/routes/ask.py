@@ -13,11 +13,17 @@ from typing import Any
 
 import httpx
 from fastapi import APIRouter, Request
-from pydantic import ValidationError
 from starlette.datastructures import UploadFile
 
 from app import ask as asking
-from app.ask import FAILED, AskRequest, QuestionCapError, WavError
+from app.ask import (
+    FAILED,
+    QUESTION_CHARS,
+    TOO_LONG_QUESTION,
+    AskRequest,
+    QuestionCapError,
+    WavError,
+)
 from app.errors import ApiError
 from app.meta.live import LiveCallCapError, LiveCallError, MalformedResponseError
 from app.meta.mock import MockFixtureMissingError
@@ -34,23 +40,28 @@ _CALL_ERRORS = (
 
 async def _read(request: Request) -> tuple[AskRequest, bytes | None]:
     ctype = request.headers.get("content-type", "")
+    audio: bytes | None = None
     try:
         if ctype.startswith("multipart/form-data"):
             async with request.form() as form:  # closes the uploaded file
-                audio = form.get("audio")
+                part = form.get("audio")
                 raw = form.get("request")
-                if not isinstance(audio, UploadFile) or not isinstance(raw, str):
+                if not isinstance(part, UploadFile) or not isinstance(raw, str):
                     raise ApiError(422, "invalid_request", "Send a request part and an audio part.")
-                return AskRequest.model_validate(json.loads(raw)), await audio.read()
-        if not ctype.startswith("application/json"):
-            raise ApiError(415, "invalid_request", "Send the question as JSON.")
-        body: Any = await request.json()
-        req = AskRequest.model_validate(body)
-    except (ValidationError, json.JSONDecodeError) as exc:
+                req = AskRequest.model_validate(json.loads(raw))
+                audio = await part.read()
+        else:
+            if not ctype.startswith("application/json"):
+                raise ApiError(415, "invalid_request", "Send the question as JSON.")
+            body: Any = await request.json()
+            req = AskRequest.model_validate(body)
+    except ValueError as exc:  # bad JSON, bytes that are not UTF-8, or a failed validation
         raise ApiError(422, "invalid_request", "The question request is not valid.") from exc
-    if not req.question:
+    if len(req.question) > QUESTION_CHARS:
+        raise ApiError(422, "invalid_request", TOO_LONG_QUESTION)
+    if audio is None and not req.question:
         raise ApiError(422, "invalid_request", "Type a question, or hold the screen to ask.")
-    return req, None
+    return req, audio
 
 
 @router.post("/transcribe")

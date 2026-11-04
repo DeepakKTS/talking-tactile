@@ -375,6 +375,11 @@ def scripted(page: Page, base: str, fid: str, regions: list[dict[str, Any]], fai
     out["offline_answer"] = asked
     if asked != [OFFLINE]:
         fail.append(f"offline question: {asked}")
+    # The Ask box takes no more than the server's 500 characters.
+    box = page.get_by_label("Ask, or say where is, more, repeat, stop, what is here")
+    out["ask_max_length"] = box.get_attribute("maxlength")
+    if out["ask_max_length"] != "500":
+        fail.append(f"ask box maxlength: {out['ask_max_length']}")
 
     # Escape stops speech.
     page.evaluate("() => window.addEventListener('keydown', () => { window.__escAt = performance.now(); }, { capture: true })")
