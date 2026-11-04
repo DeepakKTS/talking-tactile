@@ -161,6 +161,22 @@ The four screenshots of Author and Explore (Nov 3, a headless mock-mode run) sho
 fixtures/heart.png in the review and the Fix outline panel: CC BY-SA 3.0, with the heart's
 credit line, which README.md prints under them.
 
+### The project website, site/
+
+- `site/sheets/heart/` (tactile.svg, print.pdf, regions.json): fixtures/heart.png, published
+  version 4. CC BY-SA 3.0, with the heart's credit line, which `site/heart.html` shows.
+  regions.json is the same file as `fixtures/qa/heart_v4_regions.json`.
+- `site/sheets/brain/` (tactile.svg, print.pdf, regions.json): fixtures/eval/brain_lobes.png,
+  published version 4. CC BY 3.0, with the brain's credit line, which `site/brain.html`
+  shows. regions.json is the same file as `fixtures/qa/brain_lobes_v4_regions.json`.
+- `site/img/explore-device-check.png` is a copy, and `site/img/author-review.png` a crop, of
+  the screenshots in docs/submission/screenshots/, above. `site/img/explore-start.png` and
+  `site/img/explore-corners.png` (Nov 3, a headless mock-mode run) show the heart's title and
+  summary: CC BY-SA 3.0, with the heart's credit line, which `site/phone.html` prints under
+  them.
+- `site/assets/hero.jpg`, the photo behind the landing page's dot mosaic, came with the
+  owner's landing page of Oct 24. Its source and license are not recorded here yet.
+
 ### Recorded model answers, fixtures/recorded/
 
 Each recording is one Meta model call about one figure above: an S1 listing or plan, SAM

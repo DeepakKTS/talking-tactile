@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phone connection: Talking Tactile</title>
+<meta name="description" content="How the iPhone connects to the Mac, the device check, printing and mounting the sheet, and setting the corners.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="page page-plain">
+  <header class="site-header">
+    <nav class="nav glass" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Talking Tactile, home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="5" r="2.3" fill="currentColor"/><circle cx="16" cy="5" r="2.3" fill="currentColor" opacity=".35"/><circle cx="8" cy="12" r="2.3" fill="currentColor"/><circle cx="16" cy="12" r="2.3" fill="currentColor"/><circle cx="8" cy="19" r="2.3" fill="currentColor" opacity=".35"/><circle cx="16" cy="19" r="2.3" fill="currentColor"/></svg>
+        Talking Tactile
+      </a>
+      <span class="nav-sep wide" aria-hidden="true"></span>
+      <ul class="nav-links">
+        <li><a href="index.html#how">How it works</a></li>
+        <li><a href="index.html#status">Results</a></li>
+        <li><a href="start.html">Get started</a></li>
+        <li><a href="project.html" aria-current="page">Project</a></li>
+      </ul>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </nav>
+    <nav class="menu glass" id="menu" aria-label="Pages">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#status">Results</a>
+      <a href="start.html">Get started</a>
+      <a href="project.html" aria-current="page">Project</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <section aria-labelledby="phone-title">
+        <div class="page-intro">
+          <span class="eyebrow">The phone connection</span>
+          <h1 id="phone-title">Set up the iPhone over a sheet</h1>
+          <p class="lead">The Mac runs the API and serves the app over HTTPS on the local network. The iPhone opens it in Safari, watches the printed sheet from a mount, and follows the fingertip. This guide follows <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/docs/DEMO.md"><code>docs/DEMO.md</code></a>.</p>
+        </div>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="need-title">
+        <h2 id="need-title">What you need</h2>
+        <ul>
+          <li>The Mac running <code>make demo-live</code>, or <code>make demo-mock</code> for no Meta calls (<a href="start.html">Get started</a> has the setup, the phone certificate and the trusted mkcert root).</li>
+          <li>The iPhone on the same Wi-Fi as the Mac.</li>
+          <li>A published sheet, printed at 100 percent, its lines raised on swell paper or with puffy paint.</li>
+          <li>A mount that holds the phone still above the sheet.</li>
+        </ul>
+        <p>The phone loads the app and the hand model from the Mac, so it needs the local network, not the internet. Questions need the internet.</p>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="check-title">
+        <h2 id="check-title">1. The device check</h2>
+        <p>On the iPhone, open the device check. Use the Mac&rsquo;s <code>.local</code> name first; <code>make demo-live</code> prints the addresses with the real name.</p>
+<pre><code>https://&lt;your-mac&gt;.local:5173/explore?check=1</code></pre>
+        <p>Press &ldquo;Check this device&rdquo;. Every row should say OK before filming or teaching:</p>
+        <ul>
+          <li><strong>Secure page</strong>: HTTPS, so the camera and the microphone are allowed to ask.</li>
+          <li><strong>Camera</strong>: the rear camera, looking down at the sheet.</li>
+          <li><strong>Hand tracker</strong>: 10 frames a second or more.</li>
+          <li><strong>Local voice</strong>: a voice that works offline.</li>
+          <li><strong>Screen Wake Lock</strong>: &ldquo;Held and released&rdquo;. If it fails, set Auto-Lock to Never in Settings, Display and Brightness.</li>
+          <li><strong>Microphone</strong>: opened, so spoken questions can work.</li>
+        </ul>
+        <figure class="shot">
+          <img src="img/explore-device-check.png" alt="The device check page: Secure page OK, Camera needs a look because the test camera does not say which way it faces, Hand tracker OK at 20.0 frames a second on the GPU, Local voice OK, Screen Wake Lock OK, Microphone OK." width="1170" height="1464">
+          <figcaption>The device check in a headless test run with a fake camera, which is why the camera row needs a look. On the iPhone, every row should say OK.</figcaption>
+        </figure>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="print-title">
+        <h2 id="print-title">2. Print and mount</h2>
+        <ol>
+          <li>Print the sheet&rsquo;s PDF at 100 percent (&ldquo;Actual size&rdquo;, not &ldquo;Fit&rdquo;). Measure the bar at the bottom with a ruler: it must be 100 mm.</li>
+          <li>Raise the lines, then tape the sheet flat at two corners.</li>
+          <li>Fix the phone above the sheet with all four corner marks in view. It must not move once the corners are set.</li>
+          <li>Turn the overhead light on and keep window glare off the sheet.</li>
+          <li>Turn the silent switch off and the volume up: Safari mutes the tones in silent mode.</li>
+        </ol>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="corners-title">
+        <h2 id="corners-title">3. Set the corners</h2>
+        <p>This is the calibration. It maps the camera picture to millimeters on the page, and a sighted helper does it once.</p>
+        <ol>
+          <li>Open the sheet in Explore (the addresses <code>make demo-live</code> prints, or Author&rsquo;s &ldquo;Open version 1 in Explore&rdquo; link) and press &ldquo;Start exploring&rdquo;.</li>
+          <li>Tap the four printed corner marks on the camera view, in order: A top left, B top right, C bottom right, D bottom left. The app asks for each one: &ldquo;A helper sets the corners. Tap corner A, top left.&rdquo;</li>
+          <li>Check that the drawn outline sits on the printed marks. If not, tap &ldquo;Set corners&rdquo; and tap the four marks again. On a keyboard, R sets them again.</li>
+        </ol>
+        <div class="shots">
+          <figure class="shot">
+            <img src="img/explore-start.png" alt="Explore on a phone-sized screen: the heart's title, the line Press Start, a large Start exploring button, and the settings for who speaks and the pointing hand." width="780" height="960">
+            <figcaption>Explore opens with one large button, &ldquo;Start exploring&rdquo;.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="img/explore-corners.png" alt="Explore after Start on a phone-sized screen: the prompt A helper sets the corners. Tap corner A, top left. Below it the question box, the Set corners button and the camera view, here a green test picture." width="780" height="1140">
+            <figcaption>After Start, Explore asks for corner A. The camera view here is Chrome&rsquo;s test picture from a headless mock-mode run, not a sheet.</figcaption>
+          </figure>
+        </div>
+        <p class="credit">The screenshots show text from the heart sheet: <q>Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. Resized and placed on a white background.</q></p>
+        <p>The corners are saved for that camera size, so a reload with the same camera and sheet needs no new taps. Nothing detects the phone or the sheet moving afterward: if either moves, set the corners again.</p>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="use-title">
+        <h2 id="use-title">4. Explore</h2>
+        <ul>
+          <li>Touch a part: a texture tone on entering, then its name when the finger rests.</li>
+          <li>Hold anywhere on the screen to ask out loud, and let go when you are done. &ldquo;More&rdquo;, &ldquo;repeat&rdquo; and &ldquo;where is the aorta&rdquo; are handled on the phone.</li>
+          <li>With a keyboard: H says the help, M more, period repeats, W what is here, Escape stops speech, R sets the corners.</li>
+          <li>With the network off, touch still speaks; a question says &ldquo;Questions need the network. Labels still work.&rdquo;</li>
+        </ul>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="trouble-title">
+        <h2 id="trouble-title">If Safari breaks on the security headers</h2>
+        <p>Signs: the device check&rsquo;s hand tracker row fails or never finishes, Start does nothing, or a page stays blank. Stop the servers with Ctrl-C and start them without the Content-Security-Policy, then reload the page on the phone:</p>
+<pre><code>TT_CSP=off make demo-live</code></pre>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="foot glass">
+        <a class="brand" href="index.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="5" r="2.3" fill="currentColor"/><circle cx="16" cy="5" r="2.3" fill="currentColor" opacity=".35"/><circle cx="8" cy="12" r="2.3" fill="currentColor"/><circle cx="16" cy="12" r="2.3" fill="currentColor"/><circle cx="8" cy="19" r="2.3" fill="currentColor" opacity=".35"/><circle cx="16" cy="19" r="2.3" fill="currentColor"/></svg>
+          Talking Tactile
+        </a>
+        <p class="by">Built by Deepak Kumaran T S</p>
+        <ul>
+          <li><a href="https://github.com/DeepakKTS/talking-tactile" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/deepak-kumaran-ts" rel="noopener">LinkedIn</a></li>
+        </ul>
+        <p class="lic">Code under the Apache License 2.0. Figures and the sheets made from them keep their own licenses: <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/ATTRIBUTION.md">ATTRIBUTION.md</a>.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
