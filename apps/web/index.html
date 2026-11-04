@@ -8,6 +8,9 @@
          load, which Explore must not do once it is offline (test_brand_logo.py keeps them equal). -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 width=%2264%22 height=%2264%22 role=%22img%22 aria-label=%22Talking Tactile%22%3E%3Ctitle%3ETalking Tactile%3C/title%3E%3Cstyle%3E.tt-on%7Bfill:%23C9B27C%7D.tt-off%7Bfill:%23C9B27C;opacity:.18%7D%3C/style%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%2317140C%22/%3E%3Ccircle class=%22tt-off%22 cx=%229.87%22 cy=%2219.88%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%229.87%22 cy=%2232.00%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%229.87%22 cy=%2244.12%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%2221.99%22 cy=%2219.88%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%2221.99%22 cy=%2232.00%22 r=%224.36%22/%3E%3Ccircle class=%22tt-off%22 cx=%2221.99%22 cy=%2244.12%22 r=%224.36%22/%3E%3Ccircle class=%22tt-off%22 cx=%2242.01%22 cy=%2219.88%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%2242.01%22 cy=%2232.00%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%2242.01%22 cy=%2244.12%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%2254.13%22 cy=%2219.88%22 r=%224.36%22/%3E%3Ccircle class=%22tt-on%22 cx=%2254.13%22 cy=%2232.00%22 r=%224.36%22/%3E%3Ccircle class=%22tt-off%22 cx=%2254.13%22 cy=%2244.12%22 r=%224.36%22/%3E%3C/svg%3E" />
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <!-- Both fonts load while the page is parsed, before Explore can go offline. -->
+    <link rel="preload" href="/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/literata-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <div id="root"></div>

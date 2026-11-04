@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import tactileRules from "../../../../config/tactile_rules.yaml";
 import heart from "../../../../fixtures/pipeline/heart_regions.json";
 import synthetic from "../../../../fixtures/synthetic/regions.json";
 import type { RegionsFile } from "../shared/regions";
 import { FigureApi, type OverlapWarning, type Repair, type Violation, describeViolation } from "./api";
-import { AuthorPage } from "./AuthorPage";
+import { AuthorPage, MAX_UPLOAD_MB } from "./AuthorPage";
 
 const ID = "b".repeat(64);
 const NOTHING_TOUCHABLE = "No part is checked yet, so a student could touch nothing on this sheet. Check the parts you have looked at, then publish.";
@@ -167,6 +168,38 @@ describe("author page", () => {
     expect(form.get("page")).toBe("letter");
     expect(form.get("page_index")).toBe("0");
     expect(window.location.search).toBe(`?figure=${ID}`);
+  });
+
+  it("takes a file dropped on the card, and says which", async () => {
+    page();
+    const zone = screen.getByText("Figure (PNG, JPEG or a PDF page)").closest(".dropzone");
+    if (!zone) throw new Error("no drop area");
+    const file = new File([new Uint8Array([1])], "dropped.png", { type: "image/png" });
+    fireEvent.dragOver(zone, { dataTransfer: { files: [file] } });
+    expect(zone.getAttribute("data-over")).toBe("true");
+    fireEvent.drop(zone, { dataTransfer: { files: [file] } });
+    expect(zone.getAttribute("data-over")).toBe("false");
+    expect(screen.getByText("Chosen: dropped.png")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
+    await screen.findByRole("heading", { name: synthetic.title });
+    const form = server.calls.find((c) => c.method === "POST")?.body as FormData;
+    expect((form.get("file") as File).name).toBe("dropped.png");
+  });
+
+  it("shows the server's refusal of an upload as an alert, in its words", async () => {
+    const refuse = (): Promise<Response> => Promise.resolve(new Response(
+      JSON.stringify({ error: { code: "unsupported_type", message: "Upload a PNG, JPEG or PDF file.", retryable: false } }),
+      { status: 415, headers: { "Content-Type": "application/json" } }));
+    render(<AuthorPage api={new FigureApi(refuse)} pollMs={5} />);
+    fireEvent.change(screen.getByLabelText(/Figure \(PNG, JPEG or a PDF page\)/), { target: { files: [new File(["x"], "notes.txt")] } });
+    fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("Not uploaded. Upload a PNG, JPEG or PDF file.");
+  });
+
+  it("says the server's upload limit on the card", () => {
+    expect((tactileRules as { pipeline: { max_upload_mb: number } }).pipeline.max_upload_mb).toBe(MAX_UPLOAD_MB);
+    page();
+    expect(screen.getByText(`Drop the file here, or browse. Up to ${String(MAX_UPLOAD_MB)} MB.`)).toBeTruthy();
   });
 
   it("flags every part not checked, in words, not only by color", async () => {
