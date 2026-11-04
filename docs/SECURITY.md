@@ -140,10 +140,12 @@ Fixed:
   to claim a fresh address (`app/middleware.py` RateLimit, `apps/web/vite.config.ts` xfwd,
   tests in `services/api/tests/test_rate_limit.py`).
 
-Correction (Nov 3, review, `docs/review/QA.md` F03): the code takes the first X-Forwarded-For
-entry, which a client on this machine can set. A phone through the proxy is still counted by
-its own address only because uvicorn's default proxy-header handling replaces the client
-address before RateLimit runs. A fix is queued.
+Correction (Nov 3, review, `docs/review/QA.md` F03, fixed the same day): the code took the
+first X-Forwarded-For entry, which a client on this machine can set. It now counts the address
+uvicorn gives the request: through the proxy, uvicorn's proxy headers (on by default, trusting
+127.0.0.1) have already set it to the right-most address the proxy added, the phone's. If the
+API ever runs without uvicorn's proxy headers, every proxied request counts as this machine,
+which is stricter, not looser.
 
 ## Dependencies
 

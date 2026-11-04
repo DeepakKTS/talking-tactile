@@ -56,14 +56,15 @@ def test_uploads_have_their_own_limit_per_client_per_minute() -> None:
     assert run(limit, "/api/figures") == 200
 
 
-def test_the_forwarded_address_counts_only_through_this_machine() -> None:
+def test_the_client_is_the_address_uvicorn_gives_never_the_forwarded_header() -> None:
+    # uvicorn's proxy headers have already put the phone's address (the right-most one the
+    # proxy added) in the scope; a client-made first X-Forwarded-For entry changes nothing.
     limit = RateLimit(ok, per_minute=1)
-    assert run(limit, "/api/ask", xff="192.168.1.20") == 200
-    assert run(limit, "/api/ask", xff="192.168.1.21") == 200  # another phone
-    assert run(limit, "/api/ask", xff="192.168.1.20") == 429
-    # From another machine the header is ignored: it cannot claim a fresh address.
-    assert run(limit, "/api/ask", client="10.0.0.9", xff="1.2.3.4") == 200
-    assert run(limit, "/api/ask", client="10.0.0.9", xff="5.6.7.8") == 429
+    assert run(limit, "/api/ask", client="192.168.1.20", xff="1.2.3.4, 192.168.1.20") == 200
+    assert run(limit, "/api/ask", client="192.168.1.21") == 200  # another phone
+    assert run(limit, "/api/ask", client="192.168.1.20", xff="5.6.7.8, 192.168.1.20") == 429
+    assert run(limit, "/api/ask", xff="9.9.9.9") == 200  # this machine, once
+    assert run(limit, "/api/ask", xff="8.8.8.8") == 429  # a fresh header is not a fresh client
 
 
 def test_the_app_refuses_the_question_past_the_limit_with_a_spoken_sentence(tmp_path: Path) -> None:

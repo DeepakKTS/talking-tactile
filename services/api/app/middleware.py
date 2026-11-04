@@ -126,7 +126,6 @@ class CrossSiteGuard:
         await self.app(scope, receive, send)
 
 
-_LOOPBACK = ("127.0.0.1", "::1")
 _WINDOW_S = 60.0
 RATE_PER_MINUTE = 30  # questions, and fix calls, per client: a student asks far fewer
 UPLOADS_PER_MINUTE = 10  # a new figure starts S1 and S2 (up to 25 live calls); teachers upload few
@@ -140,9 +139,11 @@ _RATE_MESSAGES = {
 class RateLimit:
     """Per client, at most RATE_PER_MINUTE questions (/api/ask and /api/transcribe together),
     RATE_PER_MINUTE fix calls and UPLOADS_PER_MINUTE figure uploads in any minute; more is
-    refused with 429 before the route runs. The client is the connecting address or, when
-    that is this machine (the web server's proxy, which forwards the phone's address), the
-    first X-Forwarded-For address."""
+    refused with 429 before the route runs. The client is the address uvicorn gives the
+    request. Through the web server's proxy on this machine, uvicorn's proxy headers (on by
+    default, trusting 127.0.0.1) have already replaced it with the right-most address the
+    proxy added, the phone's; the client-controlled first X-Forwarded-For entry is never
+    read here, so a client cannot claim a fresh address."""
 
     def __init__(
         self,
@@ -170,13 +171,7 @@ class RateLimit:
 
     @staticmethod
     def _client(scope: Scope) -> str:
-        host = (scope.get("client") or ("", 0))[0]
-        if host in _LOOPBACK:
-            forwarded = dict(scope["headers"]).get(b"x-forwarded-for", b"").decode("latin-1")
-            first = forwarded.split(",")[0].strip()
-            if first:
-                return str(first)
-        return str(host)
+        return str((scope.get("client") or ("", 0))[0])
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         kind = self._kind(scope)
