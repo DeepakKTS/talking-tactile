@@ -55,7 +55,7 @@ key and in mock mode only. Each finding is one of:
 | F04 uploads have no rate limit | Fixed (code): at most 10 uploads per client per minute, 429 past it (`RateLimit`, `services/api/tests/test_rate_limit.py`). Concurrent pipeline runs are not capped: known gap |
 | F05 fix-call cap starts over per edit version | Phase B (code), low priority; known gap in SECURITY.md |
 | F06 Explore questions do not send the loaded version | Fixed (code): Explore sends the version it loaded; for `latest` the published file says which version it is (`X-Published-Version`); a version 1 question is answered from version 1 while version 2 exists (`services/api/tests/test_api_figures.py`) |
-| F07 saved sheet not used on a 5xx | Phase B (code). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
+| F07 saved sheet not used on a 5xx | Fixed (code): Explore uses the saved copy on any answer of 500 or more, as a stopped API gives 502 through the web server; a 404 or 4xx still says so (`apps/web/src/explore/loader.test.ts`). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
 | F08 personal email on every commit | Deepak, Nov 3: no history rewrite; he sets the GitHub noreply address for new commits |
 | F09 macOS `say` clips | Deepak, Nov 3: kept for now under Apple's terms (NOTICE, ATTRIBUTION); after filming he records his own voice, the replays are recorded again and "aorta" is measured on a real voice |
 | F10 SECURITY.md: no reporting route, no threat model | Fixed (docs): "Reporting a vulnerability" and "Threat model and known gaps". Deepak: turn on private vulnerability reporting in the repo settings |
