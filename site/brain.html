@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Commons brain: Talking Tactile</title>
+<meta name="description" content="The published tactile sheet for human brain lobes, lateral view, with a pointer demo and the print PDF.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+<script src="assets/sheet.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="page page-plain">
+  <header class="site-header">
+    <nav class="nav glass" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Talking Tactile, home">
+        <img class="logo-mark" src="assets/brand/logo-mark.svg" alt="" width="33" height="22">
+        Talking Tactile
+      </a>
+      <span class="nav-sep wide" aria-hidden="true"></span>
+      <ul class="nav-links">
+        <li><a href="index.html#how">How it works</a></li>
+        <li><a href="index.html#status">Results</a></li>
+        <li><a href="start.html">Get started</a></li>
+        <li><a href="project.html" aria-current="page">Project</a></li>
+      </ul>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </nav>
+    <nav class="menu glass" id="menu" aria-label="Pages">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#status">Results</a>
+      <a href="start.html">Get started</a>
+      <a href="project.html" aria-current="page">Project</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <section aria-labelledby="sheet-title">
+        <div class="page-intro">
+          <span class="eyebrow">Published sheet, version 4</span>
+          <h1 id="sheet-title">The Commons brain</h1>
+          <p class="lead">The lobes of the human brain, lateral view, drawn as one unbroken shape. The same pipeline as the heart: Muse Spark planned the parts, SAM 3.1 outlined them, and the teacher checked all 5 parts on the sheet and described two.</p>
+        </div>
+      </section>
+
+      <div class="sheet-layout">
+        <figure class="sheet" data-regions="sheets/brain/regions.json">
+          <div class="sheet-frame">
+            <div class="sheet-inner">
+              <img src="sheets/brain/tactile.svg" alt="The tactile sheet for human brain lobes, lateral view, as printed: the raised outlines with textures, braille labels, four corner marks lettered A to D, and a 100 mm bar." width="816" height="1056">
+            </div>
+          </div>
+          <figcaption>The sheet as it prints, from <code>tactile.svg</code>, with the outlines from <code>regions.json</code> over it. Both are in page millimeters. <button class="toggle small-toggle" id="zoom" type="button" hidden>Show the whole page</button></figcaption>
+        </figure>
+
+        <div>
+          <section class="panel glass prose" aria-labelledby="try-title">
+            <h2 id="try-title">Try it</h2>
+            <div class="demo-bar">
+              <button class="toggle" id="speech" type="button" aria-pressed="true">Speech on</button>
+              <p class="small muted" id="sheet-status">Loading the parts.</p>
+            </div>
+            <p class="readout-label" id="said-label">Last said</p>
+            <p class="readout" id="said" aria-live="polite" aria-labelledby="said-label">Nothing yet</p>
+            <ul>
+              <li>Move the pointer onto a part: a tone, then its name when you rest.</li>
+              <li>Click or tap a part to hear its name at once. Rest inside the outline, on no part, to hear the subject.</li>
+              <li>Keyboard: Tab to a part on the sheet or in the list, and press Enter. Escape stops speech.</li>
+              <li>The browser speaks only after a first click, tap or key press on the page.</li>
+            </ul>
+            <p class="notice">This is a stand-in on a screen. The real product follows a fingertip on the printed, raised sheet with a phone camera, and plays the same tones and names. Questions need the live app and are not on this site.</p>
+          </section>
+
+          <section class="panel glass prose" aria-labelledby="dl-title">
+            <h2 id="dl-title">Download</h2>
+            <ul>
+              <li><a href="sheets/brain/print.pdf" download>The print PDF</a> (US Letter, 39 KB). Print at 100 percent (&ldquo;Actual size&rdquo;) and check that the bar measures 100 mm.</li>
+              <li><a href="sheets/brain/tactile.svg" download>tactile.svg</a>, the sheet as a vector drawing.</li>
+              <li><a href="sheets/brain/regions.json" download>regions.json</a>, the parts in page millimeters, as Explore reads them.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+
+      <section class="panel glass prose" aria-labelledby="parts-title">
+        <h2 id="parts-title">The parts</h2>
+        <p>From this sheet&rsquo;s <code>regions.json</code>. Each button says the part&rsquo;s name.</p>
+        <h3 id="touch-title">Touchable parts (5)</h3>
+        <ul class="parts" aria-labelledby="touch-title">
+            <li><button class="say" type="button" data-say="r1" disabled>Frontal lobe</button><span class="info">texture: dots. Teacher&rsquo;s note: &ldquo;The frontal lobe helps you plan, make choices and move your body.&rdquo;</span></li>
+            <li><button class="say" type="button" data-say="r2" disabled>Parietal lobe</button><span class="info">texture: lines.</span></li>
+            <li><button class="say" type="button" data-say="r3" disabled>Temporal lobe</button><span class="info">texture: grid.</span></li>
+            <li><button class="say" type="button" data-say="r4" disabled>Occipital lobe</button><span class="info">texture: solid. Teacher&rsquo;s note: &ldquo;The occipital lobe makes sense of what your eyes see.&rdquo;</span></li>
+            <li><button class="say" type="button" data-say="r5" disabled>Cerebellum and brainstem</button><span class="info">texture: cross.</span></li>
+        </ul>
+        <h3 id="not-title">Not on the sheet (1)</h3>
+        <ul class="parts" aria-labelledby="not-title">
+            <li class="plain" data-needs="n1"><span class="info"><span class="nm">Olfactory bulb</span>: left for the teacher. The pipeline&rsquo;s note: every point was dropped by the guard.</span></li>
+        </ul>
+        <h3>Outline</h3>
+        <p>Resting inside the brain&rsquo;s outline, on no part, says &ldquo;Brain&rdquo;. This sheet was made for grade band 6 to 8.</p>
+      </section>
+
+      <section class="panel glass credit" aria-labelledby="credit-title">
+        <h2 id="credit-title">Credit and license</h2>
+        <p>Credit line: <q>Blausen 0111 BrainLobes.png by BruceBlaus (Blausen.com staff, Medical gallery of Blausen Medical 2014), CC BY 3.0, via Wikimedia Commons.</q></p>
+        <p>Source: <a href="https://commons.wikimedia.org/wiki/File:Blausen_0111_BrainLobes.png" rel="noopener">Blausen 0111 BrainLobes.png on Wikimedia Commons</a>, under <a href="https://creativecommons.org/licenses/by/3.0/" rel="noopener">CC BY 3.0</a>. This tactile sheet, its print PDF and its regions file are adaptations of that figure, under CC BY 3.0.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="foot glass">
+        <a class="brand" href="index.html">
+          <img class="logo-mark" src="assets/brand/logo-mark.svg" alt="" width="33" height="22">
+          Talking Tactile
+        </a>
+        <p class="by">Built by Deepak Kumaran T S</p>
+        <ul>
+          <li><a href="https://github.com/DeepakKTS/talking-tactile" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/deepak-kumaran-ts" rel="noopener">LinkedIn</a></li>
+        </ul>
+        <p class="lic">Code under the Apache License 2.0. Figures and the sheets made from them keep their own licenses: <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/ATTRIBUTION.md">ATTRIBUTION.md</a>.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

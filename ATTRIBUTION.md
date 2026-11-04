@@ -131,6 +131,20 @@ The license text in both places is the Apache License 2.0 from https://www.apach
 
 Installed on the system (`brew install liblouis` or `apt install liblouis-bin liblouis-data`), version 3.39.0 when checked; GPL-3.0-or-later for the tools and LGPL-2.1-or-later for the library. The backend runs `lou_translate` as a separate process (`services/api/app/braille/louis.py`). Not distributed here.
 
+## Vignette Bloom (the landing page's background art)
+
+| | |
+|---|---|
+| Title | Vignette Bloom |
+| Author | Serafim (@serafimcloud) |
+| Source | https://21st.dev/@serafimcloud/components/vignette-bloom |
+| License | MIT, as listed on that page. Full text with the copyright line: `site/licenses/vignette-bloom-MIT.txt`, published with the site |
+| Files | `site/assets/hero.jpg` is a frame of it. `site/assets/field.js` draws it as dots with its effect settings ("Vignette Bloom" in the file) |
+| Not documented | The author does not say which image the art was made from |
+| Credit | The landing page's footer: "Background art: Vignette Bloom by Serafim, 21st.dev, MIT." |
+
+Swapping the background is a one-file change: replace `site/assets/hero.jpg` (field.js reads it by that name and scales any size), then update this entry for the new image.
+
 ## Derived from the figures above
 
 These are adaptations of a figure listed above, so each carries that figure's license and,
@@ -160,6 +174,21 @@ figure's normalized size.
 The four screenshots of Author and Explore (Nov 3, a headless mock-mode run) show
 fixtures/heart.png in the review and the Fix outline panel: CC BY-SA 3.0, with the heart's
 credit line, which README.md prints under them.
+
+### The project website, site/
+
+- `site/sheets/heart/` (tactile.svg, print.pdf, regions.json): fixtures/heart.png, published
+  version 4. CC BY-SA 3.0, with the heart's credit line, which `site/heart.html` shows.
+  regions.json is the same file as `fixtures/qa/heart_v4_regions.json`.
+- `site/sheets/brain/` (tactile.svg, print.pdf, regions.json): fixtures/eval/brain_lobes.png,
+  published version 4. CC BY 3.0, with the brain's credit line, which `site/brain.html`
+  shows. regions.json is the same file as `fixtures/qa/brain_lobes_v4_regions.json`.
+- `site/img/explore-device-check.png` is a copy, and `site/img/author-review.png` a crop, of
+  the screenshots in docs/submission/screenshots/, above. `site/img/explore-start.png` and
+  `site/img/explore-corners.png` (Nov 3, a headless mock-mode run) show the heart's title and
+  summary: CC BY-SA 3.0, with the heart's credit line, which `site/phone.html` prints under
+  them.
+- `site/assets/hero.jpg` and the mosaic in `site/assets/field.js`: "Vignette Bloom", below.
 
 ### Recorded model answers, fixtures/recorded/
 

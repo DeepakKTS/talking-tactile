@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Talking Tactile</title>
+<meta name="description" content="Raised textbook figures a blind student explores by touch, with a phone that names each part and answers questions about the figure.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+<script src="assets/field.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<canvas id="field" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+
+<div class="page">
+  <header class="site-header">
+    <nav class="nav glass" aria-label="Primary">
+      <a class="brand" href="#top" aria-label="Talking Tactile, back to top">
+        <img class="logo-mark" src="assets/brand/logo-mark.svg" alt="" width="33" height="22">
+        Talking Tactile
+      </a>
+      <span class="nav-sep wide" aria-hidden="true"></span>
+      <ul class="nav-links">
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#status">Results</a></li>
+        <li><a href="start.html">Get started</a></li>
+        <li><a href="project.html">Project</a></li>
+      </ul>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <button class="icon-btn" id="motion" type="button" aria-pressed="false" aria-label="Pause background animation">
+        <svg id="ico-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
+        <svg id="ico-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden><path d="M8 5.6v12.8a1 1 0 0 0 1.52.85l10.2-6.4a1 1 0 0 0 0-1.7L9.52 4.75A1 1 0 0 0 8 5.6z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </nav>
+    <nav class="menu glass" id="menu" aria-label="Pages">
+      <a href="#how">How it works</a>
+      <a href="#status">Results</a>
+      <a href="start.html">Get started</a>
+      <a href="project.html">Project</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <h1 id="hero-title" class="rise">Textbook figures a blind student can touch, and that talk back.</h1>
+        <p class="lead rise">A teacher turns a printed figure into a raised sheet and sets a phone above it. The student explores with one finger. Rest on a part and the phone says what it is. Ask a question out loud and the answer comes from that same figure and the teacher&rsquo;s notes.</p>
+        <div class="actions rise">
+          <!-- The demo video: replace <VIDEO_URL> with the video's address (grep -rn "<VIDEO_URL>" site). -->
+          <a class="btn btn-solid" href="<VIDEO_URL>" rel="noopener">Watch the demo</a>
+          <a class="btn btn-glass glass" href="start.html">Get started</a>
+          <a class="btn btn-glass glass" href="project.html">View project</a>
+          <a class="btn btn-glass glass" href="https://github.com/DeepakKTS/talking-tactile" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+        <p class="hint rise"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".5"/></svg><span class="for-pointer">Move your pointer over the dots. The camera follows a fingertip in much the same way.</span><span class="for-touch">Drag a finger over the dots. The camera follows a fingertip in much the same way.</span></p>
+      </div>
+    </section>
+
+    <section id="why" aria-labelledby="why-title">
+      <div class="wrap">
+        <div class="slab glass">
+          <h2 id="why-title" class="statement">A college science textbook can have a picture on every other page. Very few of those pictures are ever made into something a blind student can touch.</h2>
+          <p class="statement">Mostly it comes down to time, because each one is made by hand.</p>
+          <div class="figures" role="list">
+            <div role="listitem"><b>1 to 5 hours</b><span>to make a single tactile image by hand</span></div>
+            <div role="listitem"><b>200 to 1,000 hours</b><span>to convert the images in one textbook</span></div>
+            <div role="listitem"><b>Up to 500</b><span>images in one book</span></div>
+          </div>
+          <p class="source">Figures are estimates from Ladner et al., &ldquo;Automating Tactile Graphics Translation,&rdquo; University of Washington, ASSETS 2005. <a href="https://tactilegraphics.cs.washington.edu/about.html" rel="noopener">About the UW Tactile Graphics Project</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="how-title">How it works</h2>
+          <p>The teacher prepares a sheet once. After that, the student can come back to it as often as they like.</p>
+        </div>
+        <div class="loops">
+          <article class="loop glass" aria-labelledby="loop-a">
+            <h3 id="loop-a">Making the sheet</h3>
+            <p class="sub">What the teacher does, on a computer</p>
+            <ol class="steps">
+              <li><strong>Upload a figure</strong><span>A PNG, a JPEG or a PDF page. Muse Spark reads it, lists the parts in a few words each, and plans each one for touch: an area, a line or a group.</span></li>
+              <li><strong>Each part gets an outline</strong><span>SAM 3.1 outlines each part from points Spark placed on it, with no training on that figure. Code, not a model, lays out the sheet in millimeters: gaps, textures, point symbols and braille.</span></li>
+              <li><strong>Check each part</strong><span>Fix an outline with two clicks, merge, rename, describe. A part becomes touchable only once the teacher checks it.</span></li>
+              <li><strong>Print it</strong><span>Publish, print at 100 percent, and raise the lines on swell paper or with puffy paint. Publishing also writes a file of where every part sits on the page, which Explore reads.</span></li>
+            </ol>
+          </article>
+          <article class="loop glass" aria-labelledby="loop-b">
+            <h3 id="loop-b">Reading the sheet</h3>
+            <p class="sub">What the student does, with a phone and no screen</p>
+            <ol class="steps">
+              <li><strong>Set the sheet under a phone</strong><span>A sighted helper taps the four printed corner marks once. The camera finds the fingertip, and the corners map it to the page.</span></li>
+              <li><strong>Touch a part</strong><span>A texture tone on entering, then its name when the finger rests. Touch needs no internet once the sheet has loaded from the Mac.</span></li>
+              <li><strong>Ask about it</strong><span>Hold the screen and talk. Muse Voice Transcribe listens, with the figure&rsquo;s part names as hints. Muse Spark answers from the figure or the teacher&rsquo;s notes, or sends the student to the teacher.</span></li>
+            </ol>
+          </article>
+        </div>
+        <p class="models">Built on <code>muse-spark-1.3</code>, <code>sam-3.1</code> and <code>muse-voice-transcribe-1.0</code> through the Meta Model API. No model redraws the figure: a student learns from the textbook&rsquo;s own picture.</p>
+      </div>
+    </section>
+
+    <section id="details" aria-labelledby="details-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="details-title">The choices behind it</h2>
+        </div>
+        <div class="details glass">
+          <div class="detail">
+            <h3>Four corner marks, no tags</h3>
+            <p>The sheet carries the figure, its braille, a 100 mm scale bar and four printed corner marks. A sighted helper taps the marks once on the phone. No tags or stickers go on the paper.</p>
+          </div>
+          <div class="detail">
+            <h3>The teacher has the last word</h3>
+            <p>Models make mistakes with diagrams. A part is touchable only once a teacher has checked it, and publishing refuses a sheet that breaks a tactile rule.</p>
+          </div>
+          <div class="detail">
+            <h3>Rules come from published guidance</h3>
+            <p>I have no background in tactile graphics, so the spacing, texture and braille rules come from published guidance (BANA, APH, tactilegraphics.org, the NPS and the ADA), each with its source next to it in <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/config/tactile_rules.yaml"><code>config/tactile_rules.yaml</code></a>: at least 3.2 mm between raised parts, at most five textures, point symbols of at least 6.4 mm.</p>
+          </div>
+          <div class="detail">
+            <h3>Answers stay on the figure</h3>
+            <p>An answer comes from the figure&rsquo;s parts and labels or the teacher&rsquo;s notes, under a strict schema. A question the figure does not answer gets one fixed sentence that sends the student to the teacher.</p>
+          </div>
+          <div class="detail">
+            <h3>Geometry comes from code</h3>
+            <p>Directions, neighbors and distances are computed in code. The language model never guesses them.</p>
+          </div>
+          <div class="detail">
+            <h3>A phone first</h3>
+            <p>An ordinary phone camera is enough today. A path for the camera in Meta&rsquo;s glasses is on the list for after the hackathon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="status" aria-labelledby="status-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="status-title">Where it stands</h2>
+          <p>One person, building for the Meta Global AI Developer Hackathon from October 26 to November 4, 2026. As of November 3, every number below names the committed file it comes from.</p>
+        </div>
+        <div class="panel glass">
+          <h3 class="nm">Results</h3>
+          <div class="table-wrap">
+            <table class="table">
+              <caption>Measured results, with the file each one comes from</caption>
+              <thead><tr><th scope="col">What</th><th scope="col">Result</th><th scope="col">File</th></tr></thead>
+              <tbody>
+              <tr><th scope="row">Part plan, touchable areas (live recordings)</th><td>Heart 14 of 15, Japan regions 9 of 9, brain 5 of 6, flower 7 of 13</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/plan/RESULTS.md"><code>eval/plan/RESULTS.md</code></a></td></tr>
+              <tr><th scope="row">S2 against graded reference masks</th><td>Heart: 0 of 4 regressed (3 held, 1 improved). Flower: none of 5 held</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/plan/RESULTS.md"><code>eval/plan/RESULTS.md</code></a></td></tr>
+              <tr><th scope="row">Questions, live, source right</th><td>Heart 36 of 38, brain 35 of 35</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/RESULTS.md"><code>eval/qa/RESULTS.md</code></a></td></tr>
+              <tr><th scope="row">Picture questions (shape, biggest, top)</th><td>Heart 5 of 6, brain 6 of 6; 3 of 6 each without the image</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/RESULTS.md"><code>eval/qa/RESULTS.md</code></a><br><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/RESULTS_image_no_image.md"><code>eval/qa/RESULTS_image_no_image.md</code></a></td></tr>
+              <tr><th scope="row">Release to first spoken word, Mac, live</th><td>p50 5.0 s over 12 questions; two took 13.8 and 14.7 s</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/VOICE.md"><code>eval/qa/VOICE.md</code></a></td></tr>
+              <tr><th scope="row">Release to first spoken word, iPhone</th><td><!-- tt:voice-device --><span class="tag">Not measured yet</span><!-- /tt:voice-device --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
+              <tr><th scope="row">Touch to tone, iPhone</th><td><!-- tt:earcon-device --><span class="tag">Not measured yet</span><!-- /tt:earcon-device --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
+              <tr><th scope="row">Fingertip error on the 9-point sheet (Gate B, goal 4 mm)</th><td><!-- tt:gate-b --><span class="tag">Not measured yet</span><!-- /tt:gate-b --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
+              <tr><th scope="row">Meta credits spent</th><td>$5.31 of $150 (Nov 3)</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/live/ledger.jsonl"><code>eval/live/ledger.jsonl</code></a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="status-grid">
+          <div class="status-card glass">
+            <h3>Not done yet</h3>
+            <ul class="goals">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Not yet tested with blind students or teachers.</strong> No tester session or expert review happened before the deadline.</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>The phone numbers are not measured yet:</strong> fingertip error on the printed test sheet, touch to tone, and question latency on the iPhone (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a>).</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Voice is tested on synthetic speech only,</strong> in English (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/VOICE.md"><code>eval/qa/VOICE.md</code></a>).</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Questions need the network and are slow:</strong> 5.0 s at p50 on a Mac, against a 2.0 s budget in <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/RULES.md"><code>RULES.md</code></a>.</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>A sighted helper sets the corners,</strong> and nothing detects the phone or the sheet moving afterward.</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Small parts are hard:</strong> 6 of the flower&rsquo;s 13 areas need the teacher (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/plan/RESULTS.md"><code>eval/plan/RESULTS.md</code></a>).</span></li>
+            </ul>
+          </div>
+          <div class="status-card glass">
+            <h3>The entry</h3>
+            <dl class="facts">
+              <div><dt>Track</dt><dd>Indie developer</dd></div>
+              <div><dt>Problem statement</dt><dd>Push the Frontier</dd></div>
+              <div><dt>Models</dt><dd>Muse Spark, SAM 3.1, Muse Voice Transcribe</dd></div>
+              <div><dt>Code</dt><dd><a href="https://github.com/DeepakKTS/talking-tactile" rel="noopener">github.com/DeepakKTS/talking-tactile</a></dd></div>
+            </dl>
+            <p class="card-text">Every limit is listed in the <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/README.md"><code>README.md</code></a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="foot glass">
+        <a class="brand" href="index.html">
+          <img class="logo-mark" src="assets/brand/logo-mark.svg" alt="" width="33" height="22">
+          Talking Tactile
+        </a>
+        <p class="by">Built by Deepak Kumaran T S</p>
+        <ul>
+          <li><a href="https://github.com/DeepakKTS/talking-tactile" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/deepak-kumaran-ts" rel="noopener">LinkedIn</a></li>
+        </ul>
+        <p class="lic">Code under the Apache License 2.0. Figures and the sheets made from them keep their own licenses: <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/ATTRIBUTION.md">ATTRIBUTION.md</a>.</p>
+        <p class="lic">Background art: <a href="https://21st.dev/@serafimcloud/components/vignette-bloom" rel="noopener">Vignette Bloom</a> by Serafim, 21st.dev, <a href="licenses/vignette-bloom-MIT.txt">MIT</a>.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
