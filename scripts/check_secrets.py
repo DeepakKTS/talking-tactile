@@ -52,7 +52,8 @@ def staged_blob(path: str) -> bytes:
 
 def findings(path: str, data: bytes, key: str | None) -> list[str]:
     found = []
-    if Path(path).name == ".env":
+    name = Path(path).name
+    if (name == ".env" or name.startswith(".env.")) and name != ".env.example":
         found.append("is a .env file")
     if Path(path).suffix.lower() in KEY_FILE_SUFFIXES:
         found.append("is a certificate or key file")

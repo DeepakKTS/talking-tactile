@@ -81,7 +81,7 @@ key and in mock mode only. Each finding is one of:
 | F30 dev tools inside the API package | Rejected: after the hackathon |
 | F31 tests import a private meta-sam-parser function | Rejected: the version is hash-pinned in `uv.lock` |
 | F32 LAN addresses in the tracker; private file name in `plan_eval.py` | Fixed (docs): tracker passages redacted with `tracker.py redact`. Fixed (code, Nov 3, approved for the filming window: no server imports it): `plan_eval.py` finds the one image in `fixtures/private/` by any name. History: kept, by decision |
-| F33 secret check matches `.env` by exact name | Phase B (code) |
+| F33 secret check matches `.env` by exact name | Fixed (code): any `.env.*` file except `.env.example` is refused (`scripts/test_check_secrets.py`). A generic high-entropy check: rejected, the exact key and the assignment check stay |
 | F34 SAM License not linked | Fixed (docs): NOTICE and ATTRIBUTION link it and name its terms |
 | F35 no third-party notices in a built bundle | Rejected: no bundle is distributed |
 | F36 "The page can send nothing to another host" | Fixed (docs): reworded for `dev:phone`'s websocket |
