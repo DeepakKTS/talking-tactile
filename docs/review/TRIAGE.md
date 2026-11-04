@@ -16,9 +16,9 @@ key and in mock mode only. Each finding is one of:
 | Repo shows as private; the clone URL 404s for a judge | Deepak: make it public before submitting |
 | No video, no photo of the raised sheet under the phone | Deepak: filming. README has the video line ready (`<VIDEO_URL>`) |
 | Gate B, touch to tone and iPhone latency are TBD | Deepak: Gate B and the latency film; then `make results` (Phase B, B2) |
-| Typed questions fail on the README path in mock mode | Fixed (docs): README says plainly that mock answers need the heart published as the eval published it, and points to `apps/web/e2e/ask_e2e.py`, which does that. Phase B (code): a seed command that publishes the eval's version 4 sheets in mock mode |
+| Typed questions fail on the README path in mock mode | Fixed (code and docs): `make demo-sheets` publishes the heart and brain exactly as the eval's version 4 from a fresh clone (checked against `fixtures/qa/`), and README says when to run it |
 | The Commons brain replays only with grade band 6 to 8 | Fixed (docs): README says so |
-| `app.meta.qa_eval` replay fails on a fresh clone (no published version 4) | Phase B (code), with the seed command above. Fixed (docs): README does not promise the replay |
+| `app.meta.qa_eval` replay fails on a fresh clone (no published version 4) | Fixed (code): the eval finds the eval's sheet by content, version 4 here or 1 after `make demo-sheets`, and otherwise says to run it (`services/api/tests/test_demo_sheets.py`) |
 | No Impact section with sourced numbers | Rejected for now: the problem numbers in `PLAN.md` and `APPLICATION.md` have no committed sources, and the README makes no claim it cannot back. Deepak can add one with links |
 | `APPLICATION.md`: another project, personal details | Deepak, Nov 3: removed from the tree; history stays |
 | Stale lines in `CLAUDE.md` (build state, model table, repo map, `make eval`) | Fixed (docs) |

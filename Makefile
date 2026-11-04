@@ -3,7 +3,7 @@ API := services/api
 WEB := apps/web
 UV := uv run --project $(API)
 
-.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet preflight demo-live demo-mock results
+.PHONY: dev api web install test test-api test-web lint typecheck eval check synthetic-sheet preflight demo-live demo-mock demo-sheets results
 
 install:
 	@command -v lou_translate > /dev/null || { echo "liblouis is missing: brew install liblouis"; exit 1; }
@@ -57,6 +57,11 @@ preflight:
 # The API, the phone's web server and the Gate B page, under caffeinate -i; prints the iPhone URLs.
 demo-live:
 	sh scripts/demo.sh live
+
+# Mock mode only: the heart and the Commons brain published as the question eval published them,
+# into data/, so typed questions get their recorded answers (app/demo_sheets.py). Fresh clone.
+demo-sheets:
+	cd $(API) && env -u LIVE MOCK_META=1 uv run python -m app.demo_sheets
 
 demo-mock:
 	sh scripts/demo.sh mock
