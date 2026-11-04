@@ -44,5 +44,10 @@
   "webkit dark 1440x900 heart": [],
   "webkit dark 1440x900 brain": [],
   "webkit dark 1440x900 phone": []
+ },
+ "index_rerun": {
+  "date": "2026-11-04",
+  "served": "python3 -m http.server on 127.0.0.1:15500, site/ at commit acfb6dd",
+  "why": "the landing page's footer gained the background art credit; the 8 index screenshots and runs are retaken"
  }
 }
