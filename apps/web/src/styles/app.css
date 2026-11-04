@@ -941,7 +941,9 @@ figcaption {
 .explore .btn-xl {
   width: 100%;
   max-width: 28rem;
+  min-height: 72px;
   margin: 8px 0 20px;
+  font-size: 1.5rem;
 }
 
 .explore button {

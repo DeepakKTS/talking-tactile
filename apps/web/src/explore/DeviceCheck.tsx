@@ -114,20 +114,38 @@ export function DeviceCheck() {
   };
 
   return (
-    <main>
-      <h1>Explore: device check</h1>
-      <p role="status">{status}</p>
-      <button type="button" onClick={() => void run()} disabled={busy} style={{ fontSize: "2rem", padding: "1rem 2rem" }}>
+    <main className="explore">
+      <h1><img src="/brand/logo-mark.svg" alt="" width="48" height="32" />Explore: device check</h1>
+      <p role="status" className="explore-status">{status}</p>
+      <button type="button" onClick={() => void run()} disabled={busy} className="btn-primary btn-xl">
         Check this device
       </button>
-      <ul aria-label="Device check">
+      <ul aria-label="Device check" className="checks">
         {results.map((r) => (
-          <li key={r.name}>
+          <li key={r.name} data-state={r.state}>
+            <StateIcon state={r.state} />
+            <span>
             <strong>{r.name}</strong>: {r.state === "ok" ? "OK" : r.state === "warn" ? "Look at this" : "Not working"}. {r.detail}
+            </span>
           </li>
         ))}
       </ul>
-      <video ref={video} playsInline muted style={{ maxWidth: "100%" }} />
+      <video ref={video} playsInline muted className="check-video" />
     </main>
+  );
+}
+
+/** A shape for each result, beside its words: a check, a triangle, a cross. */
+function StateIcon({ state }: { state: CheckResult["state"] }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {state === "ok" ? (
+        <><circle cx="12" cy="12" r="9.5" /><path d="M7.5 12.5l3 3 6-6.5" /></>
+      ) : state === "warn" ? (
+        <><path d="M12 3.5 21 20H3z" /><path d="M12 10v4.5" /><circle cx="12" cy="17.2" r="0.5" fill="currentColor" /></>
+      ) : (
+        <><circle cx="12" cy="12" r="9.5" /><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" /></>
+      )}
+    </svg>
   );
 }
