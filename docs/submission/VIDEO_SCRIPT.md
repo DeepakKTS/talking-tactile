@@ -37,7 +37,7 @@ words come from Muse Voice Transcribe, so they need the network. The tones and n
 | Release of the talk button to the first spoken word: p50 5.0 s, Chrome on the Mac | Not said; use only if asked | `eval/qa/VOICE.md` |
 | Release to first word on the iPhone | Not said | <!-- tt:voice-device -->Not measured: the latency film was cut<!-- /tt:voice-device --> |
 | Touch to tone on the iPhone | Not said | <!-- tt:earcon-device -->Not measured: the latency film was cut<!-- /tt:earcon-device --> |
-| Fingertip error on the 9-point sheet | Not said | <!-- tt:gate-b -->TBD: Gate B, `eval/gate-b/README.md`<!-- /tt:gate-b --> |
+| Fingertip error on the 9-point sheet | Not said | <!-- tt:gate-b -->mean 7.93 mm, median 4.0 mm, p95 25.77 mm over 45 touches (`eval/gate-b/RESULTS.md`)<!-- /tt:gate-b --> |
 
 ## Files for the edit
 

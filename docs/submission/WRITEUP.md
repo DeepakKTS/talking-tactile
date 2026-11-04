@@ -69,7 +69,8 @@ picture.
   runs in Chrome on the Mac; two of the 12 took about 14 s. On the iPhone:
   <!-- tt:voice-device -->not measured: the latency film was cut<!-- /tt:voice-device -->.
 - Fingertip accuracy on the 9-point test sheet (`eval/gate-b/README.md`, target a mean error of
-  4 mm or less): <!-- tt:gate-b -->not measured<!-- /tt:gate-b -->.
+  4 mm or less): <!-- tt:gate-b -->mean 7.93 mm, median 4.0 mm, p95 25.77 mm over 45 touches (`eval/gate-b/RESULTS.md`)<!-- /tt:gate-b -->.
+  Gate B fails by that target. Most of the error came from target 9 (five touches, mean 27.41 mm), including the run's first touch at 77.96 mm. The next fix snaps each tapped corner to its printed L mark.
 - Touch to tone on the iPhone:
   <!-- tt:earcon-device -->not measured: the latency film was cut<!-- /tt:earcon-device -->.
 - Spend: $5.42 of the $150 credits (`eval/live/ledger.jsonl`, 1,037 logged calls, as of

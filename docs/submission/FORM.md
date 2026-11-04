@@ -35,7 +35,9 @@ On the phone, MediaPipe finds the fingertip in a Web Worker, and the sheet's pri
 map it to millimeters. Labels and tones work offline. Questions go through Muse Voice
 Transcribe, with the figure's part names as hints, to Muse Spark under a strict schema. Live,
 36 of 38 heart questions and 35 of 35 brain questions were answered from the right source
-(`eval/qa/RESULTS.md`).
+(`eval/qa/RESULTS.md`). On the demo iPhone, the recorded touch test (Gate B, 45 touches on a
+9-point sheet) missed its target of a mean fingertip error of 4 mm or less: mean 7.93 mm,
+median 4.0 mm, p95 25.77 mm (`eval/gate-b/RESULTS.md`). Most of the error came from target 9 (five touches, mean 27.41 mm), including the run's first touch at 77.96 mm. The next fix snaps each tapped corner to its printed L mark.
 
 ## Describe your use of Meta products to build the submitted project
 

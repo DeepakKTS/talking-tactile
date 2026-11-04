@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 455,
- "updated_at": "2026-11-04T22:46:31.682Z",
+ "rev": 460,
+ "updated_at": "2026-11-04T23:45:08.362Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -901,13 +901,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Print the test sheet, 45 touches, record mean and p95 error in mm.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "blocked",
-   "note": "NEEDS DEEPAK: the physical 45-touch test on the iPhone, protocol in eval/gate-b/README.md. Ready: spikes/tracking/test-sheet.pdf and the touch-test page (d8-8, d9-9). The result goes to eval/gate-b/ for make results.",
-   "done_at": null,
+   "status": "done",
+   "note": "Nov 4, 14:47 to 14:54 ET, iPhone 15 Pro Max, Safari, 45 touches on the printed sheet (eval/gate-b/run.md): mean 7.93 mm, median 4.0 mm, p95 25.77 mm (eval/gate-b/RESULTS.md). Most error from target 9 (mean 27.41 mm) and the first touch (77.96 mm).",
+   "done_at": "2026-11-04T23:45:08.319Z",
    "tags": [
     "eval"
    ],
-   "changed_at": "2026-11-03T20:26:38.926Z"
+   "changed_at": "2026-11-04T23:45:08.319Z"
   },
   {
    "id": "d2-5",
@@ -947,13 +947,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Mean fingertip error 4 mm or less.",
    "timebox": "15 min",
    "fallback": "Require the pointing pose, dwell 800 ms, parts above 12 mm.",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: decided by the d2-4 run. make results writes eval/gate-b/RESULTS.md and prints the gate command.",
-   "done_at": null,
+   "status": "done",
+   "note": "Gate B fail: mean 7.93 mm against the 4 mm target (eval/gate-b/RESULTS.md). Next fix: snap tapped corners to the printed L marks (draft PR 3, not built).",
+   "done_at": "2026-11-04T23:45:08.362Z",
    "tags": [
     "gate"
    ],
-   "changed_at": "2026-11-03T20:26:38.977Z"
+   "changed_at": "2026-11-04T23:45:08.362Z"
   },
   {
    "id": "d3-1",
@@ -3198,8 +3198,9 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "title": "Tracking is accurate",
    "test": "Mean fingertip error of 4 mm or less on the 9 point sheet.",
    "fallback": "Require the pointing pose, dwell 800 ms, keep parts above 12 mm.",
-   "status": "pending",
-   "evidence": ""
+   "status": "fail",
+   "evidence": "eval/gate-b/touch-test-2026-11-04T19-54-20-482Z.json: mean 7.93 mm, p95 25.77 mm, 45 touches, protocol met (run.md)",
+   "changed_at": "2026-11-04T23:45:08.275Z"
   },
   {
    "id": "C",
@@ -3229,9 +3230,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "target": 4,
    "unit": "mm",
    "report_only": false,
-   "value": null,
-   "measured_at": null,
-   "source": ""
+   "value": 7.93,
+   "measured_at": "2026-11-04T23:45:00.308Z",
+   "source": "live",
+   "changed_at": "2026-11-04T23:45:00.308Z"
   },
   {
    "id": "touch-p95",
@@ -3241,9 +3243,10 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "target": 8,
    "unit": "mm",
    "report_only": false,
-   "value": null,
-   "measured_at": null,
-   "source": ""
+   "value": 25.77,
+   "measured_at": "2026-11-04T23:45:00.352Z",
+   "source": "live",
+   "changed_at": "2026-11-04T23:45:00.352Z"
   },
   {
    "id": "touch-hit",
@@ -4049,6 +4052,31 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-04T23:45:08.362Z",
+   "kind": "claude",
+   "text": "Task d2-7 \"Gate B check\" is now done. Note: Gate B fail: mean 7.93 mm against the 4 mm target (eval/gate-b/RESULTS.md). Next fix: snap tapped corners to the printed L marks (draft PR 3, not built)."
+  },
+  {
+   "ts": "2026-11-04T23:45:08.319Z",
+   "kind": "claude",
+   "text": "Task d2-4 \"Run the 9 point touch test\" is now done. Note: Nov 4, 14:47 to 14:54 ET, iPhone 15 Pro Max, Safari, 45 touches on the printed sheet (eval/gate-b/run.md): mean 7.93 mm, median 4.0 mm, p95 25.77 mm (eval/gate-b/RESULTS.md). Most error from target 9 (mean 27.41 mm) and the first touch (77.96 mm)."
+  },
+  {
+   "ts": "2026-11-04T23:45:08.275Z",
+   "kind": "claude",
+   "text": "Gate B is now fail. Evidence: eval/gate-b/touch-test-2026-11-04T19-54-20-482Z.json: mean 7.93 mm, p95 25.77 mm, 45 touches, protocol met (run.md)"
+  },
+  {
+   "ts": "2026-11-04T23:45:00.352Z",
+   "kind": "claude",
+   "text": "Metric \"p95 fingertip error\" set to 25.77 mm (live)."
+  },
+  {
+   "ts": "2026-11-04T23:45:00.308Z",
+   "kind": "claude",
+   "text": "Metric \"Mean fingertip error\" set to 7.93 mm (live)."
+  },
   {
    "ts": "2026-11-04T22:46:31.682Z",
    "kind": "claude",

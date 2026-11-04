@@ -86,7 +86,7 @@ def doc_values(touch: dict | None, earcon: dict | None, voice: dict | None) -> d
     v = {}
     src = f"(`{RESULTS_FILE}`)"
     if touch:
-        v["gate-b"] = f"mean {touch['mean_mm']} mm, p95 {touch['p95_mm']} mm over {touch['n']} touches {src}"
+        v["gate-b"] = f"mean {touch['mean_mm']} mm, median {touch['median_mm']} mm, p95 {touch['p95_mm']} mm over {touch['n']} touches {src}"
     if earcon:
         v["earcon-device"] = f"p50 {earcon['p50']} ms, p95 {earcon['p95']} ms over {count(earcon['n'], 'entry', 'entries')} {src}"
     if voice:
@@ -95,7 +95,7 @@ def doc_values(touch: dict | None, earcon: dict | None, voice: dict | None) -> d
         tone = f"; touch to tone p95 {earcon['p95']} ms" if earcon else ""
         # On lines of its own: a comment at the start of a list line would print the item raw.
         v["limits-touch"] = (f"\n- **Touch accuracy on the phone** (Gate B on the demo iPhone): mean fingertip error "
-                             f"{touch['mean_mm']} mm, p95 {touch['p95_mm']} mm over {touch['n']} touches, against a "
+                             f"{touch['mean_mm']} mm, median {touch['median_mm']} mm, p95 {touch['p95_mm']} mm over {touch['n']} touches, against a "
                              f"target mean of 4 mm or less{tone} {src}.\n")
     return v
 
@@ -122,12 +122,18 @@ def results_md(root: Path, touch_path: Path | None, touch: dict | None, earcon: 
         digest = hashlib.sha256(touch_path.read_bytes()).hexdigest()
         run_md = (gb / "run.md").exists()
         out += [f"- File: `eval/gate-b/{touch_path.name}`, sha256 `{digest}`.",
-                (f"- Touches {touch['n']}: mean {touch['mean_mm']} mm, p95 {touch['p95_mm']} mm, max {touch['max_mm']} mm "
+                (f"- Touches {touch['n']}: mean {touch['mean_mm']} mm, median {touch['median_mm']} mm, p95 {touch['p95_mm']} mm, max {touch['max_mm']} mm "
                 f"(target: mean 4 mm or less, p95 8 mm or less). By the numbers: {touch['gate_b']}."),
                 (f"- Bias x {touch['bias_x_mm'][0]} ± {touch['bias_x_mm'][1]} mm, y {touch['bias_y_mm'][0]} ± "
                 f"{touch['bias_y_mm'][1]} mm; touches without the pointing pose {touch['not_pointing']}.")]
         if touch.get("practice"):
             out.append(f"- Practice, not Gate B: {touch['practice']}.")
+        per = (touch.get("page_summary") or {}).get("perTargetMeanMm")
+        if per:
+            out.append("- Mean error by target, mm: " + ", ".join(f"{k}: {v}" for k, v in per.items()) + ".")
+        if touch.get("worst_touch"):
+            w = touch["worst_touch"]
+            out.append(f"- Largest error: touch {w['touch']}, on target {w['target']}, {w['mm']} mm.")
         if "scale_ratio_x_over_y" in touch:
             out.append(f"- Video {touch['video_size'][0]} x {touch['video_size'][1]}; x over y scale "
                        f"{touch['scale_ratio_x_over_y']}{' (suspect)' if touch['aspect_suspect'] else ''}.")

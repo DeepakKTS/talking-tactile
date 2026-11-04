@@ -76,6 +76,7 @@ def analyze(result: dict, corners_mm: list[list[float]]) -> dict:
     out = {
         "n": len(recs),
         "mean_mm": round(sum(err) / len(err), 2),
+        "median_mm": round(percentile(err, 50), 2),
         "p95_mm": round(percentile(err, 95), 2),
         "max_mm": round(max(err), 2),
         "gate_b": "pass" if sum(err) / len(err) <= GATE_B_MEAN_MM else "fail",
@@ -87,6 +88,8 @@ def analyze(result: dict, corners_mm: list[list[float]]) -> dict:
         "not_pointing": sum(1 for r in recs if not r.get("pointing")),
         "page_summary": result.get("stats"),
     }
+    worst = max(range(len(err)), key=lambda i: err[i])
+    out["worst_touch"] = {"touch": worst + 1, "target": recs[worst]["target"] + 1, "mm": round(err[worst], 2)}
     # The page marks a run practice when the camera changed under the corners (lib/camera.js).
     if result.get("practice"):
         out["gate_b"] = "practice"

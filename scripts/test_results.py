@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import latency_film as film
 import results as res
 
-TOUCH = {"n": 45, "mean_mm": 2.25, "p95_mm": 4.32}
+TOUCH = {"n": 45, "mean_mm": 2.25, "median_mm": 2.1, "p95_mm": 4.32}
 
 
 class LatencyTest(unittest.TestCase):
@@ -51,7 +51,7 @@ class SpanTest(unittest.TestCase):
     def test_the_doc_sentences_name_the_results_file_and_count_right(self) -> None:
         one = {"n": 1, "p50": 3203, "p95": 3203, "max": 3203}
         v = res.doc_values(TOUCH, {"n": 1, "p50": 100, "p95": 100, "max": 100}, one)
-        self.assertEqual(v["gate-b"], "mean 2.25 mm, p95 4.32 mm over 45 touches (`eval/gate-b/RESULTS.md`)")
+        self.assertEqual(v["gate-b"], "mean 2.25 mm, median 2.1 mm, p95 4.32 mm over 45 touches (`eval/gate-b/RESULTS.md`)")
         self.assertIn("over 1 entry (", v["earcon-device"])
         self.assertEqual(v["voice-device"], "p50 3.2 s, p95 3.2 s over 1 take (`eval/gate-b/RESULTS.md`)")
         self.assertTrue(v["limits-touch"].startswith("\n- **") and v["limits-touch"].endswith(".\n"))

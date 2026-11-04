@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 455, updated 2026-11-04T22:46:31.682Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 460, updated 2026-11-04T23:45:08.362Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -92,9 +92,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d2-3 Homography from 4 clicked corners (1 h)
   - 3 x 3 matrix, a few lines of math. Auto registration comes on Day 5.
   - Note: spikes/tracking: lib/homography.js (4 point DLT, convex check for click order), lib/oneeuro.js (per axis, config/explore.yaml values), lib/fingertip.js (pointing hand picker, 4 mm contact offset toward DIP), calib.js (click A to D, overlay of projected sheet and targets, saved per camera size). 18 node tests. Headless: whole frame as sheet, fingertip mapped to 62.7, 69.5 mm, matching the hand math within 0.1 mm, pointing pose recognized. Watch: MediaPipe warns NORM_RECT projection is exact only for square input; check in the touch test.
-- [ ] d2-4 Run the 9 point touch test (1 h) [blocked]
+- [x] d2-4 Run the 9 point touch test (1 h)
   - Print the test sheet, 45 touches, record mean and p95 error in mm.
-  - Note: NEEDS DEEPAK: the physical 45-touch test on the iPhone, protocol in eval/gate-b/README.md. Ready: spikes/tracking/test-sheet.pdf and the touch-test page (d8-8, d9-9). The result goes to eval/gate-b/ for make results.
+  - Note: Nov 4, 14:47 to 14:54 ET, iPhone 15 Pro Max, Safari, 45 touches on the printed sheet (eval/gate-b/run.md): mean 7.93 mm, median 4.0 mm, p95 25.77 mm (eval/gate-b/RESULTS.md). Most error from target 9 (mean 27.41 mm) and the first touch (77.96 mm).
 - [x] d2-5 Measure fps on phone browser and laptop (30 min)
   - Pick the device for Explore.
   - Fallback: Laptop plus phone as webcam.
@@ -102,13 +102,14 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [ ] ~~d2-6 Record hand touch videos for replay tests~~ (30 min) [cut]
   - Lets tracking accuracy be measured the same way every run, with no person needed.
   - Note: CUT: not done before the deadline. No hand videos were recorded. Scripted hands replay the touch loop instead: spikes/tracking/e2e_check.py and apps/web/e2e/explore_e2e.py (?source=script).
-- [ ] d2-7 Gate B check (15 min)
+- [x] d2-7 Gate B check (15 min)
   - Mean fingertip error 4 mm or less.
   - Fallback: Require the pointing pose, dwell 800 ms, parts above 12 mm.
-  - Note: NEEDS DEEPAK: decided by the d2-4 run. make results writes eval/gate-b/RESULTS.md and prints the gate command.
-- [ ] Gate B: Tracking is accurate [Pending]
+  - Note: Gate B fail: mean 7.93 mm against the 4 mm target (eval/gate-b/RESULTS.md). Next fix: snap tapped corners to the printed L marks (draft PR 3, not built).
+- [ ] Gate B: Tracking is accurate [Failed]
   - Pass when: Mean fingertip error of 4 mm or less on the 9 point sheet.
   - Fallback: Require the pointing pose, dwell 800 ms, keep parts above 12 mm.
+  - Evidence: eval/gate-b/touch-test-2026-11-04T19-54-20-482Z.json: mean 7.93 mm, p95 25.77 mm, 45 touches, protocol met (run.md)
 
 ## Day 3: Wed Oct 28
 

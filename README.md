@@ -88,7 +88,7 @@ Directions, neighbors and distances come from code, never from the model. Pictur
 | Release to first spoken word, Mac, live | p50 5.0 s over 12 questions; two took 13.8 and 14.7 s | `eval/qa/VOICE.md` |
 | Release to first spoken word, iPhone | <!-- tt:voice-device -->not measured: the latency film was cut<!-- /tt:voice-device --> (the Mac figure is above) | `eval/gate-b/README.md` |
 | Touch to tone, iPhone | <!-- tt:earcon-device -->not measured: the latency film was cut<!-- /tt:earcon-device --> | `eval/gate-b/README.md` |
-| Fingertip error on the 9-point sheet (Gate B, goal 4 mm) | <!-- tt:gate-b -->not measured<!-- /tt:gate-b --> | `eval/gate-b/README.md` |
+| Fingertip error on the 9-point sheet (Gate B, goal 4 mm) | <!-- tt:gate-b -->mean 7.93 mm, median 4.0 mm, p95 25.77 mm over 45 touches (`eval/gate-b/RESULTS.md`)<!-- /tt:gate-b --> | `eval/gate-b/README.md` |
 | Meta credits spent | $5.42 of $150 (Nov 4) | `eval/live/ledger.jsonl` |
 
 The questions ran on prompt `ask_answer.v2` at minimal effort. The "without the image" picture
@@ -100,9 +100,11 @@ like-for-like comparison (`eval/qa/RESULTS_image_no_image.md`).
 - **Not yet tested with blind students or teachers.** No tester session or expert review
   happened before the deadline.
 <!-- tt:limits-touch -->
-- **Touch accuracy on the phone is not measured yet.** Gate B (`eval/gate-b/README.md`) has
-  not run on the demo iPhone.
+- **Touch accuracy on the phone** (Gate B on the demo iPhone): mean fingertip error 7.93 mm, median 4.0 mm, p95 25.77 mm over 45 touches, against a target mean of 4 mm or less (`eval/gate-b/RESULTS.md`).
 <!-- /tt:limits-touch -->
+- **Gate B fails by that target.** Most of the error came from target 9 (five touches, mean
+  27.41 mm), including the run's first touch at 77.96 mm (`eval/gate-b/RESULTS.md`). The next
+  fix snaps each tapped corner to its printed L mark (draft pull request 3, not built).
 - **Latency on the phone was not measured.** The latency film (a phone video timed frame by
   frame, `eval/gate-b/README.md`) was cut, so touch to tone and
   release to first spoken word on the iPhone have no numbers. The only measured figure is the
