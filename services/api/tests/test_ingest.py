@@ -5,6 +5,7 @@ import io
 
 import cv2
 import numpy as np
+import pypdf
 import pytest
 from PIL import Image
 
@@ -203,3 +204,23 @@ def test_a_page_other_than_the_first_for_an_image_says_page_1(
         "bad_page",
         "An image has one page. Leave the page number at 1.",
     )
+
+
+def test_a_long_thin_strip_is_refused_in_plain_words_not_a_crash() -> None:
+    strip = np.zeros((3, 20000, 3), dtype=np.uint8)
+    strip[:, ::7] = 255
+    with pytest.raises(IngestError) as err:
+        ingest(encode(strip, "PNG"), 0, RULES)
+    assert err.value.code == "too_thin" and "Crop it closer" in str(err.value)
+
+
+def test_pdf_messages_count_pages_right_and_name_a_password(synthetic: SyntheticFigure) -> None:
+    with pytest.raises(IngestError, match=r"The PDF has 1 page\. Pick"):
+        ingest(pdf_of(synthetic.image), 2, RULES)
+    w = pypdf.PdfWriter()
+    w.add_blank_page(100, 100)
+    w.encrypt("secret")
+    buf = io.BytesIO()
+    w.write(buf)
+    with pytest.raises(IngestError, match="password protected"):
+        ingest(buf.getvalue(), 0, RULES)
