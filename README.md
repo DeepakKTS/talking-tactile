@@ -11,6 +11,9 @@ and transcribers who make tactile graphics, and for the blind students who learn
 
 **Watch the demo (3 minutes):** `<VIDEO_URL>`
 
+**Project site:** https://deepakkts.github.io/talking-tactile/ (how it works, the two sheets
+with their print PDFs, and a pointer demo that speaks part names in the browser).
+
 Built solo for the Meta Global AI Developer Hackathon (Indie track) on `muse-spark-1.3`,
 `sam-3.1` and `muse-voice-transcribe-1.0`, through the Meta Model API.
 
