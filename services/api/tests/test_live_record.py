@@ -5,14 +5,17 @@ code, with no network."""
 
 import asyncio
 import base64
+import io
 import json
 from pathlib import Path
 from typing import Any
 
 import httpx
 import pytest
+from PIL import Image
 
 from app.config import load_tactile_rules
+from app.meta import record
 from app.meta.cost import CostMeter
 from app.meta.live import Ledger, LiveCaller, LiveCallError
 from app.meta.record import Recorder, ReplayTransport, sanitize
@@ -188,3 +191,47 @@ def test_a_recording_never_overwrites_an_existing_one(tmp_path: Path) -> None:
                 "/chat/completions", body, caller="t", model=SPARK, describe="x", record_as="once"
             )
         )
+
+
+def test_a_png_finds_its_recording_by_pixels_when_its_bytes_differ(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def png(level: int) -> bytes:
+        buf = io.BytesIO()
+        Image.new("RGB", (40, 30), (200, 10, 10)).save(buf, "PNG", compress_level=level)
+        return buf.getvalue()
+
+    mac, linux = png(9), png(1)
+    assert mac != linux  # the same pixels, other bytes, as on Linux
+    recorded = record._digest("image/png", mac)
+    key = record.pixel_key(mac)
+    assert key is not None and key == record.pixel_key(linux)
+    monkeypatch.setattr(record, "_pixel_digests", {key: [recorded]})
+    assert record._digest("image/png", mac, mapped=True) == recorded
+    assert record._digest("image/png", linux) != recorded  # as sent, the bytes' own digest
+    assert record._digest("image/png", linux, mapped=True) == recorded  # same pixels: mapped
+    other = io.BytesIO()
+    Image.new("RGB", (40, 30), (0, 0, 0)).save(other, "PNG")
+    assert record._digest("image/png", other.getvalue(), mapped=True) != recorded  # never
+
+    def ask(image: bytes) -> httpx.Request:
+        uri = "data:image/png;base64," + base64.b64encode(image).decode()
+        return httpx.Request("POST", "https://x/v1/responses", json={"input": [uri]})
+
+    saved = {
+        "request": {"method": "POST", "path": "/v1/responses", "json": {"input": [recorded]}},
+        "response": {"status": 200, "json": {"ok": "mac"}},
+    }
+    plain_linux = {
+        "request": {
+            "method": "POST",
+            "path": "/v1/responses",
+            "json": {"input": [record._digest("image/png", linux)]},
+        },
+        "response": {"status": 200, "json": {"ok": "own"}},
+    }
+    replay = record.ReplayTransport([saved])
+    assert json.loads(replay.handle_request(ask(linux)).read())["ok"] == "mac"
+    # A recording of these exact bytes is found first, never swapped for the mapped one.
+    both = record.ReplayTransport([saved, plain_linux])
+    assert json.loads(both.handle_request(ask(linux)).read())["ok"] == "own"

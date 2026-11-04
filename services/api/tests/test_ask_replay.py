@@ -22,7 +22,7 @@ from app.models.regions import RegionsFile
 from app.paths import FIXTURES_DIR, REPO_ROOT
 from app.pipeline import s0_ingest
 from app.prompts import load_prompt
-from tests.recorded_png import mac_png
+from tests.recorded_png import mac_pixels, mac_png
 
 RULES = load_tactile_rules()
 PROMPT = load_prompt(ask.PROMPT)
@@ -75,7 +75,13 @@ def request(q: dict[str, Any]) -> ask.AskRequest:
 @mac_png
 @stale
 @pytest.mark.parametrize(
-    "q", [q for q in qa_eval.load_questions() if q["id"] in LIVE], ids=lambda q: q["id"]
+    "q",
+    [
+        pytest.param(q, marks=mac_pixels if q["figure"] == "brain_lobes" else ())
+        for q in qa_eval.load_questions()
+        if q["id"] in LIVE
+    ],
+    ids=lambda q: q["id"],
 )
 def test_every_eval_question_gets_its_live_answer_back(q: dict[str, Any]) -> None:
     got = asyncio.run(asker().ask(request(q), None))

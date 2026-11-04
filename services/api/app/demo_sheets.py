@@ -56,6 +56,12 @@ SHEETS: dict[str, tuple[Path, dict[str, str], list[dict[str, Any]]]] = {
 }  # fmt: skip
 
 
+EXPECTED = {  # the figure ids the recordings were made for (app/meta/qa_eval.py FIGURES)
+    "heart": "913ba16a635188097dbb235741e05e376d23cca17bdb1789aec79a1497a67ada",
+    "brain_lobes": "046e94d4f0b53298900ab96754caeb348dbc624b35841512d4e5b1198a36a699",
+}
+
+
 class SheetError(Exception):
     """A demo sheet could not be made as the eval published it; the message says why."""
 
@@ -93,6 +99,12 @@ async def make(name: str, http: httpx.AsyncClient, service: Any) -> tuple[str, i
     if r.status_code not in (httpx.codes.OK, httpx.codes.ACCEPTED):
         raise SheetError(f"{name}: the upload was refused: {r.text}")
     fid = str(r.json()["figure_id"])
+    if fid != EXPECTED[name]:
+        raise SheetError(
+            f"{name}: this machine normalizes the figure to other pixels (figure id {fid[:8]}, "
+            f"recorded {EXPECTED[name][:8]}), so its recordings do not match here. On Linux this "
+            "is the brain; the heart replays."
+        )
     await _wait(http, service, fid)
     try:
         return fid, eval_version(service, fid, name)  # already there: nothing to do
@@ -120,7 +132,11 @@ async def make(name: str, http: httpx.AsyncClient, service: Any) -> tuple[str, i
     return fid, eval_version(service, fid, name)
 
 
-async def main_async(data_dir: Path = DATA_DIR) -> list[tuple[str, str, int]]:
+async def main_async(
+    data_dir: Path = DATA_DIR, problems: list[str] | None = None
+) -> list[tuple[str, str, int]]:
+    """Each sheet made, as (name, figure id, version). A sheet that cannot be made here goes
+    to problems with the reason when a list is given, else stops the run."""
     rules = load_tactile_rules()
     app = create_app(data_dir=data_dir, client=make_client(True, rules.meta))
     service = app.state.figure_service()
@@ -129,7 +145,13 @@ async def main_async(data_dir: Path = DATA_DIR) -> list[tuple[str, str, int]]:
         transport=httpx.ASGITransport(app=app), base_url="http://demo-sheets"
     ) as http:
         for name in SHEETS:
-            fid, version = await make(name, http, service)
+            try:
+                fid, version = await make(name, http, service)
+            except SheetError as exc:
+                if problems is None:
+                    raise
+                problems.append(str(exc))
+                continue
             out.append((name, fid, version))
     return out
 
@@ -137,13 +159,16 @@ async def main_async(data_dir: Path = DATA_DIR) -> list[tuple[str, str, int]]:
 def main() -> None:
     if os.environ.get("LIVE") == "1":
         sys.exit("demo-sheets runs in mock mode only; unset LIVE.")
-    try:
-        made = asyncio.run(main_async())
-    except SheetError as exc:
-        sys.exit(str(exc))
-    print("The question eval's sheets, published. With MOCK_META=1 make dev running, open:")
+    problems: list[str] = []
+    made = asyncio.run(main_async(problems=problems))
+    if made:
+        print("The question eval's sheets, published. With MOCK_META=1 make dev running, open:")
     for name, fid, version in made:
         print(f"  {name}: http://localhost:5173/explore?figure={fid}&version={version}")
+    for p in problems:
+        print(f"Not made: {p}", file=sys.stderr)
+    if not made:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -12,10 +12,10 @@ from app.config import load_tactile_rules
 from app.main import create_app
 from app.meta import qa_eval
 from app.meta.mock import MockMetaClient
-from tests.recorded_png import mac_png
+from tests.recorded_png import mac_pixels
 
 
-@mac_png
+@mac_pixels
 def test_demo_sheets_publish_the_eval_sheets_once_and_the_eval_finds_them(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

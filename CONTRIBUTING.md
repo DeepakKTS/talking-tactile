@@ -13,8 +13,11 @@ sh scripts/install-hooks.sh     # once per clone: the pre-commit hook
 MOCK_META=1 make dev            # API on :8000, web on :5173, no network, no key
 ```
 
-Mock mode answers from the recordings in `fixtures/recorded/`, on macOS (they match a figure's
-PNG by its bytes; Linux encodes other bytes). `make demo-sheets` publishes the question eval's
+Mock mode answers from the recordings in `fixtures/recorded/`. They match a figure's PNG by its
+bytes, or on Linux, where the same pixels encode to other bytes, by its pixels
+(`fixtures/recorded/png_pixels.json`; rebuild it on a Mac with
+`cd services/api && uv run python -m app.meta.png_pixels` after a new live recording). The
+Commons brain replays on macOS only. `make demo-sheets` publishes the question eval's
 two sheets into a fresh `data/`, which `app.meta.qa_eval` and mock questions need. Live mode needs a Meta Model API
 key in `services/api/.env` (copy `.env.example`); never put it anywhere else.
 

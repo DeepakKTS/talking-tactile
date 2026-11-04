@@ -102,10 +102,10 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 
 Mock mode replays recorded live answers (`fixtures/recorded/`). No key, no network calls.
 
-Needs macOS, [uv](https://docs.astral.sh/uv/), Node 24 and liblouis (`brew install liblouis`).
-The recordings match a figure's PNG by its exact bytes, and Linux encodes the same pixels to
-other bytes, so on Linux the tests run (`apt install liblouis-bin liblouis-data`) but the
-recorded heart and brain do not replay (`services/api/tests/recorded_png.py`).
+Needs macOS or Linux, [uv](https://docs.astral.sh/uv/), Node 24 and liblouis
+(`brew install liblouis`, or `apt install liblouis-bin liblouis-data`). On Linux the heart
+replays; the Commons brain does not, because its image normalizes to other pixels there, so
+no recording of it matches (`services/api/tests/recorded_png.py`).
 
 ```
 git clone https://github.com/DeepakKTS/talking-tactile.git
