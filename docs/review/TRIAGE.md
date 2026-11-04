@@ -50,24 +50,24 @@ key and in mock mode only. Each finding is one of:
 | ID | Decision |
 |---|---|
 | F01 old key in an unreachable git object | Checked: the blob's key is not the current key (compared in code, nothing printed); it is the earlier key, which returned 401 on Nov 3. The two scratch clones that copied it are deleted. Deepak approved; pruned on Nov 3 (`git reflog expire --expire-unreachable=now --all && git gc --prune=now`): the object is gone and no unreachable object is left. Rotate the current key after the demo. Fixed (docs): `docs/SECURITY.md` says the scan now covers unreachable objects |
-| F02 cross-site simple POSTs reach paid routes | Phase B (code): refuse a browser request whose `Sec-Fetch-Site` is `cross-site`, and require JSON on `/api/ask`. Fixed (docs): listed in SECURITY.md known gaps until then |
-| F03 rate limit reads the client's first `X-Forwarded-For` entry | Phase B (code): use the address uvicorn sets; fix the test. Fixed (docs): SECURITY.md states the real mechanism |
-| F04 uploads have no rate limit | Phase B (code): rate-limit `POST /api/figures` |
+| F02 cross-site simple POSTs reach paid routes | Fixed (code): a change marked `Sec-Fetch-Site: cross-site` gets 403 before the route (CrossSiteGuard); a typed question must be JSON (415). Tests in `services/api/tests/test_cross_site.py` |
+| F03 rate limit reads the client's first `X-Forwarded-For` entry | Fixed (code): RateLimit counts the address uvicorn sets and never reads the header; the test and SECURITY.md say so |
+| F04 uploads have no rate limit | Fixed (code): at most 10 uploads per client per minute, 429 past it (`RateLimit`, `services/api/tests/test_rate_limit.py`). Concurrent pipeline runs are not capped: known gap |
 | F05 fix-call cap starts over per edit version | Phase B (code), low priority; known gap in SECURITY.md |
-| F06 Explore questions do not send the loaded version | Phase B (code): send the version |
+| F06 Explore questions do not send the loaded version | Fixed (code): Explore sends the version it loaded; for `latest` the published file says which version it is (`X-Published-Version`); a version 1 question is answered from version 1 while version 2 exists (`services/api/tests/test_api_figures.py`) |
 | F07 saved sheet not used on a 5xx | Phase B (code). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
 | F08 personal email on every commit | Deepak, Nov 3: no history rewrite; he sets the GitHub noreply address for new commits |
 | F09 macOS `say` clips | Deepak, Nov 3: kept for now under Apple's terms (NOTICE, ATTRIBUTION); after filming he records his own voice, the replays are recorded again and "aorta" is measured on a real voice |
 | F10 SECURITY.md: no reporting route, no threat model | Fixed (docs): "Reporting a vulnerability" and "Threat model and known gaps". Deepak: turn on private vulnerability reporting in the repo settings |
 | F11 APPLICATION.md personal data | Deepak, Nov 3: removed from the tree; history stays |
-| F12 extreme aspect ratio gives a 500 | Phase B (code) |
-| F13 non-UTF-8 JSON gives a 500 | Phase B (code) |
-| F14 control characters in edits fail at S4 | Phase B (code) |
+| F12 extreme aspect ratio gives a 500 | Fixed (code): an image whose short side would be under 64 px at the normalized size is refused as too_thin, with what to do (`services/api/tests/test_ingest.py`) |
+| F13 non-UTF-8 JSON gives a 500 | Fixed (code): 422 invalid_request (`services/api/tests/test_ask.py`) |
+| F14 control characters in edits fail at S4 | Fixed (code): a label or description with a control or format character is refused with 422; teacher text is otherwise stored and shown exactly as typed, hyphens and dashes included. Explore turns an em or en dash into a pause only in the string it speaks (`services/api/tests/test_edits.py`, `apps/web/src/explore/audio.test.ts`) |
 | F15 Author stops polling after one failed poll | Rejected: after the hackathon; a reload recovers |
-| F16 no `maxLength` on the question box | Phase B (code) |
-| F17 server does not cap clip length | Phase B (code) |
+| F16 no `maxLength` on the question box | Fixed (code): the box takes 500 characters (checked in `explore_e2e.py`); past 500 the server says "That question is too long. Ask a shorter one." |
+| F17 server does not cap clip length | Fixed (code): a clip over 16 s is refused as audio_invalid before any call |
 | F18 POST with no Content-Length gets 411 | Rejected: browsers send the length; documented in SECURITY.md |
-| F19 "1 pages", encrypted PDF message | Phase B (code), low priority |
+| F19 "1 pages", encrypted PDF message | Fixed (code): "1 page", "no pages", and "password protected" for an encrypted PDF |
 | F20 in-memory maps never shrink | Rejected: one process per demo, restarted per session; known gap |
 | F21 test hooks ship in Explore | Rejected: after the hackathon; the e2e tests depend on them. Fixed (docs): PRIVACY.md says the last recording stays in page memory until the next |
 | F22 no CSP on API file responses | Rejected: after the hackathon; ElementTree escapes labels |
@@ -81,7 +81,7 @@ key and in mock mode only. Each finding is one of:
 | F30 dev tools inside the API package | Rejected: after the hackathon |
 | F31 tests import a private meta-sam-parser function | Rejected: the version is hash-pinned in `uv.lock` |
 | F32 LAN addresses in the tracker; private file name in `plan_eval.py` | Fixed (docs): tracker passages redacted with `tracker.py redact`. Fixed (code, Nov 3, approved for the filming window: no server imports it): `plan_eval.py` finds the one image in `fixtures/private/` by any name. History: kept, by decision |
-| F33 secret check matches `.env` by exact name | Phase B (code) |
+| F33 secret check matches `.env` by exact name | Fixed (code): any `.env.*` file except `.env.example` is refused (`scripts/test_check_secrets.py`). A generic high-entropy check: rejected, the exact key and the assignment check stay |
 | F34 SAM License not linked | Fixed (docs): NOTICE and ATTRIBUTION link it and name its terms |
 | F35 no third-party notices in a built bundle | Rejected: no bundle is distributed |
 | F36 "The page can send nothing to another host" | Fixed (docs): reworded for `dev:phone`'s websocket |

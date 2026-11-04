@@ -20,11 +20,13 @@ open internet.
 
 - No route has a login. Anyone who can reach the Mac's web server can upload, edit, publish and
   read a figure whose id they know.
-- Cross-site requests: a page on another site, open in a browser on the same network, can send
-  simple POSTs (a typed question as `text/plain`, an upload, a publish) that the API runs. CORS
-  hides the answer only. A fix is queued (`docs/review/QA.md` F02).
-- Uploads have no rate limit, and the fix-call cap starts over with each edit version
-  (`docs/review/QA.md` F04, F05).
+- Cross-site requests (fixed Nov 3, `docs/review/QA.md` F02): a request that changes something
+  and that the browser marks `Sec-Fetch-Site: cross-site` is refused with 403 before the route
+  runs (`services/api/app/middleware.py` CrossSiteGuard), and a typed question must be JSON
+  (415 otherwise). A request with no such header (curl, an older browser) still passes; CORS
+  hides every answer (`services/api/tests/test_cross_site.py`).
+- Uploads are limited to 10 per client per minute (fixed Nov 3, F04), but concurrent pipeline
+  runs are not capped, and the fix-call cap starts over with each edit version (F05).
 - The API on 127.0.0.1:8000 accepts any Host header, so DNS rebinding from a browser on the Mac
   is possible (F24).
 - Prompt injection: a question or a teacher's description goes into Spark's prompt. The
@@ -138,10 +140,12 @@ Fixed:
   to claim a fresh address (`app/middleware.py` RateLimit, `apps/web/vite.config.ts` xfwd,
   tests in `services/api/tests/test_rate_limit.py`).
 
-Correction (Nov 3, review, `docs/review/QA.md` F03): the code takes the first X-Forwarded-For
-entry, which a client on this machine can set. A phone through the proxy is still counted by
-its own address only because uvicorn's default proxy-header handling replaces the client
-address before RateLimit runs. A fix is queued.
+Correction (Nov 3, review, `docs/review/QA.md` F03, fixed the same day): the code took the
+first X-Forwarded-For entry, which a client on this machine can set. It now counts the address
+uvicorn gives the request: through the proxy, uvicorn's proxy headers (on by default, trusting
+127.0.0.1) have already set it to the right-most address the proxy added, the phone's. If the
+API ever runs without uvicorn's proxy headers, every proxied request counts as this machine,
+which is stricter, not looser.
 
 ## Dependencies
 

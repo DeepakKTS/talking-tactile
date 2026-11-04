@@ -173,6 +173,16 @@ describe("explore session", () => {
     expect(audio.log).toContain("stop");
   });
 
+  it("asks about the version it loaded, so a newer one never answers for this sheet", async () => {
+    const asked: AskRequest[] = [];
+    const ask = (r: AskRequest) => { asked.push(r); return Promise.resolve("It joins the two lobes."); };
+    const loaded = new ExploreSession(SYNTHETIC, EXPLORE, { audio: new FakeAudio(), metrics: new Metrics(), ask, version: 4 });
+    await loaded.command("What does the stem connect to?");
+    const unknown = new ExploreSession(SYNTHETIC, EXPLORE, { audio: new FakeAudio(), metrics: new Metrics(), ask });
+    await unknown.command("What does the stem connect to?");
+    expect(asked.map((r) => r.version)).toEqual([4, undefined]);
+  });
+
   it("sends other questions to /api/ask with the touch context", async () => {
     const { audio, session, hold, asked } = setup(() => Promise.resolve("It joins the two lobes."));
     hold(centroid("right lobe"), 1500);

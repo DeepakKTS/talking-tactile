@@ -103,6 +103,17 @@ class CheckSecretsTest(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn("services/api/.env", r.stderr)
 
+    def test_env_variants_are_refused_and_the_example_passes(self) -> None:
+        for name in (".env.local", "services/api/.env.bak", ".env.production"):
+            with self.subTest(name=name):
+                self.stage(name, "META_API_BASE=https://api.meta.ai/v1\n")
+                r = self.run_check()
+                self.assertEqual(r.returncode, 1)
+                self.assertIn(f"{name} is a .env file", r.stderr)
+                self.git("rm", "-q", "--cached", name)
+        self.stage(".env.example", "META_API_BASE=https://api.meta.ai/v1\n")
+        self.assertEqual(self.run_check().returncode, 0)
+
     def test_certificate_and_key_files_are_refused(self) -> None:
         for rel in ("apps/web/.certs/phone.pem", "apps/web/.certs/phone-key.pem", "x/server.key", "x/id.p12"):
             with self.subTest(rel=rel):

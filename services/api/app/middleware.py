@@ -104,29 +104,57 @@ class UploadGuard:
         await self.app(scope, receive, send)
 
 
-_LOOPBACK = ("127.0.0.1", "::1")
+_CHANGES = ("POST", "PATCH", "PUT", "DELETE")
+
+
+class CrossSiteGuard:
+    """A request that changes something (POST, PATCH, PUT, DELETE) and that the browser marks
+    as coming from another site (Sec-Fetch-Site: cross-site) is refused before the route runs:
+    a page elsewhere must not start uploads, questions or publishes here. CORS alone hides
+    only the answer; the route would still run. Requests with no such header (curl, tests,
+    an older browser) pass. The app's own pages are same-origin through the web server."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http" and scope["method"] in _CHANGES:
+            site = dict(scope["headers"]).get(b"sec-fetch-site", b"").decode("latin-1")
+            if site.strip().lower() == "cross-site":
+                await _refuse(send, 403, "cross_site", "This request came from another site.")
+                return
+        await self.app(scope, receive, send)
+
+
 _WINDOW_S = 60.0
 RATE_PER_MINUTE = 30  # questions, and fix calls, per client: a student asks far fewer
+UPLOADS_PER_MINUTE = 10  # a new figure starts S1 and S2 (up to 25 live calls); teachers upload few
 _RATE_MESSAGES = {
     "question": "Too many questions at once. Wait a moment, then ask again.",
     "fix": "Too many fix calls at once. Wait a moment, then try again.",
+    "upload": "Too many uploads at once. Wait a moment, then try again.",
 }
 
 
 class RateLimit:
-    """Per client, at most RATE_PER_MINUTE questions (/api/ask and /api/transcribe together)
-    and RATE_PER_MINUTE fix calls in any minute; more is refused with 429 before the route
-    runs. The client is the connecting address or, when that is this machine (the web server's
-    proxy, which forwards the phone's address), the first X-Forwarded-For address."""
+    """Per client, at most RATE_PER_MINUTE questions (/api/ask and /api/transcribe together),
+    RATE_PER_MINUTE fix calls and UPLOADS_PER_MINUTE figure uploads in any minute; more is
+    refused with 429 before the route runs. The client is the address uvicorn gives the
+    request. Through the web server's proxy on this machine, uvicorn's proxy headers (on by
+    default, trusting 127.0.0.1) have already replaced it with the right-most address the
+    proxy added, the phone's; the client-controlled first X-Forwarded-For entry is never
+    read here, so a client cannot claim a fresh address."""
 
     def __init__(
         self,
         app: ASGIApp,
         per_minute: int = RATE_PER_MINUTE,
         now: Callable[[], float] = time.monotonic,
+        uploads_per_minute: int = UPLOADS_PER_MINUTE,
     ) -> None:
         self.app = app
         self.per_minute = per_minute
+        self.limits = {"question": per_minute, "fix": per_minute, "upload": uploads_per_minute}
         self.now = now
         self.seen: dict[tuple[str, str], deque[float]] = {}
 
@@ -137,17 +165,13 @@ class RateLimit:
         path = str(scope["path"])
         if path in _ASK_PATHS:
             return "question"
+        if path == "/api/figures":
+            return "upload"
         return "fix" if path.endswith("/fix") else None
 
     @staticmethod
     def _client(scope: Scope) -> str:
-        host = (scope.get("client") or ("", 0))[0]
-        if host in _LOOPBACK:
-            forwarded = dict(scope["headers"]).get(b"x-forwarded-for", b"").decode("latin-1")
-            first = forwarded.split(",")[0].strip()
-            if first:
-                return str(first)
-        return str(host)
+        return str((scope.get("client") or ("", 0))[0])
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         kind = self._kind(scope)
@@ -156,7 +180,7 @@ class RateLimit:
             times = self.seen.setdefault((kind, self._client(scope)), deque())
             while times and times[0] <= t - _WINDOW_S:
                 times.popleft()
-            if len(times) >= self.per_minute:
+            if len(times) >= self.limits[kind]:
                 await _refuse(send, 429, "rate_limited", _RATE_MESSAGES[kind])
                 return
             times.append(t)

@@ -350,3 +350,27 @@ def test_a_held_question_is_transcribed_first_and_costs_one_slot(tmp_path: Path)
             assert typed.status_code == 422
 
     asyncio.run(body())
+
+
+def test_a_clip_over_the_longest_hold_is_refused_before_any_call() -> None:
+    with pytest.raises(ask.WavError, match="too long"):
+        ask.check_wav(wav(seconds=ask.MAX_CLIP_S + 0.5))
+    assert ask.check_wav(wav(seconds=15.25)) == pytest.approx(15.25)
+
+
+def test_bad_bytes_and_long_questions_get_plain_422s(tmp_path: Path) -> None:
+    async def body() -> list[httpx.Response]:
+        app = create_app(data_dir=tmp_path, client=MockMetaClient(load_tactile_rules().meta))
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://t"
+        ) as http:
+            json_type = {"Content-Type": "application/json"}
+            return [
+                await http.post("/api/ask", content=b'{"figure_id": "\xff"}', headers=json_type),
+                await http.post("/api/ask", json={"figure_id": FID, "question": "x" * 501}),
+            ]
+
+    not_utf8, too_long = asyncio.run(body())
+    assert (not_utf8.status_code, not_utf8.json()["error"]["code"]) == (422, "invalid_request")
+    assert too_long.status_code == 422
+    assert too_long.json()["error"]["message"] == ask.TOO_LONG_QUESTION

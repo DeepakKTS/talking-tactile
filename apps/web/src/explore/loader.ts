@@ -26,6 +26,14 @@ export function publishedUrl(figureId: string, version: Version): string {
 }
 
 const key = (figureId: string, version: Version) => `tt-published-${figureId}-${String(version)}`;
+const VERSION_HEADER = "X-Published-Version";
+
+// The version number a load stands for: the one asked for, or what the server said "latest" was.
+function versionOf(asked: Version, said: string | null): number | null {
+  if (asked !== "latest") return asked;
+  const n = Number(said);
+  return Number.isInteger(n) && n >= 1 ? n : null;
+}
 
 export async function loadPublished(
   figureId: string,
@@ -41,30 +49,33 @@ export async function loadPublished(
     res = await deps.fetch(publishedUrl(figureId, version));
   } catch {
     const saved = read(deps.storage, key(figureId, version));
-    if (saved) return { ...saved, from: "saved" };
+    if (saved) return { ...saved, version: versionOf(version, readItem(deps.storage, `${key(figureId, version)}-version`)), from: "saved" };
     throw new LoadError("The sheet could not be loaded. Check the network.");
   }
   if (res.status === NOT_FOUND) throw new LoadError("This figure is not published yet.");
   if (!res.ok) throw new LoadError(`The sheet could not be loaded (${res.status}).`);
   const text = await res.text();
   const sheet = parse(text);
+  const loaded = versionOf(version, res.headers.get(VERSION_HEADER));
   try {
     deps.storage?.setItem(key(figureId, version), text);
+    if (loaded !== null) deps.storage?.setItem(`${key(figureId, version)}-version`, String(loaded));
   } catch {
     // Storage full or blocked: the sheet still works, it just cannot reopen offline.
   }
-  return { ...sheet, from: "network" };
+  return { ...sheet, version: loaded, from: "network" };
 }
 
 export interface Loaded {
   file: RegionsFile; // touchable regions only
   notTouchable: string[]; // the names Explore says once at the start
+  version: number | null; // the published version this is; null when the server did not say
   from: "network" | "saved";
 }
 
 // The file as Explore uses it: valid, touchable regions only, and the names of the rest.
 // The messages are read to a student: plain words, and what to do next.
-function parse(text: string): Omit<Loaded, "from"> {
+function parse(text: string): Omit<Loaded, "from" | "version"> {
   try {
     const json: unknown = JSON.parse(text);
     const version = typeof json === "object" && json !== null ? (json as { schema_version?: unknown }).schema_version : undefined;
@@ -77,10 +88,18 @@ function parse(text: string): Omit<Loaded, "from"> {
   }
 }
 
-function read(storage: LoaderDeps["storage"], k: string): Omit<Loaded, "from"> | null {
+function read(storage: LoaderDeps["storage"], k: string): Omit<Loaded, "from" | "version"> | null {
   try {
     const text = storage?.getItem(k);
     return text ? parse(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+function readItem(storage: LoaderDeps["storage"], k: string): string | null {
+  try {
+    return storage?.getItem(k) ?? null;
   } catch {
     return null;
   }

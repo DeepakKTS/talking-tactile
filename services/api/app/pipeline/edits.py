@@ -23,21 +23,47 @@ is one whose outline the teacher set (its mask's source is teacher). Only a veri
 touchable (Oct 30)."""
 
 import hashlib
+import unicodedata
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated, Literal
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, TypeAdapter
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    TypeAdapter,
+)
 
 from app.geometry.layout import part_id_of
 from app.geometry.reconcile import ReconciledPart
 from app.models.mask import BoolImage, Mask
 from app.pipeline import db
 
+
+def _printable(text: str) -> str:
+    """A teacher's words, kept exactly as typed. Control and format characters (NUL, bidi
+    marks, zero-width) are refused here, not left to fail S4 later. Dashes are left alone:
+    Explore turns em and en dashes into pauses only in what it speaks."""
+    if any(unicodedata.category(c) in ("Cc", "Cf") for c in text):
+        raise ValueError("Use letters, numbers and punctuation only.")
+    return text
+
+
 RegionId = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_]{1,32}$")]
-Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
-LongText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=600)]
+Text = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=80),
+    AfterValidator(_printable),
+]
+LongText = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=600),
+    AfterValidator(_printable),
+]
 
 
 class _Edit(BaseModel):

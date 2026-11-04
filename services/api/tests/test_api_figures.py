@@ -228,6 +228,54 @@ def test_a_new_edit_after_publishing_makes_version_two(tmp_path: Path) -> None:
     run(tmp_path, body)
 
 
+def test_a_question_on_version_one_is_answered_from_version_one_while_version_two_exists(
+    tmp_path: Path,
+) -> None:
+    async def body(api: Api) -> None:
+        fid = (await api.upload()).json()["figure_id"]
+        await api.wait(fid)
+        await api.check_all(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).json()["version"] == 1
+        await api.http.patch(f"/api/figures/{fid}/regions/r3", json={"op": "delete"})
+        await api.wait(fid)
+        assert (await api.http.post(f"/api/figures/{fid}/publish")).json()["version"] == 2
+        latest = await api.http.get(f"/api/figures/{fid}/published/latest/regions.json")
+        assert latest.headers["x-published-version"] == "2"
+        one = await api.http.get(f"/api/figures/{fid}/published/1/regions.json")
+        assert one.headers["x-published-version"] == "1"
+
+        seen: list[set[str]] = []
+
+        class Spark:
+            def for_job(self) -> "Spark":
+                return self
+
+            def cap_calls(self, cap: int) -> None:
+                pass
+
+            async def answer(self, figure_id: str, png: bytes, system: str, user: str,
+                             schema: dict[str, Any], what: str) -> dict[str, Any]:  # fmt: skip
+                seen.append(
+                    set(
+                        schema["properties"]["reply"]["anyOf"][-1]["properties"]["cited_part_ids"][
+                            "items"
+                        ]["enum"]
+                    )
+                )
+                return {"answer_text": "It is a lobe.", "source": "figure", "cited_part_ids": []}
+
+        api.service.asker()
+        assert api.service._asker is not None
+        api.service._asker.client = Spark()
+        for version in (1, None):
+            q = {"figure_id": fid, "question": "What is this?", "region_id": None}
+            r = await api.http.post("/api/ask", json=q if version is None else {**q, "version": 1})
+            assert r.status_code == 200, r.text
+        assert "r3" in seen[0] and "r3" not in seen[1]
+
+    run(tmp_path, body)
+
+
 def test_publish_waits_for_pending_edits(tmp_path: Path) -> None:
     async def body(api: Api) -> None:
         fid = (await api.upload()).json()["figure_id"]
@@ -454,6 +502,8 @@ def test_bad_edits_are_refused_and_not_stored(tmp_path: Path) -> None:
             ("PATCH", "/regions/r1", {"op": "label", "label": "x", "region": "r2"},
              "invalid_request"),
             ("PATCH", "/regions/bad.id", {"op": "delete"}, "invalid_request"),
+            ("PATCH", "/regions/r1", {"op": "label", "label": "left\u0000lobe"}, "invalid_request"),
+            ("PATCH", "/regions/r1", {"op": "label", "label": "left\u202elobe"}, "invalid_request"),
             ("POST", "/regions", {"name": "mitochondria"}, "edit_invalid"),
             ("POST", "/regions", {}, "invalid_request"),
         ]  # fmt: skip

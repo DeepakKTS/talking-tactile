@@ -154,6 +154,14 @@ describe("audio engine", () => {
     expect(mirror.getAttribute("aria-live")).toBe("off"); // the app voice speaks; a screen reader must not
   });
 
+  it("speaks a dash as a pause but shows the teacher's text as typed; hyphens stay", async () => {
+    const { speech, mirror, engine } = setup();
+    await engine.start(pitches);
+    engine.say("Left ventricle \u2014 the main pump. Semi-lunar valve\u2013closed.");
+    expect(speech.said).toEqual(["Left ventricle, the main pump. Semi-lunar valve, closed."]);
+    expect(mirror.textContent).toContain("Left ventricle \u2014 the main pump. Semi-lunar valve\u2013closed.");
+  });
+
   it("in screen reader mode writes to a polite live region and never uses the app voice", async () => {
     const { speech, mirror, engine } = setup("screen_reader");
     await engine.start(pitches);

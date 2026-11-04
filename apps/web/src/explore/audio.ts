@@ -81,6 +81,13 @@ export function browserAudioDeps(mirror: HTMLElement): AudioDeps {
   };
 }
 
+/** The words for the voice: an em or en dash becomes a pause (a comma), since some voices read it
+ * out or skip it. Only what is spoken changes; the mirror and the teacher's stored text keep it.
+ * Hyphens are never touched. */
+export function spoken(text: string): string {
+  return text.replace(/\s*[\u2014\u2013]\s*/g, ", ");
+}
+
 export class AudioEngine implements AudioPort {
   private ctx: AudioContext | null = null;
   private readonly tones = new Map<number, AudioBuffer>();
@@ -192,7 +199,7 @@ export class AudioEngine implements AudioPort {
     const speech = this.deps.speech;
     if (this.mode !== "app" || !speech || !this.voice) return;
     this.cancelSpeech();
-    const u = this.deps.utterance(text);
+    const u = this.deps.utterance(spoken(text));
     u.voice = this.voice;
     u.lang = this.voice.lang;
     const done = () => {

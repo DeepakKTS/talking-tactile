@@ -153,6 +153,7 @@ function ExploreSheet() {
 
   const [file, setFile] = useState<RegionsFile | null>(null);
   const [notTouchable, setNotTouchable] = useState<string[]>([]);
+  const [loadedVersion, setLoadedVersion] = useState<number | null>(null);
   const [status, setStatus] = useState(figure ? "Loading the sheet." : "");
   // A sheet that cannot load is said in an alert: Start stays off, so nothing else speaks.
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -206,9 +207,10 @@ function ExploreSheet() {
     if (!figure) return;
     let live = true;
     loadPublished(figure, version, { fetch: (u) => fetch(u), storage: storage() })
-      .then(({ file: f, from, notTouchable: missing }) => {
+      .then(({ file: f, from, notTouchable: missing, version: loaded }) => {
         if (!live) return;
         setFile(f);
+        setLoadedVersion(loaded);
         setNotTouchable(missing);
         setStatus(`${f.title}. ${from === "saved" ? "Opened the saved copy; the network is down. " : ""}Press Start.`);
         trace.current.ready = true;
@@ -273,7 +275,7 @@ function ExploreSheet() {
     eng.onVoiceChange = () => { setNoLocalVoice(eng.noLocalVoice); };
     const port = new TracingAudio(eng, trace.current.log);
     audio.current = port;
-    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, transcribe: transcribeApi, askReply: askReplyApi, notTouchable, touch });
+    const s = new ExploreSession(file, EXPLORE, { audio: port, metrics: trace.current.metrics, ask: askApi, transcribe: transcribeApi, askReply: askReplyApi, notTouchable, touch, ...(loadedVersion === null ? {} : { version: loadedVersion }) });
     session.current = s;
     eng.onSpeechStart = (at, text) => {
       s.speechStarted(at, text);
@@ -324,7 +326,7 @@ function ExploreSheet() {
     const saved = given ?? loadCorners(storage(), v.videoWidth, v.videoHeight);
     if (saved) setCorners(saved, v.videoWidth, v.videoHeight);
     else startCorners();
-  }, [file, notTouchable, started, settings.voice, scripted, given, onHands, say, setCorners, startCorners, touch]);
+  }, [file, notTouchable, loadedVersion, started, settings.voice, scripted, given, onHands, say, setCorners, startCorners, touch]);
 
   // Keys work everywhere except while typing, where only Escape does.
   useEffect(() => {
@@ -524,7 +526,7 @@ function ExploreSheet() {
           <form onSubmit={onAsk} className="glass ask">
             <label>
               Ask, or say where is, more, repeat, stop, what is here{" "}
-              <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" style={FIELD_STYLE} />
+              <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" maxLength={500} style={FIELD_STYLE} />
             </label>
             <button type="submit" className="btn-primary">Ask</button>
           </form>

@@ -22,7 +22,14 @@ from app.models.image import RGB
 
 SourceType = Literal["png", "jpeg", "pdf"]
 IngestCode = Literal[
-    "too_large", "too_many_pixels", "unsupported_type", "unreadable", "bad_page", "blank", "blurry"
+    "too_large",
+    "too_many_pixels",
+    "unsupported_type",
+    "unreadable",
+    "bad_page",
+    "blank",
+    "blurry",
+    "too_thin",
 ]
 
 _MAGIC: dict[bytes, SourceType] = {
@@ -48,6 +55,9 @@ _BLANK_RANGE = 16
 _TOO_MANY = (
     f"The image is over {MAX_PIXELS // 1_000_000} million pixels. Use a smaller scan or photo."
 )
+
+
+MIN_SHORT_SIDE_PX = 64  # the short side at the normalized size; thinner is a strip, not a figure
 
 
 class IngestError(Exception):
@@ -99,10 +109,19 @@ def _decode_pdf(data: bytes, page_index: int, dpi: int) -> RGB:
     try:
         pdf = pdfium.PdfDocument(data)
     except pdfium.PdfiumError as exc:
+        if "password" in str(exc).lower():
+            raise IngestError(
+                "unreadable", "The PDF is password protected. Upload a copy without a password."
+            ) from exc
         raise IngestError("unreadable", "The PDF file could not be read.") from exc
     try:
         if not 0 <= page_index < len(pdf):
-            raise IngestError("bad_page", f"The PDF has {len(pdf)} pages. Pick one of them.")
+            n = len(pdf)
+            if n == 0:
+                raise IngestError("unreadable", "The PDF has no pages.")
+            raise IngestError(
+                "bad_page", f"The PDF has {n} page{'' if n == 1 else 's'}. Pick one of them."
+            )
         page = pdf[page_index]
         w, h = page.get_size()  # points
         if w * h * (dpi / _POINTS_PER_INCH) ** 2 > MAX_PIXELS:
@@ -190,6 +209,11 @@ def ingest(data: bytes, page_index: int, rules: Pipeline) -> Ingested:
     original = (img.shape[1], img.shape[0])
     flat = _deskew(img, rules)
     page = img if flat is None else flat
+    h, w = page.shape[:2]
+    if min(h, w) * rules.normalize_max_side_px / max(h, w) < MIN_SHORT_SIDE_PX:
+        raise IngestError(
+            "too_thin", "The image is too long and thin for a sheet. Crop it closer to the figure."
+        )
     if int(page.max()) - int(page.min()) <= _BLANK_RANGE:
         raise IngestError("blank", "The image is one color, with no figure on it.")
     score = sharpness(page, rules.normalize_max_side_px)
