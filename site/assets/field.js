@@ -1,5 +1,7 @@
 // The mosaic background of the landing page: the photo in hero.jpg drawn as raised dots that
 // lift under the pointer. Paused under prefers-reduced-motion and by the pause button.
+// The art and its effect settings: "Vignette Bloom" by Serafim (21st.dev/@serafimcloud), MIT
+// License, Copyright (c) Serafim (21st.dev/@serafimcloud); full text in licenses/vignette-bloom-MIT.txt.
 (() => {
   "use strict";
 

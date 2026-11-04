@@ -23,6 +23,10 @@ Third-party software:
   example in a built image or a virtual environment, must include its license.
 - fixtures/audio/*.wav are synthetic speech from the macOS `say` voice. Apple's terms for its
   system voices apply to them, not the Apache License (ATTRIBUTION.md).
+- The landing page's background art, site/assets/hero.jpg and the effect in
+  site/assets/field.js: "Vignette Bloom" by Serafim (21st.dev/@serafimcloud), MIT License,
+  Copyright (c) Serafim (21st.dev/@serafimcloud). The license text is in
+  site/licenses/vignette-bloom-MIT.txt.
 - liblouis, for braille, is installed on the system (brew or apt) and is not distributed
   here.
 - Other Python and npm dependencies are installed from their registries through the lock
