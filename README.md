@@ -77,8 +77,8 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 | Questions, live, source right | Heart 36 of 38, brain 35 of 35 | `eval/qa/RESULTS.md` |
 | Picture questions (shape, biggest, top) | Heart 5 of 6, brain 6 of 6; 3 of 6 each without the image | `eval/qa/RESULTS.md`, `eval/qa/RESULTS_image_no_image.md` |
 | Release to first spoken word, Mac, live | p50 5.0 s over 12 questions; two took 13.8 and 14.7 s | `eval/qa/VOICE.md` |
-| Release to first spoken word, iPhone | <!-- tt:voice-device -->not measured<!-- /tt:voice-device --> | `eval/gate-b/` |
-| Touch to tone, iPhone | <!-- tt:earcon-device -->not measured<!-- /tt:earcon-device --> | `eval/gate-b/` |
+| Release to first spoken word, iPhone | <!-- tt:voice-device -->not measured: the latency film was cut<!-- /tt:voice-device --> (the Mac figure is above) | `eval/gate-b/README.md` |
+| Touch to tone, iPhone | <!-- tt:earcon-device -->not measured: the latency film was cut<!-- /tt:earcon-device --> | `eval/gate-b/README.md` |
 | Fingertip error on the 9-point sheet (Gate B, goal 4 mm) | <!-- tt:gate-b -->not measured<!-- /tt:gate-b --> | `eval/gate-b/README.md` |
 | Meta credits spent | $5.31 of $150 (Nov 3) | `eval/live/ledger.jsonl` |
 
@@ -87,9 +87,13 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 - **Not yet tested with blind students or teachers.** No tester session or expert review
   happened before the deadline.
 <!-- tt:limits-touch -->
-- **Touch accuracy and latency on the phone are not measured yet.** Gate B
-  (`eval/gate-b/README.md`) and the latency film have not run on the demo iPhone.
+- **Touch accuracy on the phone is not measured yet.** Gate B (`eval/gate-b/README.md`) has
+  not run on the demo iPhone.
 <!-- /tt:limits-touch -->
+- **Latency on the phone was not measured.** The latency film was cut, so touch to tone and
+  release to first spoken word on the iPhone have no numbers. The only measured figure is the
+  Mac's, live in Chrome: release to first spoken word p50 5.0 s over 12 questions, two at 13.8
+  and 14.7 s (`eval/qa/VOICE.md`).
 - **A sighted helper sets the corners**, and nothing detects the phone or the sheet moving
   afterward (`docs/EDGE_CASES.md` X5, X6).
 - **Continuous vessels are merged by the teacher.** The aorta and its branches are one drawn

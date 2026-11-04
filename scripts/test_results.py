@@ -56,7 +56,7 @@ class SpanTest(unittest.TestCase):
         self.assertEqual(v["voice-device"], "p50 3.2 s, p95 3.2 s over 1 take (`eval/gate-b/RESULTS.md`)")
         self.assertTrue(v["limits-touch"].startswith("\n- **") and v["limits-touch"].endswith(".\n"))
         self.assertEqual(res.doc_values(None, None, None), {})
-        self.assertIn("the latency film is not made yet", res.doc_values(TOUCH, None, None)["limits-touch"])
+        self.assertTrue(res.doc_values(TOUCH, None, None)["limits-touch"].endswith("or less (`eval/gate-b/RESULTS.md`).\n"))
 
 
 class FilmTest(unittest.TestCase):

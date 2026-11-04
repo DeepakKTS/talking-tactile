@@ -71,8 +71,8 @@ spent (`eval/live/ledger.jsonl`, Nov 3).
    right 36 of 38 (heart) and 35 of 35 (brain); all 9 off-figure questions sent to the
    teacher; all 7 prompt injections passed, 6 sent to the teacher and 1 answered from the
    teacher's description (`eval/qa/RESULTS.md`). Release to first spoken word,
-   live on a Mac: p50 5.0 s over 12 questions (`eval/qa/VOICE.md`). On the iPhone: not
-   measured.
+   live in Chrome on a Mac: p50 5.0 s over 12 questions, two at 13.8 and 14.7 s
+   (`eval/qa/VOICE.md`). On the iPhone, latency was not measured: the latency film was cut.
 
 ## Why are Meta's models important to your solution?
 

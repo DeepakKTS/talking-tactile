@@ -163,6 +163,9 @@ One file per counted run, written by hand after the run:
 
 ## The latency film, step by step
 
+Cut for the Nov 4 submission: the film was not made, so touch to tone and release to first
+word on the iPhone stay not measured. The steps are kept for a later run.
+
 1. Film the phone over the sheet from the side, sound on, at the camera's highest frame rate.
    For touch to tone, enter parts one at a time and rest; for questions, hold the talk button,
    ask, let go. Keep each clip short. AirDrop the videos to the Mac; they stay outside git.

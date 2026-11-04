@@ -66,18 +66,20 @@ picture.
   (`eval/qa/README.md` says why that passes).
 - Release of the talk button to the first spoken word (`eval/qa/VOICE.md`): p50 5.0 s over 12
   runs in Chrome on the Mac; two of the 12 took about 14 s. On the iPhone:
-  <!-- tt:voice-device -->not measured<!-- /tt:voice-device -->.
+  <!-- tt:voice-device -->not measured: the latency film was cut<!-- /tt:voice-device -->.
 - Fingertip accuracy on the 9-point test sheet (`eval/gate-b/README.md`, target a mean error of
   4 mm or less): <!-- tt:gate-b -->not measured<!-- /tt:gate-b -->.
-- Touch to tone on the iPhone, from the latency film:
-  <!-- tt:earcon-device -->not measured<!-- /tt:earcon-device -->.
+- Touch to tone on the iPhone:
+  <!-- tt:earcon-device -->not measured: the latency film was cut<!-- /tt:earcon-device -->.
 - Spend: $5.31 of the $150 credits (`eval/live/ledger.jsonl`, 1,013 logged calls, as of
   Nov 3).
 
 ### Limits
 
 Mock mode replays recorded model answers, so it answers only the questions that were
-recorded. Spoken questions need the network. Figures with many small, touching parts (the
+recorded. Spoken questions need the network. Latency on the phone was not measured: the
+latency film was cut, and the only measured figure is the Mac's, p50 5.0 s from release to the
+first spoken word (`eval/qa/VOICE.md`). Figures with many small, touching parts (the
 flower) still need the teacher for about half of them.
 
 ### Try it

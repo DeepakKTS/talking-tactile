@@ -35,8 +35,8 @@ words come from Muse Voice Transcribe, so they need the network. The tones and n
 |---|---|---|
 | 36 of 38 heart questions answered from the right source | Shot 7 | `eval/qa/RESULTS.md` |
 | Release of the talk button to the first spoken word: p50 5.0 s, Chrome on the Mac | Not said; use only if asked | `eval/qa/VOICE.md` |
-| Release to first word on the iPhone | Not said | <!-- tt:voice-device -->TBD: the device latency film<!-- /tt:voice-device --> |
-| Touch to tone on the iPhone | Not said | <!-- tt:earcon-device -->TBD: the device latency film<!-- /tt:earcon-device --> |
+| Release to first word on the iPhone | Not said | <!-- tt:voice-device -->Not measured: the latency film was cut<!-- /tt:voice-device --> |
+| Touch to tone on the iPhone | Not said | <!-- tt:earcon-device -->Not measured: the latency film was cut<!-- /tt:earcon-device --> |
 | Fingertip error on the 9-point sheet | Not said | <!-- tt:gate-b -->TBD: Gate B, `eval/gate-b/README.md`<!-- /tt:gate-b --> |
 
 ## Files for the edit

@@ -92,7 +92,7 @@ def doc_values(touch: dict | None, earcon: dict | None, voice: dict | None) -> d
     if voice:
         v["voice-device"] = f"p50 {voice['p50'] / 1000:.1f} s, p95 {voice['p95'] / 1000:.1f} s over {count(voice['n'], 'take', 'takes')} {src}"
     if touch:
-        tone = (f"; touch to tone p95 {earcon['p95']} ms" if earcon else "; the latency film is not made yet")
+        tone = f"; touch to tone p95 {earcon['p95']} ms" if earcon else ""
         # On lines of its own: a comment at the start of a list line would print the item raw.
         v["limits-touch"] = (f"\n- **Touch accuracy on the phone** (Gate B on the demo iPhone): mean fingertip error "
                              f"{touch['mean_mm']} mm, p95 {touch['p95_mm']} mm over {touch['n']} touches, against a "
@@ -142,7 +142,7 @@ def results_md(root: Path, touch_path: Path | None, touch: dict | None, earcon: 
             out += [f"- Files: `eval/gate-b/{file}`, videos in `eval/gate-b/videos.sha256`.",
                     f"- {count(s['n'], *what[0])}, {what[1]}: p50 {s['p50']} ms, p95 {s['p95']} ms, max {s['max']} ms."]
         else:
-            out.append("Not filmed yet.")
+            out.append("Not measured: the latency film was cut.")
     return "\n".join(out) + "\n"
 
 
