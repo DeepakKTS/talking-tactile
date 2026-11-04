@@ -129,26 +129,31 @@ class CrossSiteGuard:
 _LOOPBACK = ("127.0.0.1", "::1")
 _WINDOW_S = 60.0
 RATE_PER_MINUTE = 30  # questions, and fix calls, per client: a student asks far fewer
+UPLOADS_PER_MINUTE = 10  # a new figure starts S1 and S2 (up to 25 live calls); teachers upload few
 _RATE_MESSAGES = {
     "question": "Too many questions at once. Wait a moment, then ask again.",
     "fix": "Too many fix calls at once. Wait a moment, then try again.",
+    "upload": "Too many uploads at once. Wait a moment, then try again.",
 }
 
 
 class RateLimit:
-    """Per client, at most RATE_PER_MINUTE questions (/api/ask and /api/transcribe together)
-    and RATE_PER_MINUTE fix calls in any minute; more is refused with 429 before the route
-    runs. The client is the connecting address or, when that is this machine (the web server's
-    proxy, which forwards the phone's address), the first X-Forwarded-For address."""
+    """Per client, at most RATE_PER_MINUTE questions (/api/ask and /api/transcribe together),
+    RATE_PER_MINUTE fix calls and UPLOADS_PER_MINUTE figure uploads in any minute; more is
+    refused with 429 before the route runs. The client is the connecting address or, when
+    that is this machine (the web server's proxy, which forwards the phone's address), the
+    first X-Forwarded-For address."""
 
     def __init__(
         self,
         app: ASGIApp,
         per_minute: int = RATE_PER_MINUTE,
         now: Callable[[], float] = time.monotonic,
+        uploads_per_minute: int = UPLOADS_PER_MINUTE,
     ) -> None:
         self.app = app
         self.per_minute = per_minute
+        self.limits = {"question": per_minute, "fix": per_minute, "upload": uploads_per_minute}
         self.now = now
         self.seen: dict[tuple[str, str], deque[float]] = {}
 
@@ -159,6 +164,8 @@ class RateLimit:
         path = str(scope["path"])
         if path in _ASK_PATHS:
             return "question"
+        if path == "/api/figures":
+            return "upload"
         return "fix" if path.endswith("/fix") else None
 
     @staticmethod
@@ -178,7 +185,7 @@ class RateLimit:
             times = self.seen.setdefault((kind, self._client(scope)), deque())
             while times and times[0] <= t - _WINDOW_S:
                 times.popleft()
-            if len(times) >= self.per_minute:
+            if len(times) >= self.limits[kind]:
                 await _refuse(send, 429, "rate_limited", _RATE_MESSAGES[kind])
                 return
             times.append(t)

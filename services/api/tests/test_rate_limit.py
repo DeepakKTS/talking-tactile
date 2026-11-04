@@ -45,6 +45,17 @@ def test_questions_and_transcriptions_share_one_limit_per_client_per_minute() ->
     assert run(limit, "/api/ask") == 200  # a minute later
 
 
+def test_uploads_have_their_own_limit_per_client_per_minute() -> None:
+    clock = [0.0]
+    limit = RateLimit(ok, per_minute=3, now=lambda: clock[0], uploads_per_minute=2)
+    assert [run(limit, "/api/figures") for _ in range(2)] == [200, 200]
+    assert run(limit, "/api/figures") == 429
+    assert run(limit, "/api/ask") == 200  # questions count apart
+    assert run(limit, "/api/figures/x/publish") == 200  # publish is not an upload
+    clock[0] = 60.0
+    assert run(limit, "/api/figures") == 200
+
+
 def test_the_forwarded_address_counts_only_through_this_machine() -> None:
     limit = RateLimit(ok, per_minute=1)
     assert run(limit, "/api/ask", xff="192.168.1.20") == 200

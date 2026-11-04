@@ -25,8 +25,8 @@ open internet.
   runs (`services/api/app/middleware.py` CrossSiteGuard), and a typed question must be JSON
   (415 otherwise). A request with no such header (curl, an older browser) still passes; CORS
   hides every answer (`services/api/tests/test_cross_site.py`).
-- Uploads have no rate limit, and the fix-call cap starts over with each edit version
-  (`docs/review/QA.md` F04, F05).
+- Uploads are limited to 10 per client per minute (fixed Nov 3, F04), but concurrent pipeline
+  runs are not capped, and the fix-call cap starts over with each edit version (F05).
 - The API on 127.0.0.1:8000 accepts any Host header, so DNS rebinding from a browser on the Mac
   is possible (F24).
 - Prompt injection: a question or a teacher's description goes into Spark's prompt. The
