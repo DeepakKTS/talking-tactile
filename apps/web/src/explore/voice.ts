@@ -152,16 +152,10 @@ export interface MicPort {
   stop(): { samples: Float32Array; rate: number };
 }
 
-// The worklet: posts each render quantum of input (128 samples, under 3 ms) to the page,
-// so stopping loses at most one quantum of the post-roll.
-const TAP = `class Tap extends AudioWorkletProcessor {
-  process(inputs) {
-    const ch = inputs[0] && inputs[0][0];
-    if (ch) this.port.postMessage(ch.slice());
-    return true;
-  }
-}
-registerProcessor("tt-tap", Tap);`;
+/** The worklet that hands the microphone's samples to the page. Served by the app, never a
+ * blob: URL: the Content-Security-Policy's script-src covers worklets and allows only 'self'
+ * (on Nov 4 a blob: worklet was refused on the iPhone, so no question was ever sent). */
+export const TAP_URL = "/worklets/tt-tap.js";
 
 export class WebAudioMic implements MicPort {
   private ctx: AudioContext | null = null;
@@ -183,9 +177,7 @@ export class WebAudioMic implements MicPort {
     });
     const ctx = this.makeContext();
     if (ctx.state !== "running") await ctx.resume();
-    const url = URL.createObjectURL(new Blob([TAP], { type: "text/javascript" }));
-    await ctx.audioWorklet.addModule(url);
-    URL.revokeObjectURL(url);
+    await ctx.audioWorklet.addModule(TAP_URL);
     const node = new AudioWorkletNode(ctx, "tt-tap");
     node.port.onmessage = (e: MessageEvent<Float32Array>) => {
       if (this.recording) this.chunks.push(e.data);

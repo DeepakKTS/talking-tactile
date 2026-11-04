@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { AudioPort } from "./audio";
 import { OFFLINE_ANSWER } from "./session";
-import { HOLD_MS, HoldToTalk, MAX_MS, MIC_BUSY, MIC_DENIED, MIN_MS, type MicPort, POST_ROLL_MS, RATE, TOO_SHORT, VoiceAsk, encodeWav, resample } from "./voice";
+import { readFileSync } from "node:fs";
+import { HOLD_MS, HoldToTalk, MAX_MS, MIC_BUSY, MIC_DENIED, MIN_MS, type MicPort, POST_ROLL_MS, RATE, TAP_URL, TOO_SHORT, VoiceAsk, WebAudioMic, encodeWav, resample } from "./voice";
+import { SECURITY_HEADERS } from "../../vite.config";
 
 describe("WAV encoder", () => {
   it("writes a RIFF WAVE header for mono 16-bit PCM at 16 kHz, then the samples", () => {
@@ -299,5 +301,40 @@ describe("first hold, microphone still opening", () => {
     expect(started).toBe(0);
     expect(audio.log).toEqual([`say ${TOO_SHORT}`]);
     expect(v.hold.state).toBe("idle");
+  });
+});
+
+describe("the microphone worklet", () => {
+  // On Nov 4 the iPhone refused a blob: worklet under the app's CSP (script-src 'self'), so
+  // holding to ask never opened the microphone and no question was sent.
+  it("loads from the app's own file, which script-src 'self' allows", async () => {
+    const loaded: string[] = [];
+    const node = { port: { onmessage: null }, connect: () => undefined };
+    const ctx = {
+      state: "running",
+      sampleRate: 48000,
+      resume: () => Promise.resolve(),
+      audioWorklet: { addModule: (u: string) => { loaded.push(u); return Promise.resolve(); } },
+      createMediaStreamSource: () => ({ connect: () => undefined }),
+      destination: {},
+    };
+    const g = globalThis as { AudioWorkletNode?: unknown };
+    const before = g.AudioWorkletNode;
+    g.AudioWorkletNode = function () { return node; };
+    try {
+      const media = { getUserMedia: () => Promise.resolve({}) } as unknown as MediaDevices;
+      await new WebAudioMic(media, () => ctx as unknown as AudioContext).open();
+    } finally {
+      g.AudioWorkletNode = before;
+    }
+    expect(loaded).toEqual([TAP_URL]);
+    expect(TAP_URL.startsWith("/") && !TAP_URL.startsWith("//")).toBe(true);
+    const csp = String((SECURITY_HEADERS as Record<string, string>)["Content-Security-Policy"]);
+    expect(csp).toMatch(/script-src 'self'/);
+  });
+
+  it("is served from public/ and registers the processor the page creates", () => {
+    const src = readFileSync(new URL(`../../public${TAP_URL}`, import.meta.url), "utf8");
+    expect(src).toContain('registerProcessor("tt-tap", Tap)');
   });
 });

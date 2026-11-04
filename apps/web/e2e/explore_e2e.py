@@ -614,10 +614,15 @@ def camera_denied(page: Page, base: str, fid: str, fail: list[str]) -> dict[str,
     return out
 
 
-def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
+def camera(page: Page, reqs: Requests, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
     refused: list[str] = []
+    transcribe: list[str] = []
+    csp: list[str] = []
+    page.on("console", lambda m: csp.append(m.text[:200]) if "Content Security Policy" in m.text else None)
 
     def guard(route: Any) -> None:
+        if route.request.method == "POST" and route.request.url.split("?")[0].endswith("/api/transcribe"):
+            transcribe.append(route.request.url)
         host = route.request.url.split("/")[2]
         if host.startswith("127.0.0.1") or host.startswith("localhost"):
             route.continue_()
@@ -658,6 +663,34 @@ def camera(page: Page, base: str, fid: str, fail: list[str]) -> dict[str, Any]:
         fail.append(f"Explore asked for remote files: {refused[:5]}")
     if out["captureToLandmarksMs"]["count"] < 10:
         fail.append("the worker returned fewer than 10 frames in 5 s")
+    # Hold to ask on Chrome's fake microphone, under the built app's CSP: the microphone opens
+    # (its worklet loads) and the WAV goes to /api/transcribe. On Nov 4 the iPhone refused a
+    # blob: worklet, and no question was sent.
+    n = log_len(page)
+    box = page.locator("h1").bounding_box()
+    page.mouse.move(box["x"] + 8, box["y"] + box["height"] / 2)
+    page.mouse.down()
+    page.wait_for_timeout(1500)
+    page.mouse.up()
+    try:
+        wait_js(page, "(n) => window.__tt.log.slice(n).some((e) => e.kind === 'listen_end')", n, timeout=10000)
+    except Exception:
+        pass
+    page.wait_for_timeout(1000)
+    kinds = [e["kind"] for e in log_since(page, n)]
+    said = says(page, n)
+    out["hold_to_ask"] = {"listen_start": "listen_start" in kinds, "listen_end": "listen_end" in kinds,
+                          "transcribe_posts": len(transcribe), "said": said[:3], "csp_console": csp[:3]}
+    if not (out["hold_to_ask"]["listen_start"] and transcribe) or csp:
+        fail.append(f"holding to ask did not record and send: {out['hold_to_ask']}")
+    if any(t.startswith(("The microphone is not allowed", "The microphone did not open")) for t in said):
+        fail.append(f"holding to ask said the microphone failed: {said}")
+    # The mock has no recording of the fake microphone's clip, so transcribe answers 502; the
+    # student must hear that, and then the failure is not a silent one.
+    if any(t.startswith("Questions are not working right now") for t in said):
+        reqs.told_about("/api/transcribe")
+    else:
+        fail.append(f"holding to ask: a failed transcribe was not told: {said}")
     return out
 
 
@@ -737,7 +770,7 @@ def explore_run(browser: Any, base: str, fid: str, regions: list[dict[str, Any]]
     _, page, _ = context("explore device check")
     result["device_check"] = device_check(page, base, fail)
     _, cam, cam_reqs = context("explore camera")
-    result["camera"] = camera(cam, base, fid, fail)
+    result["camera"] = camera(cam, cam_reqs, base, fid, fail)
     # What /explore asked for, by path, in script mode and in camera mode with MediaPipe.
     paths: dict[str, set[str]] = {}
     for r in script_reqs.seen + cam_reqs.seen:

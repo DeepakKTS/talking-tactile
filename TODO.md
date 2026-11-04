@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 449, updated 2026-11-04T17:51:13.911Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 450, updated 2026-11-04T18:53:26.495Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -475,4 +475,5 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 
 ## Open issues
 
+- (high) Nov 4: holding to ask sent no question on the iPhone. The CSP of Nov 3 (c41ecdf, script-src 'self') refused the microphone's blob: AudioWorklet (WebKit: SecurityError, 'Refused to load blob:'), and voice.ts took that as a refused microphone. Fixed: the worklet is the app's own file, public/worklets/tt-tap.js; explore_e2e now holds to ask on Chrome's fake microphone under the built app's CSP (fails on the old code: 'The microphone did not open', no transcribe POST).
 - (medium) ASR heard "aorta" as "order" on a synthetic clip with no hints: Mitigated: the figure's labels go as keyword hints (d9-8). On three synthetic clips every word was right with and without hints (eval/qa/VOICE.md). Accuracy on a real voice is not measured.

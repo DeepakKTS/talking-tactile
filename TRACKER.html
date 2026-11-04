@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 449,
- "updated_at": "2026-11-04T17:51:13.911Z",
+ "rev": 450,
+ "updated_at": "2026-11-04T18:53:26.495Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -3994,6 +3994,15 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
  ],
  "issues": [
   {
+   "id": "i-mw2h5wtb9cmw",
+   "ts": "2026-11-04T18:53:26.495Z",
+   "title": "Nov 4: holding to ask sent no question on the iPhone. The CSP of Nov 3 (c41ecdf, script-src 'self') refused the microphone's blob: AudioWorklet (WebKit: SecurityError, 'Refused to load blob:'), and voice.ts took that as a refused microphone. Fixed: the worklet is the app's own file, public/worklets/tt-tap.js; explore_e2e now holds to ask on Chrome's fake microphone under the built app's CSP (fails on the old code: 'The microphone did not open', no transcribe POST).",
+   "severity": "high",
+   "status": "open",
+   "note": "",
+   "changed_at": "2026-11-04T18:53:26.495Z"
+  },
+  {
    "id": "i-mw18zsv34px3",
    "ts": "2026-11-03T22:16:58.335Z",
    "title": "An unreachable git blob in the working repo holds an earlier Meta API key (QA F01). Not the current key, compared in code; that key gave 401 on Nov 3. No ref reaches it, so pushes do not send it; a copy of the folder would. Deepak: approve git reflog expire --expire-unreachable=now --all && git gc --prune=now, and rotate the current key after the demo.",
@@ -4031,6 +4040,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-04T18:53:26.495Z",
+   "kind": "claude",
+   "text": "Issue opened: Nov 4: holding to ask sent no question on the iPhone. The CSP of Nov 3 (c41ecdf, script-src 'self') refused the microphone's blob: AudioWorklet (WebKit: SecurityError, 'Refused to load blob:'), and voice.ts took that as a refused microphone. Fixed: the worklet is the app's own file, public/worklets/tt-tap.js; explore_e2e now holds to ask on Chrome's fake microphone under the built app's CSP (fails on the old code: 'The microphone did not open', no transcribe POST).."
+  },
   {
    "ts": "2026-11-04T17:51:13.911Z",
    "kind": "claude",
