@@ -121,7 +121,8 @@ npm's 11 moderate advisories are in lint tools only (`docs/SECURITY.md`).
 2. Wait for "Ready for review." (about 25 s). The "Needs you" list shows the septum, and a
    merge proposal shows the aortic arch.
 3. Press "Mark all parts checked", confirm, then "Publish for students".
-4. Press "Open version 1 in Explore". Without a camera, Enter starts and H says the help.
+4. Press "Open version 1 in Explore", then Enter or "Start exploring": Explore says the sheet's
+   title and summary. Touch needs a camera over the printed sheet (the live setup below).
 
 On this path a typed question says "Questions are not working right now": mock answers exist
 only for the sheets as the question eval published them (the heart with the aortic arch merged

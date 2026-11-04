@@ -2,7 +2,7 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 447, updated 2026-11-03T22:55:48.399Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 448, updated 2026-11-04T04:54:37.859Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
@@ -457,9 +457,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d9-27 Submission form text
   - docs/submission/FORM.md (81f1147); Deepak confirms track, problem statement, repo public, video link
   - Note: docs/submission/FORM.md (81f1147). Deepak confirms: Indie, Push the Frontier, repo public, the video link.
-- [ ] d9-28 Phase B: code fixes queued from the review (after filming)
+- [x] d9-28 Phase B: code fixes queued from the review (after filming)
   - docs/review/TRIAGE.md, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13 non-UTF-8 500; F17 clip length; F24 trusted hosts; F16 question maxLength; F14 control characters; F12 aspect ratio; F23 Gate B listing; F33 .env* in the secret check; qa_eval seed of version 4 sheets plus the mock-question seed; eval/run.py; FORM.md in results.py DOCS; private file name in plan_eval.py; spikes/tracking/README stale line
-  - Note: Done from this list on Nov 3: the private file name in plan_eval.py (allowed in the filming window). Left, after filming, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13; F17; F24; F16; F14; F12; F23; F33; seed of version 4 sheets for qa_eval and mock questions; eval/run.py; FORM.md in results.py DOCS; spikes/tracking/README stale line. Then Deepak's own voice clips and the replays.
+  - Note: Done on Nov 3 to 4, one commit each with the full gates (suite, plan_eval and qa_eval replay unchanged, touch session, four e2e, CI): F06 the loaded version, F02 cross-site guard and JSON questions, F04 upload rate limit, F03 the resolved client address, F13 F16 F17 question checks, F12 F19 uploads and PDF messages, F14 control characters refused with teacher text kept as typed (dashes become pauses only in speech; 10 of 10 stored edits unchanged), F33 every .env file, make demo-sheets, make eval, mock replays on Linux by pixel hash (the heart; the brain is macOS only), F07 saved sheet on a 5xx. Rejected: F05 (low impact), F24 (the proxy forwards the phone's Host), FORM.md in results.py (markers would be pasted into the form). Not tonight: F23 and the spikes/tracking README line (Gate B page in use). Server fixes take effect when :8000 restarts after Gate B.
 - [ ] Gate D: Demo ready [Pending]
   - Pass when: Demo readiness checklist passes twice in a row, live, with no restart.
   - Fallback: Cut the failing step from the script. Never record a flaky step.

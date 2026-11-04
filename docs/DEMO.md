@@ -140,7 +140,7 @@ Do these in order, the day of filming.
 
 | Figure | Version | Source and license | Credit line to show |
 |---|---|---|---|
-| Heart (`fixtures/heart.png`) | 4: every part checked, descriptions on the left ventricle and the right atrium | Heart diagram-en.svg by ZooFari, Wikimedia Commons, CC BY-SA 3.0 | "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. Resized and placed on a white background." |
+| Heart (`fixtures/heart.png`) | 4: every part checked but the septum (left unchecked, so not touchable), descriptions on the left ventricle and the right atrium | Heart diagram-en.svg by ZooFari, Wikimedia Commons, CC BY-SA 3.0 | "Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. Resized and placed on a white background." |
 | Commons brain (`fixtures/eval/brain_lobes.png`) | 4: every part checked, two descriptions | Blausen 0111 BrainLobes.png by BruceBlaus, Wikimedia Commons, CC BY 3.0 | "Blausen 0111 BrainLobes.png by BruceBlaus (Blausen.com staff, Medical gallery of Blausen Medical 2014), CC BY 3.0, via Wikimedia Commons." |
 
 Share-alike: the tactile sheet, its PDF and the heart as it appears in the video are

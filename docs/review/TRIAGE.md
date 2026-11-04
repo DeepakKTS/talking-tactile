@@ -41,7 +41,7 @@ key and in mock mode only. Each finding is one of:
 | `eval/a11y.md` last run Oct 24; no real screen reader | Deepak: VoiceOver on the iPhone (tracker d7-2, d8-35) |
 | Voice tested on synthetic speech only | Deepak: one live voice take (d8-35). README says so |
 | Judge path: `TT_API`, `?source=script`, a 40 s first API start | Rejected for the README (developer detail); `CONTRIBUTING.md` covers the dev setup |
-| Unstyled UI in screenshots | Rejected: feature freeze |
+| Unstyled UI in screenshots | Restyled on branch `ui-refresh` (draft PR #2); merged only on Deepak's approval |
 | `TODO.md`, `TRACKER.html` in the root | Rejected: the project's memory, by rule |
 | `apps/web/package.json` version 0.1.0 | Rejected: harmless |
 
@@ -53,7 +53,7 @@ key and in mock mode only. Each finding is one of:
 | F02 cross-site simple POSTs reach paid routes | Fixed (code): a change marked `Sec-Fetch-Site: cross-site` gets 403 before the route (CrossSiteGuard); a typed question must be JSON (415). Tests in `services/api/tests/test_cross_site.py` |
 | F03 rate limit reads the client's first `X-Forwarded-For` entry | Fixed (code): RateLimit counts the address uvicorn sets and never reads the header; the test and SECURITY.md say so |
 | F04 uploads have no rate limit | Fixed (code): at most 10 uploads per client per minute, 429 past it (`RateLimit`, `services/api/tests/test_rate_limit.py`). Concurrent pipeline runs are not capped: known gap |
-| F05 fix-call cap starts over per edit version | Phase B (code), low priority; known gap in SECURITY.md |
+| F05 fix-call cap starts over per edit version | Rejected: low impact (a teacher on the Mac; the per-process budget stop still applies); known gap in SECURITY.md |
 | F06 Explore questions do not send the loaded version | Fixed (code): Explore sends the version it loaded; for `latest` the published file says which version it is (`X-Published-Version`); a version 1 question is answered from version 1 while version 2 exists (`services/api/tests/test_api_figures.py`) |
 | F07 saved sheet not used on a 5xx | Fixed (code): Explore uses the saved copy on any answer of 500 or more, as a stopped API gives 502 through the web server; a 404 or 4xx still says so (`apps/web/src/explore/loader.test.ts`). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
 | F08 personal email on every commit | Deepak, Nov 3: no history rewrite; he sets the GitHub noreply address for new commits |
@@ -71,11 +71,11 @@ key and in mock mode only. Each finding is one of:
 | F20 in-memory maps never shrink | Rejected: one process per demo, restarted per session; known gap |
 | F21 test hooks ship in Explore | Rejected: after the hackathon; the e2e tests depend on them. Fixed (docs): PRIVACY.md says the last recording stays in page memory until the next |
 | F22 no CSP on API file responses | Rejected: after the hackathon; ElementTree escapes labels |
-| F23 Gate B server lists directories | Phase B (code), after filming (the page is in use) |
-| F24 API accepts any Host | Phase B (code): trusted hosts 127.0.0.1 and localhost |
+| F23 Gate B server lists directories | Not tonight: the Gate B page on :8443 is in use and `spikes/tracking/` stays unchanged until Gate B is done. Local network only, during a test |
+| F24 API accepts any Host | Rejected: the web server's proxy forwards the phone's Host (the Mac's LAN name), so a Host allowlist of 127.0.0.1 and localhost would refuse the phone. The API listens on 127.0.0.1 only |
 | F25 EDGE_CASES line numbers drifted | Rejected: the file says the lines are as of 4debae0 |
 | F26 unused `health.no_hand_warn_ms` | Rejected: harmless, noted in EDGE_CASES X7 |
-| F27 stale paths in docs | Fixed (docs): `CLAUDE.md`, `eval/s2-bakeoff/flower/diagnosis_v2.md`. Phase B: `spikes/tracking/README.md` (frozen path). Rejected: `.claude/skills/` (tooling frozen) |
+| F27 stale paths in docs | Fixed (docs): `CLAUDE.md`, `eval/s2-bakeoff/flower/diagnosis_v2.md`. Not tonight: `spikes/tracking/README.md` (unchanged until Gate B is done). Rejected: `.claude/skills/` (tooling frozen) |
 | F28 bake-off HTML pages miss their git-ignored images | Rejected: grading pages for local use, not linked from the README |
 | F29 README said ATTRIBUTION lists every library | Fixed (docs): gone in the rewrite; ATTRIBUTION now lists meta-sam-parser and liblouis |
 | F30 dev tools inside the API package | Rejected: after the hackathon |

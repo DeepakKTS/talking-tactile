@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 447,
- "updated_at": "2026-11-03T22:55:48.399Z",
+ "rev": 448,
+ "updated_at": "2026-11-04T04:54:37.859Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -3141,14 +3141,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "docs/review/TRIAGE.md, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13 non-UTF-8 500; F17 clip length; F24 trusted hosts; F16 question maxLength; F14 control characters; F12 aspect ratio; F23 Gate B listing; F33 .env* in the secret check; qa_eval seed of version 4 sheets plus the mock-question seed; eval/run.py; FORM.md in results.py DOCS; private file name in plan_eval.py; spikes/tracking/README stale line",
    "timebox": "after filming",
    "fallback": "",
-   "status": "todo",
-   "note": "Done from this list on Nov 3: the private file name in plan_eval.py (allowed in the filming window). Left, after filming, in order: F06 send the loaded version; F02 cross-site POSTs; F04 upload rate limit; F03 forwarded address; F13; F17; F24; F16; F14; F12; F23; F33; seed of version 4 sheets for qa_eval and mock questions; eval/run.py; FORM.md in results.py DOCS; spikes/tracking/README stale line. Then Deepak's own voice clips and the replays.",
-   "done_at": null,
+   "status": "done",
+   "note": "Done on Nov 3 to 4, one commit each with the full gates (suite, plan_eval and qa_eval replay unchanged, touch session, four e2e, CI): F06 the loaded version, F02 cross-site guard and JSON questions, F04 upload rate limit, F03 the resolved client address, F13 F16 F17 question checks, F12 F19 uploads and PDF messages, F14 control characters refused with teacher text kept as typed (dashes become pauses only in speech; 10 of 10 stored edits unchanged), F33 every .env file, make demo-sheets, make eval, mock replays on Linux by pixel hash (the heart; the brain is macOS only), F07 saved sheet on a 5xx. Rejected: F05 (low impact), F24 (the proxy forwards the phone's Host), FORM.md in results.py (markers would be pasted into the form). Not tonight: F23 and the spikes/tracking README line (Gate B page in use). Server fixes take effect when :8000 restarts after Gate B.",
+   "done_at": "2026-11-04T04:54:37.859Z",
    "tags": [
     "fix",
     "security"
    ],
-   "changed_at": "2026-11-03T22:55:48.399Z"
+   "changed_at": "2026-11-04T04:54:37.859Z"
   },
   {
    "id": "d10-1",
@@ -4023,6 +4023,11 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-04T04:54:37.859Z",
+   "kind": "claude",
+   "text": "Task d9-28 \"Phase B: code fixes queued from the review\" is now done. Note: Done on Nov 3 to 4, one commit each with the full gates (suite, plan_eval and qa_eval replay unchanged, touch session, four e2e, CI): F06 the loaded version, F02 cross-site guard and JSON questions, F04 upload rate limit, F03 the resolved client address, F13 F16 F17 question checks, F12 F19 uploads and PDF messages, F14 control characters refused with teacher text kept as typed (dashes become pauses only in speech; 10 of 10 stored edits unchanged), F33 every .env file, make demo-sheets, make eval, mock replays on Linux by pixel hash (the heart; the brain is macOS only), F07 saved sheet on a 5xx. Rejected: F05 (low impact), F24 (the proxy forwards the phone's Host), FORM.md in results.py (markers would be pasted into the form). Not tonight: F23 and the spikes/tracking README line (Gate B page in use). Server fixes take effect when :8000 restarts after Gate B."
+  },
   {
    "ts": "2026-11-03T22:55:48.399Z",
    "kind": "claude",
