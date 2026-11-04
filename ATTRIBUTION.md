@@ -118,6 +118,32 @@ The same terms apply as for the clip above.
 
 The license text in both places is the Apache License 2.0 from https://www.apache.org/licenses/LICENSE-2.0.txt (sha256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30).
 
+## apps/web/public/fonts/literata-latin-opsz-normal.woff2
+
+| | |
+|---|---|
+| Title | Literata, variable (opsz 7 to 72, wght 200 to 900), Latin subset, version 3.103 |
+| Author | The Literata Project Authors (https://github.com/googlefonts/literata) |
+| Source | https://cdn.jsdelivr.net/npm/@fontsource-variable/literata@5.3.0/files/literata-latin-opsz-normal.woff2 (Fontsource's packaging of the Google Fonts release) |
+| License | SIL Open Font License 1.1. Full text next to the font: `apps/web/public/fonts/Literata-OFL.txt` (the package's LICENSE file) |
+| License checked | 2026-11-03, in the package's LICENSE and the font's name table |
+| Changes | None. sha256 29de894c768689feef6ab4ef274a9a16d19bfc5b0c3cbfcdac80ef220816210c |
+| Use | Headings in the web app, self-hosted (`apps/web/src/styles/tokens.css`), and the outlined wordmark in `apps/web/public/brand/logo.svg` |
+
+## apps/web/public/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2
+
+| | |
+|---|---|
+| Title | Atkinson Hyperlegible Next, variable (wght 200 to 800), Latin subset, version 2.001 |
+| Author | The Atkinson Hyperlegible Next Project Authors (https://github.com/googlefonts/atkinson-hyperlegible-next), originally the Braille Institute of America |
+| Source | https://cdn.jsdelivr.net/npm/@fontsource-variable/atkinson-hyperlegible-next@5.3.0/files/atkinson-hyperlegible-next-latin-wght-normal.woff2 (Fontsource's packaging of the Google Fonts release) |
+| License | SIL Open Font License 1.1. Full text next to the font: `apps/web/public/fonts/AtkinsonHyperlegibleNext-OFL.txt` (the package's LICENSE file) |
+| License checked | 2026-11-03, in the package's LICENSE and the font's name table |
+| Changes | None. sha256 18b2a1a39a2fa298b0ba5390aca68462669826c90925656f1c1f6796e0e1bbaf |
+| Use | Body text in the web app, self-hosted (`apps/web/src/styles/tokens.css`) |
+
+Both fonts are served by the app itself, so no page asks Google Fonts or any other host for them.
+
 ## meta-sam-parser 0.1.0 (PyPI)
 
 | | |
