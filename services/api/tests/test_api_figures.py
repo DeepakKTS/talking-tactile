@@ -502,6 +502,8 @@ def test_bad_edits_are_refused_and_not_stored(tmp_path: Path) -> None:
             ("PATCH", "/regions/r1", {"op": "label", "label": "x", "region": "r2"},
              "invalid_request"),
             ("PATCH", "/regions/bad.id", {"op": "delete"}, "invalid_request"),
+            ("PATCH", "/regions/r1", {"op": "label", "label": "left\u0000lobe"}, "invalid_request"),
+            ("PATCH", "/regions/r1", {"op": "label", "label": "left\u202elobe"}, "invalid_request"),
             ("POST", "/regions", {"name": "mitochondria"}, "edit_invalid"),
             ("POST", "/regions", {}, "invalid_request"),
         ]  # fmt: skip

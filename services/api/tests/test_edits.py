@@ -177,3 +177,14 @@ def test_the_store_numbers_edits_per_figure(tmp_path: Path) -> None:
     assert store.list(f, 2) == [a, b]
     assert store.list(f, 1) == [a]
     assert EditStore(tmp_path / "jobs.sqlite").version(f) == 2
+
+
+def test_teacher_text_is_kept_as_typed_and_controls_are_refused() -> None:
+    for kept in ("left \u2014 lobe", "left\u2013lobe", "semi-lunar valve"):
+        edit = EDIT.validate_python({"op": "label", "region": "r1", "label": kept})
+        assert edit.label == kept  # type: ignore[union-attr]
+    for bad in ("left\u0000lobe", "left\u202elobe", "a\u200bb"):
+        with pytest.raises(ValidationError, match="letters, numbers and punctuation"):
+            EDIT.validate_python({"op": "label", "region": "r1", "label": bad})
+    with pytest.raises(ValidationError):
+        EDIT.validate_python({"op": "describe", "region": "r1", "description": "x\u0007"})

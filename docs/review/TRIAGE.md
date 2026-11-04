@@ -62,7 +62,7 @@ key and in mock mode only. Each finding is one of:
 | F11 APPLICATION.md personal data | Deepak, Nov 3: removed from the tree; history stays |
 | F12 extreme aspect ratio gives a 500 | Fixed (code): an image whose short side would be under 64 px at the normalized size is refused as too_thin, with what to do (`services/api/tests/test_ingest.py`) |
 | F13 non-UTF-8 JSON gives a 500 | Fixed (code): 422 invalid_request (`services/api/tests/test_ask.py`) |
-| F14 control characters in edits fail at S4 | Phase B (code) |
+| F14 control characters in edits fail at S4 | Fixed (code): a label or description with a control or format character is refused with 422; teacher text is otherwise stored and shown exactly as typed, hyphens and dashes included. Explore turns an em or en dash into a pause only in the string it speaks (`services/api/tests/test_edits.py`, `apps/web/src/explore/audio.test.ts`) |
 | F15 Author stops polling after one failed poll | Rejected: after the hackathon; a reload recovers |
 | F16 no `maxLength` on the question box | Fixed (code): the box takes 500 characters (checked in `explore_e2e.py`); past 500 the server says "That question is too long. Ask a shorter one." |
 | F17 server does not cap clip length | Fixed (code): a clip over 16 s is refused as audio_invalid before any call |
