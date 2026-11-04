@@ -54,7 +54,7 @@ key and in mock mode only. Each finding is one of:
 | F03 rate limit reads the client's first `X-Forwarded-For` entry | Phase B (code): use the address uvicorn sets; fix the test. Fixed (docs): SECURITY.md states the real mechanism |
 | F04 uploads have no rate limit | Phase B (code): rate-limit `POST /api/figures` |
 | F05 fix-call cap starts over per edit version | Phase B (code), low priority; known gap in SECURITY.md |
-| F06 Explore questions do not send the loaded version | Phase B (code): send the version |
+| F06 Explore questions do not send the loaded version | Fixed (code): Explore sends the version it loaded; for `latest` the published file says which version it is (`X-Published-Version`); a version 1 question is answered from version 1 while version 2 exists (`services/api/tests/test_api_figures.py`) |
 | F07 saved sheet not used on a 5xx | Phase B (code). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
 | F08 personal email on every commit | Deepak, Nov 3: no history rewrite; he sets the GitHub noreply address for new commits |
 | F09 macOS `say` clips | Deepak, Nov 3: kept for now under Apple's terms (NOTICE, ATTRIBUTION); after filming he records his own voice, the replays are recorded again and "aorta" is measured on a real voice |

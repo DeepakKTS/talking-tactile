@@ -107,6 +107,18 @@ describe("published regions loader", () => {
     expect(urls.every((u) => u.includes("/published/"))).toBe(true);
   });
 
+  it("knows which version it loaded: the one asked for, or the server's for latest", async () => {
+    const ok = (headers: Record<string, string> = {}) => fetcher(() => new Response(BODY, { headers })).f;
+    const storage = new MemoryStorage();
+    expect((await loadPublished(ID, 3, { fetch: ok(), storage })).version).toBe(3);
+    expect((await loadPublished(ID, "latest", { fetch: ok({ "X-Published-Version": "5" }), storage })).version).toBe(5);
+    expect((await loadPublished(ID, "latest", { fetch: ok(), storage: null })).version).toBeNull();
+    expect((await loadPublished(ID, "latest", { fetch: ok({ "X-Published-Version": "x" }), storage: null })).version).toBeNull();
+    const offline = fetcher(() => new TypeError("Failed to fetch")).f;
+    expect((await loadPublished(ID, 3, { fetch: offline, storage })).version).toBe(3);
+    expect((await loadPublished(ID, "latest", { fetch: offline, storage })).version).toBe(5);
+  });
+
   it("uses the saved copy when the network is down", async () => {
     const storage = new MemoryStorage();
     await loadPublished(ID, "latest", { fetch: fetcher(() => new Response(BODY)).f, storage });

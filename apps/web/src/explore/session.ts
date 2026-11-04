@@ -14,6 +14,8 @@ import { TouchMachine } from "./touch";
 
 export interface AskRequest {
   figure_id: string;
+  /** The published version Explore loaded; the server answers from that one, not the newest. */
+  version?: number;
   question: string;
   region_id: string | null;
   recent_region_ids: string[];
@@ -53,6 +55,8 @@ export interface SessionDeps {
   transcribe?: (wav: Uint8Array, req: AskRequest) => Promise<Heard>;
   /** A question with the server's times, given the time left of ASK_TIMEOUT_MS. */
   askReply?: (req: AskRequest, timeoutMs: number) => Promise<AskReply>;
+  /** The published version of this sheet, when known: questions are answered from it. */
+  version?: number;
   /** Parts on the sheet a student cannot touch yet, said once in the intro. */
   notTouchable?: readonly string[];
   /** A phone (device.ts): sentences name what to tap, never a key. */
@@ -325,6 +329,7 @@ export class ExploreSession {
     const current = this.touch.region;
     return {
       figure_id: this.file.figure_id,
+      ...(this.deps.version === undefined ? {} : { version: this.deps.version }),
       question,
       region_id: current?.id ?? null,
       recent_region_ids: this.recent.filter((r) => r !== current).slice(-RECENT).map((r) => r.id),

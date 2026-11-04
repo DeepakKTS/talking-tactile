@@ -45,12 +45,16 @@ def _media_type(name: str, types: dict[str, str] = MEDIA_TYPES) -> str:
     return types[name]
 
 
-def _file(request: Request, data: bytes, media_type: str, immutable: bool) -> Response:
+def _file(
+    request: Request, data: bytes, media_type: str, immutable: bool, version: int | None = None
+) -> Response:
     etag = f'"{hashlib.sha256(data).hexdigest()}"'
     headers = {
         "ETag": etag,
         "Cache-Control": "public, max-age=31536000, immutable" if immutable else "no-cache",
     }
+    if version is not None:  # which version "latest" was, so Explore asks about that one
+        headers["X-Published-Version"] = str(version)
     if etag in request.headers.get("if-none-match", ""):
         return Response(status_code=304, headers=headers)
     return Response(data, media_type=media_type, headers=headers)
@@ -172,7 +176,7 @@ async def published_file(
         raise ApiError(404, "not_published", f"This figure has no published version {version}.")
     pub = service.published(_fid(figure_id), None if version == "latest" else version)
     data = service.publications.path(pub, name).read_bytes()
-    return _file(request, data, media_type, immutable=version != "latest")
+    return _file(request, data, media_type, immutable=version != "latest", version=pub.version)
 
 
 @router.get("/{figure_id}/{name}")
