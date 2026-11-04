@@ -56,7 +56,7 @@ make test         # pytest + vitest
 make lint         # ruff + eslint
 make typecheck    # mypy strict on app/ + tsc
 make check        # test + lint + typecheck, what the pre-commit hook runs
-make eval         # a stub: writes eval/RESULTS.md with every suite "not run"; the scorers are plan_eval and qa_eval below
+make eval         # reruns plan_eval and qa_eval on replay, checks they reproduce the committed results, writes eval/RESULTS.md (git-ignored)
 uv run spikes/tracking/e2e_check.py session   # the whole touch test through the spike page, scripted hands, about 50 s. Run before Gate B
 uv run apps/web/e2e/explore_e2e.py   # headless Chrome on a mock API: author flow, Explore online and offline, no local voice, camera with MediaPipe. Prints JSON, exits non-zero on a failed check
 uv run apps/web/e2e/fix_e2e.py   # headless Chrome on the mock API: Fix outline of the heart's aorta from recorded clicks, publish, Explore touches it

@@ -29,7 +29,7 @@ key and in mock mode only. Each finding is one of:
 | `eval/qa/RESULTS.md` has no date, prompt or effort | Rejected for now: the file is generated and the gate restores it. The README row names the date, prompt and effort with `eval/qa/VOICE.md`. Phase B (code) if time allows: the header line in `qa_eval` |
 | The 2.0 s question budget in `RULES.md` is missed (p50 5.0 s) | Fixed (docs): README limitation says so |
 | WRITEUP: author instruction and TBDs | Fixed (docs): "not measured", no instruction line. `make results` still fills the spans |
-| `eval/run.py` is a stub; `make eval` writes "not run" for every suite | Phase B (code): run the replay scorers, or remove `make eval` and its mentions |
+| `eval/run.py` is a stub; `make eval` writes "not run" for every suite | Fixed (code): `make eval` reruns both replay scorers, checks they reproduce the committed results (puts the committed files back), and writes `eval/RESULTS.md` as an index; a suite that cannot run says why |
 | Skills and `SKILLS.md` name `eval/RESULTS.md` | Rejected: agent tooling is frozen since Oct 24; resolved together with `eval/run.py` in Phase B |
 | "Touchable parts in regions.json: 0" reads as a broken metric | Rejected: generated text, by design (touch needs the teacher's check); changing it rewrites the graded file in the freeze |
 | "a lead for a reader, not a verdict" | Fixed (docs): gone in the README rewrite |
