@@ -2,8 +2,10 @@
 two cells of dots 2-3-4-5, and the SVG mark raises exactly those dots
 (apps/web/scripts/brand_logo.py made it)."""
 
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from urllib.parse import unquote
 
 import pytest
 
@@ -50,3 +52,12 @@ def test_the_wordmark_is_outlined() -> None:
     assert root.find(f".//{SVG}text") is None
     assert root.find(f"{SVG}path") is not None
     assert root.findtext(f"{SVG}title") == "Talking Tactile"
+
+
+def test_the_inlined_favicon_is_favicon_svg() -> None:
+    """index.html carries favicon.svg as a data URI, so no icon is fetched after load."""
+    html = (BRAND.parents[1] / "index.html").read_text()
+    found = re.search(r'rel="icon" type="image/svg\+xml" href="data:image/svg\+xml,([^"]+)"', html)
+    assert found is not None
+    assert unquote(found.group(1)) == (BRAND / "favicon.svg").read_text().strip()
+    assert 'rel="icon" href="/' not in html
