@@ -7,11 +7,15 @@ export function App() {
   if (route === "author") return <AuthorPage />;
   if (route === "explore") return <ExplorePage />;
   return (
-    <main>
+    <main className="page">
+      <header className="topbar">
+        <img className="brand" src="/brand/logo.svg" alt="" width="351" height="45" />
+      </header>
       <h1>Talking Tactile</h1>
-      <ul>
-        <li><a href="/author">Author a tactile sheet</a></li>
-        <li><a href="/explore">Explore a sheet</a></li>
+      <p className="lede">Raised textbook figures a blind student explores by touch, with a phone that names each part and answers questions about the figure.</p>
+      <ul className="home-links">
+        <li><a className="glass" href="/author">Author a tactile sheet</a></li>
+        <li><a className="glass" href="/explore">Explore a sheet</a></li>
       </ul>
     </main>
   );

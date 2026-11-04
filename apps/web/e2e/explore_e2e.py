@@ -464,7 +464,8 @@ def author(page: Page, base: str, api: str, fail: list[str]) -> tuple[str, dict[
     publish = page.get_by_role("button", name="Publish for students")
     out["not_checked_at_start"] = parts.get_by_text("Not checked").count()
     out["images_loaded"] = page.evaluate(
-        "() => [...document.querySelectorAll('img')].map((i) => [i.alt, i.complete && i.naturalWidth > 0])"
+        # The review's own images: the page header's logo is not part of the review.
+        "() => [...document.querySelectorAll('section[aria-label=Review] img')].map((i) => [i.alt, i.complete && i.naturalWidth > 0])"
     )
     if not all(ok for _, ok in out["images_loaded"]) or len(out["images_loaded"]) != 2:
         fail.append(f"review images: {out['images_loaded']}")

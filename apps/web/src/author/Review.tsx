@@ -119,11 +119,11 @@ export function Review({ api, id, status, onEdited }: Props) {
   ];
 
   return (
-    <section aria-label="Review">
+    <section aria-label="Review" className="review">
       <h2>{file.title}</h2>
-      <p>{file.summary}</p>
+      <p className="review-summary">{file.summary}</p>
       <p role="status">{settled ? message : "Applying your edit."}</p>
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(18rem,1fr) minmax(0,1fr)", gap: "1rem" }}>
+      <div className="review-grid">
         {fixing ? (
           <FixPanel key={`${fixing.region}\u0000${version}`} api={api} id={id} region={fixing.region} label={fixing.label}
             busy={busy || !settled}
@@ -134,12 +134,12 @@ export function Review({ api, id, status, onEdited }: Props) {
               if (ok) setFixing(null);
             }} />
         ) : (
-          <figure>
-            <img src={api.draftUrl(id, "source.png", 0)} alt="The figure as uploaded" style={{ maxWidth: "100%" }} />
+          <figure className="glass">
+            <img src={api.draftUrl(id, "source.png", 0)} alt="The figure as uploaded" />
             <figcaption>As uploaded</figcaption>
           </figure>
         )}
-        <div>
+        <div className="glass panel">
           <h3>Parts</h3>
           <p>
             {unchecked === 0
@@ -147,10 +147,10 @@ export function Review({ api, id, status, onEdited }: Props) {
               : `${unchecked} of ${parts.length} parts not checked yet. A student can touch a part only once you check it.`}
           </p>
           {waiting.length > 0 && !confirmAll && (
-            <p><button type="button" disabled={busy || !settled} onClick={() => { setConfirmAll(true); }}>Mark all parts checked</button></p>
+            <p><button type="button" className="btn-primary" disabled={busy || !settled} onClick={() => { setConfirmAll(true); }}>Mark all parts checked</button></p>
           )}
           {confirmAll && (
-            <section aria-label="Confirm marking all parts checked">
+            <section aria-label="Confirm marking all parts checked" className="confirm">
               <p>Mark all {waiting.length} parts checked? A student can then touch each of them.</p>
               {warned.length > 0 ? (
                 <>
@@ -160,15 +160,17 @@ export function Review({ api, id, status, onEdited }: Props) {
                   </ul>
                 </>
               ) : <p>No part carries a warning.</p>}
-              <button type="button" disabled={busy || !settled} onClick={() => {
+              <p className="actions">
+              <button type="button" className="btn-primary" disabled={busy || !settled} onClick={() => {
                 setConfirmAll(false);
                 const ids = waiting.map((r) => partId(r.id));
                 void send(`Marking ${ids.length} parts checked`, () => api.edit(id, ids[0] ?? "", { op: "check", also: ids.slice(1) }));
               }}>Yes, mark all {waiting.length} checked</button>{" "}
               <button type="button" onClick={() => { setConfirmAll(false); }}>Cancel</button>
+              </p>
             </section>
           )}
-          <ul aria-label="Parts" style={{ listStyle: "none", padding: 0 }}>
+          <ul aria-label="Parts" className="items">
             {parts.map((r) => (
               // Keyed on the saved text too, so the fields start over after an edit lands.
               <PartRow key={`${r.id}\u0000${r.label}\u0000${r.description ?? ""}`} region={r} all={parts} busy={busy || !settled} selected={selected === r.id}
@@ -182,10 +184,10 @@ export function Review({ api, id, status, onEdited }: Props) {
             <>
               <h3>Suggested merges</h3>
               <p>These parts are drawn as one shape with no line between them.</p>
-              <ul aria-label="Suggested merges" style={{ listStyle: "none", padding: 0 }}>
+              <ul aria-label="Suggested merges" className="items">
                 {(file.merge_proposals ?? []).map((m) => (
-                  <li key={m.region_ids.join(" ")}>
-                    <button type="button" disabled={busy || !settled} onClick={() => void merge(m)}>
+                  <li key={m.region_ids.join(" ")} data-tone="info">
+                    <button type="button" className="btn-primary" disabled={busy || !settled} onClick={() => void merge(m)}>
                       Merge {joined(m.region_ids.map(labelOf))} as &apos;{m.name}&apos;
                     </button>{" "}
                     <span>{capital(m.why)}.</span>
@@ -198,10 +200,10 @@ export function Review({ api, id, status, onEdited }: Props) {
             <>
               <h3>Needs you</h3>
               <p>A student cannot touch these parts yet. Each needs you; the reason is given.</p>
-              <ul aria-label="Needs you" style={{ listStyle: "none", padding: 0 }}>
+              <ul aria-label="Needs you" className="items">
                 {flagged.map((f) => (
-                  <li key={f.id} style={{ borderLeft: "0.4rem solid #c62828", padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
-                    <strong>{f.label}</strong> <span>Not touchable yet.</span> {f.reason}{" "}
+                  <li key={f.id} data-tone="danger">
+                    <strong>{f.label}</strong> <span className="flag" data-tone="danger">Not touchable yet.</span> {f.reason}{" "}
                     {f.outlines.length > 0 && (
                       <button type="button" onClick={() => { setSelected(selected === f.id ? null : f.id); }} aria-pressed={selected === f.id}>
                         Show the suggested outline of {f.label}
@@ -219,9 +221,9 @@ export function Review({ api, id, status, onEdited }: Props) {
             <>
               <h3>For your information</h3>
               <p>Nothing to do here. This is how the sheet shows these parts.</p>
-              <ul aria-label="For your information" style={{ listStyle: "none", padding: 0 }}>
+              <ul aria-label="For your information" className="items">
                 {notes.map((n) => (
-                  <li key={n.key} style={{ borderLeft: "0.4rem solid #1565c0", padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
+                  <li key={n.key} data-tone="info">
                     <strong>{n.label}</strong> <span>{n.text}</span>
                   </li>
                 ))}
@@ -230,13 +232,16 @@ export function Review({ api, id, status, onEdited }: Props) {
           )}
           <AddPart busy={busy || !settled} onAdd={async (name) => { await send(`Looking for ${name}`, () => api.add(id, name)); }} />
         </div>
-        <figure style={{ position: "relative", margin: 0 }}>
-          <img src={api.draftUrl(id, "tactile.svg", version)} alt="Preview of the tactile sheet" style={{ width: "100%", display: "block" }} />
-          {selected && <Highlight file={file} ids={flagged.find((f) => f.id === selected)?.outlines ?? [selected]} areas={area?.area_mm ?? []} />}
+        <figure className="glass sheet">
+          <div style={{ position: "relative" }}>
+            <img src={api.draftUrl(id, "tactile.svg", version)} alt="Preview of the tactile sheet" />
+            {selected && <Highlight file={file} ids={flagged.find((f) => f.id === selected)?.outlines ?? [selected]} areas={area?.area_mm ?? []} />}
+          </div>
           <figcaption>Tactile sheet{selected ? `, ${labelOf(selected)} outlined` : ""}</figcaption>
         </figure>
       </div>
 
+      <div className="glass card publish">
       <h3>Tactile rules</h3>
       {report.length === 0 ? (
         <p>All tactile rules pass.</p>
@@ -255,19 +260,22 @@ export function Review({ api, id, status, onEdited }: Props) {
           </ul>
         </div>
       )}
-      <p>
-        <button type="button" onClick={() => void publish()} disabled={busy || !settled}>Publish for students</button>{" "}
+      <p className="actions">
+        <button type="button" className="btn-primary" onClick={() => void publish()} disabled={busy || !settled}>Publish for students</button>{" "}
         <a href={api.draftUrl(id, "print.pdf", version)}>Download the draft print PDF</a>
       </p>
       {refused && (
-        <div role="alert">
+        <div role="alert" className="notice notice-danger">
+          <div className="notice-body">
           <p>Publishing was refused. Fix these with an edit, then publish again:</p>
           <ul aria-label="Refused because">
             {refused.map((v, i) => <li key={i}>{describeViolation(v, labelOf)}</li>)}
           </ul>
+          </div>
         </div>
       )}
       {published && <PrintPanel id={id} pub={published} />}
+      </div>
     </section>
   );
 }
@@ -424,9 +432,9 @@ function PartRow(props: {
   const others = all.filter((o) => o.id !== r.id);
   const flag = r.verified_by_teacher ? "Checked" : "Not checked";
   return (
-    <li style={{ borderLeft: `0.4rem solid ${r.verified_by_teacher ? "#2e7d32" : "#f0a000"}`, padding: "0.25rem 0.5rem", marginBottom: "0.5rem" }}>
+    <li data-tone={r.verified_by_teacher ? "ok" : "warn"}>
       <strong>{r.label}</strong>
-      {r.abbrev ? ` (braille ${r.abbrev})` : ""} <span>{r.verified_by_teacher ? "✓ " : "! "}{flag}</span>{" "}
+      {r.abbrev ? ` (braille ${r.abbrev})` : ""} <span className="flag" data-tone={r.verified_by_teacher ? "ok" : "warn"}>{r.verified_by_teacher ? "✓ " : "! "}{flag}</span>{" "}
       {(r.flags ?? []).map((f) => <span key={f.reason}>{NOTES[f.reason] ?? f.detail} </span>)}
       <button type="button" onClick={onSelect} aria-pressed={selected}>Show on sheet</button>{" "}
       {!r.verified_by_teacher && (
@@ -436,7 +444,7 @@ function PartRow(props: {
       )}{" "}
       {r.source === "teacher" && <span>Outline set by teacher. </span>}
       {warnings.map((w) => (
-        <span key={w.other} style={{ display: "block", color: "#8a4b00" }}>
+        <span key={w.other} className="note-warn">
           {w.text}.{" "}
           <button type="button" aria-label={`Show where ${w.other} is on the sheet`} aria-pressed={shown === w} onClick={() => { onShowArea(w); }}>
             Show on sheet
@@ -446,7 +454,7 @@ function PartRow(props: {
       <button type="button" onClick={() => { setOpen(!open); }} aria-expanded={open}>Edit {r.label}</button>{" "}
       <button type="button" disabled={busy} onClick={onFix}>Fix outline of {r.label}</button>
       {open && (
-        <div>
+        <div className="edit-box">
           <form onSubmit={(e) => { e.preventDefault(); void onEdit(r, { op: "label", label }, `Renaming ${r.label}`); }}>
             <label>New name for {r.label} <input value={label} onChange={(e) => { setLabel(e.target.value); }} maxLength={80} required /></label>{" "}
             <button type="submit" disabled={busy || !label.trim()}>Rename {r.label}</button>
@@ -563,12 +571,12 @@ function FixPanel(props: {
   const ready = view !== null && positive.length > 0 && !view.empty && !pending;
   const spills = view !== null && view.spill.length > 0;
   return (
-    <section aria-label={`Fix outline of ${label}`} style={{ border: "2px solid #333", padding: "0.5rem" }}>
+    <section aria-label={`Fix outline of ${label}`} className="fix">
       <h3>Fix outline of {label}</h3>
       <p>Click inside {label} to add a point. Turn on Negative points, or hold Shift, to mark what is not {label}.</p>
       {view && (
         <img src={view.image} alt={`${label}: the new outline over the faded figure, the old outline in magenta`}
-          onClick={click} style={{ width: "100%", cursor: pending ? "progress" : "crosshair", opacity: pending ? 0.6 : 1 }} />
+          onClick={click} className="fix-image" data-pending={pending} />
       )}
       <p role="status" aria-live="polite">{message}</p>
       {view?.warnings.map((w, i) => <p key={i}>Warning: {w}</p>)}
@@ -581,10 +589,10 @@ function FixPanel(props: {
         Positive points: {positive.length ? positive.map(([x, y]) => `(${x}, ${y})`).join(", ") : "none"}.
         Negative points: {negative.length ? negative.map(([x, y]) => `(${x}, ${y})`).join(", ") : "none"}.
       </p>
-      <p>
+      <p className="actions">
         <button type="button" aria-pressed={negativeMode} onClick={() => { setNegativeMode(!negativeMode); }}>Negative points</button>{" "}
         <button type="button" disabled={pending || order.length === 0} onClick={undo}>Undo last point</button>{" "}
-        <button type="button" disabled={!ready || busy} onClick={() => void onAccept(positive, negative)}>
+        <button type="button" className="btn-primary" disabled={!ready || busy} onClick={() => void onAccept(positive, negative)}>
           {spills ? `Accept the outline of ${label} anyway` : `Accept the outline of ${label}`}
         </button>{" "}
         <button type="button" onClick={onClose}>Cancel</button>
@@ -604,7 +612,7 @@ function describeFix(v: FixPreview): string {
 function AddPart({ busy, onAdd }: { busy: boolean; onAdd: (name: string) => Promise<void> }) {
   const [name, setName] = useState("");
   return (
-    <form onSubmit={(e) => { e.preventDefault(); const n = name.trim(); if (n) void onAdd(n).then(() => { setName(""); }); }}>
+    <form className="add-part" onSubmit={(e) => { e.preventDefault(); const n = name.trim(); if (n) void onAdd(n).then(() => { setName(""); }); }}>
       <label>
         Add a missing part by name <input value={name} onChange={(e) => { setName(e.target.value); }} maxLength={80} />
       </label>{" "}
@@ -637,9 +645,9 @@ function Highlight({ file, ids, areas = [] }: { file: RegionsFile; ids: string[]
 function PrintPanel({ id, pub }: { id: string; pub: Publication }) {
   const pdf = pub.files["print.pdf"]?.url;
   return (
-    <section aria-label="Print and explore">
+    <section aria-label="Print and explore" className="print">
       <h3>Print and explore</h3>
-      <ol>
+      <ol className="print-steps">
         <li>{pdf ? <a href={pdf} download>Download print PDF, version {pub.version}</a> : "The print PDF is missing."}</li>
         <li>Print at 100 percent, or actual size. Do not fit to page.</li>
         <li>Measure the bar at the bottom. It must be 100 mm. If not, check the printer scale and print again.</li>

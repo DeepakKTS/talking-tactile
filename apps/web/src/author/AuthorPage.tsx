@@ -10,6 +10,9 @@ const STAGES: StageName[] = ["s0", "s1", "s2", "s3", "s4", "s5"];
 const FINISHED = new Set<Job["status"]>(["done", "failed", "describe_only"]);
 // Spark's verdict on a figure with nothing to make tactile; its reason follows.
 const DESCRIBE_ONLY = "This figure is better described in words than made into a tactile sheet.";
+// The server's upload guard, config/tactile_rules.yaml pipeline.max_upload_mb (a test keeps
+// the two equal). The server checks it; this is only said on the card.
+export const MAX_UPLOAD_MB = 10;
 
 export function figureFromUrl(): string | null {
   const id = new URLSearchParams(window.location.search).get("figure");
@@ -68,11 +71,16 @@ export function AuthorPage({ api = new FigureApi(), pollMs = POLL_MS }: { api?: 
   };
 
   return (
-    <main>
+    <main className="page author">
+      <header className="topbar">
+        <a className="brand" href="/">
+          <img src="/brand/logo.svg" alt="Talking Tactile, home" width="351" height="45" />
+        </a>
+      </header>
       <h1>Author a tactile sheet</h1>
       {!id && <UploadPanel api={apiRef} onUploaded={opened} />}
       {id && again && <p role="status">{UPLOADED_BEFORE}</p>}
-      {id && error && <p role="alert">{error}</p>}
+      {id && error && <p role="alert" className="notice notice-danger">{error}</p>}
       {id && status && <Progress status={status} />}
       {id && status && reviewable === id && <Review api={apiRef} id={id} status={status} onEdited={refresh} />}
       {id && (
@@ -89,12 +97,18 @@ const UPLOADED_BEFORE = "You uploaded this figure before. Its review, edits and 
 function UploadPanel({ api, onUploaded }: { api: FigureApi; onUploaded: (id: string, created: boolean) => void }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [refused, setRefused] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<string | null>(null);
+  const [over, setOver] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  // A file dropped on the card. Choosing one with Browse replaces it.
+  const dropped = useRef<File | null>(null);
 
   const submit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    const file = fileInput.current?.files?.[0];
+    const file = fileInput.current?.files?.[0] ?? dropped.current;
+    setRefused(null);
     if (!file) {
       setMessage("Choose a PNG, JPEG or PDF file first.");
       return;
@@ -111,28 +125,68 @@ function UploadPanel({ api, onUploaded }: { api: FigureApi; onUploaded: (id: str
       });
       onUploaded(r.figure_id, r.created);
     } catch (err) {
-      setMessage(err instanceof ApiError ? err.message : "The upload failed.");
+      setMessage("");
+      setRefused(err instanceof ApiError ? err.message : "The upload failed.");
     } finally {
       setBusy(false);
     }
   };
 
+  const drop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setOver(false);
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    dropped.current = file;
+    if (fileInput.current) fileInput.current.value = "";
+    setChosen(file.name);
+    setRefused(null);
+    setMessage("");
+  };
+
   return (
-    <form onSubmit={(e) => void submit(e)} aria-label="Upload a figure">
-      <p>
-        <label>
-          Figure (PNG, JPEG or a PDF page){" "}
-          <input ref={fileInput} name="file" type="file" accept="image/png,image/jpeg,application/pdf" />
+    <form onSubmit={(e) => void submit(e)} aria-label="Upload a figure" className="glass card upload">
+      <div className="card-head">
+        <span className="tile" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 3h8l4 4v14H6z" />
+            <path d="M14 3v4h4" />
+            <circle cx="10" cy="12" r="1.1" fill="currentColor" />
+            <circle cx="10" cy="16" r="1.1" fill="currentColor" />
+            <circle cx="14" cy="12" r="1.1" fill="currentColor" />
+          </svg>
+        </span>
+        <div>
+          <h2 className="card-title">New tactile sheet</h2>
+          <p className="card-desc">Upload a textbook figure. You check the parts it finds, then print the sheet.</p>
+        </div>
+      </div>
+
+      <div className="dropzone" data-over={over}
+        onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+        onDragLeave={() => { setOver(false); }}
+        onDrop={drop}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 15V4" />
+          <path d="M7.5 8.5 12 4l4.5 4.5" />
+          <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+        </svg>
+        <p className="drop-title" id="tt-file-label">Figure (PNG, JPEG or a PDF page)</p>
+        <p className="drop-meta" id="tt-file-hint">Drop the file here, or browse. Up to {MAX_UPLOAD_MB} MB.</p>
+        <input ref={fileInput} id="tt-file" className="file-input" name="file" type="file" accept="image/png,image/jpeg,application/pdf"
+          aria-labelledby="tt-file-label" aria-describedby="tt-file-hint tt-file-chosen"
+          onChange={(e) => { dropped.current = null; setChosen(e.target.files?.[0]?.name ?? null); setRefused(null); }} />
+        <label htmlFor="tt-file" className="browse">Browse</label>
+        <p className="drop-file" id="tt-file-chosen">{chosen ? `Chosen: ${chosen}` : "No file chosen."}</p>
+      </div>
+
+      <div className="fields">
+        <label className="field">
+          <span className="field-label">PDF page number</span>
+          <input name="page_index" type="number" min={1} defaultValue={1} inputMode="numeric" />
         </label>
-      </p>
-      <p>
-        <label>
-          PDF page number <input name="page_index" type="number" min={1} defaultValue={1} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Grade band{" "}
+        <label className="field">
+          <span className="field-label">Grade band</span>
           <select name="grade_band" defaultValue="">
             <option value="">Not set</option>
             <option value="k5">K to 5</option>
@@ -140,27 +194,136 @@ function UploadPanel({ api, onUploaded }: { api: FigureApi; onUploaded: (id: str
             <option value="9_12">9 to 12</option>
             <option value="college">College</option>
           </select>
-        </label>{" "}
-        <label>
-          Paper{" "}
+        </label>
+        <label className="field">
+          <span className="field-label">Paper</span>
           <select name="page" defaultValue="letter">
             <option value="letter">US Letter</option>
             <option value="a4">A4</option>
           </select>
         </label>
-      </p>
-      <button type="submit" disabled={busy}>Make a tactile sheet</button>
-      <p role="status">{message}</p>
+      </div>
+
+      {refused && (
+        <div role="alert" className="notice notice-danger">
+          <AlertIcon />
+          <div className="notice-body">
+            <p><strong>Not uploaded.</strong> {refused}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="card-foot">
+        <p role="status">{message}</p>
+        <button type="submit" className="btn-primary" disabled={busy}>Make a tactile sheet</button>
+      </div>
     </form>
   );
+}
+
+function AlertIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9.5" />
+      <path d="M12 7v6" />
+      <circle cx="12" cy="16.5" r="0.6" fill="currentColor" />
+    </svg>
+  );
+}
+
+type StepState = "done" | "active" | "pending" | "failed";
+
+function StepIcon({ state }: { state: StepState }) {
+  if (state === "done") {
+    return (
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <circle cx="14" cy="14" r="12" fill="currentColor" />
+        <path d="M8.5 14.5l3.6 3.6 7.4-8" fill="none" stroke="var(--accent-ink)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  if (state === "active") {
+    return (
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <circle cx="14" cy="14" r="11" fill="none" stroke="var(--hair)" strokeWidth="3" />
+        <path className="spin" d="M14 3a11 11 0 0 1 11 11" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="14" cy="14" r="3" fill="currentColor" />
+      </svg>
+    );
+  }
+  if (state === "failed") {
+    return (
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <circle cx="14" cy="14" r="12" fill="currentColor" />
+        <path d="M10 10l8 8M18 10l-8 8" stroke="var(--bg)" strokeWidth="2.4" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 28 28" aria-hidden="true">
+      <circle cx="14" cy="14" r="11" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/** Whole seconds since this page first saw the job on this stage. Measured here, by the
+ * page's own clock: the API gives a stage's time only once it is done. */
+function useSecondsOn(key: string | null): number {
+  const [seen, setSeen] = useState<{ key: string | null; s: number }>({ key: null, s: 0 });
+  useEffect(() => {
+    if (!key) return;
+    const at = performance.now();
+    const t = setInterval(() => { setSeen({ key, s: Math.floor((performance.now() - at) / 1000) }); }, 1000);
+    return () => { clearInterval(t); };
+  }, [key]);
+  return seen.key === key ? seen.s : 0;
 }
 
 function Progress({ status }: { status: Status }) {
   const job = status.job;
   const done = new Map(job.stages.map((s) => [s.stage, s]));
   const applying = job.edit_version !== status.edit_version || !FINISHED.has(job.status);
+  const failed = job.status === "failed" && !applying;
+  const running = applying && job.stage ? `${job.id} ${job.stage}` : null;
+  const seconds = useSecondsOn(running);
+
+  const stateOf = (s: StageName): StepState => {
+    if (failed && job.stage === s) return "failed";
+    if (done.has(s)) return "done";
+    if (applying && job.stage === s) return "active";
+    return "pending";
+  };
+  const chain = (
+    <ol className="chain" aria-label="Stages">
+      {STAGES.map((s) => {
+        const state = stateOf(s);
+        const run = done.get(s);
+        const detail =
+          state === "done" && run
+            ? `Done in ${Math.round(run.ms)} ms${run.outcome === "cached" ? ", from cache" : ""}${run.cost_usd > 0 ? `. Cost $${run.cost_usd.toFixed(3)}` : ""}.`
+            : state === "active"
+              ? `Working, ${seconds} s so far.`
+              : state === "failed"
+                ? `Stopped: ${job.error?.message ?? "an error"}`
+                : "Waiting.";
+        return (
+          <li key={s} className="step" data-state={state}>
+            <span className="step-icon"><StepIcon state={state} /></span>
+            <span className="step-body">
+              <span className="step-head">
+                <span className="step-label">{STAGE_WORDS[s]}</span>
+                {state === "active" && <span className="badge">In progress</span>}
+              </span>
+              <span className="step-detail">{detail}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+
   return (
-    <section aria-label="Progress">
+    <section aria-label="Progress" className="glass card progress">
       <p role="status">
         {job.status === "failed"
           ? `Stopped at ${job.stage ? STAGE_WORDS[job.stage].toLowerCase() : "a stage"}: ${job.error?.message ?? "an error"}`
@@ -172,18 +335,12 @@ function Progress({ status }: { status: Status }) {
               : "Waiting to start."
             : "Ready for review."}
       </p>
-      {applying && (
-        <ol>
-          {STAGES.map((s) => {
-            const run = done.get(s);
-            const state = run ? `done in ${Math.round(run.ms)} ms${run.outcome === "cached" ? ", from cache" : ""}` : job.stage === s ? "working" : "waiting";
-            return (
-              <li key={s}>
-                {STAGE_WORDS[s]}: {state}
-              </li>
-            );
-          })}
-        </ol>
+      {failed && job.error?.retryable && <p>To try again, upload the same figure again. Stages already done come from the cache.</p>}
+      {applying || failed ? chain : job.stages.length > 0 && (
+        <details className="steps-toggle">
+          <summary>Stages and timings</summary>
+          {chain}
+        </details>
       )}
     </section>
   );

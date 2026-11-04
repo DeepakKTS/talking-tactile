@@ -499,42 +499,42 @@ function ExploreSheet() {
 
   if (!figure) {
     return (
-      <main>
-        <h1>Explore</h1>
-        <form method="get" action="/explore">
+      <main className="explore">
+        <h1><img src="/brand/logo-mark.svg" alt="" width="48" height="32" />Explore</h1>
+        <form method="get" action="/explore" className="glass ask">
           <label>
             Figure id <input name="figure" required pattern="[0-9a-f]{64}" autoComplete="off" />
           </label>
-          <button type="submit">Open sheet</button>
+          <button type="submit" className="btn-primary">Open sheet</button>
         </form>
       </main>
     );
   }
 
   return (
-    <main style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none", minHeight: "100vh" }}>
-      <h1>Explore{file ? `: ${file.title}` : ""}</h1>
-      {loadError ? <p role="alert">{loadError}</p> : <p>{status}</p>}
+    <main className="explore" style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none", minHeight: "100vh" }}>
+      <h1><img src="/brand/logo-mark.svg" alt="" width="48" height="32" />Explore{file ? `: ${file.title}` : ""}</h1>
+      {loadError ? <p role="alert" className="explore-status notice notice-danger">{loadError}</p> : <p className="explore-status">{status}</p>}
       {!started && (
-        <button ref={startButton} type="button" onClick={() => void start()} disabled={!file} style={{ fontSize: "2rem", padding: "1rem 2rem" }}>
+        <button ref={startButton} type="button" onClick={() => void start()} disabled={!file} className="btn-primary btn-xl">
           Start exploring
         </button>
       )}
-      {started && noLocalVoice && <p role="alert">{NO_LOCAL_VOICE}</p>}
+      {started && noLocalVoice && <p role="alert" className="notice notice-danger">{NO_LOCAL_VOICE}</p>}
       {started && (
         <>
-          <form onSubmit={onAsk}>
+          <form onSubmit={onAsk} className="glass ask">
             <label>
               Ask, or say where is, more, repeat, stop, what is here{" "}
               <input value={question} onChange={(e) => { setQuestion(e.target.value); }} autoComplete="off" maxLength={500} style={FIELD_STYLE} />
             </label>
-            <button type="submit">Ask</button>
+            <button type="submit" className="btn-primary">Ask</button>
           </form>
-          <p>Hold anywhere on the screen to ask out loud, and let go when you are done.</p>
+          <p className="explore-hint">Hold anywhere on the screen to ask out loud, and let go when you are done.</p>
           {heard && <p aria-live="off">You asked: {heard}</p>}
-          {!touch && <p>Keys: Escape stops speech. R sets the corners. H help. M more. Period repeats. W what is here.</p>}
+          {!touch && <p className="explore-hint">Keys: Escape stops speech. R sets the corners. H help. M more. Period repeats. W what is here.</p>}
           {!scripted && (
-            <section aria-label="Camera view">
+            <section aria-label="Camera view" className="glass camera">
               <button type="button" onClick={startCorners}>Set corners (R)</button>
               <canvas ref={canvas} onClick={onCanvasClick} style={{ maxWidth: "100%", display: "block" }}
                 aria-label={`Camera view. A helper ${touch ? "taps" : "clicks"} the four corner marks here, in order A, B, C, D.`} />
@@ -543,7 +543,7 @@ function ExploreSheet() {
         </>
       )}
       <video ref={video} playsInline muted hidden />
-      <fieldset>
+      <fieldset className="settings">
         <legend>Settings</legend>
         <label>
           Who speaks{" "}
@@ -565,7 +565,7 @@ function ExploreSheet() {
           Camera image is mirrored
         </label>
       </fieldset>
-      <h2>What was said</h2>
+      <h2 className="said">What was said</h2>
       <div ref={mirror} />
     </main>
   );
