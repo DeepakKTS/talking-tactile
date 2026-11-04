@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Get started: Talking Tactile</title>
+<meta name="description" content="Run Talking Tactile in mock mode in four commands, then set it up live with an iPhone.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="page page-plain">
+  <header class="site-header">
+    <nav class="nav glass" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Talking Tactile, home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="5" r="2.3" fill="currentColor"/><circle cx="16" cy="5" r="2.3" fill="currentColor" opacity=".35"/><circle cx="8" cy="12" r="2.3" fill="currentColor"/><circle cx="16" cy="12" r="2.3" fill="currentColor"/><circle cx="8" cy="19" r="2.3" fill="currentColor" opacity=".35"/><circle cx="16" cy="19" r="2.3" fill="currentColor"/></svg>
+        Talking Tactile
+      </a>
+      <span class="nav-sep wide" aria-hidden="true"></span>
+      <ul class="nav-links">
+        <li><a href="index.html#how">How it works</a></li>
+        <li><a href="index.html#status">Results</a></li>
+        <li><a href="start.html" aria-current="page">Get started</a></li>
+        <li><a href="project.html">Project</a></li>
+      </ul>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </nav>
+    <nav class="menu glass" id="menu" aria-label="Pages">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#status">Results</a>
+      <a href="start.html" aria-current="page">Get started</a>
+      <a href="project.html">Project</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <section aria-labelledby="start-title">
+        <div class="page-intro">
+          <span class="eyebrow">Get started</span>
+          <h1 id="start-title">Run it on your computer</h1>
+          <p class="lead">Mock mode needs no key and no phone. It replays answers recorded from the live models, so it makes no network calls and costs nothing. The live setup with an iPhone comes after it.</p>
+        </div>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="mock-title">
+        <h2 id="mock-title">Mock mode, in four commands</h2>
+        <p>Needs macOS, <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, Node 24 and liblouis (<code>brew install liblouis</code>). The recordings match a figure by its PNG&rsquo;s exact bytes, and Linux encodes the same pixels to other bytes, so on Linux the tests run but the recorded heart and brain do not replay (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/services/api/tests/recorded_png.py"><code>services/api/tests/recorded_png.py</code></a>).</p>
+<pre><code>git clone https://github.com/DeepakKTS/talking-tactile.git
+cd talking-tactile
+make install
+MOCK_META=1 make dev</code></pre>
+        <p>The API runs on port 8000 and the web app on <code>http://localhost:5173</code>. Ctrl-C stops both.</p>
+        <h3>Make a sheet</h3>
+        <ol>
+          <li>Once the API answers (the first start can take 40 s), open <code>http://localhost:5173/author</code>, choose <code>fixtures/heart.png</code>, keep the default options and press &ldquo;Make a tactile sheet&rdquo;.</li>
+          <li>Wait for &ldquo;Ready for review.&rdquo; (about 25 s). The &ldquo;Needs you&rdquo; list shows the septum, and a merge proposal shows the aortic arch.</li>
+          <li>Press &ldquo;Mark all parts checked&rdquo;, confirm, then &ldquo;Publish for students&rdquo;.</li>
+          <li>Press &ldquo;Open version 1 in Explore&rdquo;, then Enter or &ldquo;Start exploring&rdquo;: Explore says the sheet&rsquo;s title and summary. Touch needs a camera over the printed sheet (the live setup below).</li>
+        </ol>
+        <figure class="shot">
+          <img src="img/author-review.png" alt="Author mode reviewing the heart: parts not yet checked, the suggested merge for the aortic arch, the Needs you list with the septum, and the lines between parts." width="1030" height="1800">
+          <figcaption>Author mode, reviewing the heart in mock mode. <q>Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. Resized and placed on a white background.</q></figcaption>
+        </figure>
+        <h3>What mock mode cannot do</h3>
+        <p>On this path a typed question says &ldquo;Questions are not working right now&rdquo;. Recorded answers exist only for the heart and the brain as the question eval published them (the heart with the aortic arch merged and two teacher descriptions). To get them, run <code>make demo-sheets</code> before <code>MOCK_META=1 make dev</code>, and before uploading the heart yourself: it publishes both sheets exactly as the eval did, in mock mode, in about a minute. The brain replays with grade band &ldquo;6 to 8&rdquo;.</p>
+        <p><code>make check</code> runs every test, lint and type check, as CI does.</p>
+      </section>
+
+      <section class="panel glass prose" aria-labelledby="live-title">
+        <h2 id="live-title">Live, with an iPhone</h2>
+        <p>Live mode calls Muse Spark, SAM 3.1 and Muse Voice Transcribe, and costs Meta Model API credits. The Mac runs the API and serves the app to the phone over HTTPS on the local network. These steps follow <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/README.md"><code>README.md</code></a> and <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/docs/DEMO.md"><code>docs/DEMO.md</code></a>.</p>
+        <ol>
+          <li><strong>The key.</strong> Copy the example file and set <code>MODEL_API_KEY</code> in it. The key stays on the Mac; the browser never sees it.
+<pre><code>cp .env.example services/api/.env</code></pre></li>
+          <li><strong>A certificate for the phone.</strong> An iPhone opens the camera only on an HTTPS page. With <a href="https://github.com/FiloSottile/mkcert" rel="noopener">mkcert</a> installed and its local root made (<code>mkcert -install</code>), make a certificate for this Mac&rsquo;s LAN address and <code>.local</code> name. Run it again when the LAN address changes.
+<pre><code>cd apps/web &amp;&amp; npm run cert:phone</code></pre></li>
+          <li><strong>Trust the mkcert root on the iPhone.</strong> Send the phone the <code>rootCA.pem</code> file from the folder <code>mkcert -CAROOT</code> prints, install it as a profile, then turn on full trust for it under Settings, General, About, Certificate Trust Settings. These are mkcert&rsquo;s steps for iOS, not the repository&rsquo;s.</li>
+          <li><strong>Check the setup.</strong> <code>make preflight</code> prints OK or FAIL for each check: the key file (never printed), the phone certificate, the ports, the published sheets, CI and the credits left. Fix every FAIL first.
+<pre><code>make preflight</code></pre></li>
+          <li><strong>Start the servers.</strong> <code>make demo-live</code> starts the API on 127.0.0.1:8000, the web app for the phone over HTTPS on port 5173 and the Gate B touch-test page on port 8443, under <code>caffeinate -i</code> so the Mac cannot sleep mid-call. It refuses to start while one of those ports is in use, and prints the iPhone addresses. Ctrl-C stops all three. <code>make demo-mock</code> does the same with no Meta calls.
+<pre><code>make demo-live
+caffeinate -dimsu      # in another terminal: keeps the display awake</code></pre></li>
+          <li><strong>Open the app on the iPhone.</strong> On the same Wi-Fi, in Safari, use the Mac&rsquo;s <code>.local</code> name first (<code>scutil --get LocalHostName</code> prints it), or the address <code>npm run cert:phone</code> printed. Start with the device check:
+<pre><code>https://&lt;your-mac&gt;.local:5173/explore?check=1</code></pre></li>
+          <li><strong>Publish a sheet first.</strong> A fresh clone has no published sheets. Make one in Author on the Mac (<code>https://localhost:5173/author</code>, as <code>make demo-live</code> prints it), print it, then open it in Explore on the phone.</li>
+        </ol>
+        <p>The <a href="phone.html">phone connection guide</a> covers the device check, printing, the mount and setting the corners.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="foot glass">
+        <a class="brand" href="index.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="5" r="2.3" fill="currentColor"/><circle cx="16" cy="5" r="2.3" fill="currentColor" opacity=".35"/><circle cx="8" cy="12" r="2.3" fill="currentColor"/><circle cx="16" cy="12" r="2.3" fill="currentColor"/><circle cx="8" cy="19" r="2.3" fill="currentColor" opacity=".35"/><circle cx="16" cy="19" r="2.3" fill="currentColor"/></svg>
+          Talking Tactile
+        </a>
+        <p class="by">Built by Deepak Kumaran T S</p>
+        <ul>
+          <li><a href="https://github.com/DeepakKTS/talking-tactile" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/deepak-kumaran-ts" rel="noopener">LinkedIn</a></li>
+        </ul>
+        <p class="lic">Code under the Apache License 2.0. Figures and the sheets made from them keep their own licenses: <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/ATTRIBUTION.md">ATTRIBUTION.md</a>.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
