@@ -80,7 +80,7 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 | Release to first spoken word, iPhone | <!-- tt:voice-device -->not measured: the latency film was cut<!-- /tt:voice-device --> (the Mac figure is above) | `eval/gate-b/README.md` |
 | Touch to tone, iPhone | <!-- tt:earcon-device -->not measured: the latency film was cut<!-- /tt:earcon-device --> | `eval/gate-b/README.md` |
 | Fingertip error on the 9-point sheet (Gate B, goal 4 mm) | <!-- tt:gate-b -->not measured<!-- /tt:gate-b --> | `eval/gate-b/README.md` |
-| Meta credits spent | $5.31 of $150 (Nov 3) | `eval/live/ledger.jsonl` |
+| Meta credits spent | $5.42 of $150 (Nov 4) | `eval/live/ledger.jsonl` |
 
 ## Limitations
 

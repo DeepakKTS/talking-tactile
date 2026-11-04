@@ -71,8 +71,8 @@ picture.
   4 mm or less): <!-- tt:gate-b -->not measured<!-- /tt:gate-b -->.
 - Touch to tone on the iPhone:
   <!-- tt:earcon-device -->not measured: the latency film was cut<!-- /tt:earcon-device -->.
-- Spend: $5.31 of the $150 credits (`eval/live/ledger.jsonl`, 1,013 logged calls, as of
-  Nov 3).
+- Spend: $5.42 of the $150 credits (`eval/live/ledger.jsonl`, 1,037 logged calls, as of
+  Nov 4).
 
 ### Limits
 

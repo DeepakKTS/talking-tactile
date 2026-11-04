@@ -41,8 +41,8 @@ Transcribe, with the figure's part names as hints, to Muse Spark under a strict 
 
 All calls go through the Meta Model API (`https://api.meta.ai/v1`) from the backend, on
 Standard models. The backend refuses to start with a Contributor model id, and the API key
-never reaches the browser. Every call is logged with its price: $5.31 of the $150 credits
-spent (`eval/live/ledger.jsonl`, Nov 3).
+never reaches the browser. Every call is logged with its price: $5.42 of the $150 credits
+spent (`eval/live/ledger.jsonl`, Nov 4).
 
 1. Reading the figure (S1), Muse Spark (`muse-spark-1.3`). A first call, with the image,
    lists the parts as short phrases with the subject, a summary and a verdict (make tactile,
