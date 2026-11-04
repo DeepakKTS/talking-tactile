@@ -585,8 +585,12 @@ def device_check(page: Page, base: str, fail: list[str]) -> dict[str, Any]:
     if "loading" in hands.get("detail", "") or hands.get("state") == "fail":
         fail.append(f"device check: hand tracker {hands}")
     wake = next((r for r in rows if r["name"] == "Screen Wake Lock"), {})
-    if len(rows) != 6 or wake.get("state") != "ok":
+    names = [r["name"] for r in rows]
+    want = ["Secure page", "Camera", "Camera choice", "Zoom and focus", "Camera reports", "Hand tracker",
+            "Local voice", "Screen Wake Lock", "Microphone"]
+    if names != want or wake.get("state") != "ok":
         fail.append(f"device check rows: {out['rows']}")
+    out["camera_rows"] = {r["name"]: r["detail"] for r in rows if r["name"] in ("Camera choice", "Zoom and focus")}
     return out
 
 
@@ -663,6 +667,20 @@ def camera(page: Page, reqs: Requests, base: str, fid: str, fail: list[str]) -> 
         fail.append(f"Explore asked for remote files: {refused[:5]}")
     if out["captureToLandmarksMs"]["count"] < 10:
         fail.append("the worker returned fewer than 10 frames in 5 s")
+    # The camera: how it was chosen, then the drift guard. The track is made to report another
+    # device, as when an iPhone's camera changes under the corners: Explore says so once.
+    out["camera_choice"] = page.evaluate("() => ({ how: window.__tt.camera.opened.how, label: window.__tt.camera.opened.label })")
+    if out["camera_choice"]["how"] != "facingMode environment (no Back Camera listed)":
+        fail.append(f"camera choice on a laptop: {out['camera_choice']}")
+    page.wait_for_timeout(2000)  # the zoom and focus lock settles, then the corners' camera is kept
+    n = log_len(page)
+    page.evaluate("""() => { const t = document.querySelector('video').srcObject.getVideoTracks()[0];
+      const g = t.getSettings.bind(t); t.getSettings = () => ({ ...g(), deviceId: 'another-lens' }); }""")
+    page.wait_for_timeout(1500)
+    changed = says(page, n)
+    out["camera_changed_said"] = changed
+    if changed != ["The camera changed. Press Set corners, or R, to set them again."]:
+        fail.append(f"the camera change was not said once: {changed}")
     # Hold to ask on Chrome's fake microphone, under the built app's CSP: the microphone opens
     # (its worklet loads) and the WAV goes to /api/transcribe. On Nov 4 the iPhone refused a
     # blob: worklet, and no question was sent.

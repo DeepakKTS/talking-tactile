@@ -9,6 +9,7 @@ import type { RegionsFile } from "../shared/regions";
 import type { WorkerHand } from "../workers/protocol";
 import { AudioEngine, type AudioPort, NO_LOCAL_VOICE, type VoiceMode, browserAudioDeps } from "./audio";
 import { CameraLoop, type HandsFrame, askApi, askReplyApi, transcribeApi } from "./camera";
+import { CAMERA_CHANGED_KEYS, CAMERA_CHANGED_TOUCH } from "./cameraPick";
 import { touchOnly } from "./device";
 import { HandTracker } from "./tracker";
 import { ScreenAwake } from "./wakeLock";
@@ -177,6 +178,8 @@ function ExploreSheet() {
   const tracker = useRef(new FingertipTracker(EXPLORE, { dominant: settings.dominant, cameraMirrored: settings.cameraMirrored }));
   const corners = useRef<CornerClicks | null>(null);
   const clicking = useRef(false);
+  /** The camera changed under the corners: no part is said until they are set again. */
+  const cameraChanged = useRef(false);
   const view = useRef<{ toPx: Mat3 | null; quad: Quad | null; tip: Pt | null; pointing: boolean }>({
     toPx: null,
     quad: null,
@@ -239,6 +242,8 @@ function ExploreSheet() {
     }
     tracker.current.setCalibration(step.toMm);
     session.current?.resetTouch();
+    cameraChanged.current = false;
+    camera.current?.rebaseWatch();
     view.current.toPx = invertHomography(step.toMm);
     view.current.quad = quad;
     trace.current.calibrated = true;
@@ -261,6 +266,7 @@ function ExploreSheet() {
     const tip = tracker.current.update(f.hands, f.width, f.height, f.receivedAt);
     view.current.tip = tip.p;
     view.current.pointing = tip.pointing;
+    if (cameraChanged.current) return;
     s.finger({ p: tip.p, t: f.receivedAt, receivedAt: f.receivedAt, capturedAt: f.capturedAt });
   }, []);
 
@@ -310,7 +316,15 @@ function ExploreSheet() {
     if (!v) return;
     const t = handTracker.current;
     if (!t) return;
-    const loop = new CameraLoop({ video: v, tracker: t, onHands });
+    const loop = new CameraLoop({
+      video: v,
+      tracker: t,
+      onHands,
+      onCameraChange: () => {
+        cameraChanged.current = true;
+        say(touch ? CAMERA_CHANGED_TOUCH : CAMERA_CHANGED_KEYS);
+      },
+    });
     camera.current = loop;
     trace.current.camera = loop;
     try {

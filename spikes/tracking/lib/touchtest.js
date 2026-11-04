@@ -118,7 +118,7 @@ export class TouchWindow {
 
 // The JSON the page offers when a test ends. Fields only ever get added, so
 // analyze_touch.py keeps working: version 2 added calibration and each record's frames.
-export function sessionResult({ startedAt, finishedAt, seed, backend, videoSize, contactOffsetMm, corners, calibration, records }) {
+export function sessionResult({ startedAt, finishedAt, seed, backend, videoSize, contactOffsetMm, corners, calibration, records, camera = null, practice = null }) {
   return {
     kind: "touch-test",
     startedAt,
@@ -133,6 +133,10 @@ export function sessionResult({ startedAt, finishedAt, seed, backend, videoSize,
     version: 2,
     calibration,
     framesPerTouchLimit: FRAMES_PER_TOUCH,
+    // Which camera, how it was chosen, its zoom and focus (lib/camera.js); and why the run is
+    // practice when the camera changed under the corners (null when it did not).
+    camera,
+    practice,
   };
 }
 

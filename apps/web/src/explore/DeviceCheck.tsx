@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { EXPLORE } from "../shared/config";
 import { CameraLoop } from "./camera";
-import { type CheckResult, SAMPLE_MS, cameraResult, handsResult, measureHands, micResult, secureResult, summary, voiceResult, wakeResult } from "./check";
+import { type CheckResult, SAMPLE_MS, cameraResult, choiceResult, handsResult, measureHands, micResult, reportsResult, secureResult, summary, voiceResult, wakeResult, zoomFocusResult } from "./check";
 import { HandTracker } from "./tracker";
 import { ScreenAwake } from "./wakeLock";
 
@@ -53,6 +53,10 @@ async function cameraAndHands(video: HTMLVideoElement, tracker: HandTracker, cam
   }
   const track = video.srcObject instanceof MediaStream ? video.srcObject.getVideoTracks()[0] : undefined;
   const camera = cameraResult(track?.getSettings() ?? null, track?.label ?? "");
+  const lock = loop.lock ? await loop.lock : null;
+  const settings = track?.getSettings() ?? null;
+  console.info("camera", JSON.stringify({ how: loop.opened?.how, label: track?.label, capabilities: lock?.capabilities ?? null, settings, applied: lock?.applied, failed: lock?.failed }));
+  const lens = [choiceResult(loop.opened?.how ?? "unknown", track?.label ?? "", settings), zoomFocusResult(lock, settings), reportsResult(lock, settings)];
   onStatus("Waiting for the hand tracker to warm up, then measuring for 5 seconds.");
   const hands = await measureHands(tracker, {
     reset: () => { frames = 0; infer.length = 0; },
@@ -60,7 +64,7 @@ async function cameraAndHands(video: HTMLVideoElement, tracker: HandTracker, cam
   });
   loop.stop();
   cam.current = null;
-  return [camera, hands];
+  return [camera, ...lens, hands];
 }
 
 export function DeviceCheck() {

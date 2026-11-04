@@ -87,6 +87,12 @@ def analyze(result: dict, corners_mm: list[list[float]]) -> dict:
         "not_pointing": sum(1 for r in recs if not r.get("pointing")),
         "page_summary": result.get("stats"),
     }
+    # The page marks a run practice when the camera changed under the corners (lib/camera.js).
+    if result.get("practice"):
+        out["gate_b"] = "practice"
+        out["practice"] = result["practice"]
+    if result.get("camera"):
+        out["camera"] = result["camera"]
     corners_px = result.get("corners")
     size = result.get("videoSize")
     if corners_px and size:

@@ -2,6 +2,7 @@
 // (tracker.ts), and each result handed on with the time it was captured and the time it came
 // back.
 import type { FromWorker, WorkerHand } from "../workers/protocol";
+import { CameraWatch, type LockResult, type OpenedCamera, cameraKey, lockCamera, openCamera } from "./cameraPick";
 import { FramePump } from "./pump";
 import { ASK_TIMEOUT_MS, AskError, type AskReply, type AskRequest, type Heard, TOO_LONG } from "./session";
 import type { HandTracker } from "./tracker";
@@ -22,7 +23,12 @@ export interface CameraLoopOptions {
   /** Made when the page loaded (tracker.ts), so Start never waits for the model download. */
   tracker: HandTracker;
   onHands: (f: HandsFrame) => void;
+  /** The video's size, device or zoom changed since the corners were set (cameraPick.ts). */
+  onCameraChange?: (changes: string[]) => void;
 }
+
+/** How often the camera is compared with the one the corners were set on. */
+const WATCH_MS = 500;
 
 type Result = Extract<FromWorker, { type: "result" }>;
 
@@ -31,6 +37,12 @@ export class CameraLoop {
   private readonly capturedAt = new Map<number, number>();
   private frameId = 0;
   private running = false;
+  private readonly watch = new CameraWatch();
+  private watchedAt = 0;
+  /** Which camera opened and how it was chosen. */
+  opened: OpenedCamera | null = null;
+  /** Zoom and focus, fixed when the camera offers them; settles FOCUS_SETTLE_MS after start. */
+  lock: Promise<LockResult> | null = null;
 
   constructor(private readonly o: CameraLoopOptions) {
     this.pump = new FramePump(({ bitmap, id }) => {
@@ -48,22 +60,24 @@ export class CameraLoop {
 
   async start(deviceId?: string): Promise<void> {
     const v = this.o.video;
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      // The rear camera on a phone, which looks down at the sheet; a laptop's one camera
-      // ignores the ideal.
-      video: {
-        ...(deviceId ? { deviceId } : { facingMode: { ideal: "environment" } }),
-        width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 },
-      },
-    });
+    // The rear camera on a phone, which looks down at the sheet, its single wide lens when
+    // listed (cameraPick.ts); a laptop's one camera ignores the ideal.
+    this.opened = await openCamera(navigator.mediaDevices, { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }, deviceId);
+    const stream = this.opened.stream;
     v.srcObject = stream;
     v.muted = true;
     await v.play();
     this.running = true;
+    const track = stream.getVideoTracks()[0];
+    this.lock = track ? lockCamera(track) : null;
+    void this.lock?.then(() => { this.rebaseWatch(); });
     const tick = (now: number) => {
       if (!this.running) return;
       v.requestVideoFrameCallback(tick);
+      if (now - this.watchedAt >= WATCH_MS) {
+        this.watchedAt = now;
+        if (this.watch.check(this.key())) this.o.onCameraChange?.(this.watch.changed);
+      }
       if (!this.o.tracker.ready) return; // still warming up: no frame is fed, none is lost
       const id = ++this.frameId;
       this.capturedAt.set(id, now);
@@ -75,6 +89,16 @@ export class CameraLoop {
         .catch(() => this.capturedAt.delete(id));
     };
     v.requestVideoFrameCallback(tick);
+  }
+
+  private key() {
+    const track = this.o.video.srcObject instanceof MediaStream ? this.o.video.srcObject.getVideoTracks()[0] : undefined;
+    return cameraKey((track?.getSettings() ?? null) as Record<string, unknown> | null, this.o.video.videoWidth, this.o.video.videoHeight);
+  }
+
+  /** The corners were set on the camera as it is now. */
+  rebaseWatch(): void {
+    this.watch.rebase(this.key());
   }
 
   /** Stops the camera. The tracker is the page's, and keeps running. */

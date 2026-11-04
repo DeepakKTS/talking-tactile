@@ -59,6 +59,36 @@ class SpanTest(unittest.TestCase):
         self.assertTrue(res.doc_values(TOUCH, None, None)["limits-touch"].endswith("or less (`eval/gate-b/RESULTS.md`).\n"))
 
 
+class PracticeTest(unittest.TestCase):
+    def test_a_run_the_page_marked_practice_says_so_and_prints_no_gate_command(self) -> None:
+        import io
+        import tempfile
+        from contextlib import redirect_stdout
+        from pathlib import Path as P
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as d:
+            root = P(d)
+            (root / "eval" / "gate-b").mkdir(parents=True)
+            run = root / "eval" / "gate-b" / "touch-test-x.json"
+            run.write_text("{}")
+            touch = {**TOUCH, "max_mm": 5, "gate_b": "practice", "bias_x_mm": [0, 0], "bias_y_mm": [0, 0],
+                     "not_pointing": 0, "practice": "the camera changed during the run (device)"}
+            md = res.results_md(root, run, touch, None, None)
+            self.assertIn("- Practice, not Gate B: the camera changed during the run (device).", md)
+            for rel in res.DOCS:
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text("")
+            (root / "spikes" / "tracking").mkdir(parents=True)
+            (root / "spikes" / "tracking" / "sheet.json").write_text('{"corners_mm": []}')
+            out = io.StringIO()
+            with mock.patch.object(res, "load_analyzer") as la, redirect_stdout(out):
+                la.return_value.analyze.return_value = touch
+                res.run(root, run, update_tracker=False)
+            self.assertIn("Not Gate B", out.getvalue())
+            self.assertNotIn("tracker.py gate B", out.getvalue())
+
+
 class FilmTest(unittest.TestCase):
     def test_sounds_are_found_where_they_start_above_the_background(self) -> None:
         rate = film.RATE

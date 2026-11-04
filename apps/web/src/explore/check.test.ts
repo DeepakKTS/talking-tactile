@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SAMPLE_MS, WARM_MAX_MS, cameraResult, handsResult, measureHands, micResult, secureResult, summary, voiceResult, wakeResult } from "./check";
+import { SAMPLE_MS, WARM_MAX_MS, cameraResult, handsResult, measureHands, micResult, secureResult, summary, voiceResult, wakeResult, choiceResult, reportsResult, zoomFocusResult } from "./check";
 
 const voice = (name: string, local: boolean, lang = "en-US") => ({ name, lang, localService: local, default: false }) as SpeechSynthesisVoice;
 
@@ -77,5 +77,23 @@ describe("device check", () => {
     expect(secureResult(false).detail).toContain("npm run dev:phone");
     expect(summary([secureResult(true), micResult()])).toBe("All 2 checks pass.");
     expect(summary([secureResult(true), micResult("x"), wakeResult(false)])).toBe("2 of 3 checks need a look: Microphone, Screen Wake Lock.");
+  });
+});
+
+describe("the camera's lens, zoom and focus rows", () => {
+  it("warns on a multi-lens camera and names how the camera was chosen", () => {
+    const tri = choiceResult("facingMode environment (no Back Camera listed)", "Back Triple Camera", { width: 1280, height: 720, frameRate: 30 });
+    expect(tri.state).toBe("warn");
+    expect(tri.detail).toBe("Back Triple Camera, chosen by facingMode environment (no Back Camera listed); 1280 x 720 at 30 fps. A multi-lens camera can switch lenses close to the sheet.");
+    expect(choiceResult("Back Camera, by deviceId", "Back Camera", { width: 1280, height: 720 }).state).toBe("ok");
+  });
+
+  it("says what the camera offers and what was fixed, or that nothing could be read", () => {
+    const lock = { capabilities: { zoom: { min: 1, max: 10 }, focusMode: ["manual", "continuous"] }, plan: { zoom: 1, focusMode: "manual" }, applied: ["zoom 1", "focusMode manual"], failed: [] };
+    const r = zoomFocusResult(lock, { zoom: 1, focusMode: "manual" } as MediaTrackSettings);
+    expect(r).toEqual({ name: "Zoom and focus", state: "ok", detail: "zoom 1 to 10, now 1. focus modes manual, continuous, now manual. fixed: zoom 1, focusMode manual." });
+    const none = zoomFocusResult({ capabilities: null, plan: {}, applied: [], failed: [] }, null);
+    expect([none.state, none.detail]).toEqual(["warn", "getCapabilities() is not supported here: zoom and focus are left to the camera."]);
+    expect(JSON.parse(reportsResult(lock, { width: 1 }).detail)).toEqual({ capabilities: lock.capabilities, settings: { width: 1 } });
   });
 });

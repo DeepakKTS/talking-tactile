@@ -43,6 +43,7 @@ export function startTest() {
   test.i = 0;
   test.records = [];
   test.active = true;
+  test.practice = state.cameraChanged ? `the camera changed before the run and was not calibrated again (${state.cameraChanged})` : null;
   test.startedAt = new Date().toISOString();
   dwell.reset();
   $("results").textContent = "";
@@ -84,6 +85,8 @@ function finish() {
     corners: state.calib.corners,
     calibration: state.calib.record,
     records: test.records,
+    camera: state.camera ?? null,
+    practice: test.practice,
   });
   const stats = result.stats;
   test.stats = stats;
@@ -106,7 +109,8 @@ function finish() {
     "",
   ].join("\n");
   $("results").append(a);
-  speak(`Done. Mean error ${stats.meanMm} millimeters. p95 ${stats.p95Mm}.`);
+  if (test.practice) $("results").prepend(`Practice run: ${test.practice}. It does not count as Gate B.\n\n`);
+  speak(`Done. Mean error ${stats.meanMm} millimeters. p95 ${stats.p95Mm}.${test.practice ? " This was a practice run: the camera changed." : ""}`);
 }
 
 // Dwell capture runs on every new fingertip estimate.

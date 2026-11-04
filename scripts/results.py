@@ -126,6 +126,8 @@ def results_md(root: Path, touch_path: Path | None, touch: dict | None, earcon: 
                 f"(target: mean 4 mm or less, p95 8 mm or less). By the numbers: {touch['gate_b']}."),
                 (f"- Bias x {touch['bias_x_mm'][0]} ± {touch['bias_x_mm'][1]} mm, y {touch['bias_y_mm'][0]} ± "
                 f"{touch['bias_y_mm'][1]} mm; touches without the pointing pose {touch['not_pointing']}.")]
+        if touch.get("practice"):
+            out.append(f"- Practice, not Gate B: {touch['practice']}.")
         if "scale_ratio_x_over_y" in touch:
             out.append(f"- Video {touch['video_size'][0]} x {touch['video_size'][1]}; x over y scale "
                        f"{touch['scale_ratio_x_over_y']}{' (suspect)' if touch['aspect_suspect'] else ''}.")
@@ -190,7 +192,9 @@ def run(root: Path, touch_file: Path | None = None, update_tracker: bool = True)
         if voice:
             tracker(root, "metric", "lat-answer-device", str(round(voice["p50"] / 1000, 2)), "--source", "live")
         tracker(root, "todo")
-    if touch and touch_path:
+    if touch and touch.get("practice"):
+        print(f"Not Gate B: the page marked eval/gate-b/{touch_path.name if touch_path else ''} practice ({touch['practice']}).")
+    elif touch and touch_path:
         verdict = "pass" if touch["gate_b"] == "pass" else "fail"
         print(f"Gate B, once eval/gate-b/run.md says the protocol was met:\n  python3 scripts/tracker.py gate B {verdict} "
               f"--evidence \"eval/gate-b/{touch_path.name}: mean {touch['mean_mm']} mm, p95 {touch['p95_mm']} mm, "

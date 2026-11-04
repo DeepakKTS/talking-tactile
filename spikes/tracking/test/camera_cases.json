@@ -1,0 +1,47 @@
+{
+  "about": "Shared cases for the camera choice, the zoom and focus plan and the change check. Explore (apps/web/src/explore/cameraPick.ts, cameraPick.test.ts) and the Gate B page (spikes/tracking/lib/camera.js, test/camera.test.mjs) must give the same answers.",
+  "pick": [
+    {"why": "an iPhone after permission: the single wide lens over the virtual ones",
+     "devices": [
+       {"kind": "videoinput", "deviceId": "front", "label": "Front Camera"},
+       {"kind": "videoinput", "deviceId": "triple", "label": "Back Triple Camera"},
+       {"kind": "videoinput", "deviceId": "dualwide", "label": "Back Dual Wide Camera"},
+       {"kind": "videoinput", "deviceId": "ultra", "label": "Back Ultra Wide Camera"},
+       {"kind": "videoinput", "deviceId": "wide", "label": "Back Camera"},
+       {"kind": "videoinput", "deviceId": "tele", "label": "Back Telephoto Camera"},
+       {"kind": "audioinput", "deviceId": "mic", "label": "iPhone Microphone"}],
+     "expect": {"deviceId": "wide", "label": "Back Camera"}},
+    {"why": "labels are empty before permission",
+     "devices": [{"kind": "videoinput", "deviceId": "", "label": ""}, {"kind": "videoinput", "deviceId": "", "label": ""}],
+     "expect": null},
+    {"why": "only virtual rear cameras: facingMode chooses",
+     "devices": [{"kind": "videoinput", "deviceId": "dual", "label": "Back Dual Camera"}, {"kind": "videoinput", "deviceId": "f", "label": "Front Camera"}],
+     "expect": null},
+    {"why": "a laptop",
+     "devices": [{"kind": "videoinput", "deviceId": "ft", "label": "FaceTime HD Camera"}],
+     "expect": null},
+    {"why": "case and spaces do not matter, an audio device never counts",
+     "devices": [{"kind": "audioinput", "deviceId": "a", "label": "Back Camera"}, {"kind": "videoinput", "deviceId": "w", "label": " back camera "}],
+     "expect": {"deviceId": "w", "label": " back camera "}}
+  ],
+  "plan": [
+    {"why": "zoom and manual focus offered: zoom fixed where it is, focus manual",
+     "caps": {"zoom": {"min": 1, "max": 10, "step": 0.1}, "focusMode": ["manual", "single-shot", "continuous"]},
+     "settings": {"zoom": 1, "focusMode": "continuous"},
+     "expect": {"zoom": 1, "focusMode": "manual"}},
+    {"why": "only single-shot focus: that holds the first focus",
+     "caps": {"focusMode": ["single-shot", "continuous"]}, "settings": {}, "expect": {"focusMode": "single-shot"}},
+    {"why": "continuous only: focus is left alone; zoom outside the range is clamped",
+     "caps": {"zoom": {"min": 2, "max": 4}, "focusMode": ["continuous"]}, "settings": {"zoom": 1}, "expect": {"zoom": 2}},
+    {"why": "zoom offered, no zoom setting reported: 1 is used",
+     "caps": {"zoom": {"min": 1, "max": 5}}, "settings": {}, "expect": {"zoom": 1}},
+    {"why": "nothing offered", "caps": {"width": {"min": 1, "max": 1920}}, "settings": {}, "expect": {}},
+    {"why": "no getCapabilities", "caps": null, "settings": null, "expect": {}}
+  ],
+  "changes": [
+    {"why": "the same camera", "base": {"width": 1280, "height": 720, "deviceId": "w", "zoom": 1}, "now": {"width": 1280, "height": 720, "deviceId": "w", "zoom": 1}, "expect": []},
+    {"why": "rotated: the size changed", "base": {"width": 1280, "height": 720, "deviceId": "w", "zoom": 1}, "now": {"width": 720, "height": 1280, "deviceId": "w", "zoom": 1}, "expect": ["size"]},
+    {"why": "another lens and zoom", "base": {"width": 1280, "height": 720, "deviceId": "w", "zoom": 1}, "now": {"width": 1280, "height": 720, "deviceId": "t", "zoom": 2}, "expect": ["device", "zoom"]},
+    {"why": "zoom not reported on one side: not a change", "base": {"width": 1280, "height": 720, "deviceId": "w", "zoom": null}, "now": {"width": 1280, "height": 720, "deviceId": "w", "zoom": 1.5}, "expect": []}
+  ]
+}

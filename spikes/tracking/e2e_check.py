@@ -207,9 +207,21 @@ def session() -> list[str]:
             wait_js(page, "window.__tt.touchTest.active")
             result = page.evaluate(PLAY_SESSION)
             link = page.evaluate("() => { const a = document.querySelector('#results a'); return a && a.download; }")
+            # The drift guard, as in Explore (lib/camera.js): the track reports another device,
+            # the page says so, and a touch test started then is practice.
+            page.evaluate("""() => { const t = document.querySelector('video').srcObject.getVideoTracks()[0];
+              const g = t.getSettings.bind(t); t.getSettings = () => ({ ...g(), deviceId: 'another-lens' }); }""")
+            page.wait_for_timeout(1500)
+            changed = page.evaluate("() => window.__tt.cameraChanged")
+            page.keyboard.press("t")
+            practice = page.evaluate("() => window.__tt.touchTest.practice")
             browser.close()
     finally:
         srv.shutdown()
+    if changed != "device" or not (practice or "").startswith("the camera changed before the run"):
+        fail.append(f"drift guard: changed {changed!r}, practice {practice!r}")
+    if not (result.get("camera") or {}).get("how") or result.get("practice") is not None:
+        fail.append(f"the session JSON's camera or practice: {result.get('camera')}, {result.get('practice')}")
     OUT.mkdir(exist_ok=True)
     path = OUT / (link or "touch-test-missing.json")
     path.write_text(json.dumps(result, indent=1))

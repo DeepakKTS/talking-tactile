@@ -1,6 +1,8 @@
 import { createFramePump } from "./lib/pump.js";
 import { CPU_FALLBACK_MS, Warmup } from "./lib/warmup.js";
 import { ScreenAwake } from "./lib/wakelock.js";
+import { CameraWatch, cameraKey, lockCamera, openCamera } from "./lib/camera.js";
+import { touchOnly } from "./lib/device.js";
 
 const params = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
@@ -145,16 +147,23 @@ async function listCameras() {
 async function startCamera() {
   // First, before any await: Safari grants the Wake Lock only within the tap. Not awaited.
   awake.request();
-  // A phone's default camera faces the user: ask for the rear one until a camera is picked.
+  // A phone's default camera faces the user: the rear one, its single wide lens when listed
+  // (lib/camera.js, as Explore), until a camera is picked.
   const deviceId = $("camera").value || undefined;
-  const which = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } };
   video.srcObject?.getTracks().forEach((t) => t.stop());
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: { ...which, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
-  });
+  const opened = await openCamera(navigator.mediaDevices, { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }, deviceId);
+  const stream = opened.stream;
   video.srcObject = stream;
   await video.play();
+  const track = stream.getVideoTracks()[0];
+  state.camera = { label: opened.label, how: opened.how, lock: null };
+  watch.rebase(null);
+  lockCamera(track).then((lock) => {
+    state.camera.lock = lock;
+    state.camera.settings = track.getSettings();
+    console.log(`camera: ${JSON.stringify(state.camera)}`);
+    rebaseCamera();
+  }).catch(() => {});
   view.width = video.videoWidth;
   view.height = video.videoHeight;
   state.startedAt = performance.now();
@@ -162,15 +171,32 @@ async function startCamera() {
   state.videoSize = [video.videoWidth, video.videoHeight];
   await listCameras();
   $("calibrate").disabled = false;
-  say(`Camera on at ${video.videoWidth} by ${video.videoHeight}.`);
+  say(`Camera on at ${video.videoWidth} by ${video.videoHeight}: ${opened.label || "no label"}, chosen by ${opened.how}.`);
   if (state.looping) return; // a second Start swaps the camera; the loops keep running
   state.looping = true;
   video.requestVideoFrameCallback(onVideoFrame);
   requestAnimationFrame(draw);
 }
 
-function onVideoFrame() {
+// The camera changed under the corners (size, device or zoom): told once, and a touch test
+// running then is practice (state.cameraChanged goes into its JSON).
+const watch = new CameraWatch();
+let watchedAt = 0;
+const cameraNow = () => cameraKey(video.srcObject?.getVideoTracks()[0]?.getSettings() ?? null, video.videoWidth, video.videoHeight);
+export function rebaseCamera() {
+  watch.rebase(cameraNow());
+}
+
+function onVideoFrame(now) {
   state.camFrames++;
+  if (now - watchedAt >= 500) {
+    watchedAt = now;
+    if (watch.check(cameraNow())) {
+      state.cameraChanged = watch.changed.join(", ");
+      if (state.touchTest?.active) state.touchTest.practice = `the camera changed during the run (${state.cameraChanged})`;
+      say(touchOnly() ? "The camera changed. Tap Calibrate to set the corners again." : "The camera changed. Press R to set the corners again.");
+    }
+  }
   if (!warmup.isReady) {
     // Still warming up: no frame is fed, so none waits on a landmarker that is not there.
     video.requestVideoFrameCallback(onVideoFrame);

@@ -1,4 +1,4 @@
-import { state, view, say, setHandsListener, addOverlay, clickToVideo } from "./main.js";
+import { state, view, say, setHandsListener, addOverlay, clickToVideo, rebaseCamera } from "./main.js";
 import { homographyFromPoints, applyHomography, isConvexQuad } from "./lib/homography.js";
 import { FingertipMapper } from "./lib/fingertip.js";
 import { touchOnly } from "./lib/device.js";
@@ -32,6 +32,9 @@ function setCorners(px) {
   // What the touch-test JSON keeps: the clicks, the video size they were made at, the marks.
   calib.record = { cornersPx: px, videoSize: [view.width, view.height], cornersMm: sheet.corners_mm, at: new Date().toISOString() };
   mapper.setCalibration(calib.toMm);
+  // The corners belong to the camera as it is now.
+  state.cameraChanged = null;
+  rebaseCamera();
   try {
     localStorage.setItem(storeKey(), JSON.stringify(px));
   } catch {}

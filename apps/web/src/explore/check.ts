@@ -2,6 +2,8 @@
 // since the camera, the microphone, speech and the wake lock all need a user gesture.
 // - Secure page: the camera and the microphone need HTTPS (npm run dev:phone on the LAN).
 // - Camera: opens the rear camera when there is one; says which way it faces.
+// - Camera choice, zoom and focus: which lens opened and why, what zoom and focus the camera
+//   offers and what was fixed, and the raw capabilities and settings (cameraPick.ts).
 // - Hand tracker: the page's tracker (loaded with the page), on that camera. The check waits
 //   for it to warm up (a first result, on GPU or after the fallback to CPU), then measures
 //   SAMPLE_MS: frames a second, ms a frame, the delegate in use, time to first result.
@@ -9,6 +11,7 @@
 // - Screen Wake Lock: requested first in the tap, held, then released (wakeLock.ts).
 // - Microphone: opened, for spoken questions.
 import { pickVoice } from "./audio";
+import { type LockResult, lockDetail } from "./cameraPick";
 import type { Delegate } from "./warmup";
 
 export type CheckState = "ok" | "warn" | "fail";
@@ -29,6 +32,32 @@ export function cameraResult(settings: MediaTrackSettings | null, label: string,
   if (facing === "environment") return { name: "Camera", state: "ok", detail: `Rear camera, ${size}${label ? `, ${label}` : ""}.` };
   const which = facing === "user" ? "the front camera" : "a camera that does not say which way it faces";
   return { name: "Camera", state: "warn", detail: `Opened ${which}, ${size}${label ? `, ${label}` : ""}. Explore needs the rear camera looking down at the sheet.` };
+}
+
+/** Which camera opened and how it was chosen (cameraPick.ts). A virtual multi-lens camera
+ * switches lenses at close range, which moves the picture under the corners. */
+export function choiceResult(how: string, label: string, settings: MediaTrackSettings | null): CheckResult {
+  const s = settings ?? {};
+  const size = s.width && s.height ? `${String(s.width)} x ${String(s.height)}` : "size unknown";
+  const fps = typeof s.frameRate === "number" ? ` at ${s.frameRate.toFixed(0)} fps` : "";
+  const detail = `${label || "No label"}, chosen by ${how}; ${size}${fps}.`;
+  const multi = /\b(triple|dual)\b/i.test(label);
+  return multi
+    ? { name: "Camera choice", state: "warn", detail: `${detail} A multi-lens camera can switch lenses close to the sheet.` }
+    : { name: "Camera choice", state: "ok", detail };
+}
+
+/** Zoom and focus as the camera reports them, and what was fixed (cameraPick.ts). */
+export function zoomFocusResult(lock: LockResult | null, settings: MediaTrackSettings | null): CheckResult {
+  if (!lock) return { name: "Zoom and focus", state: "warn", detail: "No camera track to read." };
+  const detail = lockDetail(lock, settings as Record<string, unknown> | null);
+  const ok = lock.applied.length > 0 && lock.failed.length === 0;
+  return { name: "Zoom and focus", state: ok ? "ok" : "warn", detail };
+}
+
+/** The raw capabilities and settings, as the device reported them. */
+export function reportsResult(lock: LockResult | null, settings: MediaTrackSettings | null): CheckResult {
+  return { name: "Camera reports", state: "ok", detail: JSON.stringify({ capabilities: lock?.capabilities ?? null, settings }) };
 }
 
 /** The tracker as the check reads it, after warm-up (tracker.ts). */
