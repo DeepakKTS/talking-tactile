@@ -102,8 +102,10 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 
 Mock mode replays recorded live answers (`fixtures/recorded/`). No key, no network calls.
 
-Needs macOS or Linux, [uv](https://docs.astral.sh/uv/), Node 24 and liblouis
-(`brew install liblouis`, or `apt install liblouis-bin liblouis-data`).
+Needs macOS, [uv](https://docs.astral.sh/uv/), Node 24 and liblouis (`brew install liblouis`).
+The recordings match a figure's PNG by its exact bytes, and Linux encodes the same pixels to
+other bytes, so on Linux the tests run (`apt install liblouis-bin liblouis-data`) but the
+recorded heart and brain do not replay (`services/api/tests/recorded_png.py`).
 
 ```
 git clone https://github.com/DeepakKTS/talking-tactile.git
@@ -121,10 +123,12 @@ npm's 11 moderate advisories are in lint tools only (`docs/SECURITY.md`).
 3. Press "Mark all parts checked", confirm, then "Publish for students".
 4. Press "Open version 1 in Explore". Without a camera, Enter starts and H says the help.
 
-On this path a typed question says "Questions are not working right now". Mock answers exist
-only for the heart as the question eval published it (aortic arch merged, two teacher
-descriptions): `uv run apps/web/e2e/ask_e2e.py` publishes it that way and asks two questions.
-The brain replays with grade band "6 to 8".
+On this path a typed question says "Questions are not working right now": mock answers exist
+only for the sheets as the question eval published them (the heart with the aortic arch merged
+and two teacher descriptions; the brain at grade band "6 to 8"). To try questions, on a fresh
+clone run `make demo-sheets` before `MOCK_META=1 make dev` (about a minute, no network). It
+publishes both sheets that way and prints their Explore links; a question from
+`eval/qa/questions.jsonl`, typed with no finger on the sheet, then gets its recorded answer.
 
 `make check` runs every test, lint and type check, as CI does.
 

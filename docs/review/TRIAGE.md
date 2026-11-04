@@ -16,9 +16,9 @@ key and in mock mode only. Each finding is one of:
 | Repo shows as private; the clone URL 404s for a judge | Deepak: make it public before submitting |
 | No video, no photo of the raised sheet under the phone | Deepak: filming. README has the video line ready (`<VIDEO_URL>`) |
 | Gate B, touch to tone and iPhone latency are TBD | Deepak: Gate B and the latency film; then `make results` (Phase B, B2) |
-| Typed questions fail on the README path in mock mode | Fixed (docs): README says plainly that mock answers need the heart published as the eval published it, and points to `apps/web/e2e/ask_e2e.py`, which does that. Phase B (code): a seed command that publishes the eval's version 4 sheets in mock mode |
+| Typed questions fail on the README path in mock mode | Fixed (code and docs): `make demo-sheets` publishes the heart and brain exactly as the eval's version 4 from a fresh clone (checked against `fixtures/qa/`), and README says when to run it |
 | The Commons brain replays only with grade band 6 to 8 | Fixed (docs): README says so |
-| `app.meta.qa_eval` replay fails on a fresh clone (no published version 4) | Phase B (code), with the seed command above. Fixed (docs): README does not promise the replay |
+| `app.meta.qa_eval` replay fails on a fresh clone (no published version 4) | Fixed (code): the eval finds the eval's sheet by content, version 4 here or 1 after `make demo-sheets`, and otherwise says to run it (`services/api/tests/test_demo_sheets.py`) |
 | No Impact section with sourced numbers | Rejected for now: the problem numbers in `PLAN.md` and `APPLICATION.md` have no committed sources, and the README makes no claim it cannot back. Deepak can add one with links |
 | `APPLICATION.md`: another project, personal details | Deepak, Nov 3: removed from the tree; history stays |
 | Stale lines in `CLAUDE.md` (build state, model table, repo map, `make eval`) | Fixed (docs) |
@@ -29,7 +29,7 @@ key and in mock mode only. Each finding is one of:
 | `eval/qa/RESULTS.md` has no date, prompt or effort | Rejected for now: the file is generated and the gate restores it. The README row names the date, prompt and effort with `eval/qa/VOICE.md`. Phase B (code) if time allows: the header line in `qa_eval` |
 | The 2.0 s question budget in `RULES.md` is missed (p50 5.0 s) | Fixed (docs): README limitation says so |
 | WRITEUP: author instruction and TBDs | Fixed (docs): "not measured", no instruction line. `make results` still fills the spans |
-| `eval/run.py` is a stub; `make eval` writes "not run" for every suite | Phase B (code): run the replay scorers, or remove `make eval` and its mentions |
+| `eval/run.py` is a stub; `make eval` writes "not run" for every suite | Fixed (code): `make eval` reruns both replay scorers, checks they reproduce the committed results (puts the committed files back), and writes `eval/RESULTS.md` as an index; a suite that cannot run says why |
 | Skills and `SKILLS.md` name `eval/RESULTS.md` | Rejected: agent tooling is frozen since Oct 24; resolved together with `eval/run.py` in Phase B |
 | "Touchable parts in regions.json: 0" reads as a broken metric | Rejected: generated text, by design (touch needs the teacher's check); changing it rewrites the graded file in the freeze |
 | "a lead for a reader, not a verdict" | Fixed (docs): gone in the README rewrite |
@@ -55,7 +55,7 @@ key and in mock mode only. Each finding is one of:
 | F04 uploads have no rate limit | Fixed (code): at most 10 uploads per client per minute, 429 past it (`RateLimit`, `services/api/tests/test_rate_limit.py`). Concurrent pipeline runs are not capped: known gap |
 | F05 fix-call cap starts over per edit version | Phase B (code), low priority; known gap in SECURITY.md |
 | F06 Explore questions do not send the loaded version | Fixed (code): Explore sends the version it loaded; for `latest` the published file says which version it is (`X-Published-Version`); a version 1 question is answered from version 1 while version 2 exists (`services/api/tests/test_api_figures.py`) |
-| F07 saved sheet not used on a 5xx | Phase B (code). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
+| F07 saved sheet not used on a 5xx | Fixed (code): Explore uses the saved copy on any answer of 500 or more, as a stopped API gives 502 through the web server; a 404 or 4xx still says so (`apps/web/src/explore/loader.test.ts`). Fixed (docs): README says "offline" means no internet, with the Mac's server up |
 | F08 personal email on every commit | Deepak, Nov 3: no history rewrite; he sets the GitHub noreply address for new commits |
 | F09 macOS `say` clips | Deepak, Nov 3: kept for now under Apple's terms (NOTICE, ATTRIBUTION); after filming he records his own voice, the replays are recorded again and "aorta" is measured on a real voice |
 | F10 SECURITY.md: no reporting route, no threat model | Fixed (docs): "Reporting a vulnerability" and "Threat model and known gaps". Deepak: turn on private vulnerability reporting in the repo settings |

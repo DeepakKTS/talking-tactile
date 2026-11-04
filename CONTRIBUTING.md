@@ -13,7 +13,9 @@ sh scripts/install-hooks.sh     # once per clone: the pre-commit hook
 MOCK_META=1 make dev            # API on :8000, web on :5173, no network, no key
 ```
 
-Mock mode answers from the recordings in `fixtures/recorded/`. Live mode needs a Meta Model API
+Mock mode answers from the recordings in `fixtures/recorded/`, on macOS (they match a figure's
+PNG by its bytes; Linux encodes other bytes). `make demo-sheets` publishes the question eval's
+two sheets into a fresh `data/`, which `app.meta.qa_eval` and mock questions need. Live mode needs a Meta Model API
 key in `services/api/.env` (copy `.env.example`); never put it anywhere else.
 
 ## Tests

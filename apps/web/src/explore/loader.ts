@@ -20,6 +20,7 @@ const SCHEMA_VERSION = schema.properties.schema_version.const;
 export const OTHER_VERSION = "This sheet was made for another version of Explore. Ask your teacher to publish it again.";
 export const DAMAGED = "The sheet is damaged. Ask your teacher to publish it again.";
 const NOT_FOUND = 404;
+const SERVER_ERROR = 500;
 
 export function publishedUrl(figureId: string, version: Version): string {
   return `/api/figures/${figureId}/published/${String(version)}/regions.json`;
@@ -44,15 +45,24 @@ export async function loadPublished(
   if (version !== "latest" && !(Number.isInteger(version) && version >= 1)) {
     throw new LoadError("That is not a published version.");
   }
+  const fromSaved = (): Loaded | null => {
+    const saved = read(deps.storage, key(figureId, version));
+    return saved ? { ...saved, version: versionOf(version, readItem(deps.storage, `${key(figureId, version)}-version`)), from: "saved" } : null;
+  };
   let res: Response;
   try {
     res = await deps.fetch(publishedUrl(figureId, version));
   } catch {
-    const saved = read(deps.storage, key(figureId, version));
-    if (saved) return { ...saved, version: versionOf(version, readItem(deps.storage, `${key(figureId, version)}-version`)), from: "saved" };
+    const saved = fromSaved();
+    if (saved) return saved;
     throw new LoadError("The sheet could not be loaded. Check the network.");
   }
   if (res.status === NOT_FOUND) throw new LoadError("This figure is not published yet.");
+  // A stopped API answers 502 through the web server's proxy: the saved copy still works.
+  if (res.status >= SERVER_ERROR) {
+    const saved = fromSaved();
+    if (saved) return saved;
+  }
   if (!res.ok) throw new LoadError(`The sheet could not be loaded (${res.status}).`);
   const text = await res.text();
   const sheet = parse(text);

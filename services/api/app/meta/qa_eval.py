@@ -13,19 +13,22 @@ reports, per figure and category:
   words that appear nowhere in what Spark was given (the prompt, the question) nor in a
   short list of words any answer may use. A flag is a lead for a reader, not a verdict.
 
-The published versions are pinned (VERSION), so a replay sends the same requests the live
-run recorded. Writes eval/qa/RESULTS.md and eval/qa/scores.json."""
+The published versions are pinned (VERSION; on a fresh clone, make demo-sheets publishes the
+same sheets as version 1 and the eval finds them by content), so a replay sends the same
+requests the live run recorded. Writes eval/qa/RESULTS.md and eval/qa/scores.json."""
 
 import argparse
 import asyncio
 import json
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
 from app.ask import PROMPT, TEXT_PROMPT, Asker, AskRequest, prompt_text
 from app.config import load_tactile_rules
+from app.demo_sheets import SheetError, eval_version
 from app.main import create_app
 from app.meta.client import make_client
 from app.meta.mock import MockMetaClient
@@ -113,15 +116,19 @@ async def run(
             image=False,
         )
     rows = []
+    versions: dict[str, int] = {}  # the eval's sheet: version 4 where it ran, 1 after demo-sheets
     for q in load_questions():
         if q["figure"] not in names or (only is not None and q["category"] != only):
             continue
         fid = FIGURES[q["figure"]]
-        regions, _ = service._published_figure(fid, VERSION)
+        if q["figure"] not in versions:
+            versions[q["figure"]] = eval_version(service, fid, q["figure"])
+        version = versions[q["figure"]]
+        regions, _ = service._published_figure(fid, version)
         by_label = {r.label: r.id for r in regions.regions if r.touchable and "_" not in r.id}
         req = AskRequest(
             figure_id=fid,
-            version=VERSION,
+            version=version,
             question=q["question"],
             region_id=by_label.get(q["finger"]) if q["finger"] else None,
             recent_region_ids=[by_label[x] for x in q["recent"]],
@@ -239,7 +246,10 @@ def main() -> None:
     args = ap.parse_args()
     names = args.figures or list(FIGURES)
     image = not args.no_image
-    rows = asyncio.run(run(args.live, names, image, args.only))
+    try:
+        rows = asyncio.run(run(args.live, names, image, args.only))
+    except SheetError as exc:
+        sys.exit(str(exc))
     s = summary(rows)
     OUT.mkdir(parents=True, exist_ok=True)
     tail = ("" if args.only is None else f"_{args.only}") + ("" if image else "_no_image")

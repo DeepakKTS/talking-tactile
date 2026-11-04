@@ -128,6 +128,28 @@ describe("published regions loader", () => {
     expect(got.file.title).toBe(synthetic.title);
   });
 
+  it.each([500, 502, 503])("uses the saved copy when the server answers %s", async (status) => {
+    const storage = new MemoryStorage();
+    await loadPublished(ID, 2, { fetch: fetcher(() => new Response(BODY)).f, storage });
+    const got = await loadPublished(ID, 2, { fetch: fetcher(() => new Response("", { status })).f, storage });
+    expect(got.from).toBe("saved");
+    expect(got.version).toBe(2);
+    await expect(loadPublished(ID, 2, { fetch: fetcher(() => new Response("", { status })).f, storage: new MemoryStorage() })).rejects.toThrow(
+      `The sheet could not be loaded (${status}).`,
+    );
+  });
+
+  it("does not use the saved copy when the server says the figure is gone or the request is wrong", async () => {
+    const storage = new MemoryStorage();
+    await loadPublished(ID, 2, { fetch: fetcher(() => new Response(BODY)).f, storage });
+    await expect(loadPublished(ID, 2, { fetch: fetcher(() => new Response("", { status: 404 })).f, storage })).rejects.toThrow(
+      "This figure is not published yet.",
+    );
+    await expect(loadPublished(ID, 2, { fetch: fetcher(() => new Response("", { status: 403 })).f, storage })).rejects.toThrow(
+      "The sheet could not be loaded (403).",
+    );
+  });
+
   it("fails clearly offline with nothing saved", async () => {
     const down = fetcher(() => new TypeError("Failed to fetch"));
     await expect(loadPublished(ID, "latest", { fetch: down.f, storage: new MemoryStorage() })).rejects.toThrow(
