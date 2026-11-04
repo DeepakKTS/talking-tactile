@@ -2,7 +2,8 @@
 
 The site is static: plain HTML, one stylesheet and three scripts in site/assets/, the two
 published sheets in site/sheets/. These checks keep it honest and self-contained:
-- the shared design tokens are the app's, byte for byte (once the app has them);
+- the shared design tokens, fonts and brand files are the app's, byte for byte (once the
+  app has them);
 - every internal link, anchor and asset resolves;
 - nothing is requested from another host (scripts, styles, fonts, images);
 - every page carries the CSP meta tag, and no page has inline script or style;
@@ -102,6 +103,13 @@ class SiteTest(unittest.TestCase):
             self.skipTest("apps/web/src/styles/tokens.css is not on this branch yet (it comes with ui-refresh); nothing to compare")
         self.assertTrue(SITE_TOKENS.is_file(), "site/assets/tokens.css is missing: copy apps/web/src/styles/tokens.css")
         self.assertEqual(SITE_TOKENS.read_bytes(), APP_TOKENS.read_bytes(), "site/assets/tokens.css differs from the app's")
+        for kind in ("fonts", "brand"):
+            app = REPO / "apps" / "web" / "public" / kind
+            for f in sorted(app.iterdir()) if app.is_dir() else []:
+                with self.subTest(file=f"{kind}/{f.name}"):
+                    copy = SITE / "assets" / kind / f.name
+                    self.assertTrue(copy.is_file(), f"site/assets/{kind}/{f.name} is missing")
+                    self.assertEqual(copy.read_bytes(), f.read_bytes())
 
     def test_every_internal_link_anchor_and_asset_resolves(self) -> None:
         parsed = {p.name: parse(p) for p in pages()}
@@ -122,6 +130,13 @@ class SiteTest(unittest.TestCase):
         for css in SITE.rglob("*.css"):
             for ref in css_urls(css.read_text(encoding="utf-8")):
                 if ref.startswith("data:") or ref.startswith("#") or external(ref):
+                    continue
+                if ref.startswith("/") and css == SITE_TOKENS:
+                    # tokens.css names the app's root (/fonts/); site.css declares the same face
+                    # from assets/fonts/, so the site works under a subpath too.
+                    rel = ref.lstrip("/")
+                    if not (SITE / "assets" / rel).is_file() or f'url("{rel}")' not in (SITE / "assets" / "site.css").read_text():
+                        missing.append(f"tokens.css: url({ref}) is not declared again in site.css from assets/{rel}")
                     continue
                 if not (css.parent / unquote(urlsplit(ref).path)).is_file():
                     missing.append(f"{css.relative_to(SITE)}: url({ref}) has no file")

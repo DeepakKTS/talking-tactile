@@ -1,69 +1,19 @@
-/* ---------- Tokens ---------- */
-:root{
-  --mode: light;
-  --bg:#E7E1D1;            /* paper */
-  --grout:#E7E1D1;
-  --tile-lift:0.32;
-  --tshadow:0 1px 18px rgba(231,225,209,.9);
-  --menu-fill:rgba(244,239,226,.9);
-  --pool:.9;        /* light mode pulls tiles toward paper */
-  --text:#1B1912;
-  --text-2:rgba(27,25,18,.74);
-  --accent:#6B5627;        /* deep brass, readable on paper */
-  --accent-ink:#FBF7EC;
-  --veil:231,225,209;
-  --glass-fill:rgba(250,246,236,.56);
-  --glass-fill-2:rgba(250,246,236,.30);
-  --glass-edge:rgba(27,25,18,.12);
-  --glass-rim-a:rgba(255,255,255,.95);
-  --glass-rim-b:rgba(27,25,18,.10);
-  --glass-sheen:rgba(255,255,255,.55);
-  --glass-shadow:0 24px 60px rgba(70,56,30,.18), 0 2px 6px rgba(70,56,30,.10);
-  --hair:rgba(27,25,18,.14);
-  --focus:#2F5D8A;
+/* Talking Tactile project website. The colors, fonts and sizes are the app's design tokens,
+   in tokens.css (a byte for byte copy of apps/web/src/styles/tokens.css, loaded first).
 
-  --f-sans:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --f-serif:"Literata","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-
-  --r-pill:999px; --r-slab:30px; --r-panel:24px; --r-item:14px;
-  --wrap:1120px;
-  color-scheme:light;
+   Fonts: tokens.css names them at /fonts/, the app's root. The site may be served from a
+   subpath (GitHub Pages serves a project at /talking-tactile/), so the same faces are
+   declared again here from assets/fonts/, relative to this file. A later @font-face with the
+   same descriptors replaces the earlier one, so only these files are fetched. */
+@font-face{
+  font-family:"Literata";font-style:normal;font-weight:200 900;font-display:swap;
+  src:url("fonts/literata-latin-opsz-normal.woff2") format("woff2-variations"),url("fonts/literata-latin-opsz-normal.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --mode: dark;
-    --bg:#000000; --grout:#000000; --tile-lift:0; --pool:.74; --tshadow:0 2px 28px rgba(0,0,0,.6),0 1px 2px rgba(0,0,0,.45); --menu-fill:rgba(14,13,10,.86);
-    --text:#ECE4CF; --text-2:rgba(236,228,207,.76);
-    --accent:#C9B27C; --accent-ink:#17140C;
-    --veil:0,0,0;
-    --glass-fill:rgba(26,24,18,.42);
-    --glass-fill-2:rgba(60,56,44,.18);
-    --glass-edge:rgba(236,228,207,.14);
-    --glass-rim-a:rgba(255,248,228,.42);
-    --glass-rim-b:rgba(167,178,180,.14);
-    --glass-sheen:rgba(255,246,222,.16);
-    --glass-shadow:0 30px 70px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35);
-    --hair:rgba(236,228,207,.14);
-    --focus:#E8D7A6;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --mode: dark;
-  --bg:#000000; --grout:#000000; --tile-lift:0; --pool:.74; --tshadow:0 2px 28px rgba(0,0,0,.6),0 1px 2px rgba(0,0,0,.45); --menu-fill:rgba(14,13,10,.86); --pool:.66; --menu-fill:rgba(14,13,10,.86);
-  --text:#ECE4CF; --text-2:rgba(236,228,207,.76);
-  --accent:#C9B27C; --accent-ink:#17140C;
-  --veil:0,0,0;
-  --glass-fill:rgba(26,24,18,.42);
-  --glass-fill-2:rgba(60,56,44,.18);
-  --glass-edge:rgba(236,228,207,.14);
-  --glass-rim-a:rgba(255,248,228,.42);
-  --glass-rim-b:rgba(167,178,180,.14);
-  --glass-sheen:rgba(255,246,222,.16);
-  --glass-shadow:0 30px 70px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35);
-  --hair:rgba(236,228,207,.14);
-  --focus:#E8D7A6;
-  color-scheme:dark;
+@font-face{
+  font-family:"Atkinson Hyperlegible Next";font-style:normal;font-weight:200 800;font-display:swap;
+  src:url("fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2") format("woff2-variations"),url("fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
 
 /* ---------- Base ---------- */
@@ -81,7 +31,7 @@ img,svg,canvas{max-width:100%;display:block}
 a{color:inherit}
 h1,h2,h3{margin:0;font-weight:400}
 p{margin:0}
-:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+:focus-visible{outline:var(--focus-width,3px) solid var(--focus);outline-offset:3px;border-radius:6px}
 .skip{position:absolute;left:16px;top:-60px;z-index:100;padding:10px 16px;border-radius:var(--r-pill);background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600}
 .skip:focus{top:calc(env(safe-area-inset-top,0px) + 12px)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -135,6 +85,7 @@ p{margin:0}
 }
 .brand{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px 0 12px;text-decoration:none;border-radius:var(--r-pill);font-weight:600;letter-spacing:.01em;white-space:nowrap}
 .brand svg{width:22px;height:22px;flex:none}
+.brand .logo-mark{width:33px;height:22px;flex:none}
 .nav-links{display:flex;gap:2px;margin:0;padding:0;list-style:none}
 .nav-links a{
   display:flex;align-items:center;min-height:44px;padding:0 15px;border-radius:var(--r-pill);text-decoration:none;font-size:.9375rem;color:var(--text-2);
