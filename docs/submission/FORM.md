@@ -1,7 +1,7 @@
 # Submission form text
 
-Ready to paste. Every number names the committed file it comes from. Fields marked "not
-measured" are filled from `eval/gate-b/` once the phone measurements exist.
+Ready to paste. Every number names the committed file it comes from. What was not measured
+says so.
 
 ## Before pasting
 
@@ -9,8 +9,8 @@ measured" are filled from `eval/gate-b/` once the phone measurements exist.
 - Problem statement: **Push the Frontier**. Confirmed by Deepak, Nov 3. The idea: an ordinary
   camera learns what a finger is touching on a printed sheet, with only four printed corner
   marks on it.
-- Public GitHub repository: https://github.com/DeepakKTS/talking-tactile (Deepak makes it
-  public on Nov 3).
+- Public GitHub repository: https://github.com/DeepakKTS/talking-tactile (public since
+  Nov 3).
 - Demo video: `<VIDEO_URL>`
 - Coding tool: the code was written with Claude Code. Muse Code was not used; nothing below
   claims it.
@@ -55,13 +55,13 @@ spent (`eval/live/ledger.jsonl`, Nov 4).
    time, from Spark's points, with a neighbor's points as negatives on a retry. A concept
    prompt for the subject gives the silhouette, raised on the sheet. The teacher's "Fix
    outline" sends the teacher's clicks as new point prompts. Result: 44 point prompts, 44 answers with
-   one instance (`spikes/sam.md`); on the heart, 0 of 4 graded reference parts regressed
+   one instance, the point inside its own mask in 38 of 44 (`spikes/sam.md`); on the heart, 0 of 4 graded reference parts regressed
    (`eval/plan/RESULTS.md`).
 3. Hearing the question, Muse Voice Transcribe (`muse-voice-transcribe-1.0`). The phone
    records 16 kHz mono WAV while the screen is held; the backend sends it with the figure's
    part, line and group names as keywords. Commands such as "where is the aorta" are then
    handled on the phone with no further call. Result: on 3 synthetic clips every word was
-   recognized, with one doubled "the" when hints were on; transcribe p50 941 ms on the server
+   recognized, with one doubled "the" when hints were on; transcribe p50 964 ms on the server
    (`eval/qa/VOICE.md`). Accuracy on a real voice is not
    measured.
 4. Answering (Explore), Muse Spark (`muse-spark-1.3`). The question goes with the published

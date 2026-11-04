@@ -32,7 +32,7 @@ Spark is most of it. The phone, VoiceOver and a real network are for the iPhone 
 
 ## Latency experiment: the answer prompt without the figure image (Oct 30)
 
-The full eval (61 questions, published version 4) run live twice: (a) ask_answer.v1 with the figure image, as /api/ask does (eval/qa/RESULTS.md); (b) ask_answer_text.v1, the same rules without the image, and no image sent (eval/qa/RESULTS_no_image.md, recorded as qa3_ask_*, not replayed).
+The full eval (61 questions, published version 4) run live twice: (a) ask_answer.v1 with the figure image, as /api/ask did then (written to eval/qa/RESULTS.md at the time; that file now holds the later ask_answer.v2 run); (b) ask_answer_text.v1, the same rules without the image, and no image sent (eval/qa/RESULTS_no_image.md, recorded as qa3_ask_*, not replayed).
 
 | Variant, figure | Source correct | Citations correct | Outside words | Spark p50 ms | Spark p95 ms |
 |---|---|---|---|---|---|

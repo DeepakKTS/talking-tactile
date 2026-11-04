@@ -37,7 +37,8 @@ Explore mode is for the student and needs no screen. A phone in a mount watches 
 MediaPipe finds the fingertip in a Web Worker; the sheet's corners map the camera to the page.
 Entering a part plays its texture tone, and resting says its name. Labels, tones and "where
 is" guidance come from the sheet's file alone, so they work offline. Directions and neighbors
-are computed in code; the language model never guesses geometry.
+are computed in code; the language model never guesses them. Only picture questions (shape,
+biggest, top) are answered from the figure's image.
 
 Holding to talk records a question. Muse Voice Transcribe turns it into words, with the
 figure's part names as keyword hints. Commands such as "where is the aorta" are handled on the

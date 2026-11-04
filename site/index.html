@@ -141,7 +141,7 @@
           </div>
           <div class="detail">
             <h3>Geometry comes from code</h3>
-            <p>Directions, neighbors and distances are computed in code. The language model never guesses them.</p>
+            <p>Directions, neighbors and distances are computed in code. The language model never guesses them; only picture questions (shape, biggest, top) are answered from the figure&rsquo;s image.</p>
           </div>
           <div class="detail">
             <h3>A phone first</h3>
@@ -155,7 +155,7 @@
       <div class="wrap">
         <div class="sec-head">
           <h2 id="status-title">Where it stands</h2>
-          <p>One person, building for the Meta Global AI Developer Hackathon from October 26 to November 4, 2026. As of November 3, every number below names the committed file it comes from.</p>
+          <p>One person, building for the Meta Global AI Developer Hackathon, October 26 to November 4, 2026. The first code was written on October 24, before the build window; the Official Rules allow pre-event work. As of November 4, every number below names the committed file it comes from.</p>
         </div>
         <div class="panel glass">
           <h3 class="nm">Results</h3>
@@ -169,8 +169,8 @@
               <tr><th scope="row">Questions, live, source right</th><td>Heart 36 of 38, brain 35 of 35</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/RESULTS.md"><code>eval/qa/RESULTS.md</code></a></td></tr>
               <tr><th scope="row">Picture questions (shape, biggest, top)</th><td>Heart 5 of 6, brain 6 of 6; 3 of 6 each without the image</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/RESULTS.md"><code>eval/qa/RESULTS.md</code></a><br><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/RESULTS_image_no_image.md"><code>eval/qa/RESULTS_image_no_image.md</code></a></td></tr>
               <tr><th scope="row">Release to first spoken word, Mac, live</th><td>p50 5.0 s over 12 questions; two took 13.8 and 14.7 s</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/VOICE.md"><code>eval/qa/VOICE.md</code></a></td></tr>
-              <tr><th scope="row">Release to first spoken word, iPhone</th><td><!-- tt:voice-device --><span class="tag">Not measured yet</span><!-- /tt:voice-device --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
-              <tr><th scope="row">Touch to tone, iPhone</th><td><!-- tt:earcon-device --><span class="tag">Not measured yet</span><!-- /tt:earcon-device --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
+              <tr><th scope="row">Release to first spoken word, iPhone</th><td><!-- tt:voice-device --><span class="tag">Not measured: the latency film was cut</span><!-- /tt:voice-device --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
+              <tr><th scope="row">Touch to tone, iPhone</th><td><!-- tt:earcon-device --><span class="tag">Not measured: the latency film was cut</span><!-- /tt:earcon-device --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
               <tr><th scope="row">Fingertip error on the 9-point sheet (Gate B, goal 4 mm)</th><td><!-- tt:gate-b --><span class="tag">Not measured yet</span><!-- /tt:gate-b --></td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a></td></tr>
               <tr><th scope="row">Meta credits spent</th><td>$5.42 of $150 (Nov 4)</td><td class="file"><a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/live/ledger.jsonl"><code>eval/live/ledger.jsonl</code></a></td></tr>
               </tbody>
@@ -182,7 +182,7 @@
             <h3>Not done yet</h3>
             <ul class="goals">
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Not yet tested with blind students or teachers.</strong> No tester session or expert review happened before the deadline.</span></li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>The phone numbers are not measured yet:</strong> fingertip error on the printed test sheet, touch to tone, and question latency on the iPhone (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a>).</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Latency on the phone was not measured:</strong> the latency film was cut, so touch to tone and question latency on the iPhone have no numbers; the Mac&rsquo;s release to first spoken word is p50 5.0 s (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/VOICE.md"><code>eval/qa/VOICE.md</code></a>). Fingertip error on the printed test sheet: not measured yet (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/gate-b/README.md"><code>eval/gate-b/README.md</code></a>).</span></li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Voice is tested on synthetic speech only,</strong> in English (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/eval/qa/VOICE.md"><code>eval/qa/VOICE.md</code></a>).</span></li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>Questions need the network and are slow:</strong> 5.0 s at p50 on a Mac, against a 2.0 s budget in <a href="https://github.com/DeepakKTS/talking-tactile/blob/main/RULES.md"><code>RULES.md</code></a>.</span></li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg><span><strong>A sighted helper sets the corners,</strong> and nothing detects the phone or the sheet moving afterward.</span></li>

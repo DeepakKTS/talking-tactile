@@ -56,7 +56,7 @@
 
       <section class="panel glass prose" aria-labelledby="mock-title">
         <h2 id="mock-title">Mock mode, in four commands</h2>
-        <p>Needs macOS, <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, Node 24 and liblouis (<code>brew install liblouis</code>). The recordings match a figure by its PNG&rsquo;s exact bytes, and Linux encodes the same pixels to other bytes, so on Linux the tests run but the recorded heart and brain do not replay (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/services/api/tests/recorded_png.py"><code>services/api/tests/recorded_png.py</code></a>).</p>
+        <p>Needs macOS or Linux, <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a>, Node 24 and liblouis (<code>brew install liblouis</code>, or <code>apt install liblouis-bin liblouis-data</code>). On Linux the heart replays; the brain from Wikimedia Commons does not, because its image normalizes to other pixels there, so no recording of it matches (<a href="https://github.com/DeepakKTS/talking-tactile/blob/main/services/api/tests/recorded_png.py"><code>services/api/tests/recorded_png.py</code></a>).</p>
 <pre><code>git clone https://github.com/DeepakKTS/talking-tactile.git
 cd talking-tactile
 make install

@@ -15,11 +15,16 @@ and transcribers who make tactile graphics, and for the blind students who learn
 with their print PDFs, and a pointer demo that speaks part names in the browser).
 
 Built solo for the Meta Global AI Developer Hackathon (Indie track) on `muse-spark-1.3`,
-`sam-3.1` and `muse-voice-transcribe-1.0`, through the Meta Model API.
+`sam-3.1` and `muse-voice-transcribe-1.0`, through the Meta Model API. The first code (the
+backend and app skeletons and the tracking spike) was written on Oct 24, before the Oct 26
+build window; the Official Rules allow pre-event work (`TRACKER.html`, decision of Oct 27).
 
 ## How it works
 
 ![The teacher's upload, stages S0 to S5 with the Meta model at each, the printed sheet, and the phone's touch and question paths, with the safety rules marked](docs/submission/architecture.svg)
+
+The backend runs six stages: S0 reads the upload, S1 is Spark's plan, S2 is SAM's outlines,
+S3 reconciles them, S4 lays out the sheet and S5 draws it (`services/api/app/pipeline/`).
 
 The teacher (Author mode, on a computer):
 
@@ -43,13 +48,16 @@ The student (Explore mode, on a phone, no screen needed):
 - **SAM text prompts found no heart parts, so Spark places points.** "left ventricle",
   "aorta" and "right atrium" gave zero instances; "heart" gave the whole heart
   (`spikes/sam.md`). Spark now places points and SAM segments from them: 44 point prompts,
-  44 single-instance answers. Code keeps points off text and leader lines and retries a mask
+  44 single-instance answers, with the point inside its own mask in 38 of 44. Code keeps
+  points off text and leader lines and retries a mask
   that spills onto a neighbor (`services/api/app/pipeline/s2_points.py`).
 - **S1 plans for touch.** Spark marks each part as an area, a line or a group, with
   parents. A valve is a line, spoken when the finger crosses it. Vessels drawn as one shape
   come back as a merge proposal. Heart: 15 areas, 4 lines, one merge for the aortic arch
-  (`eval/plan/RESULTS.md`). On a private test figure, planning raised touchable parts from
-  5 of 12 to 10 of 10 (`TRACKER.html`, decision of Oct 30).
+  (`eval/plan/RESULTS.md`). On a private test figure, 5 of 12 parts were touchable before
+  planning (`TRACKER.html`, decision of Oct 30), and 8 of 10 areas are touchable
+  with it
+  (`eval/plan/RESULTS.md`).
 - **Touch only after the teacher confirms.** Automatic safety rules failed on a different
   figure each time: the aortic arch's members overlap, a shaded brain's lobes are one drawn
   region, clipping cut Japan's regions in half (`TRACKER.html`, decision of Oct 30). A part
@@ -66,7 +74,8 @@ The student (Explore mode, on a phone, no screen needed):
   starts only once the GPU model is ready and has a frame (`apps/web/src/explore/warmup.ts`).
   The Gate B page runs a port held to it by `spikes/tracking/test/parity.test.mjs`.
 
-The model never guesses geometry. Directions, neighbors and distances come from code.
+Directions, neighbors and distances come from code, never from the model. Picture questions
+(shape, biggest, top) are the one exception: Spark answers them from the figure's image.
 
 ## Results
 
@@ -82,6 +91,10 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 | Fingertip error on the 9-point sheet (Gate B, goal 4 mm) | <!-- tt:gate-b -->not measured<!-- /tt:gate-b --> | `eval/gate-b/README.md` |
 | Meta credits spent | $5.42 of $150 (Nov 4) | `eval/live/ledger.jsonl` |
 
+The questions ran on prompt `ask_answer.v2` at minimal effort. The "without the image" picture
+numbers come from the older text-only prompt `ask_answer_text.v1`, so that pair is not a
+like-for-like comparison (`eval/qa/RESULTS_image_no_image.md`).
+
 ## Limitations
 
 - **Not yet tested with blind students or teachers.** No tester session or expert review
@@ -90,7 +103,8 @@ The model never guesses geometry. Directions, neighbors and distances come from 
 - **Touch accuracy on the phone is not measured yet.** Gate B (`eval/gate-b/README.md`) has
   not run on the demo iPhone.
 <!-- /tt:limits-touch -->
-- **Latency on the phone was not measured.** The latency film was cut, so touch to tone and
+- **Latency on the phone was not measured.** The latency film (a phone video timed frame by
+  frame, `eval/gate-b/README.md`) was cut, so touch to tone and
   release to first spoken word on the iPhone have no numbers. The only measured figure is the
   Mac's, live in Chrome: release to first spoken word p50 5.0 s over 12 questions, two at 13.8
   and 14.7 s (`eval/qa/VOICE.md`).
@@ -111,7 +125,7 @@ Mock mode replays recorded live answers (`fixtures/recorded/`). No key, no netwo
 
 Needs macOS or Linux, [uv](https://docs.astral.sh/uv/), Node 24 and liblouis
 (`brew install liblouis`, or `apt install liblouis-bin liblouis-data`). On Linux the heart
-replays; the Commons brain does not, because its image normalizes to other pixels there, so
+replays; the brain from Wikimedia Commons does not, because its image normalizes to other pixels there, so
 no recording of it matches (`services/api/tests/recorded_png.py`).
 
 ```
@@ -174,4 +188,4 @@ installed from PyPI, not distributed here).
 ## Documents
 
 `PLAN.md` design, `RULES.md` hard rules, `docs/EDGE_CASES.md` edge cases,
-`docs/DEMO.md` filming runbook, `docs/review/` independent reviews, `CONTRIBUTING.md`.
+`docs/DEMO.md` filming runbook, `docs/review/` reviews by fresh-context AI agents (not people) and their triage, `CONTRIBUTING.md`.

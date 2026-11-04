@@ -201,6 +201,14 @@ The four screenshots of Author and Explore (Nov 3, a headless mock-mode run) sho
 fixtures/heart.png in the review and the Fix outline panel: CC BY-SA 3.0, with the heart's
 credit line, which README.md prints under them.
 
+### The UI review screenshots, docs/review/ui/
+
+The 112 screenshots (Nov 3, headless Chromium and WebKit, both themes, two sizes) and
+`site-axe.json`. The `app-*` ones show the synthetic test figure (own work, below). The `site-*`
+ones show the project website, so they carry what its pages carry (next section): the heart
+(CC BY-SA 3.0, with the heart's credit line), the brain from Wikimedia Commons (CC BY 3.0, with
+the brain's credit line) and the Vignette Bloom background (MIT).
+
 ### The project website, site/
 
 - `site/sheets/heart/` (tactile.svg, print.pdf, regions.json): fixtures/heart.png, published
