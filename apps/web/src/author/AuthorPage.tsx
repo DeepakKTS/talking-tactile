@@ -231,12 +231,99 @@ function AlertIcon() {
   );
 }
 
+type StepState = "done" | "active" | "pending" | "failed";
+
+function StepIcon({ state }: { state: StepState }) {
+  if (state === "done") {
+    return (
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <circle cx="14" cy="14" r="12" fill="currentColor" />
+        <path d="M8.5 14.5l3.6 3.6 7.4-8" fill="none" stroke="var(--accent-ink)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  if (state === "active") {
+    return (
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <circle cx="14" cy="14" r="11" fill="none" stroke="var(--hair)" strokeWidth="3" />
+        <path className="spin" d="M14 3a11 11 0 0 1 11 11" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="14" cy="14" r="3" fill="currentColor" />
+      </svg>
+    );
+  }
+  if (state === "failed") {
+    return (
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <circle cx="14" cy="14" r="12" fill="currentColor" />
+        <path d="M10 10l8 8M18 10l-8 8" stroke="var(--bg)" strokeWidth="2.4" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 28 28" aria-hidden="true">
+      <circle cx="14" cy="14" r="11" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/** Whole seconds since this page first saw the job on this stage. Measured here, by the
+ * page's own clock: the API gives a stage's time only once it is done. */
+function useSecondsOn(key: string | null): number {
+  const [seen, setSeen] = useState<{ key: string | null; s: number }>({ key: null, s: 0 });
+  useEffect(() => {
+    if (!key) return;
+    const at = performance.now();
+    const t = setInterval(() => { setSeen({ key, s: Math.floor((performance.now() - at) / 1000) }); }, 1000);
+    return () => { clearInterval(t); };
+  }, [key]);
+  return seen.key === key ? seen.s : 0;
+}
+
 function Progress({ status }: { status: Status }) {
   const job = status.job;
   const done = new Map(job.stages.map((s) => [s.stage, s]));
   const applying = job.edit_version !== status.edit_version || !FINISHED.has(job.status);
+  const failed = job.status === "failed" && !applying;
+  const running = applying && job.stage ? `${job.id} ${job.stage}` : null;
+  const seconds = useSecondsOn(running);
+
+  const stateOf = (s: StageName): StepState => {
+    if (failed && job.stage === s) return "failed";
+    if (done.has(s)) return "done";
+    if (applying && job.stage === s) return "active";
+    return "pending";
+  };
+  const chain = (
+    <ol className="chain" aria-label="Stages">
+      {STAGES.map((s) => {
+        const state = stateOf(s);
+        const run = done.get(s);
+        const detail =
+          state === "done" && run
+            ? `Done in ${Math.round(run.ms)} ms${run.outcome === "cached" ? ", from cache" : ""}${run.cost_usd > 0 ? `. Cost $${run.cost_usd.toFixed(3)}` : ""}.`
+            : state === "active"
+              ? `Working, ${seconds} s so far.`
+              : state === "failed"
+                ? `Stopped: ${job.error?.message ?? "an error"}`
+                : "Waiting.";
+        return (
+          <li key={s} className="step" data-state={state}>
+            <span className="step-icon"><StepIcon state={state} /></span>
+            <span className="step-body">
+              <span className="step-head">
+                <span className="step-label">{STAGE_WORDS[s]}</span>
+                {state === "active" && <span className="badge">In progress</span>}
+              </span>
+              <span className="step-detail">{detail}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+
   return (
-    <section aria-label="Progress">
+    <section aria-label="Progress" className="glass card progress">
       <p role="status">
         {job.status === "failed"
           ? `Stopped at ${job.stage ? STAGE_WORDS[job.stage].toLowerCase() : "a stage"}: ${job.error?.message ?? "an error"}`
@@ -248,18 +335,12 @@ function Progress({ status }: { status: Status }) {
               : "Waiting to start."
             : "Ready for review."}
       </p>
-      {applying && (
-        <ol>
-          {STAGES.map((s) => {
-            const run = done.get(s);
-            const state = run ? `done in ${Math.round(run.ms)} ms${run.outcome === "cached" ? ", from cache" : ""}` : job.stage === s ? "working" : "waiting";
-            return (
-              <li key={s}>
-                {STAGE_WORDS[s]}: {state}
-              </li>
-            );
-          })}
-        </ol>
+      {failed && job.error?.retryable && <p>To try again, upload the same figure again. Stages already done come from the cache.</p>}
+      {applying || failed ? chain : job.stages.length > 0 && (
+        <details className="steps-toggle">
+          <summary>Stages and timings</summary>
+          {chain}
+        </details>
       )}
     </section>
   );

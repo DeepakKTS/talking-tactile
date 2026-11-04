@@ -160,7 +160,15 @@ describe("author page", () => {
     server.holdRunning = true; // so the stages are still on screen when checked (CI is slower)
     fireEvent.click(screen.getByRole("button", { name: "Make a tactile sheet" }));
     expect(await screen.findByText("Outlining each part.")).toBeTruthy();
-    expect(screen.getByText("Reading the file: done in 40 ms")).toBeTruthy();
+    // Each stage is a step: its name, then its state in words, beside an icon.
+    const steps = within(screen.getByRole("list", { name: "Stages" })).getAllByRole("listitem");
+    expect(steps.map((li) => li.getAttribute("data-state"))).toEqual(["done", "pending", "active", "pending", "pending", "pending"]);
+    expect(within(steps[0] as HTMLElement).getByText("Reading the file")).toBeTruthy();
+    expect(within(steps[0] as HTMLElement).getByText("Done in 40 ms.")).toBeTruthy();
+    expect(within(steps[2] as HTMLElement).getByText("Outlining each part")).toBeTruthy();
+    expect(within(steps[2] as HTMLElement).getByText("In progress")).toBeTruthy();
+    expect(within(steps[2] as HTMLElement).getByText(/^Working, \d+ s so far\.$/)).toBeTruthy();
+    expect(within(steps[5] as HTMLElement).getByText("Waiting.")).toBeTruthy();
     server.holdRunning = false;
     await screen.findByRole("heading", { name: synthetic.title });
     const form = server.calls.find((c) => c.method === "POST")?.body as FormData;
@@ -168,6 +176,26 @@ describe("author page", () => {
     expect(form.get("page")).toBe("letter");
     expect(form.get("page_index")).toBe("0");
     expect(window.location.search).toBe(`?figure=${ID}`);
+  });
+
+  it("shows a failed stage with the server's message and how to try again", async () => {
+    const failed = {
+      figure_id: ID,
+      edit_version: 0,
+      published: [],
+      job: {
+        id: "j1", status: "failed", stage: "s1", edit_version: 0,
+        stages: [{ stage: "s0", outcome: "ran", ms: 40, cost_usd: 0 }],
+        error: { code: "meta_unreachable", message: "The Meta API could not be reached. Try again later.", retryable: true },
+      },
+    };
+    window.history.replaceState(null, "", `/author?figure=${ID}`);
+    render(<AuthorPage api={new FigureApi(() => Promise.resolve(new Response(JSON.stringify(failed))))} pollMs={5} />);
+    expect(await screen.findByText("Stopped at finding the parts: The Meta API could not be reached. Try again later.")).toBeTruthy();
+    const steps = within(screen.getByRole("list", { name: "Stages" })).getAllByRole("listitem");
+    expect(steps.map((li) => li.getAttribute("data-state"))).toEqual(["done", "failed", "pending", "pending", "pending", "pending"]);
+    expect(within(steps[1] as HTMLElement).getByText("Stopped: The Meta API could not be reached. Try again later.")).toBeTruthy();
+    expect(screen.getByText("To try again, upload the same figure again. Stages already done come from the cache.")).toBeTruthy();
   });
 
   it("takes a file dropped on the card, and says which", async () => {
