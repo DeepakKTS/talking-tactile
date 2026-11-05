@@ -11,7 +11,7 @@ says so.
   marks on it.
 - Public GitHub repository: https://github.com/DeepakKTS/talking-tactile (public since
   Nov 3).
-- Demo video: `<VIDEO_URL>`
+- Demo video: https://www.youtube.com/watch?v=t0WsLi3jYXY
 - Coding tool: the code was written with Claude Code. Muse Code was not used; nothing below
   claims it.
 

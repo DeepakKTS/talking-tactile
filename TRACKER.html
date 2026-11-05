@@ -525,8 +525,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
 {
  "schema": 1,
  "project": "Talking Tactile",
- "rev": 460,
- "updated_at": "2026-11-04T23:45:08.362Z",
+ "rev": 471,
+ "updated_at": "2026-11-05T00:01:34.967Z",
  "file_saved_at": "2026-10-24T00:00:00.000Z",
  "budget_usd": 150,
  "tasks": [
@@ -612,13 +612,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Puffy fabric paint in 2 colors, heavy cardstock, a phone stand or gooseneck clamp, masking tape, a ruler.",
    "timebox": "1 h",
    "fallback": "Hot glue and layered card also work.",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: physical. Confirm the paint, cardstock and stand were bought; no repo evidence.",
+   "status": "cut",
+   "note": "Not done before the deadline.",
    "done_at": null,
    "tags": [
     "materials"
    ],
-   "changed_at": "2026-11-03T20:26:38.874Z"
+   "changed_at": "2026-11-05T00:01:29.283Z"
   },
   {
    "id": "d0-7",
@@ -1184,13 +1184,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Let them dry overnight. Tape the sheet edges for the demo.",
    "timebox": "1 h",
    "fallback": "Hot glue or layered card.",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: physical. Print and trace the heart sheet (docs/DEMO.md pre-flight: bar measured, sheet traced or swelled, taped).",
+   "status": "cut",
+   "note": "Not done before the deadline.",
    "done_at": null,
    "tags": [
     "materials"
    ],
-   "changed_at": "2026-11-03T20:26:39.027Z"
+   "changed_at": "2026-11-05T00:01:29.332Z"
   },
   {
    "id": "d4-6",
@@ -1293,13 +1293,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "The heart figure works end to end on the real traced sheet.",
    "timebox": "30 min",
    "fallback": "Cut Plus features, spend Day 6 on the loop.",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: the heart on the real traced sheet, end to end, during filming (docs/DEMO.md shots). Headless replay already passes (apps/web/e2e/plan_e2e.py, ask_e2e.py).",
-   "done_at": null,
+   "status": "done",
+   "note": "Filmed Nov 4 on a plain printed heart sheet, not traced: touch and spoken names worked. The held question was not filmed on video. Gate C stays pending: its test includes tracing the sheet, which was cut (d4-5).",
+   "done_at": "2026-11-05T00:01:29.379Z",
    "tags": [
     "gate"
    ],
-   "changed_at": "2026-11-03T20:26:39.076Z"
+   "changed_at": "2026-11-05T00:01:29.379Z"
   },
   {
    "id": "d5-6",
@@ -1900,13 +1900,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Keyboard only, VoiceOver or NVDA, onboarding audio. accessibility-pass skill.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: the machine steps pass (eval/a11y.md, explore_e2e.py); a real screen reader was never run. VoiceOver hold-to-talk on the iPhone is in d8-35.",
+   "status": "cut",
+   "note": "Not tested on the device: no real screen reader run. Machine checks pass (eval/a11y.md, explore_e2e.py).",
    "done_at": null,
    "tags": [
     "a11y"
    ],
-   "changed_at": "2026-11-03T20:26:39.123Z"
+   "changed_at": "2026-11-05T00:01:29.426Z"
   },
   {
    "id": "d7-3",
@@ -2482,14 +2482,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "",
    "timebox": "",
    "fallback": "",
-   "status": "doing",
-   "note": "NEEDS DEEPAK: on the phone during filming: ?check=1 cold start, Explore Start cold, Gate B page cold, VoiceOver hold-to-talk, Gate B, the latency film, one live voice take. Done before: item C, the iPhone servers, warm-up and Wake Lock fixes (d8-46, d8-47).",
+   "status": "cut",
+   "note": "Done on the phone: Gate B (eval/gate-b/run.md) and filming. Cut: the latency film; VoiceOver hold-to-talk not tested on the device.",
    "done_at": null,
    "tags": [
     "demo",
     "gate-b"
    ],
-   "changed_at": "2026-11-03T20:26:39.221Z"
+   "changed_at": "2026-11-05T00:01:29.475Z"
   },
   {
    "id": "d8-36",
@@ -2734,13 +2734,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "demo-readiness skill. Passes twice in a row.",
    "timebox": "1 h",
    "fallback": "",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: demo-readiness checklist live on the phone, twice in a row (Gate D).",
+   "status": "cut",
+   "note": "The demo-readiness checklist was not run twice in a row on record, so Gate D stays pending; filming worked by Deepak's account, which is not the gate's test.",
    "done_at": null,
    "tags": [
     "demo"
    ],
-   "changed_at": "2026-11-03T20:26:39.269Z"
+   "changed_at": "2026-11-05T00:01:29.528Z"
   },
   {
    "id": "d9-3",
@@ -2749,13 +2749,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Two takes minimum. Only steps that work every time.",
    "timebox": "2 h",
    "fallback": "Cut the failing step from the script.",
-   "status": "todo",
-   "note": "NEEDS DEEPAK: filming, docs/DEMO.md and docs/submission/VIDEO_SCRIPT.md; captions in docs/submission/captions.srt.",
-   "done_at": null,
+   "status": "done",
+   "note": "Filmed Nov 4; the 3 minute video: https://www.youtube.com/watch?v=t0WsLi3jYXY (oEmbed 200), linked in README, FORM and the site.",
+   "done_at": "2026-11-05T00:01:29.130Z",
    "tags": [
     "demo"
    ],
-   "changed_at": "2026-11-03T20:26:39.316Z"
+   "changed_at": "2026-11-05T00:01:29.130Z"
   },
   {
    "id": "d9-4",
@@ -2764,13 +2764,13 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Setup, models and why, numbers from RESULTS.md, honest tester status.",
    "timebox": "1.5 h",
    "fallback": "",
-   "status": "doing",
-   "note": "README rewritten (6033c4b), every number cited, phone numbers 'not measured' in tt: spans. Left: make results in Phase B (B2), then the video link (B3).",
-   "done_at": null,
+   "status": "done",
+   "note": "README carries every measured number with its file: plan and question evals, Mac voice latency, Gate B (eval/gate-b/RESULTS.md), spend $5.42 (ledger); phone latency stated as not measured (film cut).",
+   "done_at": "2026-11-05T00:01:29.179Z",
    "tags": [
     "docs"
    ],
-   "changed_at": "2026-11-03T22:16:43.726Z"
+   "changed_at": "2026-11-05T00:01:29.179Z"
   },
   {
    "id": "d9-5",
@@ -2779,14 +2779,14 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "detail": "Use the credit line in ATTRIBUTION.md: Heart diagram-en.svg by ZooFari, CC BY-SA 3.0, via Wikimedia Commons. State that the tactile sheet and its files are adaptations shared under CC BY-SA 3.0.",
    "timebox": "15 min",
    "fallback": "A credits slide at the end of the video and a Credits section in the README.",
-   "status": "todo",
-   "note": "README part done (README.md:72, the credit line from ATTRIBUTION.md). NEEDS DEEPAK: the credit line in the recorded video, VIDEO_SCRIPT.md shots 1 and 10.",
-   "done_at": null,
+   "status": "done",
+   "note": "Heart credit line in README (Credits), ATTRIBUTION.md, the site's heart page, and the YouTube description's Credits.",
+   "done_at": "2026-11-05T00:01:29.231Z",
    "tags": [
     "docs",
     "license"
    ],
-   "changed_at": "2026-11-03T20:26:39.409Z"
+   "changed_at": "2026-11-05T00:01:29.231Z"
   },
   {
    "id": "d9-6",
@@ -3209,7 +3209,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "test": "The heart figure: upload, print, trace, explore, labels spoken, on the real sheet.",
    "fallback": "Cut Plus features. Spend Day 6 on the loop only.",
    "status": "pending",
-   "evidence": ""
+   "evidence": "Not met: the test needs the heart printed and traced; tracing was cut (d4-5). On a plain print, touch and spoken names were filmed Nov 4 (d5-5).",
+   "changed_at": "2026-11-05T00:01:34.907Z"
   },
   {
    "id": "D",
@@ -3218,7 +3219,8 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
    "test": "Demo readiness checklist passes twice in a row, live, with no restart.",
    "fallback": "Cut the failing step from the script. Never record a flaky step.",
    "status": "pending",
-   "evidence": ""
+   "evidence": "Not met: no record of the demo-readiness checklist passing twice in a row live (d9-2 cut).",
+   "changed_at": "2026-11-05T00:01:34.967Z"
   }
  ],
  "metrics": [
@@ -4052,6 +4054,61 @@ At my Twin AI co-op, I build RAG pipelines and LLM evaluation tooling on Azure O
   }
  ],
  "log": [
+  {
+   "ts": "2026-11-05T00:01:34.967Z",
+   "kind": "claude",
+   "text": "Gate D is now pending. Evidence: Not met: no record of the demo-readiness checklist passing twice in a row live (d9-2 cut)."
+  },
+  {
+   "ts": "2026-11-05T00:01:34.907Z",
+   "kind": "claude",
+   "text": "Gate C is now pending. Evidence: Not met: the test needs the heart printed and traced; tracing was cut (d4-5). On a plain print, touch and spoken names were filmed Nov 4 (d5-5)."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.528Z",
+   "kind": "claude",
+   "text": "Task d9-2 \"Demo readiness checklist\" is now cut. Note: The demo-readiness checklist was not run twice in a row on record, so Gate D stays pending; filming worked by Deepak's account, which is not the gate's test."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.475Z",
+   "kind": "claude",
+   "text": "Task d8-35 \"At home: network and phone checklist\" is now cut. Note: Done on the phone: Gate B (eval/gate-b/run.md) and filming. Cut: the latency film; VoiceOver hold-to-talk not tested on the device."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.426Z",
+   "kind": "claude",
+   "text": "Task d7-2 \"Accessibility pass\" is now cut. Note: Not tested on the device: no real screen reader run. Machine checks pass (eval/a11y.md, explore_e2e.py)."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.379Z",
+   "kind": "claude",
+   "text": "Task d5-5 \"Gate C check\" is now done. Note: Filmed Nov 4 on a plain printed heart sheet, not traced: touch and spoken names worked. The held question was not filmed on video. Gate C stays pending: its test includes tracing the sheet, which was cut (d4-5)."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.332Z",
+   "kind": "claude",
+   "text": "Task d4-5 \"Print two copies and trace with puffy paint\" is now cut. Note: Not done before the deadline."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.283Z",
+   "kind": "claude",
+   "text": "Task d0-6 \"Buy materials\" is now cut. Note: Not done before the deadline."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.231Z",
+   "kind": "claude",
+   "text": "Task d9-5 \"Credit the CC BY-SA heart figure in the README and demo video\" is now done. Note: Heart credit line in README (Credits), ATTRIBUTION.md, the site's heart page, and the YouTube description's Credits."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.179Z",
+   "kind": "claude",
+   "text": "Task d9-4 \"README with measured numbers\" is now done. Note: README carries every measured number with its file: plan and question evals, Mac voice latency, Gate B (eval/gate-b/RESULTS.md), spend $5.42 (ledger); phone latency stated as not measured (film cut)."
+  },
+  {
+   "ts": "2026-11-05T00:01:29.130Z",
+   "kind": "claude",
+   "text": "Task d9-3 \"Record the demo video\" is now done. Note: Filmed Nov 4; the 3 minute video: https://www.youtube.com/watch?v=t0WsLi3jYXY (oEmbed 200), linked in README, FORM and the site."
+  },
   {
    "ts": "2026-11-04T23:45:08.362Z",
    "kind": "claude",

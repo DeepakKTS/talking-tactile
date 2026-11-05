@@ -9,7 +9,7 @@ does it do?", and hears an answer taken from this figure and its teacher's notes
 Talking Tactile turns a printed STEM figure into a raised sheet that talks. It is for teachers
 and transcribers who make tactile graphics, and for the blind students who learn from them.
 
-**Watch the demo (3 minutes):** `<VIDEO_URL>`
+**Watch the demo (3 minutes):** https://www.youtube.com/watch?v=t0WsLi3jYXY
 
 **Project site:** https://deepakkts.github.io/talking-tactile/ (how it works, the two sheets
 with their print PDFs, and a pointer demo that speaks part names in the browser).
