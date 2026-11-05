@@ -2,14 +2,14 @@ Generated from TRACKER.html by scripts/tracker.py todo. Do not edit by hand.
 
 # TODO.md
 
-Tracker rev 471, updated 2026-11-05T00:01:34.967Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
+Tracker rev 473, updated 2026-11-05T00:28:10.930Z. Change tasks with scripts/tracker.py, then run scripts/tracker.py todo.
 If a task runs 50 percent over its time box, take its fallback. If it has none, propose one first.
 
 ## Day 0: Oct 23 to 25
 
-- [ ] d0-1 Submit the hackathon application (1 h)
+- [x] d0-1 Submit the hackathon application (1 h)
   - Use the crisp answers in Handbook, Application answers. One application only.
-  - Note: NEEDS DEEPAK: confirm the application was submitted. Nothing in the repo shows it; the credits and the accepted Official Rules (d1-1, d1-3) suggest it was.
+  - Note: Submitted; confirmed by Deepak on Nov 4.
 - [ ] ~~d0-2 Make the Weavory repo public and its README current~~ (30 min) [cut]
   - Reviewers will click github.com/DeepakKTS/weavory.ai. Check the 232 tests and npm link are visible.
   - Note: CUT: another project (Weavory), outside this repo. Not tracked here.
@@ -472,9 +472,9 @@ If a task runs 50 percent over its time box, take its fallback. If it has none, 
 - [x] d10-1 Fresh clone test (45 min)
   - Clone, make dev, run the demo script once.
   - Note: DONE at 81f1147 (Nov 3): gh repo clone, make install (14 s, warm caches), mock API and Vite on own ports, the README quickstart in headless Chrome: Ready for review in 22.9 s, publish, print PDF 200 (93,205 bytes), Explore version 1, Enter and H; a typed question says 'Questions are not working right now', as README now states. WebKit 26.6 with the real headers: device check, Explore Start, Gate B page: no CSP violation or page error, MediaPipe GPU ready (115, 90, 624 ms). One 404 in Chrome's console, likely /favicon.ico (the app has none), not confirmed.
-- [ ] d10-2 Submit by 3 PM ET (30 min)
+- [x] d10-2 Submit by 3 PM ET (30 min)
   - The official deadline is 9 PM ET. Do not use it.
-  - Note: NEEDS DEEPAK: the submission form, text in docs/submission/FORM.md; target 3 PM ET Nov 4.
+  - Note: Submitted Nov 4 before the 9 PM ET deadline, after the 3 PM ET target: team 3765, Indie track, Push the Frontier, repo and video https://www.youtube.com/watch?v=t0WsLi3jYXY. Submitted state tagged hackathon-submission (6d81bf7).
 
 ## Open issues
 
